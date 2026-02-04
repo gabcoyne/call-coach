@@ -1,0 +1,137 @@
+{
+  "name": "Engagement Rubric",
+  "version": "1.0.0",
+  "category": "engagement",
+  "description": "Evaluates rapport building, energy, talk ratios, and overall call engagement",
+  "scoring_guide": {
+    "90-100": "Exceptional engagement - strong rapport, high energy, excellent talk ratio, customer highly engaged",
+    "80-89": "Strong engagement - good rapport and energy, balanced conversation",
+    "70-79": "Adequate engagement - maintains professional interaction, minor imbalances",
+    "60-69": "Weak engagement - low energy, poor talk ratio, or limited rapport",
+    "0-59": "Poor engagement - disengaged customer, one-sided conversation, or negative dynamic"
+  },
+  "criteria": {
+    "rapport_building": {
+      "weight": 25,
+      "description": "Establishes connection and trust with customer",
+      "indicators": {
+        "excellent": [
+          "Finds common ground or shared interests",
+          "Uses customer's name naturally in conversation",
+          "References previous interactions or research",
+          "Demonstrates genuine curiosity about customer's business",
+          "Appropriate humor or personality",
+          "Thanks customer for their time and insights"
+        ],
+        "poor": [
+          "Immediately dives into pitch without connection",
+          "Doesn't personalize interaction",
+          "Overly formal or robotic tone",
+          "No acknowledgment of customer's time or input",
+          "Inappropriate familiarity or humor"
+        ]
+      }
+    },
+    "talk_listen_ratio": {
+      "weight": 30,
+      "description": "Balance of rep talking vs. customer talking",
+      "targets": {
+        "discovery_calls": "Rep should talk 30-40%, customer 60-70%",
+        "demo_calls": "Rep should talk 50-60%, customer 40-50%",
+        "technical_deep_dive": "Rep should talk 40-50%, customer 50-60%"
+      },
+      "indicators": {
+        "excellent": [
+          "Appropriate ratio for call type",
+          "Customer speaks in substantial blocks (not just yes/no)",
+          "Rep pauses to let customer think and respond",
+          "Back-and-forth dialogue, not monologue"
+        ],
+        "poor": [
+          "Rep dominates conversation (>70% talk time)",
+          "Customer only responds with brief answers",
+          "Rep doesn't pause for customer input",
+          "Feels like presentation vs. conversation"
+        ]
+      }
+    },
+    "energy_and_enthusiasm": {
+      "weight": 20,
+      "description": "Rep's energy level and enthusiasm",
+      "indicators": {
+        "excellent": [
+          "Upbeat and positive tone",
+          "Demonstrates genuine excitement about product/solution",
+          "Matches or slightly elevates customer's energy",
+          "Maintains energy throughout call"
+        ],
+        "poor": [
+          "Monotone or low energy delivery",
+          "Sounds bored or disinterested",
+          "Reads from script without enthusiasm",
+          "Energy drops significantly during call"
+        ]
+      }
+    },
+    "customer_engagement_signals": {
+      "weight": 25,
+      "description": "Customer's level of engagement and participation",
+      "positive_signals": [
+        "Customer asks clarifying questions",
+        "Customer volunteers information without prompting",
+        "Customer references specific use cases or challenges",
+        "Customer suggests next steps or brings up timeline",
+        "Customer introduces additional stakeholders"
+      ],
+      "negative_signals": [
+        "Short, one-word answers to questions",
+        "Long silences or distracted behavior",
+        "Customer multitasking (emails, side conversations)",
+        "Deflects or gives vague responses",
+        "Asks to reschedule or cut call short"
+      ]
+    }
+  },
+  "call_structure": {
+    "strong_opening": [
+      "Confirms agenda and time allocation",
+      "States objectives for the call",
+      "Asks if customer has specific goals or questions",
+      "Transitions smoothly after pleasantries"
+    ],
+    "strong_closing": [
+      "Summarizes key points and next steps",
+      "Confirms mutual understanding and agreement",
+      "Sets specific follow-up with date/time",
+      "Thanks customer and reiterates value"
+    ]
+  },
+  "anti_patterns": {
+    "monologuing": {
+      "description": "Rep talks for >2 minutes without customer input",
+      "fix": "Ask engagement questions every 60-90 seconds during explanations"
+    },
+    "interrupting": {
+      "description": "Rep cuts off customer mid-sentence",
+      "fix": "Pause 2 seconds after customer finishes to ensure they're done"
+    },
+    "filler_words": {
+      "description": "Excessive 'um', 'uh', 'like', 'you know'",
+      "fix": "Practice pausing instead of filling silence. Brief silence shows confidence."
+    },
+    "reading_script": {
+      "description": "Sounds like reading vs. conversing",
+      "fix": "Internalize key points, use notes as prompts not scripts"
+    }
+  },
+  "examples": {
+    "strong_engagement": {
+      "quote": "That's fascinating - so your data team is spending 40% of their time on Airflow maintenance. Before we dive into how Prefect solves that, I'm curious: what would those engineers work on if they had that time back? What strategic projects are currently on hold?",
+      "analysis": "Shows active listening (references '40%'), validates customer input ('fascinating'), asks permission to transition ('before we dive'), and probes for deeper impact with open-ended question. Creates dialogue, not monologue."
+    },
+    "weak_engagement": {
+      "quote": "Okay, so let me show you all the features of Prefect. First, we have the dashboard which has these capabilities...",
+      "analysis": "No rapport building, immediately launches into feature dump. Customer becomes passive observer. No check for customer interests or priorities."
+    }
+  }
+}

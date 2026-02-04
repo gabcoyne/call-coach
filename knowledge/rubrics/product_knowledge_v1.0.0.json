@@ -1,0 +1,125 @@
+{
+  "name": "Product Knowledge Rubric",
+  "version": "1.0.0",
+  "category": "product_knowledge",
+  "description": "Evaluates technical accuracy, competitive positioning, and ability to connect features to business value",
+  "scoring_guide": {
+    "90-100": "Expert-level product knowledge - technically accurate, strong competitive positioning, clear value articulation",
+    "80-89": "Strong product knowledge - mostly accurate with minor gaps, good value connection",
+    "70-79": "Adequate product knowledge - generally correct but misses opportunities or lacks depth",
+    "60-69": "Weak product knowledge - some inaccuracies or unclear explanations",
+    "0-59": "Poor product knowledge - significant inaccuracies or inability to explain capabilities"
+  },
+  "criteria": {
+    "technical_accuracy": {
+      "weight": 35,
+      "description": "Correctness of technical statements about product capabilities",
+      "indicators": {
+        "excellent": [
+          "Accurately describes product architecture and capabilities",
+          "Correctly explains technical differentiators",
+          "Provides accurate examples of use cases",
+          "Cites correct limitations and workarounds"
+        ],
+        "poor": [
+          "Misrepresents product capabilities",
+          "Provides incorrect technical details",
+          "Overpromises features not yet available",
+          "Confuses product terminology or concepts"
+        ]
+      }
+    },
+    "feature_to_value_connection": {
+      "weight": 30,
+      "description": "Ability to connect features to business outcomes",
+      "indicators": {
+        "excellent": [
+          "Explains features in terms of customer problems they solve",
+          "Quantifies business impact where possible",
+          "Uses customer-specific examples and language",
+          "Connects technical capabilities to ROI"
+        ],
+        "poor": [
+          "Lists features without explaining value",
+          "Uses technical jargon without translation",
+          "Focuses on 'how it works' vs. 'what you achieve'",
+          "Generic value props not tailored to customer"
+        ]
+      }
+    },
+    "competitive_positioning": {
+      "weight": 25,
+      "description": "Accuracy and effectiveness of competitive differentiation",
+      "indicators": {
+        "excellent": [
+          "Accurately positions vs. Airflow, Temporal, Dagster",
+          "Highlights genuine differentiators relevant to customer",
+          "Acknowledges competitor strengths where appropriate",
+          "Reframes competitive concerns as our advantages"
+        ],
+        "poor": [
+          "Misrepresents competitor capabilities",
+          "Dismisses competitors without substance",
+          "Compares on irrelevant dimensions",
+          "Defensive or negative competitive stance"
+        ]
+      }
+    },
+    "use_case_relevance": {
+      "weight": 10,
+      "description": "Provides relevant examples and use cases",
+      "indicators": {
+        "excellent": [
+          "References similar customer use cases",
+          "Tailors examples to customer's industry/tech stack",
+          "Provides concrete implementation examples"
+        ],
+        "poor": [
+          "Generic examples not relevant to customer",
+          "Unclear or confusing use case explanations",
+          "No examples provided when needed"
+        ]
+      }
+    }
+  },
+  "product_specifics": {
+    "prefect": {
+      "key_differentiators": [
+        "Python-native (no DSLs or YAML)",
+        "Hybrid execution model (run anywhere)",
+        "Dynamic workflows (not static DAGs)",
+        "Built-in observability without extra setup",
+        "Subflows and task caching"
+      ],
+      "common_competitive_comparisons": {
+        "vs_airflow": "No scheduler headaches, local testing with pytest, dynamic workflows, modern Python",
+        "vs_temporal": "Higher-level for data workflows, easier learning curve, better observability out-of-box",
+        "vs_dagster": "Lighter weight, don't need asset definitions everywhere, simpler mental model"
+      }
+    },
+    "horizon": {
+      "key_differentiators": [
+        "Managed Prefect with zero ops burden",
+        "Enterprise-grade SLAs and support",
+        "Advanced access controls and audit logs",
+        "Scalable work pools and queues",
+        "First-class CI/CD integrations"
+      ],
+      "pricing_positioning": [
+        "Usage-based pricing (per execution hour)",
+        "No infrastructure costs to manage",
+        "Includes cost of engineering time saved on ops"
+      ]
+    }
+  },
+  "examples": {
+    "strong_product_knowledge": {
+      "quote": "Unlike Airflow where you define static DAGs, Prefect workflows are dynamic Python functions. This means you can use if/else logic, loops, and even generate tasks at runtime based on data. For your use case of processing varying numbers of files, you wouldn't need to create a task per file upfront - Prefect handles that dynamically.",
+      "analysis": "Technically accurate comparison, explains feature (dynamic workflows) in context of customer's specific need (varying file counts), contrasts with competitor limitation."
+    },
+    "weak_product_knowledge": {
+      "quote": "Prefect is better than Airflow because it's newer and has a nicer UI.",
+      "analysis": "Vague, subjective differentiation without technical substance. Doesn't connect to business value or customer needs."
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "name": "Discovery Quality Rubric",
+  "version": "1.0.0",
+  "category": "discovery",
+  "description": "Evaluates quality of discovery questions, active listening, and MEDDIC/BANT coverage",
+  "scoring_guide": {
+    "90-100": "Exceptional discovery - thorough MEDDIC coverage, insightful follow-up questions, active listening demonstrated",
+    "80-89": "Strong discovery - good coverage of most MEDDIC elements, some missed opportunities for deeper probing",
+    "70-79": "Adequate discovery - basic qualification achieved, but lacks depth or misses key elements",
+    "60-69": "Weak discovery - superficial questions, poor listening, minimal qualification",
+    "0-59": "Poor discovery - primarily presenting without understanding customer needs"
+  },
+  "criteria": {
+    "question_quality": {
+      "weight": 30,
+      "description": "Quality and depth of questions asked",
+      "indicators": {
+        "excellent": [
+          "Open-ended questions that uncover business impact",
+          "Follow-up questions that dig deeper into responses",
+          "Questions reveal priorities and decision criteria",
+          "Probing questions to understand pain points thoroughly"
+        ],
+        "poor": [
+          "Primarily yes/no questions",
+          "Surface-level questions without follow-up",
+          "Questions focused on product features vs. business needs",
+          "Asking questions already answered in prep materials"
+        ]
+      }
+    },
+    "active_listening": {
+      "weight": 25,
+      "description": "Demonstrates listening and building on customer responses",
+      "indicators": {
+        "excellent": [
+          "References specific customer statements in responses",
+          "Asks clarifying questions before answering",
+          "Paraphrases customer concerns to confirm understanding",
+          "Connects current topic to earlier customer statements"
+        ],
+        "poor": [
+          "Interrupts customer frequently",
+          "Provides generic responses not tailored to customer input",
+          "Repeats information customer already shared",
+          "Doesn't acknowledge or build on customer concerns"
+        ]
+      }
+    },
+    "meddic_coverage": {
+      "weight": 25,
+      "description": "Covers MEDDIC qualification framework elements",
+      "elements": {
+        "metrics": "Quantifies business impact (time saved, cost reduction, efficiency gains)",
+        "economic_buyer": "Identifies budget holder and decision-making authority",
+        "decision_criteria": "Uncovers technical and business requirements for solution selection",
+        "decision_process": "Understands timeline, stakeholders, and approval steps",
+        "identify_pain": "Explores current challenges and consequences of inaction",
+        "champion": "Identifies internal advocate who will sell on your behalf"
+      },
+      "scoring": {
+        "5-6_elements": "Excellent",
+        "3-4_elements": "Good",
+        "1-2_elements": "Needs improvement",
+        "0_elements": "Poor"
+      }
+    },
+    "talk_listen_ratio": {
+      "weight": 20,
+      "description": "Balance of talking vs. listening during discovery",
+      "targets": {
+        "ideal": "Customer talks 60-70% of the time",
+        "acceptable": "Customer talks 50-60%",
+        "concerning": "Customer talks <50%"
+      }
+    }
+  },
+  "examples": {
+    "strong_discovery": {
+      "quote": "You mentioned your data engineers spend 40% of their time debugging Airflow DAGs. Can you walk me through a recent example? What was the root cause, and how long did resolution take?",
+      "analysis": "Open-ended question that quantifies pain, asks for specific example, and probes for impact. Demonstrates active listening by referencing customer's earlier statement."
+    },
+    "weak_discovery": {
+      "quote": "So you're looking for a workflow orchestration tool?",
+      "analysis": "Closed question that doesn't uncover needs. Assumes intent without exploring current challenges or desired outcomes."
+    }
+  }
+}

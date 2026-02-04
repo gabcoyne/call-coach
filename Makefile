@@ -52,3 +52,15 @@ dev: docker-up ## Start local development environment
 env-example: ## Copy .env.example to .env
 	cp .env.example .env
 	@echo "Created .env file. Please update with your credentials."
+
+kb-load: ## Load complete knowledge base (rubrics + docs)
+	python -m knowledge.loader all
+
+kb-load-rubrics: ## Load coaching rubrics only
+	python -m knowledge.loader rubrics
+
+kb-load-docs: ## Load product documentation only
+	python -m knowledge.loader docs
+
+kb-verify: ## Verify knowledge base is loaded correctly
+	python -m knowledge.loader verify

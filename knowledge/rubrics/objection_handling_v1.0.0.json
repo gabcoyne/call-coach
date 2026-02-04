@@ -1,0 +1,157 @@
+{
+  "name": "Objection Handling Rubric",
+  "version": "1.0.0",
+  "category": "objection_handling",
+  "description": "Evaluates identification, response quality, and resolution of customer objections",
+  "scoring_guide": {
+    "90-100": "Expert objection handling - identifies root concerns, addresses with evidence, achieves resolution",
+    "80-89": "Strong objection handling - acknowledges objections well, mostly effective responses",
+    "70-79": "Adequate objection handling - addresses objections but may lack depth or miss underlying concerns",
+    "60-69": "Weak objection handling - defensive responses or fails to fully address concerns",
+    "0-59": "Poor objection handling - dismissive, argumentative, or avoids objections"
+  },
+  "criteria": {
+    "objection_identification": {
+      "weight": 20,
+      "description": "Recognizes and surfaces objections proactively",
+      "indicators": {
+        "excellent": [
+          "Identifies implicit objections (hesitation, vague concerns)",
+          "Proactively addresses likely objections before raised",
+          "Asks clarifying questions to understand root concern",
+          "Distinguishes between real blockers and smokescreens"
+        ],
+        "poor": [
+          "Misses or ignores stated objections",
+          "Doesn't probe unclear concerns",
+          "Treats symptoms without addressing root cause",
+          "Moves forward despite unresolved hesitation"
+        ]
+      }
+    },
+    "acknowledgment_and_empathy": {
+      "weight": 25,
+      "description": "Validates concerns before responding",
+      "indicators": {
+        "excellent": [
+          "Acknowledges objection as valid concern",
+          "Shows empathy ('I understand why that's important')",
+          "Paraphrases to confirm understanding",
+          "Doesn't dismiss or minimize concern"
+        ],
+        "poor": [
+          "Immediately counters without acknowledgment",
+          "Defensive or dismissive tone",
+          "Invalidates customer's concern",
+          "Interrupts customer mid-objection"
+        ]
+      }
+    },
+    "response_quality": {
+      "weight": 35,
+      "description": "Effectiveness of objection response",
+      "indicators": {
+        "excellent": [
+          "Provides specific evidence (data, case studies, demos)",
+          "Addresses root concern, not just surface objection",
+          "Offers multiple resolution paths where appropriate",
+          "Connects response to customer's specific situation",
+          "Uses social proof from similar customers"
+        ],
+        "poor": [
+          "Generic responses not tailored to concern",
+          "Vague promises without evidence",
+          "Avoids difficult objections",
+          "Overpromises features to overcome objection",
+          "Focuses on defending product vs. solving concern"
+        ]
+      }
+    },
+    "resolution_confirmation": {
+      "weight": 20,
+      "description": "Confirms objection is resolved before moving forward",
+      "indicators": {
+        "excellent": [
+          "Checks for understanding ('Does that address your concern?')",
+          "Asks if additional concerns exist",
+          "Ensures alignment before proceeding",
+          "Documents resolution for follow-up if needed"
+        ],
+        "poor": [
+          "Assumes objection is resolved without confirmation",
+          "Moves to next topic without checking",
+          "Doesn't verify customer satisfaction with response",
+          "Leaves objections partially addressed"
+        ]
+      }
+    }
+  },
+  "common_objections": {
+    "pricing": {
+      "examples": [
+        "Too expensive compared to self-hosted Airflow",
+        "Need to justify ROI to leadership",
+        "Budget concerns or approval process"
+      ],
+      "strong_responses": [
+        "Quantify TCO including engineering time and infrastructure costs",
+        "Provide ROI calculator with customer-specific inputs",
+        "Share case study with similar cost profile showing payback period",
+        "Offer POC to prove value before full commitment"
+      ]
+    },
+    "timing": {
+      "examples": [
+        "Not ready to switch from current solution",
+        "Want to wait for Q2/next budget cycle",
+        "Bandwidth concerns for migration"
+      ],
+      "strong_responses": [
+        "Understand root reason for timing concern",
+        "Quantify cost of waiting (inefficiencies, lost productivity)",
+        "Propose phased approach or pilot to reduce risk",
+        "Offer migration support to address bandwidth concern"
+      ]
+    },
+    "technical_fit": {
+      "examples": [
+        "Doesn't support specific technology requirement",
+        "Concerns about scalability or performance",
+        "Integration challenges with existing stack"
+      ],
+      "strong_responses": [
+        "Demonstrate capability with concrete example or demo",
+        "Share similar customer implementation",
+        "Involve SE/engineer to address technical deep-dive",
+        "Provide documentation or proof points",
+        "If genuine gap, acknowledge and propose workaround or timeline"
+      ]
+    },
+    "competitive": {
+      "examples": [
+        "Evaluating Temporal/Dagster/Airflow",
+        "Already using competitor",
+        "Feature parity questions"
+      ],
+      "strong_responses": [
+        "Focus on differentiated value, not feature checklist",
+        "Acknowledge competitor strengths where fair",
+        "Reframe comparison on dimensions where you win",
+        "Use customer proof points from competitive wins",
+        "Offer side-by-side evaluation or bake-off"
+      ]
+    }
+  },
+  "examples": {
+    "strong_objection_handling": {
+      "objection": "We're concerned about the cost. We currently self-host Airflow for free.",
+      "response": "I understand - infrastructure costs are important to consider. Let me ask: how much engineering time does your team spend maintaining Airflow monthly? Most teams tell us 20-40 hours between debugging scheduler issues, managing infrastructure, and handling upgrades. At $150/hr loaded cost, that's $3-6K/month. Our pricing for your scale would be around $2K/month with zero ops burden. Would it be helpful to map out your current TCO together?",
+      "analysis": "Acknowledges concern, probes for hidden costs, quantifies with data, provides comparison, offers collaborative next step. Reframes 'free' as actually expensive."
+    },
+    "weak_objection_handling": {
+      "objection": "This seems expensive.",
+      "response": "Actually, we're very competitively priced. Most customers find great value.",
+      "analysis": "Defensive, vague, doesn't acknowledge concern or provide evidence. No specifics or customer-tailored response."
+    }
+  }
+}
