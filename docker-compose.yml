@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for local development (use Neon in production)
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: callcoach
+      POSTGRES_USER: callcoach
+      POSTGRES_PASSWORD: callcoach_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U callcoach"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Webhook server (FastAPI)
+  webhook-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.webhook
+    environment:
+      DATABASE_URL: postgresql://callcoach:callcoach_dev_password@postgres:5432/callcoach?sslmode=disable
+      GONG_API_KEY: ${GONG_API_KEY}
+      GONG_WEBHOOK_SECRET: ${GONG_WEBHOOK_SECRET}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      WEBHOOK_HOST: 0.0.0.0
+      WEBHOOK_PORT: 8000
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: python webhook_server.py
+
+  # MCP Server (for development testing)
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    environment:
+      DATABASE_URL: postgresql://callcoach:callcoach_dev_password@postgres:5432/callcoach?sslmode=disable
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      MCP_SERVER_HOST: 0.0.0.0
+      MCP_SERVER_PORT: 3000
+      LOG_LEVEL: INFO
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: python -m mcp.server
+
+volumes:
+  postgres_data:

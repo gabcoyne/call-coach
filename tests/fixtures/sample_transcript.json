@@ -1,0 +1,84 @@
+{
+  "call_id": "sample-call-123",
+  "title": "Horizon Technical Deep Dive - TechCorp",
+  "duration_seconds": 2700,
+  "segments": [
+    {
+      "speaker_id": "se_1",
+      "speaker_name": "Alex Chen",
+      "start_time": 0,
+      "text": "Hi everyone, thanks for joining today's deep dive on Horizon. I'm Alex, a Solutions Engineer at Prefect.",
+      "sentiment": "positive"
+    },
+    {
+      "speaker_id": "prospect_1",
+      "speaker_name": "Maya Patel",
+      "start_time": 8,
+      "text": "Thanks for having us. We're really excited to see what Horizon can do for our data platform.",
+      "sentiment": "positive"
+    },
+    {
+      "speaker_id": "se_1",
+      "speaker_name": "Alex Chen",
+      "start_time": 15,
+      "text": "Perfect. Before we dive in, can you tell me a bit about your current orchestration challenges? What problems are you trying to solve?",
+      "sentiment": "neutral"
+    },
+    {
+      "speaker_id": "prospect_1",
+      "speaker_name": "Maya Patel",
+      "start_time": 25,
+      "text": "Sure. We're running Airflow right now, but we're hitting a lot of pain points. Our DAGs are hard to test locally, and we spend way too much time debugging scheduler issues.",
+      "sentiment": "negative"
+    },
+    {
+      "speaker_id": "se_1",
+      "speaker_name": "Alex Chen",
+      "start_time": 42,
+      "text": "That's a common pain point we hear. Horizon addresses this in a few key ways. First, everything is just Python - no DSLs or YAML configs. That means you can test locally with pytest before deploying anything.",
+      "sentiment": "neutral"
+    },
+    {
+      "speaker_id": "prospect_1",
+      "speaker_name": "Maya Patel",
+      "start_time": 60,
+      "text": "That would be huge for us. How does Horizon compare to something like Temporal or Dagster?",
+      "sentiment": "neutral"
+    },
+    {
+      "speaker_id": "se_1",
+      "speaker_name": "Alex Chen",
+      "start_time": 68,
+      "text": "Great question. Compared to Temporal, Horizon is higher-level and more focused on data workflows. We give you observability out of the box without extra setup. Versus Dagster, we're more lightweight - you don't need to define assets everywhere, just write normal Python functions.",
+      "sentiment": "neutral"
+    },
+    {
+      "speaker_id": "prospect_1",
+      "speaker_name": "Maya Patel",
+      "start_time": 92,
+      "text": "Interesting. What about pricing? We're currently self-hosting Airflow, so cloud costs are a concern.",
+      "sentiment": "neutral"
+    },
+    {
+      "speaker_id": "se_1",
+      "speaker_name": "Alex Chen",
+      "start_time": 100,
+      "text": "Totally understand. Horizon's pricing is based on usage - you pay per execution hour. For most teams migrating from self-hosted Airflow, we're actually cheaper when you factor in infrastructure maintenance and engineering time.",
+      "sentiment": "positive"
+    },
+    {
+      "speaker_id": "prospect_1",
+      "speaker_name": "Maya Patel",
+      "start_time": 118,
+      "text": "That makes sense. Can you show me how work pools work? I want to understand how we'd run jobs on our existing Kubernetes cluster.",
+      "sentiment": "neutral"
+    },
+    {
+      "speaker_id": "se_1",
+      "speaker_name": "Alex Chen",
+      "start_time": 128,
+      "text": "Absolutely. Let me share my screen and walk you through that...",
+      "sentiment": "positive"
+    }
+  ]
+}
