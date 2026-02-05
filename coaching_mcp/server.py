@@ -5,7 +5,13 @@ Provides on-demand coaching tools accessible via Claude Desktop.
 import logging
 import os
 import sys
+from pathlib import Path
 from typing import Any
+
+# Add project root to Python path for proper imports
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 from fastmcp import FastMCP
 
