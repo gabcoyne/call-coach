@@ -4,7 +4,7 @@ version = "0.1.0"
 
 [server]
 command = "uv"
-args = ["run", "python", "-m", "coaching_mcp.server"]
+args = ["run", "fastmcp", "run", "coaching_mcp/server.py:mcp"]
 
 [server.env]
 GONG_API_KEY = "${GONG_API_KEY}"
