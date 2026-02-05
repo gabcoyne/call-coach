@@ -9,7 +9,7 @@ from typing import Any
 
 from db import fetch_one, execute_query
 from db.models import CoachingDimension, CoachingSession
-from shared import settings
+from coaching_mcp.shared import settings
 
 logger = logging.getLogger(__name__)
 

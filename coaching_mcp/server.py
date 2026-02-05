@@ -8,14 +8,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
-# Add project root to Python path for proper imports
-project_root = Path(__file__).parent.parent
-if str(project_root) not in sys.path:
-    sys.path.insert(0, str(project_root))
-
 from fastmcp import FastMCP
 
-from shared import settings
+from coaching_mcp.shared import settings
 from coaching_mcp.tools.analyze_call import analyze_call_tool
 from coaching_mcp.tools.get_rep_insights import get_rep_insights_tool
 from coaching_mcp.tools.search_calls import search_calls_tool
@@ -54,12 +49,12 @@ def _validate_environment() -> None:
 
 def _validate_database_connection() -> None:
     """
-    Test database connectivity with a simple query.
+    Test database connectivity and verify schema.
 
     Raises:
-        SystemExit: If database connection fails
+        SystemExit: If database connection fails or required tables are missing
     """
-    from db import fetch_one
+    from db import fetch_one, fetch_all
 
     try:
         # Verify sslmode is present for Neon
@@ -76,8 +71,30 @@ def _validate_database_connection() -> None:
             logger.error("✗ Database query returned unexpected result")
             sys.exit(1)
 
+        # Verify required tables exist
+        required_tables = ["calls", "speakers", "transcripts", "coaching_sessions"]
+        existing_tables = fetch_all(
+            """
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+            """
+        )
+        existing_table_names = {row["table_name"] for row in existing_tables}
+
+        missing_tables = [t for t in required_tables if t not in existing_table_names]
+        if missing_tables:
+            logger.error(f"✗ Missing required database tables: {', '.join(missing_tables)}")
+            logger.error("Run database migrations to create required schema")
+            sys.exit(1)
+
+        logger.info(f"✓ Database schema validated ({len(required_tables)} tables)")
+
+    except SystemExit:
+        # Re-raise SystemExit to preserve validation failure behavior
+        raise
     except Exception as e:
-        logger.error(f"✗ Database connection failed: {e}")
+        logger.error(f"✗ Database validation failed: {e}")
         logger.error("Verify DATABASE_URL and Neon database is accessible")
         sys.exit(1)
 
@@ -86,39 +103,89 @@ def _validate_gong_api() -> None:
     """
     Test Gong API authentication with minimal request.
 
+    Non-fatal for timeouts (logs warning), fatal for auth failures.
+
     Raises:
-        SystemExit: If Gong API authentication fails
+        SystemExit: If Gong API authentication definitively fails (401/403)
     """
     from datetime import datetime, timedelta
     from gong.client import GongClient, GongAPIError
+    import httpx
 
     try:
-        with GongClient() as client:
-            # Test with minimal date range (last 7 days)
-            to_date = datetime.now()
-            from_date = to_date - timedelta(days=7)
+        # Create client with short timeout for validation
+        client_kwargs = {
+            "api_key": settings.gong_api_key,
+            "api_secret": settings.gong_api_secret,
+            "base_url": settings.gong_api_base_url,
+        }
 
-            # Attempt to list calls (will fail auth if credentials invalid)
-            calls, _ = client.list_calls(
-                from_date=from_date.isoformat() + "Z",
-                to_date=to_date.isoformat() + "Z",
+        # Temporarily patch the client to use 1-second timeout for validation
+        original_init = GongClient.__init__
+
+        def patched_init(self, **kwargs):
+            original_init(self, **kwargs)
+            # Replace the client with a shorter timeout
+            self.client.close()
+            self.client = httpx.Client(
+                base_url=self.base_url,
+                auth=(self.api_key, self.api_secret),
+                timeout=1.0,  # 1 second timeout for validation
+                headers={
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                },
             )
 
-            logger.info("✓ Gong API authentication successful")
+        GongClient.__init__ = patched_init
+
+        try:
+            with GongClient(**client_kwargs) as client:
+                # Test with minimal date range (last 1 day instead of 7)
+                to_date = datetime.now()
+                from_date = to_date - timedelta(days=1)
+
+                # Attempt to list calls (will fail auth if credentials invalid)
+                calls, _ = client.list_calls(
+                    from_date=from_date.isoformat() + "Z",
+                    to_date=to_date.isoformat() + "Z",
+                )
+
+                logger.info("✓ Gong API authentication successful")
+        finally:
+            # Restore original __init__
+            GongClient.__init__ = original_init
+
+    except httpx.TimeoutException:
+        # Non-fatal: log warning but allow server to start
+        logger.warning("⚠️  Gong API validation timed out (server will still start)")
+        logger.warning("This may indicate slow network or Gong API issues")
+        return
 
     except GongAPIError as e:
-        if "401" in str(e) or "authentication" in str(e).lower():
+        # Check for definitive auth failures (401, 403)
+        error_str = str(e)
+        if "401" in error_str or "403" in error_str or "authentication" in error_str.lower() or "unauthorized" in error_str.lower():
             logger.error("✗ Gong API authentication failed")
             logger.error("Verify GONG_API_KEY and GONG_API_SECRET are correct")
+            sys.exit(1)
         else:
-            logger.error(f"✗ Gong API error: {e}")
-            logger.error("Verify GONG_API_BASE_URL is correct tenant URL")
-        sys.exit(1)
+            # Other errors - log warning but don't fail startup
+            logger.warning(f"⚠️  Gong API validation error (non-fatal): {e}")
+            logger.warning("Server will start, but Gong API may not be accessible")
+            return
 
     except Exception as e:
-        logger.error(f"✗ Gong API unreachable: {e}")
-        logger.error("Verify GONG_API_BASE_URL and network connectivity")
-        sys.exit(1)
+        # Check if it's a timeout-related error
+        if "timeout" in str(e).lower() or "timed out" in str(e).lower():
+            logger.warning("⚠️  Gong API validation timed out (server will still start)")
+            logger.warning("This may indicate slow network or Gong API issues")
+            return
+
+        # Other unexpected errors - log warning but don't fail startup
+        logger.warning(f"⚠️  Gong API validation failed (non-fatal): {e}")
+        logger.warning("Server will start, but Gong API may not be accessible")
+        return
 
 
 def _validate_anthropic_api() -> None:
@@ -130,10 +197,17 @@ def _validate_anthropic_api() -> None:
     """
     api_key = settings.anthropic_api_key
 
-    # Check format (should start with sk-ant-)
-    if not api_key.startswith("sk-ant-"):
-        logger.error("✗ ANTHROPIC_API_KEY has invalid format")
-        logger.error("Expected format: sk-ant-...")
+    # Check key is long enough and not a placeholder
+    if len(api_key) < 20:
+        logger.error("✗ ANTHROPIC_API_KEY is too short (minimum 20 characters)")
+        logger.error("Verify you have a valid API key from Anthropic Console")
+        sys.exit(1)
+
+    # Check for obvious placeholders
+    placeholder_patterns = ["your_key", "replace", "placeholder", "xxx", "example"]
+    if any(pattern in api_key.lower() for pattern in placeholder_patterns):
+        logger.error("✗ ANTHROPIC_API_KEY appears to be a placeholder")
+        logger.error("Replace with actual API key from Anthropic Console")
         sys.exit(1)
 
     logger.info("✓ Anthropic API key validated")

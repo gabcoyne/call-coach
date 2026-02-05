@@ -12,7 +12,7 @@ from prefect.task_runners import ConcurrentTaskRunner
 
 from analysis.chunking import chunk_transcript, count_tokens
 from analysis.cache import generate_transcript_hash
-from shared import settings
+from coaching_mcp.shared import settings
 from db import execute_query, fetch_one
 from db.models import (
     Call,

@@ -49,26 +49,26 @@
 
 ## 5. Data Fetching with SWR
 
-- [ ] 5.1 Install swr package
-- [ ] 5.2 Create custom SWR hooks (useCallAnalysis, useRepInsights, useSearchCalls)
-- [ ] 5.3 Configure SWR global config with revalidation and error retry settings
-- [ ] 5.4 Implement optimistic UI updates for mutations
-- [ ] 5.5 Add loading and error state handling utilities
+- [x] 5.1 Install swr package
+- [x] 5.2 Create custom SWR hooks (useCallAnalysis, useRepInsights, useSearchCalls)
+- [x] 5.3 Configure SWR global config with revalidation and error retry settings
+- [x] 5.4 Implement optimistic UI updates for mutations
+- [x] 5.5 Add loading and error state handling utilities
 
 ## 6. Call Analysis Viewer
 
-- [ ] 6.1 Create app/calls/[callId]/page.tsx route
-- [ ] 6.2 Implement call metadata header component (title, date, participants)
-- [ ] 6.3 Create overall score badge with color coding (green/yellow/red)
-- [ ] 6.4 Build dimension score cards component (4 dimensions)
-- [ ] 6.5 Implement strengths and areas for improvement sections
-- [ ] 6.6 Create transcript snippet component with highlights (good/needs work)
-- [ ] 6.7 Add timestamp click handler to link to Gong (if available)
-- [ ] 6.8 Implement action items list with checkboxes
-- [ ] 6.9 Add coaching notes section (manager-only with RBAC check)
-- [ ] 6.10 Implement share analysis feature (generate link)
-- [ ] 6.11 Add export as PDF functionality
-- [ ] 6.12 Make viewer responsive for mobile/tablet
+- [x] 6.1 Create app/calls/[callId]/page.tsx route
+- [x] 6.2 Implement call metadata header component (title, date, participants)
+- [x] 6.3 Create overall score badge with color coding (green/yellow/red)
+- [x] 6.4 Build dimension score cards component (4 dimensions)
+- [x] 6.5 Implement strengths and areas for improvement sections
+- [x] 6.6 Create transcript snippet component with highlights (good/needs work)
+- [x] 6.7 Add timestamp click handler to link to Gong (if available)
+- [x] 6.8 Implement action items list with checkboxes
+- [x] 6.9 Add coaching notes section (manager-only with RBAC check)
+- [x] 6.10 Implement share analysis feature (generate link)
+- [x] 6.11 Add export as PDF functionality
+- [x] 6.12 Make viewer responsive for mobile/tablet
 
 ## 7. Rep Performance Dashboard
 
@@ -116,14 +116,14 @@
 
 ## 10. Navigation and Layout
 
-- [ ] 10.1 Create app/layout.tsx with main navigation sidebar
-- [ ] 10.2 Implement navigation links (Dashboard, Search, Feed, Profile)
-- [ ] 10.3 Add user profile dropdown with logout option
-- [ ] 10.4 Create responsive mobile navigation (hamburger menu)
-- [ ] 10.5 Implement breadcrumb navigation for deep pages
-- [ ] 10.6 Add loading states using React Suspense and loading.tsx files
-- [ ] 10.7 Create error boundaries with error.tsx files
-- [ ] 10.8 Add not-found.tsx for 404 pages
+- [x] 10.1 Create app/layout.tsx with main navigation sidebar
+- [x] 10.2 Implement navigation links (Dashboard, Search, Feed, Profile)
+- [x] 10.3 Add user profile dropdown with logout option
+- [x] 10.4 Create responsive mobile navigation (hamburger menu)
+- [x] 10.5 Implement breadcrumb navigation for deep pages
+- [x] 10.6 Add loading states using React Suspense and loading.tsx files
+- [x] 10.7 Create error boundaries with error.tsx files
+- [x] 10.8 Add not-found.tsx for 404 pages
 
 ## 11. Vercel Deployment Configuration
 

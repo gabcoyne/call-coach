@@ -8,7 +8,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from shared import settings
+from coaching_mcp.shared import settings
 from gong.webhook import router as webhook_router
 
 # Configure logging

@@ -8,7 +8,7 @@ from typing import Any
 import httpx
 from httpx import HTTPStatusError, RequestError
 
-from shared import settings
+from coaching_mcp.shared import settings
 from .types import GongCall, GongTranscript, GongMonologue, GongSentence, GongSpeaker
 
 logger = logging.getLogger(__name__)
@@ -101,12 +101,24 @@ class GongClient:
             return response.json()
 
         except HTTPStatusError as e:
-            logger.error(f"Gong API HTTP error: {e.response.status_code} - {e.response.text}")
-            raise GongAPIError(f"HTTP {e.response.status_code}: {e.response.text}") from e
+            # Sanitize response text to avoid logging credentials
+            sanitized_text = e.response.text
+            if self.api_key and self.api_key in sanitized_text:
+                sanitized_text = sanitized_text.replace(self.api_key, "***")
+            if self.api_secret and self.api_secret in sanitized_text:
+                sanitized_text = sanitized_text.replace(self.api_secret, "***")
+            logger.error(f"Gong API HTTP error: {e.response.status_code} - {sanitized_text}")
+            raise GongAPIError(f"HTTP {e.response.status_code}: {sanitized_text}") from e
 
         except RequestError as e:
-            logger.error(f"Gong API request error: {e}")
-            raise GongAPIError(f"Request failed: {e}") from e
+            # Sanitize error message to avoid logging credentials
+            error_msg = str(e)
+            if self.api_key and self.api_key in error_msg:
+                error_msg = error_msg.replace(self.api_key, "***")
+            if self.api_secret and self.api_secret in error_msg:
+                error_msg = error_msg.replace(self.api_secret, "***")
+            logger.error(f"Gong API request error: {error_msg}")
+            raise GongAPIError(f"Request failed: {error_msg}") from e
 
     def get_call(self, call_id: str) -> GongCall:
         """

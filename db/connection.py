@@ -10,7 +10,7 @@ import psycopg2
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
 
-from shared import settings
+from coaching_mcp.shared import settings
 
 logger = logging.getLogger(__name__)
 
@@ -32,13 +32,21 @@ def get_db_pool() -> pool.ThreadedConnectionPool:
                 minconn=settings.database_pool_min_size,
                 maxconn=settings.database_pool_max_size,
                 dsn=settings.database_url,
+                options="-c statement_timeout=30000",  # 30 second statement timeout
             )
             logger.info(
                 f"Database pool initialized: "
-                f"{settings.database_pool_min_size}-{settings.database_pool_max_size} connections"
+                f"{settings.database_pool_min_size}-{settings.database_pool_max_size} connections "
+                f"(statement_timeout=30s)"
             )
         except Exception as e:
-            logger.error(f"Failed to initialize database pool: {e}")
+            # Sanitize error message to avoid logging database credentials
+            error_msg = str(e)
+            if settings.database_url and 'password=' in settings.database_url:
+                import re
+                for match in re.finditer(r'(?:password|pwd)=([^&\s]+)', error_msg, re.IGNORECASE):
+                    error_msg = error_msg.replace(match.group(1), "***")
+            logger.error(f"Failed to initialize database pool: {error_msg}")
             raise
 
     return _db_pool
@@ -87,7 +95,14 @@ def execute_query(
                 logger.debug(f"Query executed: {cur.rowcount} rows affected")
             except Exception as e:
                 conn.rollback()
-                logger.error(f"Query failed: {e}\nQuery: {query}\nParams: {params}")
+                # Sanitize params to avoid logging sensitive connection info
+                sanitized_params = str(params)
+                if settings.database_url and 'password=' in settings.database_url:
+                    # Extract password from database_url and mask it
+                    import re
+                    for match in re.finditer(r'(?:password|pwd)=([^&\s]+)', sanitized_params, re.IGNORECASE):
+                        sanitized_params = sanitized_params.replace(match.group(1), "***")
+                logger.error(f"Query failed: {e}\nQuery: {query}\nParams: {sanitized_params}")
                 raise
 
 

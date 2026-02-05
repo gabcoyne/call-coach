@@ -105,7 +105,7 @@ def search_calls_tool(
             EXISTS (
                 SELECT 1 FROM transcripts t
                 WHERE t.call_id = c.id
-                AND t.topics && %s
+                AND t.topics && %s::text[]
             )
         """)
         params.append(topics)
