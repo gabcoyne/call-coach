@@ -159,15 +159,26 @@ export class MCPClient {
    */
   private async callTool<T>(
     toolName: string,
-    params: Record<string, unknown>
+    params: Record<string, unknown>,
+    authToken?: string
   ): Promise<T> {
     const url = `${this.baseUrl}/tools/${toolName}`;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Add Authorization header if token provided
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
 
     return fetchWithRetry<T>(
       url,
       {
         method: 'POST',
         body: JSON.stringify(params),
+        headers,
       },
       this.retryConfig
     );
@@ -182,8 +193,8 @@ export class MCPClient {
     use_cache?: boolean;
     include_transcript_snippets?: boolean;
     force_reanalysis?: boolean;
-  }): Promise<AnalyzeCallResponse> {
-    return this.callTool<AnalyzeCallResponse>('analyze_call', params);
+  }, authToken?: string): Promise<AnalyzeCallResponse> {
+    return this.callTool<AnalyzeCallResponse>('analyze_call', params, authToken);
   }
 
   /**
@@ -193,8 +204,8 @@ export class MCPClient {
     rep_email: string;
     time_period?: string;
     product_filter?: string;
-  }): Promise<RepInsightsResponse> {
-    return this.callTool<RepInsightsResponse>('get_rep_insights', params);
+  }, authToken?: string): Promise<RepInsightsResponse> {
+    return this.callTool<RepInsightsResponse>('get_rep_insights', params, authToken);
   }
 
   /**
@@ -210,8 +221,8 @@ export class MCPClient {
     has_objection_type?: string;
     topics?: string[];
     limit?: number;
-  }): Promise<SearchCallsResponse> {
-    return this.callTool<SearchCallsResponse>('search_calls', params);
+  }, authToken?: string): Promise<SearchCallsResponse> {
+    return this.callTool<SearchCallsResponse>('search_calls', params, authToken);
   }
 }
 

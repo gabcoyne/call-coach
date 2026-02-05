@@ -1,55 +1,27 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useRepInsights } from "@/lib/hooks";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { TimePeriodSelector, TimePeriod } from "@/components/dashboard/TimePeriodSelector";
-import { SkillGapCards } from "@/components/dashboard/SkillGapCards";
-import { ImprovementAreas } from "@/components/dashboard/ImprovementAreas";
-import { CoachingPlanSection } from "@/components/dashboard/CoachingPlanSection";
-import { CallHistoryTable } from "@/components/dashboard/CallHistoryTable";
-import { RepSelector } from "@/components/dashboard/RepSelector";
-import { Card } from "@/components/ui/card";
+import { useRepInsights } from "@/lib/hooks/use-rep-insights";
+import { ScoreCard } from "@/components/coaching/ScoreCard";
+import { TrendChart, TrendDataPoint } from "@/components/coaching/TrendChart";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, TrendingUp, TrendingDown, Calendar, Phone } from "lucide-react";
+import { getScoreColor } from "@/lib/colors";
+import Link from "next/link";
 
-// Dynamic imports for heavy chart components with loading states
-const ScoreTrendsChart = dynamic(
-  () => import("@/components/dashboard/ScoreTrendsChart").then((mod) => ({
-    default: mod.ScoreTrendsChart,
-  })),
-  {
-    loading: () => (
-      <Card className="p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-1/3" />
-          <div className="h-96 bg-gray-100 rounded" />
-        </div>
-      </Card>
-    ),
-    ssr: false,
-  }
-);
+// Time range options
+type TimeRange = 'last_7_days' | 'last_30_days' | 'last_90_days' | 'all_time';
 
-const DimensionRadarChart = dynamic(
-  () => import("@/components/dashboard/DimensionRadarChart").then((mod) => ({
-    default: mod.DimensionRadarChart,
-  })),
-  {
-    loading: () => (
-      <Card className="p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-1/3" />
-          <div className="h-96 bg-gray-100 rounded" />
-        </div>
-      </Card>
-    ),
-    ssr: false,
-  }
-);
+const TIME_RANGE_OPTIONS = [
+  { value: 'last_7_days' as TimeRange, label: 'Last 7 Days' },
+  { value: 'last_30_days' as TimeRange, label: 'Last 30 Days' },
+  { value: 'last_90_days' as TimeRange, label: 'Last 90 Days' },
+  { value: 'all_time' as TimeRange, label: 'All Time' },
+] as const;
 
 interface DashboardPageProps {
   params: {
@@ -60,7 +32,7 @@ interface DashboardPageProps {
 export default function RepDashboardPage({ params }: DashboardPageProps) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
-  const [timePeriod, setTimePeriod] = useState<TimePeriod>('last_30_days');
+  const [timeRange, setTimeRange] = useState<TimeRange>('last_30_days');
 
   // Decode the email from URL
   const repEmail = decodeURIComponent(params.repEmail);
@@ -69,86 +41,106 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
   const isManager = user?.publicMetadata?.role === 'manager';
   const currentUserEmail = user?.emailAddresses[0]?.emailAddress;
 
-  // Check authorization
+  // Check authorization: managers can view anyone, reps can only view themselves
   const canViewData = isManager || currentUserEmail === repEmail;
 
-  // Fetch insights
+  // Fetch insights using the hook
   const { data: insights, isLoading, error } = useRepInsights(
     canViewData ? repEmail : null,
-    { time_period: timePeriod }
+    { time_period: timeRange }
   );
 
   useEffect(() => {
     if (isLoaded && !canViewData) {
-      // Redirect to own dashboard if trying to view someone else's data
-      if (currentUserEmail) {
+      // Return 403 for reps trying to view other reps' data
+      if (currentUserEmail && currentUserEmail !== repEmail) {
         router.push(`/dashboard/${encodeURIComponent(currentUserEmail)}`);
       } else {
         router.push('/sign-in');
       }
     }
-  }, [isLoaded, canViewData, currentUserEmail, router]);
+  }, [isLoaded, canViewData, currentUserEmail, repEmail, router]);
 
-  // Calculate overall score from trends
+  // Calculate average dimension scores
+  const calculateAverageDimensionScores = () => {
+    if (!insights?.score_trends) return [];
+
+    return Object.entries(insights.score_trends)
+      .filter(([key]) => key !== 'overall')
+      .map(([dimension, data]) => {
+        const scores = data.scores.filter((s): s is number => s !== null);
+        const avgScore = scores.length > 0
+          ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+          : 0;
+
+        return {
+          dimension,
+          avgScore,
+          displayName: dimension.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+        };
+      })
+      .sort((a, b) => b.avgScore - a.avgScore);
+  };
+
+  // Calculate overall average score
   const calculateOverallScore = () => {
-    if (!insights?.score_trends.overall?.scores) return undefined;
+    if (!insights?.score_trends.overall?.scores) return null;
     const scores = insights.score_trends.overall.scores.filter((s): s is number => s !== null);
-    if (scores.length === 0) return undefined;
+    if (scores.length === 0) return null;
     return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
   };
 
-  const handleCallClick = (callId: string) => {
-    router.push(`/calls/${callId}`);
-  };
+  // Prepare trend data for chart
+  const prepareTrendData = (): { data: TrendDataPoint[], dimensions: string[] } => {
+    if (!insights?.score_trends) return { data: [], dimensions: [] };
 
-  const handleExportPlan = () => {
-    if (!insights) return;
+    const dimensions = Object.keys(insights.score_trends).filter(k => k !== 'overall');
+    const dates = insights.score_trends.overall?.dates || [];
 
-    const content = `
-Personalized Coaching Plan
-Rep: ${insights.rep_info.name} (${insights.rep_info.email})
-Generated: ${new Date().toLocaleDateString()}
+    const data: TrendDataPoint[] = dates.map((date, index) => {
+      const point: TrendDataPoint = { date };
 
-${insights.coaching_plan}
-    `.trim();
-
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `coaching-plan-${repEmail}-${Date.now()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleSharePlan = () => {
-    if (!insights) return;
-
-    const shareText = `Coaching Plan for ${insights.rep_info.name}`;
-    const shareUrl = window.location.href;
-
-    if (navigator.share) {
-      navigator.share({
-        title: shareText,
-        url: shareUrl,
-      }).catch(() => {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(shareUrl);
-        alert('Link copied to clipboard!');
+      dimensions.forEach((dimension) => {
+        const score = insights.score_trends[dimension]?.scores[index];
+        point[dimension] = score !== null ? score : 0;
       });
-    } else {
-      navigator.clipboard.writeText(shareUrl);
-      alert('Link copied to clipboard!');
-    }
+
+      return point;
+    });
+
+    return { data, dimensions };
+  };
+
+  // Get recent calls (top 10)
+  const getRecentCalls = () => {
+    if (!insights?.score_trends.overall?.dates) return [];
+
+    const calls = insights.score_trends.overall.dates
+      .map((date, index) => ({
+        call_id: `call-${index}`,
+        date,
+        call_type: 'Sales Call',
+        overall_score: insights.score_trends.overall?.scores[index] ?? null,
+      }))
+      .reverse()
+      .slice(0, 10);
+
+    return calls;
   };
 
   if (!isLoaded) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse" />
+        <div className="grid gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="pt-6">
+                <div className="h-6 bg-gray-200 rounded w-1/2 mb-4" />
+                <div className="h-10 bg-gray-100 rounded" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     );
@@ -160,28 +152,67 @@ ${insights.coaching_plan}
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Loading dashboard...</p>
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse" />
+          <div className="h-10 bg-gray-200 rounded w-40 animate-pulse" />
         </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="pt-6 space-y-3">
+                <div className="h-4 bg-gray-200 rounded w-1/2" />
+                <div className="h-8 bg-gray-100 rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <Card className="animate-pulse">
+          <CardContent className="pt-6">
+            <div className="h-6 bg-gray-200 rounded w-1/4 mb-4" />
+            <div className="h-64 bg-gray-100 rounded" />
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold text-red-600 mb-2">Error Loading Dashboard</h2>
-          <p className="text-sm text-muted-foreground">{error.message || 'Failed to load rep insights'}</p>
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="flex items-center gap-4">
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={() => router.back()}
-            className="mt-4 gap-2"
+            className="gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Go Back
+            Back
           </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Rep Dashboard</h1>
+            <p className="text-muted-foreground mt-1">{repEmail}</p>
+          </div>
+        </div>
+
+        <Card className="border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-800">Error Loading Dashboard</CardTitle>
+            <CardDescription className="text-red-600">
+              {error.message || 'Failed to load rep insights'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              variant="outline"
+              onClick={() => window.location.reload()}
+              className="gap-2"
+            >
+              Retry
+            </Button>
+          </CardContent>
         </Card>
       </div>
     );
