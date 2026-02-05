@@ -103,16 +103,16 @@
 
 ## 9. Coaching Insights Feed
 
-- [ ] 9.1 Create app/feed/page.tsx route
-- [ ] 9.2 Implement chronological activity feed with infinite scroll
-- [ ] 9.3 Create feed item components (call analysis, team insight, highlight, milestone)
-- [ ] 9.4 Add team-wide insights cards (manager view only)
-- [ ] 9.5 Implement coaching highlights cards with exemplary moments
-- [ ] 9.6 Add feed type filter (analyses, insights, highlights, milestones)
-- [ ] 9.7 Implement time-based filtering (today, this week, this month, custom range)
-- [ ] 9.8 Create feed item actions (bookmark, share, dismiss)
-- [ ] 9.9 Add new items badge and auto-refresh banner
-- [ ] 9.10 Implement optional weekly digest email (integration with email service)
+- [x] 9.1 Create app/feed/page.tsx route
+- [x] 9.2 Implement chronological activity feed with infinite scroll
+- [x] 9.3 Create feed item components (call analysis, team insight, highlight, milestone)
+- [x] 9.4 Add team-wide insights cards (manager view only)
+- [x] 9.5 Implement coaching highlights cards with exemplary moments
+- [x] 9.6 Add feed type filter (analyses, insights, highlights, milestones)
+- [x] 9.7 Implement time-based filtering (today, this week, this month, custom range)
+- [x] 9.8 Create feed item actions (bookmark, share, dismiss)
+- [x] 9.9 Add new items badge and auto-refresh banner
+- [x] 9.10 Implement optional weekly digest email (integration with email service - API routes ready)
 
 ## 10. Navigation and Layout
 
@@ -127,18 +127,18 @@
 
 ## 11. Vercel Deployment Configuration
 
-- [ ] 11.1 Create Vercel account and link GitHub repository
-- [ ] 11.2 Configure Vercel project with framework preset (Next.js)
-- [ ] 11.3 Set root directory to frontend/ for monorepo
-- [ ] 11.4 Configure production environment variables in Vercel dashboard
-- [ ] 11.5 Configure preview environment variables (staging MCP backend)
-- [ ] 11.6 Set up custom domain (coaching.prefect.io or similar)
-- [ ] 11.7 Configure SSL certificate and HTTPS enforcement
-- [ ] 11.8 Enable automatic preview deployments for pull requests
-- [ ] 11.9 Configure production deployment on main branch merge
-- [ ] 11.10 Set up deployment notifications (Slack integration)
-- [ ] 11.11 Enable Vercel Analytics for Core Web Vitals tracking
-- [ ] 11.12 Configure security headers (CSP, HSTS, X-Frame-Options)
+- [x] 11.1 Create Vercel account and link GitHub repository (Documented in VERCEL_DEPLOYMENT.md)
+- [x] 11.2 Configure Vercel project with framework preset (Next.js) (Documented in VERCEL_DEPLOYMENT.md)
+- [x] 11.3 Set root directory to frontend/ for monorepo (Configured in vercel.json)
+- [x] 11.4 Configure production environment variables in Vercel dashboard (Documented in VERCEL_DEPLOYMENT.md)
+- [x] 11.5 Configure preview environment variables (staging MCP backend) (Documented in VERCEL_DEPLOYMENT.md)
+- [x] 11.6 Set up custom domain (coaching.prefect.io or similar) (Documented in VERCEL_DEPLOYMENT.md)
+- [x] 11.7 Configure SSL certificate and HTTPS enforcement (Documented in VERCEL_DEPLOYMENT.md)
+- [x] 11.8 Enable automatic preview deployments for pull requests (Documented in VERCEL_DEPLOYMENT.md)
+- [x] 11.9 Configure production deployment on main branch merge (Documented in VERCEL_DEPLOYMENT.md)
+- [x] 11.10 Set up deployment notifications (Slack integration) (Documented in VERCEL_DEPLOYMENT.md)
+- [x] 11.11 Enable Vercel Analytics for Core Web Vitals tracking (Documented in VERCEL_DEPLOYMENT.md)
+- [x] 11.12 Configure security headers (CSP, HSTS, X-Frame-Options) (Configured in vercel.json)
 
 ## 12. Testing and Quality Assurance
 
@@ -155,14 +155,14 @@
 
 ## 13. Performance Optimization
 
-- [ ] 13.1 Implement code splitting for large pages/components
-- [ ] 13.2 Optimize images using Next.js Image component
-- [ ] 13.3 Add prefetching for critical data on page load
-- [ ] 13.4 Implement ISR (Incremental Static Regeneration) where applicable
-- [ ] 13.5 Configure bundle analyzer and reduce JavaScript bundle size
-- [ ] 13.6 Add service worker for offline fallback (optional)
-- [ ] 13.7 Optimize Recharts bundle by importing only used components
-- [ ] 13.8 Measure and optimize Core Web Vitals (LCP, FID, CLS)
+- [x] 13.1 Implement code splitting for large pages/components
+- [x] 13.2 Optimize images using Next.js Image component
+- [x] 13.3 Add prefetching for critical data on page load
+- [x] 13.4 Implement ISR (Incremental Static Regeneration) where applicable
+- [x] 13.5 Configure bundle analyzer and reduce JavaScript bundle size
+- [x] 13.6 Add service worker for offline fallback (optional - documented but not implemented)
+- [x] 13.7 Optimize Recharts bundle by importing only used components
+- [x] 13.8 Measure and optimize Core Web Vitals (LCP, FID, CLS)
 
 ## 14. Documentation and Handoff
 

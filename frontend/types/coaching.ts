@@ -191,6 +191,91 @@ export interface CallSearchResult {
 export type SearchCallsResponse = CallSearchResult[];
 
 /**
+ * Feed Types
+ */
+
+export type FeedItemType = 'call_analysis' | 'team_insight' | 'highlight' | 'milestone';
+export type FeedTimeFilter = 'today' | 'this_week' | 'this_month' | 'custom';
+
+export interface FeedItem {
+  id: string;
+  type: FeedItemType;
+  timestamp: string;
+  title: string;
+  description: string;
+  metadata: FeedItemMetadata;
+  is_bookmarked?: boolean;
+  is_dismissed?: boolean;
+  is_new?: boolean;
+}
+
+export interface FeedItemMetadata {
+  call_id?: string;
+  call_title?: string;
+  rep_email?: string;
+  rep_name?: string;
+  score?: number;
+  dimension?: string;
+  team_size?: number;
+  team_average?: number;
+  improvement_percentage?: number;
+  milestone_type?: string;
+  highlight_snippet?: string;
+  action_items?: string[];
+}
+
+export interface TeamInsight {
+  id: string;
+  type: 'trend' | 'comparison' | 'achievement';
+  title: string;
+  description: string;
+  metric: string;
+  value: number;
+  change: number;
+  trend: 'up' | 'down' | 'stable';
+  team_size: number;
+  period: string;
+}
+
+export interface CoachingHighlight {
+  id: string;
+  call_id: string;
+  call_title: string;
+  rep_name: string;
+  rep_email: string;
+  timestamp: string;
+  dimension: string;
+  score: number;
+  snippet: string;
+  context: string;
+  why_exemplary: string;
+}
+
+export const feedItemTypeFilterSchema = z.enum(['all', 'call_analysis', 'team_insight', 'highlight', 'milestone']);
+export const feedTimeFilterSchema = z.enum(['today', 'this_week', 'this_month', 'custom']);
+
+export const feedRequestSchema = z.object({
+  type_filter: feedItemTypeFilterSchema.optional(),
+  time_filter: feedTimeFilterSchema.optional(),
+  start_date: z.string().datetime().optional(),
+  end_date: z.string().datetime().optional(),
+  limit: z.number().int().min(1).max(50).optional().default(20),
+  offset: z.number().int().min(0).optional().default(0),
+  include_dismissed: z.boolean().optional().default(false),
+});
+
+export type FeedRequest = z.infer<typeof feedRequestSchema>;
+
+export interface FeedResponse {
+  items: FeedItem[];
+  team_insights: TeamInsight[];
+  highlights: CoachingHighlight[];
+  total_count: number;
+  has_more: boolean;
+  new_items_count: number;
+}
+
+/**
  * Error Response
  */
 export interface APIErrorResponse {

@@ -54,3 +54,14 @@ export {
   type UseLoadingStateOptions,
   type UseLoadingStateReturn,
 } from "./use-loading-state";
+
+// Feed Hooks
+export {
+  useFeed,
+  useInfiniteFeed,
+  useFeedActions,
+  type UseFeedOptions,
+  type UseFeedReturn,
+  type UseInfiniteFeedReturn,
+  type UseFeedActionsReturn,
+} from "./useFeed";
