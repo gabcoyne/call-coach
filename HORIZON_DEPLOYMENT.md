@@ -10,11 +10,12 @@ When configuring the server in the Horizon UI, use these settings:
 
 ### Server Entrypoint
 ```
-coaching_mcp/server.py:mcp
+launcher.py:mcp
 ```
 
-**NOT**: `python -m coaching_mcp.server`
-**NOT**: `uv run python -m coaching_mcp.server`
+**Alternative (if launcher doesn't work)**: Add `--with-editable .` flag to install the package first
+
+The launcher script handles installing the `coaching_mcp` package before importing the server.
 
 ### Explanation
 
