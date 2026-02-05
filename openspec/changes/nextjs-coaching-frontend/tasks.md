@@ -72,19 +72,19 @@
 
 ## 7. Rep Performance Dashboard
 
-- [ ] 7.1 Create app/dashboard/[repEmail]/page.tsx route
-- [ ] 7.2 Implement dashboard header with rep profile and summary stats
-- [ ] 7.3 Install Recharts and configure chart components
-- [ ] 7.4 Create line chart for score trends over time (4 dimensions)
-- [ ] 7.5 Add time period selector (7 days, 30 days, quarter, year, all time)
-- [ ] 7.6 Implement skill gap cards with priority indicators
-- [ ] 7.7 Create radar chart for dimension score distribution
-- [ ] 7.8 Add team average comparison overlay (manager view only)
-- [ ] 7.9 Implement improvement areas and recent wins sections
-- [ ] 7.10 Create call history table with sorting and filtering
-- [ ] 7.11 Add personalized coaching plan section
-- [ ] 7.12 Implement RBAC (reps see own data only, managers see all)
-- [ ] 7.13 Add rep selector dropdown for managers
+- [x] 7.1 Create app/dashboard/[repEmail]/page.tsx route
+- [x] 7.2 Implement dashboard header with rep profile and summary stats
+- [x] 7.3 Install Recharts and configure chart components
+- [x] 7.4 Create line chart for score trends over time (4 dimensions)
+- [x] 7.5 Add time period selector (7 days, 30 days, quarter, year, all time)
+- [x] 7.6 Implement skill gap cards with priority indicators
+- [x] 7.7 Create radar chart for dimension score distribution
+- [x] 7.8 Add team average comparison overlay (manager view only)
+- [x] 7.9 Implement improvement areas and recent wins sections
+- [x] 7.10 Create call history table with sorting and filtering
+- [x] 7.11 Add personalized coaching plan section
+- [x] 7.12 Implement RBAC (reps see own data only, managers see all)
+- [x] 7.13 Add rep selector dropdown for managers
 
 ## 8. Call Search and Filter
 

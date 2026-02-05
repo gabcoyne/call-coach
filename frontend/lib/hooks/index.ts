@@ -25,3 +25,32 @@ export {
   type UseSearchCallsMutationOptions,
   type UseSearchCallsMutationReturn,
 } from "./use-search-calls";
+
+// Optimistic Update Hooks
+export {
+  useOptimistic,
+  useOptimisticList,
+  useOptimisticItem,
+  type OptimisticUpdateOptions,
+} from "./use-optimistic";
+
+// Error Handling Hooks
+export {
+  useErrorHandling,
+  useRetry,
+  useErrorMessage,
+  type UseErrorHandlingOptions,
+  type UseErrorHandlingReturn,
+} from "./use-error-handling";
+
+// Loading State Hooks
+export {
+  useLoadingState,
+  useMultipleLoadingStates,
+  useDebouncedLoading,
+  useProgressiveLoading,
+  useDataFreshness,
+  type LoadingState,
+  type UseLoadingStateOptions,
+  type UseLoadingStateReturn,
+} from "./use-loading-state";
