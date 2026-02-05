@@ -2,15 +2,33 @@
 Configuration management using Pydantic Settings.
 Loads configuration from environment variables with validation.
 """
+from pathlib import Path
 from pydantic import Field, PostgresDsn, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def find_project_root() -> Path:
+    """
+    Find project root by walking up from this file looking for .git or pyproject.toml.
+    Falls back to 3 levels up if markers not found.
+    """
+    current = Path(__file__).resolve()
+    for parent in [current] + list(current.parents):
+        if (parent / ".git").exists() or (parent / "pyproject.toml").exists():
+            return parent
+    # Fallback: 3 levels up from coaching_mcp/shared/config.py
+    return current.parent.parent.parent
+
+
+PROJECT_ROOT = find_project_root()
+ENV_FILE = PROJECT_ROOT / ".env"
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_FILE) if ENV_FILE.exists() else None,
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",

@@ -32,39 +32,49 @@ call-coach/
 └── tests/              # Test suite
 ```
 
+## Prerequisites
+
+- **Python 3.11+**: Required for FastMCP backend server
+- **uv**: Modern Python package manager ([installation guide](https://github.com/astral-sh/uv))
+- **Neon Postgres Database**: Cloud PostgreSQL instance with SSL ([Neon Console](https://console.neon.tech))
+- **Node.js 18+**: For Next.js frontend (if doing full-stack development)
+
 ## Setup
 
-1. **Install dependencies with uv**:
+1. **Install uv** (Python package manager):
    ```bash
-   # Install uv if not already installed
    curl -LsSf https://astral.sh/uv/install.sh | sh
-
-   # Install project dependencies
-   uv sync
    ```
 
 2. **Configure environment**:
    ```bash
    cp .env.example .env
-   # Edit .env with your credentials
+   # Edit .env with your credentials:
+   # - GONG_API_KEY, GONG_API_SECRET (from Gong dashboard)
+   # - ANTHROPIC_API_KEY (from Anthropic Console)
+   # - DATABASE_URL (from Neon dashboard, must include ?sslmode=require)
    ```
 
-3. **Initialize database**:
+3. **Initialize database** (first time only):
    ```bash
    psql $DATABASE_URL -f db/migrations/001_initial_schema.sql
    ```
 
-4. **Load knowledge base**:
+4. **Load knowledge base** (first time only):
    ```bash
-   python -m knowledge.loader
+   uv run python -m knowledge.loader
    ```
 
 5. **Run FastMCP server**:
    ```bash
-   python coaching_mcp/server.py
+   # Development mode (recommended for local dev)
+   uv run mcp-server-dev
+
+   # Or production mode with full validation
+   uv run mcp-server
    ```
 
-6. **Deploy Prefect flows**:
+6. **Deploy Prefect flows** (optional):
    ```bash
    prefect deploy flows/process_new_call.py
    prefect deploy flows/weekly_review.py
@@ -259,6 +269,35 @@ Scheduled every Monday at 6am PT via Prefect Horizon:
 - Sends team-wide insights to sales leadership
 
 ## Local Development
+
+### Quick Start
+
+Get the MCP backend server running locally in 3 steps:
+
+1. **Install uv** (Python package manager):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+2. **Setup environment**:
+   ```bash
+   # Ensure .env exists in project root with required credentials
+   # Required: GONG_API_KEY, GONG_API_SECRET, ANTHROPIC_API_KEY, DATABASE_URL
+   cp .env.example .env
+   # Edit .env with your credentials
+   ```
+
+3. **Run the server**:
+   ```bash
+   # Development mode (fast startup, relaxed validation)
+   uv run mcp-server-dev
+
+   # You should see:
+   # 🚀 MCP server ready - 3 tools registered
+   # Server running on http://localhost:8000
+   ```
+
+For detailed backend development guide, see [CLAUDE.md](CLAUDE.md).
 
 ### Full Stack Development (Backend + Frontend)
 

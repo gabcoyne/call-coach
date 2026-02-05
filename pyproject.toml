@@ -31,6 +31,10 @@ dependencies = [
     "pgvector>=0.3.0",
 ]
 
+[project.scripts]
+mcp-server = "coaching_mcp.server:main"
+mcp-server-dev = "coaching_mcp.server:main_dev"
+
 [project.optional-dependencies]
 dev = [
     # Testing

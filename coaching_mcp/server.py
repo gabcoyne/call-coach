@@ -2,6 +2,7 @@
 FastMCP Server for Gong Call Coaching Agent.
 Provides on-demand coaching tools accessible via Claude Desktop.
 """
+import argparse
 import logging
 import os
 import sys
@@ -99,15 +100,57 @@ def _validate_database_connection() -> None:
         sys.exit(1)
 
 
-def _validate_gong_api() -> None:
+def _validate_database_connection_only() -> None:
+    """
+    Test basic database connectivity without schema validation.
+    Used in development mode for faster startup.
+
+    Raises:
+        SystemExit: If database connection fails
+    """
+    from db import fetch_one
+
+    try:
+        # Verify sslmode is present for Neon
+        if "sslmode=require" not in settings.database_url:
+            logger.error("✗ DATABASE_URL must include sslmode=require for Neon")
+            logger.error(f"Example: postgresql://user:pass@host/db?sslmode=require")
+            sys.exit(1)
+
+        # Test connection with simple query
+        result = fetch_one("SELECT 1 as test")
+        if result and result.get("test") == 1:
+            logger.info("✓ Database connection successful (dev mode - schema not validated)")
+        else:
+            logger.error("✗ Database query returned unexpected result")
+            sys.exit(1)
+
+    except SystemExit:
+        # Re-raise SystemExit to preserve validation failure behavior
+        raise
+    except Exception as e:
+        logger.error(f"✗ Database validation failed: {e}")
+        logger.error("Verify DATABASE_URL and Neon database is accessible")
+        sys.exit(1)
+
+
+def _validate_gong_api(dev_mode: bool = False) -> None:
     """
     Test Gong API authentication with minimal request.
 
     Non-fatal for timeouts (logs warning), fatal for auth failures.
+    Skipped entirely in development mode.
+
+    Args:
+        dev_mode: If True, skips Gong API validation entirely
 
     Raises:
         SystemExit: If Gong API authentication definitively fails (401/403)
     """
+    if dev_mode:
+        logger.info("✓ Gong API validation skipped (dev mode)")
+        return
+
     from datetime import datetime, timedelta
     from gong.client import GongClient, GongAPIError
     import httpx
@@ -214,6 +257,24 @@ def _validate_anthropic_api() -> None:
 
 # Initialize FastMCP server
 mcp = FastMCP("Gong Call Coaching Agent")
+
+# Server status tracking
+_server_ready = False
+
+
+# Add health check endpoint
+async def health_check(request):
+    """Health check endpoint for monitoring server status."""
+    from starlette.responses import JSONResponse
+
+    if _server_ready:
+        return JSONResponse({"status": "ok", "tools": 3})
+    else:
+        return JSONResponse({"status": "starting"}, status_code=503)
+
+
+# Add health endpoint to the SSE app
+mcp.sse_app().add_route("/health", health_check, methods=["GET"])
 
 
 # Register tools
@@ -363,9 +424,19 @@ def search_calls(
     )
 
 
-if __name__ == "__main__":
+def main(dev: bool = False) -> None:
+    """
+    Start the MCP server with optional development mode.
+
+    Args:
+        dev: Enable development mode with relaxed validation
+    """
+    global _server_ready
+
     logger.info("=" * 60)
     logger.info("Starting Gong Call Coaching MCP Server")
+    if dev:
+        logger.info("🏗️  Dev mode: skipping expensive validations")
     logger.info("=" * 60)
 
     # Run startup validation checks (optional - controlled by env var)
@@ -376,14 +447,24 @@ if __name__ == "__main__":
             logger.info("\n🔍 Running pre-flight validation checks...")
 
             _validate_environment()
-            _validate_database_connection()
-            _validate_gong_api()
+
+            # Use relaxed validation in dev mode
+            if dev:
+                _validate_database_connection_only()
+                _validate_gong_api(dev_mode=True)
+            else:
+                _validate_database_connection()
+                _validate_gong_api(dev_mode=False)
+
             _validate_anthropic_api()
 
             logger.info("\n✅ All validation checks passed!")
             logger.info("=" * 60)
             logger.info("🚀 MCP server ready - 3 tools registered")
             logger.info("=" * 60)
+
+            # Mark server as ready
+            _server_ready = True
 
         except SystemExit:
             # Validation failed - error already logged
@@ -400,6 +481,28 @@ if __name__ == "__main__":
         logger.info("=" * 60)
         logger.info("🚀 MCP server starting - 3 tools registered")
         logger.info("=" * 60)
+        _server_ready = True
 
     # Run the server
     mcp.run()
+
+
+def main_dev() -> None:
+    """
+    Start the MCP server in development mode.
+    Wrapper for `main(dev=True)` to be used with uv script entry.
+    """
+    main(dev=True)
+
+
+if __name__ == "__main__":
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Gong Call Coaching MCP Server")
+    parser.add_argument(
+        "--dev",
+        action="store_true",
+        help="Development mode with relaxed validation (skips Gong API check, basic DB check only)"
+    )
+    args = parser.parse_args()
+
+    main(dev=args.dev)
