@@ -59,5 +59,11 @@
     "app/api/**/*.ts": {
       "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/daily-sync",
+      "schedule": "0 6 * * *"
+    }
+  ]
 }

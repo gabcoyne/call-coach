@@ -333,3 +333,331 @@ def get_top_performers(
         """,
         (dimension.value, days, limit),
     )
+
+
+# ============================================================================
+# OPPORTUNITY QUERIES
+# ============================================================================
+
+def upsert_opportunity(opp_data: dict[str, Any]) -> str:
+    """
+    Upsert opportunity from Gong API data.
+
+    Args:
+        opp_data: Opportunity dict from Gong API
+
+    Returns:
+        Opportunity UUID (str)
+    """
+    execute_query(
+        """
+        INSERT INTO opportunities (
+            gong_opportunity_id, name, account_name, owner_email,
+            stage, close_date, amount, health_score, metadata, updated_at
+        ) VALUES (
+            %(gong_opportunity_id)s, %(name)s, %(account_name)s, %(owner_email)s,
+            %(stage)s, %(close_date)s, %(amount)s, %(health_score)s, %(metadata)s, NOW()
+        )
+        ON CONFLICT (gong_opportunity_id) DO UPDATE SET
+            name = EXCLUDED.name,
+            account_name = EXCLUDED.account_name,
+            owner_email = EXCLUDED.owner_email,
+            stage = EXCLUDED.stage,
+            close_date = EXCLUDED.close_date,
+            amount = EXCLUDED.amount,
+            health_score = EXCLUDED.health_score,
+            metadata = EXCLUDED.metadata,
+            updated_at = NOW()
+        """,
+        opp_data,
+    )
+
+    result = fetch_one(
+        "SELECT id FROM opportunities WHERE gong_opportunity_id = %s",
+        (opp_data["gong_opportunity_id"],),
+    )
+    return result["id"] if result else None
+
+
+def upsert_email(email_data: dict[str, Any]) -> str:
+    """
+    Upsert email from Gong API data.
+
+    Args:
+        email_data: Email dict from Gong API with opportunity_id already set
+
+    Returns:
+        Email UUID (str)
+    """
+    execute_query(
+        """
+        INSERT INTO emails (
+            gong_email_id, opportunity_id, subject, sender_email,
+            recipients, sent_at, body_snippet, metadata
+        ) VALUES (
+            %(gong_email_id)s, %(opportunity_id)s, %(subject)s, %(sender_email)s,
+            %(recipients)s, %(sent_at)s, %(body_snippet)s, %(metadata)s
+        )
+        ON CONFLICT (gong_email_id) DO UPDATE SET
+            opportunity_id = EXCLUDED.opportunity_id,
+            subject = EXCLUDED.subject,
+            sender_email = EXCLUDED.sender_email,
+            recipients = EXCLUDED.recipients,
+            sent_at = EXCLUDED.sent_at,
+            body_snippet = EXCLUDED.body_snippet,
+            metadata = EXCLUDED.metadata
+        """,
+        email_data,
+    )
+
+    result = fetch_one(
+        "SELECT id FROM emails WHERE gong_email_id = %s",
+        (email_data["gong_email_id"],),
+    )
+    return result["id"] if result else None
+
+
+def link_call_to_opportunity(call_id: str, opp_id: str) -> None:
+    """
+    Create junction record linking call to opportunity.
+
+    Args:
+        call_id: Call UUID
+        opp_id: Opportunity UUID
+    """
+    execute_query(
+        """
+        INSERT INTO call_opportunities (call_id, opportunity_id)
+        VALUES (%s, %s)
+        ON CONFLICT (call_id, opportunity_id) DO NOTHING
+        """,
+        (call_id, opp_id),
+    )
+
+
+def get_opportunity(opp_id: str) -> dict[str, Any] | None:
+    """
+    Get opportunity with aggregated call/email counts.
+
+    Args:
+        opp_id: Opportunity UUID
+
+    Returns:
+        Opportunity dict with call_count and email_count
+    """
+    return fetch_one(
+        """
+        SELECT
+            o.*,
+            COUNT(DISTINCT co.call_id) as call_count,
+            COUNT(DISTINCT e.id) as email_count
+        FROM opportunities o
+        LEFT JOIN call_opportunities co ON o.id = co.opportunity_id
+        LEFT JOIN emails e ON o.id = e.opportunity_id
+        WHERE o.id = %s
+        GROUP BY o.id
+        """,
+        (opp_id,),
+    )
+
+
+def get_opportunity_timeline(
+    opp_id: str,
+    limit: int = 20,
+    offset: int = 0,
+) -> list[dict[str, Any]]:
+    """
+    Get chronological timeline of calls and emails for an opportunity.
+
+    Args:
+        opp_id: Opportunity UUID
+        limit: Max items to return
+        offset: Number of items to skip
+
+    Returns:
+        List of timeline items with type field ('call' or 'email')
+    """
+    return fetch_all(
+        """
+        -- Calls timeline
+        SELECT
+            'call' as item_type,
+            c.id,
+            c.gong_call_id,
+            c.title,
+            c.scheduled_at as timestamp,
+            c.duration,
+            NULL as subject,
+            NULL as sender_email
+        FROM calls c
+        JOIN call_opportunities co ON c.id = co.call_id
+        WHERE co.opportunity_id = %s
+
+        UNION ALL
+
+        -- Emails timeline
+        SELECT
+            'email' as item_type,
+            e.id,
+            e.gong_email_id,
+            NULL as title,
+            e.sent_at as timestamp,
+            NULL as duration,
+            e.subject,
+            e.sender_email
+        FROM emails e
+        WHERE e.opportunity_id = %s
+
+        ORDER BY timestamp DESC
+        LIMIT %s OFFSET %s
+        """,
+        (opp_id, opp_id, limit, offset),
+    )
+
+
+def search_opportunities(
+    filters: dict[str, Any] | None = None,
+    sort: str = "updated_at",
+    sort_dir: str = "DESC",
+    limit: int = 50,
+    offset: int = 0,
+) -> tuple[list[dict[str, Any]], int]:
+    """
+    Search opportunities with filters, sorting, and pagination.
+
+    Args:
+        filters: Dict with optional keys: owner, stage, health_score_min, health_score_max, search
+        sort: Field to sort by (updated_at, close_date, health_score, amount)
+        sort_dir: Sort direction (ASC or DESC)
+        limit: Max results to return
+        offset: Number of results to skip
+
+    Returns:
+        Tuple of (opportunities list, total count)
+    """
+    filters = filters or {}
+
+    # Build WHERE clauses
+    where_clauses = []
+    params = {}
+
+    if "owner" in filters:
+        where_clauses.append("o.owner_email = %(owner)s")
+        params["owner"] = filters["owner"]
+
+    if "stage" in filters:
+        if isinstance(filters["stage"], list):
+            where_clauses.append("o.stage = ANY(%(stage)s)")
+            params["stage"] = filters["stage"]
+        else:
+            where_clauses.append("o.stage = %(stage)s")
+            params["stage"] = filters["stage"]
+
+    if "health_score_min" in filters:
+        where_clauses.append("o.health_score >= %(health_score_min)s")
+        params["health_score_min"] = filters["health_score_min"]
+
+    if "health_score_max" in filters:
+        where_clauses.append("o.health_score <= %(health_score_max)s")
+        params["health_score_max"] = filters["health_score_max"]
+
+    if "search" in filters:
+        where_clauses.append("(o.name ILIKE %(search)s OR o.account_name ILIKE %(search)s)")
+        params["search"] = f"%{filters['search']}%"
+
+    where_sql = "WHERE " + " AND ".join(where_clauses) if where_clauses else ""
+
+    # Validate sort field
+    valid_sorts = {"updated_at", "close_date", "health_score", "amount"}
+    if sort not in valid_sorts:
+        sort = "updated_at"
+
+    # Validate sort direction
+    sort_dir = "DESC" if sort_dir.upper() == "DESC" else "ASC"
+
+    params["limit"] = limit
+    params["offset"] = offset
+
+    # Get total count
+    count_result = fetch_one(
+        f"""
+        SELECT COUNT(*) as total
+        FROM opportunities o
+        {where_sql}
+        """,
+        params,
+    )
+    total = count_result["total"] if count_result else 0
+
+    # Get paginated results with counts
+    opportunities = fetch_all(
+        f"""
+        SELECT
+            o.*,
+            COUNT(DISTINCT co.call_id) as call_count,
+            COUNT(DISTINCT e.id) as email_count
+        FROM opportunities o
+        LEFT JOIN call_opportunities co ON o.id = co.opportunity_id
+        LEFT JOIN emails e ON o.id = e.opportunity_id
+        {where_sql}
+        GROUP BY o.id
+        ORDER BY o.{sort} {sort_dir} NULLS LAST
+        LIMIT %(limit)s OFFSET %(offset)s
+        """,
+        params,
+    )
+
+    return opportunities, total
+
+
+def get_sync_status(entity_type: str) -> dict[str, Any] | None:
+    """
+    Get last sync timestamp for entity type.
+
+    Args:
+        entity_type: Type of entity (opportunities, calls, emails)
+
+    Returns:
+        Sync status dict or None
+    """
+    return fetch_one(
+        "SELECT * FROM sync_status WHERE entity_type = %s",
+        (entity_type,),
+    )
+
+
+def update_sync_status(
+    entity_type: str,
+    status: str = "success",
+    items_synced: int = 0,
+    errors_count: int = 0,
+    error_details: dict[str, Any] | None = None,
+) -> None:
+    """
+    Update sync status after successful sync.
+
+    Args:
+        entity_type: Type of entity (opportunities, calls, emails)
+        status: Sync status (success, partial, failed)
+        items_synced: Number of items successfully synced
+        errors_count: Number of errors encountered
+        error_details: JSONB dict with error details
+    """
+    execute_query(
+        """
+        INSERT INTO sync_status (
+            entity_type, last_sync_timestamp, last_sync_status,
+            items_synced, errors_count, error_details, updated_at
+        ) VALUES (
+            %s, NOW(), %s, %s, %s, %s, NOW()
+        )
+        ON CONFLICT (entity_type) DO UPDATE SET
+            last_sync_timestamp = NOW(),
+            last_sync_status = EXCLUDED.last_sync_status,
+            items_synced = EXCLUDED.items_synced,
+            errors_count = EXCLUDED.errors_count,
+            error_details = EXCLUDED.error_details,
+            updated_at = NOW()
+        """,
+        (entity_type, status, items_synced, errors_count, error_details),
+    )

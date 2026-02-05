@@ -3,6 +3,7 @@ Gong API client for fetching call data and transcripts.
 Documentation: https://gong.app.gong.io/settings/api/documentation
 """
 import logging
+import time
 from typing import Any
 
 import httpx
@@ -74,51 +75,70 @@ class GongClient:
         endpoint: str,
         params: dict[str, Any] | None = None,
         json_data: dict[str, Any] | None = None,
+        max_retries: int = 3,
     ) -> dict[str, Any]:
         """
-        Make an authenticated request to Gong API.
+        Make an authenticated request to Gong API with rate limit handling and exponential backoff.
 
         Args:
             method: HTTP method (GET, POST, etc.)
             endpoint: API endpoint (e.g., "/calls")
             params: Query parameters
             json_data: JSON body
+            max_retries: Maximum number of retry attempts for rate limits (default: 3)
 
         Returns:
             Response JSON as dict
 
         Raises:
-            GongAPIError: If request fails
+            GongAPIError: If request fails after all retries
         """
-        try:
-            response = self.client.request(
-                method=method,
-                url=endpoint,
-                params=params,
-                json=json_data,
-            )
-            response.raise_for_status()
-            return response.json()
+        retry_count = 0
+        backoff_seconds = 1
 
-        except HTTPStatusError as e:
-            # Sanitize response text to avoid logging credentials
-            sanitized_text = e.response.text
-            if self.api_key and self.api_key in sanitized_text:
-                sanitized_text = sanitized_text.replace(self.api_key, "***")
-            if self.api_secret and self.api_secret in sanitized_text:
-                sanitized_text = sanitized_text.replace(self.api_secret, "***")
-            logger.error(f"Gong API HTTP error: {e.response.status_code} - {sanitized_text}")
-            raise GongAPIError(f"HTTP {e.response.status_code}: {sanitized_text}") from e
+        while retry_count <= max_retries:
+            try:
+                response = self.client.request(
+                    method=method,
+                    url=endpoint,
+                    params=params,
+                    json=json_data,
+                )
+                response.raise_for_status()
+                return response.json()
 
-        except RequestError as e:
-            # Sanitize error message to avoid logging credentials
-            error_msg = str(e)
-            if self.api_key and self.api_key in error_msg:
-                error_msg = error_msg.replace(self.api_key, "***")
-            if self.api_secret and self.api_secret in error_msg:
-                error_msg = error_msg.replace(self.api_secret, "***")
-            logger.error(f"Gong API request error: {error_msg}")
-            raise GongAPIError(f"Request failed: {error_msg}") from e
+            except HTTPStatusError as e:
+                # Handle rate limiting (HTTP 429)
+                if e.response.status_code == 429 and retry_count < max_retries:
+                    retry_count += 1
+                    wait_time = backoff_seconds * (2 ** (retry_count - 1))  # Exponential backoff
+                    logger.warning(
+                        f"Rate limited by Gong API. Retry {retry_count}/{max_retries} "
+                        f"after {wait_time}s backoff"
+                    )
+                    time.sleep(wait_time)
+                    continue
+
+                # Sanitize response text to avoid logging credentials
+                sanitized_text = e.response.text
+                if self.api_key and self.api_key in sanitized_text:
+                    sanitized_text = sanitized_text.replace(self.api_key, "***")
+                if self.api_secret and self.api_secret in sanitized_text:
+                    sanitized_text = sanitized_text.replace(self.api_secret, "***")
+                logger.error(f"Gong API HTTP error: {e.response.status_code} - {sanitized_text}")
+                raise GongAPIError(f"HTTP {e.response.status_code}: {sanitized_text}") from e
+
+            except RequestError as e:
+                # Sanitize error message to avoid logging credentials
+                error_msg = str(e)
+                if self.api_key and self.api_key in error_msg:
+                    error_msg = error_msg.replace(self.api_key, "***")
+                if self.api_secret and self.api_secret in error_msg:
+                    error_msg = error_msg.replace(self.api_secret, "***")
+                logger.error(f"Gong API request error: {error_msg}")
+                raise GongAPIError(f"Request failed: {error_msg}") from e
+
+        raise GongAPIError(f"Request failed after {max_retries} retries")
 
     def get_call(self, call_id: str) -> GongCall:
         """
@@ -360,3 +380,127 @@ class GongClient:
             "Use list_calls() with date filters and filter results client-side instead. "
             "See .openspec/GONG_CLIENT_AUDIT.md for details."
         )
+
+    def list_opportunities(
+        self,
+        modified_after: str | None = None,
+        cursor: str | None = None,
+        limit: int = 100,
+    ) -> tuple[list[dict[str, Any]], str | None]:
+        """
+        List opportunities from Gong CRM with pagination and incremental sync support.
+
+        Args:
+            modified_after: ISO 8601 timestamp to fetch only modified opportunities (e.g., "2024-01-01T00:00:00Z")
+            cursor: Pagination cursor from previous response
+            limit: Maximum number of opportunities to return per page (default: 100)
+
+        Returns:
+            Tuple of (list of opportunity dicts, next cursor or None if no more pages)
+
+        Example:
+            # Initial sync
+            opps, cursor = client.list_opportunities()
+
+            # Incremental sync
+            opps, cursor = client.list_opportunities(modified_after="2024-02-05T00:00:00Z")
+
+            # Pagination
+            if cursor:
+                more_opps, next_cursor = client.list_opportunities(modified_after=..., cursor=cursor)
+        """
+        logger.info(f"Listing opportunities: modified_after={modified_after}, cursor={cursor[:20] if cursor else None}")
+
+        json_data: dict[str, Any] = {}
+
+        if modified_after:
+            json_data["filter"] = {"modifiedAfter": modified_after}
+
+        if cursor:
+            json_data["cursor"] = cursor
+
+        if limit:
+            json_data["contentSelector"] = {"limit": limit}
+
+        response = self._make_request("POST", "/crm/opportunities", json_data=json_data)
+
+        opportunities = response.get("opportunities", [])
+        next_cursor = response.get("records", {}).get("cursor")
+
+        logger.info(f"Fetched {len(opportunities)} opportunities")
+        return opportunities, next_cursor
+
+    def get_opportunity_calls(
+        self,
+        opportunity_id: str,
+        cursor: str | None = None,
+    ) -> tuple[list[str], str | None]:
+        """
+        Fetch call IDs associated with an opportunity.
+
+        Args:
+            opportunity_id: Gong opportunity ID
+            cursor: Pagination cursor from previous response
+
+        Returns:
+            Tuple of (list of call IDs, next cursor or None)
+
+        Example:
+            call_ids, cursor = client.get_opportunity_calls("opp-123")
+        """
+        logger.info(f"Fetching calls for opportunity {opportunity_id}")
+
+        json_data: dict[str, Any] = {
+            "filter": {"opportunityIds": [opportunity_id]}
+        }
+
+        if cursor:
+            json_data["cursor"] = cursor
+
+        response = self._make_request("POST", "/crm/opportunities/calls", json_data=json_data)
+
+        # Extract call IDs from response
+        call_ids = []
+        for item in response.get("calls", []):
+            if "callId" in item:
+                call_ids.append(item["callId"])
+
+        next_cursor = response.get("records", {}).get("cursor")
+
+        logger.info(f"Found {len(call_ids)} calls for opportunity {opportunity_id}")
+        return call_ids, next_cursor
+
+    def get_opportunity_emails(
+        self,
+        opportunity_id: str,
+        cursor: str | None = None,
+    ) -> tuple[list[dict[str, Any]], str | None]:
+        """
+        Fetch emails associated with an opportunity.
+
+        Args:
+            opportunity_id: Gong opportunity ID
+            cursor: Pagination cursor from previous response
+
+        Returns:
+            Tuple of (list of email dicts, next cursor or None)
+
+        Example:
+            emails, cursor = client.get_opportunity_emails("opp-123")
+        """
+        logger.info(f"Fetching emails for opportunity {opportunity_id}")
+
+        json_data: dict[str, Any] = {
+            "filter": {"opportunityIds": [opportunity_id]}
+        }
+
+        if cursor:
+            json_data["cursor"] = cursor
+
+        response = self._make_request("POST", "/crm/opportunities/emails", json_data=json_data)
+
+        emails = response.get("emails", [])
+        next_cursor = response.get("records", {}).get("cursor")
+
+        logger.info(f"Found {len(emails)} emails for opportunity {opportunity_id}")
+        return emails, next_cursor

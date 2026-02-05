@@ -268,7 +268,7 @@ async def health_check(request):
     from starlette.responses import JSONResponse
 
     if _server_ready:
-        return JSONResponse({"status": "ok", "tools": 3})
+        return JSONResponse({"status": "ok", "tools": 5})
     else:
         return JSONResponse({"status": "starting"}, status_code=503)
 
@@ -278,6 +278,82 @@ mcp.sse_app().add_route("/health", health_check, methods=["GET"])
 
 
 # Register tools
+@mcp.tool()
+def analyze_opportunity(opportunity_id: str) -> dict[str, Any]:
+    """
+    Analyze an opportunity with holistic coaching insights across all calls and emails.
+
+    Provides:
+    - Coaching score patterns across all touchpoints
+    - Recurring themes and evolution
+    - Objection handling patterns (resolved vs recurring)
+    - Relationship strength trends
+    - Specific coaching recommendations for next steps
+
+    Args:
+        opportunity_id: UUID of the opportunity to analyze
+
+    Returns:
+        Comprehensive opportunity analysis with coaching insights
+    """
+    from analysis.opportunity_coaching import (
+        analyze_opportunity_patterns,
+        identify_recurring_themes,
+        analyze_objection_progression,
+        assess_relationship_strength,
+        generate_coaching_recommendations,
+    )
+    from db import queries
+
+    # Verify opportunity exists
+    opp = queries.get_opportunity(opportunity_id)
+    if not opp:
+        return {"error": f"Opportunity not found: {opportunity_id}"}
+
+    # Run all analyses
+    patterns = analyze_opportunity_patterns(opportunity_id)
+    themes = identify_recurring_themes(opportunity_id)
+    objections = analyze_objection_progression(opportunity_id)
+    relationship = assess_relationship_strength(opportunity_id)
+    recommendations = generate_coaching_recommendations(opportunity_id)
+
+    return {
+        "opportunity": {
+            "id": opportunity_id,
+            "name": opp["name"],
+            "account": opp["account_name"],
+            "owner": opp["owner_email"],
+            "stage": opp["stage"],
+            "health_score": opp.get("health_score"),
+        },
+        "patterns": patterns,
+        "themes": themes,
+        "objections": objections,
+        "relationship": relationship,
+        "recommendations": recommendations,
+    }
+
+
+@mcp.tool()
+def get_learning_insights(rep_email: str, focus_area: str = "discovery") -> dict[str, Any]:
+    """
+    Compare rep's performance to top performers on closed-won deals.
+
+    Shows specific behavioral differences with concrete examples from successful calls.
+    Focus areas: discovery, objections, product_knowledge, rapport, next_steps.
+
+    Args:
+        rep_email: Email of the rep to analyze
+        focus_area: Area to focus on (discovery, objections, product_knowledge, rapport, next_steps)
+
+    Returns:
+        Behavioral differences and exemplar moments from top performers
+    """
+    from analysis.learning_insights import get_learning_insights as _get_learning_insights
+
+    return _get_learning_insights(rep_email, focus_area)
+
+
 @mcp.tool()
 def analyze_call(
     call_id: str,
@@ -460,7 +536,7 @@ def main(dev: bool = False) -> None:
 
             logger.info("\n✅ All validation checks passed!")
             logger.info("=" * 60)
-            logger.info("🚀 MCP server ready - 3 tools registered")
+            logger.info("🚀 MCP server ready - 5 tools registered")
             logger.info("=" * 60)
 
             # Mark server as ready
@@ -479,7 +555,7 @@ def main(dev: bool = False) -> None:
     else:
         logger.info("\n⚠️  Validation skipped (SKIP_VALIDATION=true)")
         logger.info("=" * 60)
-        logger.info("🚀 MCP server starting - 3 tools registered")
+        logger.info("🚀 MCP server starting - 5 tools registered")
         logger.info("=" * 60)
         _server_ready = True
 
