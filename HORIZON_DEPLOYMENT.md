@@ -1,54 +1,48 @@
-# Horizon Deployment Configuration
+# Horizon Deployment Configuration - FastMCP Best Practices
 
-## Current Issue
+## The Right Way: fastmcp.json
 
-The deployment is failing with "No module named 'coaching_mcp'" because Horizon is trying to run the server as a Python module instead of importing it as a file.
+According to FastMCP documentation, the best practice for Horizon deployment is to use a `fastmcp.json` configuration file. This file is now included in the repository.
 
-## Correct Horizon Configuration
+### What fastmcp.json does:
 
-When configuring the server in the Horizon UI, use these settings:
-
-### Server Entrypoint
-```
-launcher.py:mcp
-```
-
-**Alternative (if launcher doesn't work)**: Add `--with-editable .` flag to install the package first
-
-The launcher script handles installing the `coaching_mcp` package before importing the server.
-
-### Explanation
-
-According to FastMCP documentation, Horizon expects:
-- **Format**: `path/to/file.py:variable_name`
-- **Our server**: The FastMCP instance is created at line 216 of `coaching_mcp/server.py` as `mcp = FastMCP("Gong Call Coaching Agent")`
-- **Therefore**: Use `coaching_mcp/server.py:mcp`
-
-Horizon will:
-1. Clone the GitHub repository
-2. Install dependencies from `requirements.txt` or `pyproject.toml`
-3. Import the file directly: `from coaching_mcp.server import mcp`
-4. Run the FastMCP instance
-
-## Dependencies
-
-Horizon will auto-detect dependencies. Ensure we have either:
-
-### Option 1: requirements.txt (Recommended)
-Create a `requirements.txt` with:
-```
-fastmcp==0.3.0
-anthropic==0.40.0
-psycopg2-binary==2.9.9
-httpx==0.27.2
-pydantic>=2.0.0
-pydantic-settings>=2.0.0
+```json
+{
+  "source": {
+    "path": "coaching_mcp/server.py",  // Path to the server file
+    "entrypoint": "mcp"                 // Variable name of the FastMCP instance
+  },
+  "environment": {
+    "type": "uv",
+    "project": ".",                     // Use pyproject.toml in current directory
+    "editable": ["."]                   // Install current directory as editable package
+  }
+}
 ```
 
-### Option 2: pyproject.toml
-Horizon can also read from `pyproject.toml` if it exists.
+The **`"editable": ["."]`** is the key - it tells Horizon to install the current directory as an editable Python package before importing the server. This makes all `from coaching_mcp.*` imports work correctly.
 
-## Environment Variables
+## Horizon UI Configuration
+
+### Entrypoint
+```
+coaching_mcp/server.py:mcp
+```
+
+This means:
+- **File**: `coaching_mcp/server.py`
+- **Variable**: `mcp` (the FastMCP instance at line 216 in that file)
+
+### How Horizon Will Build It
+
+1. Clone GitHub repository
+2. Read `fastmcp.json` configuration
+3. Install dependencies from `pyproject.toml` (detected via `"project": "."`)
+4. Install current directory as editable package (via `"editable": ["."]`)
+5. Import: `from coaching_mcp.server import mcp`
+6. Run the server
+
+### Environment Variables
 
 Configure these in Horizon UI under "Environment Variables":
 
@@ -63,23 +57,29 @@ LOG_LEVEL=INFO
 SKIP_VALIDATION=false  # Set to true to skip startup validation
 ```
 
-## Testing the Fix
+## Why Previous Approaches Failed
 
-1. **Go to Horizon UI** → Your call-coach server
-2. **Click "Settings" or "Configuration"**
-3. **Update the entrypoint to**: `coaching_mcp/server.py:mcp`
-4. **Save and redeploy**
+1. **`python -m coaching_mcp.server`** - Requires parent directory in PYTHONPATH
+2. **`coaching_mcp/server.py:mcp` alone** - Package not installed, imports fail
+3. **`launcher.py`** - Workaround, not best practice
 
-The server should now start successfully!
+## Best Practice (Current Approach)
+
+Use `fastmcp.json` with `"editable": ["."]` to install the local package properly. This follows FastMCP's documented pattern for projects with local packages.
 
 ## Verification
 
-Once deployed, you should see in the logs:
+Once deployed, check logs for:
 ```
 🚀 MCP server ready - 3 tools registered
 ```
 
-And in Claude Desktop, you should see 3 tools available:
+And in Claude Desktop, verify 3 tools are available:
 - `analyze_call`
 - `get_rep_insights`
 - `search_calls`
+
+## References
+
+- [FastMCP Environment Configuration](https://gofastmcp.com/deployment/server-configuration#environment-configuration)
+- [FastMCP Horizon Deployment](https://gofastmcp.com/deployment/prefect-horizon)
