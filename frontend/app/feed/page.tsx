@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useUser } from "@clerk/nextjs";
 import { useInfiniteFeed } from "@/lib/hooks";
 import {
   FeedItemCard,
@@ -13,21 +14,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Inbox } from "lucide-react";
-import { isManager as checkIsManager } from "@/lib/auth";
+import { isManager } from "@/lib/auth-utils";
 
 export default function FeedPage() {
+  const { user } = useUser();
   const [filters, setFilters] = useState<FeedFilterState>({
     typeFilter: 'all',
     timeFilter: 'this_week',
   });
-  const [isManager, setIsManager] = useState(false);
   const [newItemsCount, setNewItemsCount] = useState(0);
   const loaderRef = useRef<HTMLDivElement>(null);
 
-  // Check if user is manager
-  useEffect(() => {
-    checkIsManager().then(setIsManager);
-  }, []);
+  // Check if user is manager using client-safe utility
+  const userIsManager = isManager(user);
 
   // Build filter options for the hook
   const filterOptions = {
@@ -136,7 +135,7 @@ export default function FeedPage() {
         filters={filters}
         onFiltersChange={setFilters}
         itemCounts={itemCounts}
-        isManager={isManager}
+        isManager={userIsManager}
       />
 
       {/* Content Grid */}
@@ -210,7 +209,7 @@ export default function FeedPage() {
         {/* Sidebar Column */}
         <div className="space-y-6">
           {/* Team Insights - Manager Only */}
-          {isManager && teamInsights.length > 0 && (
+          {userIsManager && teamInsights.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-foreground">
                 Team Insights

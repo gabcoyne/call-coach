@@ -1,12 +1,7 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+'use server';
 
-/**
- * User roles for the coaching application
- */
-export enum UserRole {
-  MANAGER = "manager",
-  REP = "rep",
-}
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { UserRole } from "./auth-utils";
 
 /**
  * Get the current user's role from Clerk metadata
@@ -100,19 +95,4 @@ export async function getUserSession() {
     role: await getCurrentUserRole(),
     email: await getCurrentUserEmail(),
   };
-}
-
-/**
- * Type guard for checking if metadata contains a valid role
- */
-export function hasValidRole(metadata: unknown): metadata is { role: UserRole } {
-  if (typeof metadata !== "object" || metadata === null) {
-    return false;
-  }
-
-  const obj = metadata as Record<string, unknown>;
-  return (
-    typeof obj.role === "string" &&
-    (obj.role === UserRole.MANAGER || obj.role === UserRole.REP)
-  );
 }
