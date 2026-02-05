@@ -1,3 +1,6 @@
+# Install the current package (coaching_mcp) in editable mode
+-e .
+
 # FastMCP for on-demand coaching tools
 fastmcp>=0.3.0
 
