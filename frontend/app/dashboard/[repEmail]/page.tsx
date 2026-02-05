@@ -220,97 +220,228 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
 
   if (!insights) {
     return (
-      <div className="container mx-auto p-6">
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-2">No Data Available</h2>
-          <p className="text-sm text-muted-foreground">
-            No insights available for this rep. Make sure calls have been analyzed.
-          </p>
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Rep Dashboard</h1>
+            <p className="text-muted-foreground mt-1">{repEmail}</p>
+          </div>
+        </div>
+
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-muted-foreground text-center">
+              No insights available for this rep. Make sure calls have been analyzed.
+            </p>
+          </CardContent>
         </Card>
       </div>
     );
   }
 
-  // Mock call history - in production this would come from the API
-  const callHistory = insights.score_trends.overall?.dates.map((date, index) => ({
-    call_id: `call-${index}`,
-    title: `Sales Call ${index + 1}`,
-    date,
-    duration_seconds: 1800 + Math.random() * 1800,
-    call_type: ['discovery', 'demo', 'technical_deep_dive'][Math.floor(Math.random() * 3)],
-    product: ['prefect', 'horizon'][Math.floor(Math.random() * 2)],
-    overall_score: insights.score_trends.overall?.scores[index] ?? null,
-  })) || [];
+  const totalCalls = insights.rep_info.calls_analyzed;
+  const overallScore = calculateOverallScore();
+  const dimensionScores = calculateAverageDimensionScores();
+  const { data: trendData, dimensions } = prepareTrendData();
+  const recentCalls = getRecentCalls();
+  const hasEnoughData = totalCalls >= 3;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Header with period selector */}
+      {/* Header with Back Button and Time Range Filter */}
       <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          onClick={() => router.back()}
-          className="gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </Button>
-        <TimePeriodSelector value={timePeriod} onChange={setTimePeriod} />
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">
+              {insights.rep_info.name}
+            </h1>
+            <p className="text-muted-foreground mt-1">{repEmail}</p>
+          </div>
+        </div>
+
+        {/* Time Range Filter */}
+        <Select value={timeRange} onValueChange={(v) => setTimeRange(v as TimeRange)}>
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {TIME_RANGE_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Manager-only Rep Selector */}
-      {isManager && (
-        <Card className="p-4">
-          <RepSelector
-            reps={[
-              { email: repEmail, name: insights.rep_info.name },
-              // In production, this would be fetched from an API
-            ]}
-            selectedRepEmail={repEmail}
-            onChange={(email) => router.push(`/dashboard/${encodeURIComponent(email)}`)}
-            currentUserEmail={currentUserEmail}
-          />
+      {/* Performance Overview Section */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Performance Overview</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {overallScore !== null ? (
+            <ScoreCard
+              score={overallScore}
+              title="Overall Average Score"
+              subtitle={`Based on ${totalCalls} call${totalCalls !== 1 ? 's' : ''}`}
+            />
+          ) : (
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-gray-500">No score data available</p>
+              </CardContent>
+            </Card>
+          )}
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Calls</p>
+                  <p className="text-3xl font-bold mt-2">{totalCalls}</p>
+                </div>
+                <Phone className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                {insights.rep_info.date_range.period}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Date Range</p>
+                  <p className="text-sm font-semibold mt-2">
+                    {new Date(insights.rep_info.date_range.start).toLocaleDateString()}
+                  </p>
+                  <p className="text-sm text-gray-500">to</p>
+                  <p className="text-sm font-semibold">
+                    {new Date(insights.rep_info.date_range.end).toLocaleDateString()}
+                  </p>
+                </div>
+                <Calendar className="w-8 h-8 text-gray-400" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Performance Trend Charts */}
+      {hasEnoughData ? (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Performance Trends</h2>
+          <Card>
+            <CardHeader>
+              <CardTitle>Score Trends Over Time</CardTitle>
+              <CardDescription>
+                Track performance across different coaching dimensions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TrendChart
+                data={trendData}
+                dimensions={dimensions}
+                height={350}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="pt-6">
+            <p className="text-sm text-yellow-800 text-center">
+              Not enough data to display trends. At least 3 analyzed calls are required.
+            </p>
+          </CardContent>
         </Card>
       )}
 
-      {/* Dashboard Header */}
-      <DashboardHeader
-        repInfo={insights.rep_info}
-        overallScore={calculateOverallScore()}
-      />
+      {/* Aggregated Metrics - Average Dimension Scores */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Dimension Breakdown</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {dimensionScores.map((dim) => (
+            <ScoreCard
+              key={dim.dimension}
+              score={dim.avgScore}
+              title={dim.displayName}
+            />
+          ))}
+        </div>
+      </div>
 
-      {/* Score Trends Chart */}
-      <ScoreTrendsChart
-        scoreTrends={insights.score_trends}
-        showTeamAverage={isManager}
-      />
+      {/* Recent Calls List */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Recent Calls</h2>
+        <Card>
+          <CardContent className="pt-6">
+            {recentCalls.length > 0 ? (
+              <div className="space-y-3">
+                {recentCalls.map((call, index) => {
+                  const scoreColor = call.overall_score ? getScoreColor(call.overall_score) : null;
 
-      {/* Radar Chart */}
-      <DimensionRadarChart
-        scoreTrends={insights.score_trends}
-        showTeamAverage={isManager}
-      />
-
-      {/* Skill Gaps */}
-      <SkillGapCards skillGaps={insights.skill_gaps} />
-
-      {/* Improvement Areas and Recent Wins */}
-      <ImprovementAreas
-        improvementAreas={insights.improvement_areas}
-        recentWins={insights.recent_wins}
-      />
-
-      {/* Coaching Plan */}
-      <CoachingPlanSection
-        coachingPlan={insights.coaching_plan}
-        onExport={handleExportPlan}
-        onShare={handleSharePlan}
-      />
-
-      {/* Call History */}
-      <CallHistoryTable
-        calls={callHistory}
-        onCallClick={handleCallClick}
-      />
+                  return (
+                    <div
+                      key={call.call_id}
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm text-gray-500">#{index + 1}</div>
+                        <div>
+                          <p className="text-sm font-medium">{call.call_type}</p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(call.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {call.overall_score !== null ? (
+                          <div
+                            className="px-3 py-1 rounded-full text-sm font-semibold"
+                            style={{
+                              backgroundColor: scoreColor?.bg,
+                              color: scoreColor?.text,
+                            }}
+                          >
+                            {call.overall_score}
+                          </div>
+                        ) : (
+                          <span className="text-sm text-gray-400">N/A</span>
+                        )}
+                        <Link
+                          href={`/calls/${call.call_id}`}
+                          className="text-sm text-blue-600 hover:text-blue-800"
+                        >
+                          View Details
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center">No calls available</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

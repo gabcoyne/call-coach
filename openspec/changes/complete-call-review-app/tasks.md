@@ -56,20 +56,20 @@
 
 ## 5. Rep Dashboard Pages
 
-- [ ] 5.1 Update frontend/app/dashboard/page.tsx for manager view (all reps list)
-- [ ] 5.2 Implement manager dashboard table with rep name, email, average scores, recent activity
-- [ ] 5.3 Add click handler to navigate to individual rep dashboard
-- [ ] 5.4 Hide manager dashboard features for rep role users
-- [ ] 5.5 Update frontend/app/dashboard/[repEmail]/page.tsx to use useRepInsights hook
-- [ ] 5.6 Implement performance overview section with average scores and total calls
-- [ ] 5.7 Display performance trend charts using TrendChart component
-- [ ] 5.8 Add "Not enough data" message when rep has fewer than 3 calls
-- [ ] 5.9 Display recent calls list (10 most recent) with date, type, score, and link
-- [ ] 5.10 Implement aggregated metrics: average dimension scores and call type distribution
-- [ ] 5.11 Add time range filter dropdown (7 days, 30 days, 90 days, all time)
-- [ ] 5.12 Implement role-based access check: rep users return 403 for other reps' dashboards
-- [ ] 5.13 Add loading skeletons for metrics and charts
-- [ ] 5.14 Implement error handling with retry button
+- [x] 5.1 Update frontend/app/dashboard/page.tsx for manager view (all reps list)
+- [x] 5.2 Implement manager dashboard table with rep name, email, average scores, recent activity
+- [x] 5.3 Add click handler to navigate to individual rep dashboard
+- [x] 5.4 Hide manager dashboard features for rep role users
+- [x] 5.5 Update frontend/app/dashboard/[repEmail]/page.tsx to use useRepInsights hook
+- [x] 5.6 Implement performance overview section with average scores and total calls
+- [x] 5.7 Display performance trend charts using TrendChart component
+- [x] 5.8 Add "Not enough data" message when rep has fewer than 3 calls
+- [x] 5.9 Display recent calls list (10 most recent) with date, type, score, and link
+- [x] 5.10 Implement aggregated metrics: average dimension scores and call type distribution
+- [x] 5.11 Add time range filter dropdown (7 days, 30 days, 90 days, all time)
+- [x] 5.12 Implement role-based access check: rep users return 403 for other reps' dashboards
+- [x] 5.13 Add loading skeletons for metrics and charts
+- [x] 5.14 Implement error handling with retry button
 
 ## 6. Search and Filter Page
 
