@@ -1,0 +1,152 @@
+{
+  "server_name": "gong-call-coach",
+  "description": "AI-powered coaching agent for Gong sales calls with performance tracking and insights",
+  "version": "0.1.0",
+  "runtime": "python",
+  "python_version": "3.11",
+  "entry_point": "mcp/server.py",
+  "dependencies": [
+    "fastmcp==0.3.0",
+    "anthropic==0.40.0",
+    "psycopg2-binary==2.9.9",
+    "httpx==0.27.2",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "tiktoken>=0.7.0"
+  ],
+  "environment_variables": {
+    "required": [
+      "GONG_API_KEY",
+      "GONG_API_SECRET",
+      "GONG_API_BASE_URL",
+      "ANTHROPIC_API_KEY",
+      "DATABASE_URL"
+    ],
+    "optional": [
+      "GONG_WEBHOOK_SECRET",
+      "LOG_LEVEL"
+    ]
+  },
+  "tools": [
+    {
+      "name": "analyze_call",
+      "description": "Deep-dive coaching analysis of a specific Gong call with scores, examples, and action items",
+      "parameters": [
+        {
+          "name": "call_id",
+          "type": "string",
+          "required": true,
+          "description": "Gong call ID to analyze"
+        },
+        {
+          "name": "dimensions",
+          "type": "array",
+          "required": false,
+          "description": "List of dimensions to analyze (product_knowledge, discovery, objection_handling, engagement)"
+        },
+        {
+          "name": "use_cache",
+          "type": "boolean",
+          "required": false,
+          "description": "Use cached analyses if available"
+        },
+        {
+          "name": "include_transcript_snippets",
+          "type": "boolean",
+          "required": false,
+          "description": "Include actual quotes from call"
+        },
+        {
+          "name": "force_reanalysis",
+          "type": "boolean",
+          "required": false,
+          "description": "Bypass cache and regenerate analysis"
+        }
+      ]
+    },
+    {
+      "name": "get_rep_insights",
+      "description": "Performance trends and coaching history for a sales rep with skill gaps and personalized coaching plans",
+      "parameters": [
+        {
+          "name": "rep_email",
+          "type": "string",
+          "required": true,
+          "description": "Email address of the sales rep"
+        },
+        {
+          "name": "time_period",
+          "type": "string",
+          "required": false,
+          "description": "Time range for analysis (last_7_days, last_30_days, last_quarter, last_year, all_time)"
+        },
+        {
+          "name": "product_filter",
+          "type": "string",
+          "required": false,
+          "description": "Filter by product (prefect, horizon, both)"
+        }
+      ]
+    },
+    {
+      "name": "search_calls",
+      "description": "Find calls matching specific criteria with powerful filtering",
+      "parameters": [
+        {
+          "name": "rep_email",
+          "type": "string",
+          "required": false,
+          "description": "Filter by sales rep email"
+        },
+        {
+          "name": "product",
+          "type": "string",
+          "required": false,
+          "description": "Filter by product (prefect, horizon, both)"
+        },
+        {
+          "name": "call_type",
+          "type": "string",
+          "required": false,
+          "description": "Filter by call type (discovery, demo, technical_deep_dive, negotiation)"
+        },
+        {
+          "name": "date_range",
+          "type": "object",
+          "required": false,
+          "description": "Date range filter with start and end dates"
+        },
+        {
+          "name": "min_score",
+          "type": "integer",
+          "required": false,
+          "description": "Minimum overall score (0-100)"
+        },
+        {
+          "name": "max_score",
+          "type": "integer",
+          "required": false,
+          "description": "Maximum overall score (0-100)"
+        },
+        {
+          "name": "has_objection_type",
+          "type": "string",
+          "required": false,
+          "description": "Filter for calls with specific objection types (pricing, timing, technical, competitor)"
+        },
+        {
+          "name": "topics",
+          "type": "array",
+          "required": false,
+          "description": "Filter by topics discussed"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Maximum number of results (default: 20, max: 100)"
+        }
+      ]
+    }
+  ]
+}

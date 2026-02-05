@@ -1,0 +1,19 @@
+[project]
+name = "gong-call-coach"
+version = "0.1.0"
+
+[server]
+command = "uv"
+args = ["run", "python", "coaching_mcp/server.py"]
+
+[server.env]
+GONG_API_KEY = "${GONG_API_KEY}"
+GONG_API_SECRET = "${GONG_API_SECRET}"
+GONG_API_BASE_URL = "${GONG_API_BASE_URL}"
+ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY}"
+DATABASE_URL = "${DATABASE_URL}"
+GONG_WEBHOOK_SECRET = "${GONG_WEBHOOK_SECRET}"
+LOG_LEVEL = "${LOG_LEVEL}"
+
+[dependencies]
+python = ">=3.11"
