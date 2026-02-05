@@ -1,11 +1,11 @@
 ## 1. Project Bootstrap and Monorepo Setup
 
-- [ ] 1.1 Add Turborepo to root package.json and create turbo.json config
-- [ ] 1.2 Create frontend/ directory with proper workspace configuration
-- [ ] 1.3 Initialize Next.js 15 with App Router in frontend/ directory
-- [ ] 1.4 Configure TypeScript with strict mode and path aliases
-- [ ] 1.5 Set up ESLint and Prettier with shared configs
-- [ ] 1.6 Create .gitignore for frontend build artifacts
+- [x] 1.1 Add Turborepo to root package.json and create turbo.json config
+- [x] 1.2 Create frontend/ directory with proper workspace configuration
+- [x] 1.3 Initialize Next.js 15 with App Router in frontend/ directory
+- [x] 1.4 Configure TypeScript with strict mode and path aliases
+- [x] 1.5 Set up ESLint and Prettier with shared configs
+- [x] 1.6 Create .gitignore for frontend build artifacts
 
 ## 2. Design System Foundation
 
