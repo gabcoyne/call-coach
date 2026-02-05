@@ -1,0 +1,83 @@
+# Vercel Ignore File
+# Files and directories to exclude from Vercel deployments
+
+# Documentation (not needed in production)
+*.md
+!README.md
+docs/
+
+# Development files
+.env.local
+.env*.local
+*.log
+*.logs
+
+# Test files
+**/__tests__/
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+coverage/
+.jest/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD (handled separately)
+.github/
+.gitlab-ci.yml
+.circleci/
+
+# Python backend (not part of frontend deployment)
+*.py
+*.pyc
+__pycache__/
+venv/
+.venv/
+.python-version
+pyproject.toml
+uv.lock
+flows/
+analysis/
+gong/
+knowledge/
+db/
+
+# OpenSpec and project management
+openspec/
+.openspec/
+.beads/
+.fastmcp/
+
+# Turborepo cache
+.turbo/
+
+# Node modules (reinstalled during build)
+node_modules/
+
+# Build artifacts (regenerated)
+.next/
+out/
+dist/
+build/
+
+# Storybook
+storybook-static/
+.storybook/
+
+# Misc
+*.tgz
+*.zip
+.npmrc
+.yarnrc
