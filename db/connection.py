@@ -32,12 +32,10 @@ def get_db_pool() -> pool.ThreadedConnectionPool:
                 minconn=settings.database_pool_min_size,
                 maxconn=settings.database_pool_max_size,
                 dsn=settings.database_url,
-                options="-c statement_timeout=30000",  # 30 second statement timeout
             )
             logger.info(
                 f"Database pool initialized: "
-                f"{settings.database_pool_min_size}-{settings.database_pool_max_size} connections "
-                f"(statement_timeout=30s)"
+                f"{settings.database_pool_min_size}-{settings.database_pool_max_size} connections"
             )
         except Exception as e:
             # Sanitize error message to avoid logging database credentials
@@ -68,6 +66,10 @@ def get_db_connection() -> Generator[psycopg2.extensions.connection, None, None]
     conn = db_pool.getconn()
 
     try:
+        # Set statement timeout per connection (30 seconds)
+        # This is done per-connection rather than in pool options for Neon pooler compatibility
+        with conn.cursor() as cur:
+            cur.execute("SET statement_timeout = '30s'")
         yield conn
     finally:
         db_pool.putconn(conn)

@@ -258,22 +258,169 @@ Scheduled every Monday at 6am PT via Prefect Horizon:
 - Generates rep-specific coaching reports
 - Sends team-wide insights to sales leadership
 
-## Development
+## Local Development
 
-### Run tests
+### Full Stack Development (Backend + Frontend)
+
+**Terminal 1 - MCP Backend Server**:
 ```bash
-pytest tests/
+# Ensure you're in the project root
+cd /Users/gcoyne/src/prefect/call-coach
+
+# Activate Python environment
+source .venv/bin/activate  # or use uv
+
+# Run the FastMCP server on port 8000
+uv run python coaching_mcp/server.py
+
+# You should see:
+# ✓ Database connection successful
+# ✓ Gong API authentication successful
+# ✓ Anthropic API key validated
+# 🚀 MCP server ready - 3 tools registered
+# Server running on http://localhost:8000
 ```
 
-### Local development with Docker Compose
+**Terminal 2 - Next.js Frontend**:
 ```bash
-docker-compose up
+# Navigate to frontend directory
+cd /Users/gcoyne/src/prefect/call-coach/frontend
+
+# Install dependencies (first time only)
+npm install
+
+# Start development server on port 3000
+npm run dev
+
+# You should see:
+# ▲ Next.js 15.1.6
+# - Local:    http://localhost:3000
+# ✓ Ready in 1.5s
 ```
 
-### Check cost metrics
+**Terminal 3 - Watch Tests (Optional)**:
 ```bash
-python -m analysis.metrics
+cd /Users/gcoyne/src/prefect/call-coach/frontend
+npm run test:watch
 ```
+
+### Environment Setup
+
+**Backend** (`.env` in project root):
+```bash
+# Required for MCP backend
+ANTHROPIC_API_KEY=sk-ant-...
+DATABASE_URL=postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/callcoach?sslmode=require
+GONG_API_KEY=your_key
+GONG_API_SECRET=your_secret
+GONG_API_BASE_URL=https://us-79647.api.gong.io/v2
+```
+
+**Frontend** (`frontend/.env.local`):
+```bash
+# Required for Next.js frontend
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_MCP_BACKEND_URL=http://localhost:8000
+
+# Optional - Clerk URLs (defaults shown)
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+```
+
+### Development Workflow
+
+1. **Backend changes**: Edit files in `coaching_mcp/`, `analysis/`, `gong/`, or `db/`
+   - Server auto-reloads on file changes (if using uvicorn with --reload)
+   - Test with: `pytest tests/`
+
+2. **Frontend changes**: Edit files in `frontend/app/`, `frontend/components/`, or `frontend/lib/`
+   - Next.js hot-reloads automatically
+   - Test with: `npm run test`
+
+3. **Database changes**:
+   ```bash
+   # Apply migration
+   psql $DATABASE_URL -f db/migrations/00X_migration_name.sql
+
+   # Verify
+   psql $DATABASE_URL -c "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';"
+   ```
+
+4. **Test full flow**:
+   - Open browser: http://localhost:3000
+   - Sign in with Clerk (create test user first)
+   - Navigate to Dashboard, Search, or Feed
+   - Backend API calls go to http://localhost:8000
+
+### Common Development Tasks
+
+**Run Python tests**:
+```bash
+pytest tests/ -v
+```
+
+**Run frontend tests**:
+```bash
+cd frontend
+npm run test:coverage
+```
+
+**Analyze bundle size**:
+```bash
+cd frontend
+npm run analyze
+```
+
+**Check Python dependencies**:
+```bash
+uv tree
+```
+
+**Update frontend dependencies**:
+```bash
+cd frontend
+npm outdated
+npm update
+```
+
+**Format code**:
+```bash
+# Python (if black/ruff configured)
+black coaching_mcp/ analysis/ gong/ db/
+
+# Frontend
+cd frontend
+npm run lint
+```
+
+### Troubleshooting
+
+**Backend won't start**:
+- Check `.env` has all required variables
+- Verify database connection: `psql $DATABASE_URL -c "SELECT 1"`
+- Check Gong credentials: `python tests/test_gong_client_live.py`
+- Review logs for specific error
+
+**Frontend won't start**:
+- Check `frontend/.env.local` exists with Clerk keys
+- Run `npm install` to ensure dependencies are installed
+- Clear Next.js cache: `rm -rf frontend/.next`
+- Check port 3000 isn't already in use: `lsof -ti:3000`
+
+**API calls failing** (Frontend → Backend):
+- Verify backend is running on http://localhost:8000
+- Check `NEXT_PUBLIC_MCP_BACKEND_URL` in `frontend/.env.local`
+- Open browser DevTools Network tab, check request/response
+- Review CORS settings if needed
+
+**Database connection issues**:
+- Confirm Neon database is running
+- Check DATABASE_URL includes `?sslmode=require`
+- Verify IP allowlist in Neon dashboard
+- Test connection: `psql $DATABASE_URL`
 
 ## Cost Optimization
 

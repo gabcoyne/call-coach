@@ -36,7 +36,7 @@ jest.mock('@clerk/nextjs/server', () => ({
     emailAddresses: [{ emailAddress: 'test@example.com' }],
     publicMetadata: { role: 'rep' },
   })),
-  ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
+  ClerkProvider: ({ children }) => children,
 }))
 
 jest.mock('@clerk/nextjs', () => ({
