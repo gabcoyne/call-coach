@@ -88,18 +88,18 @@
 
 ## 8. Call Search and Filter
 
-- [ ] 8.1 Create app/search/page.tsx route
-- [ ] 8.2 Implement multi-criteria filter form (rep, date, product, call type)
-- [ ] 8.3 Add score threshold filters (min/max overall and dimension scores)
-- [ ] 8.4 Create objection type multi-select filter
-- [ ] 8.5 Add topic keyword filter with multi-select
-- [ ] 8.6 Implement search results display (card view and table view toggle)
-- [ ] 8.7 Add sorting options (date, score, duration)
-- [ ] 8.8 Implement pagination (20 results per page with page size selector)
-- [ ] 8.9 Create save search feature (persist to localStorage or DB)
-- [ ] 8.10 Add load saved searches dropdown
-- [ ] 8.11 Implement export results as CSV/Excel
-- [ ] 8.12 Create quick filter presets (My Calls This Week, Low Performers, etc.)
+- [x] 8.1 Create app/search/page.tsx route
+- [x] 8.2 Implement multi-criteria filter form (rep, date, product, call type)
+- [x] 8.3 Add score threshold filters (min/max overall and dimension scores)
+- [x] 8.4 Create objection type multi-select filter
+- [x] 8.5 Add topic keyword filter with multi-select
+- [x] 8.6 Implement search results display (card view and table view toggle)
+- [x] 8.7 Add sorting options (date, score, duration)
+- [x] 8.8 Implement pagination (20 results per page with page size selector)
+- [x] 8.9 Create save search feature (persist to localStorage or DB)
+- [x] 8.10 Add load saved searches dropdown
+- [x] 8.11 Implement export results as CSV/Excel
+- [x] 8.12 Create quick filter presets (My Calls This Week, Low Performers, etc.)
 
 ## 9. Coaching Insights Feed
 
