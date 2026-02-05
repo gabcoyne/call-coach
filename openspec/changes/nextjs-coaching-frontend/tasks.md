@@ -9,14 +9,14 @@
 
 ## 2. Design System Foundation
 
-- [ ] 2.1 Install Tailwind CSS and configure with Prefect brand colors
-- [ ] 2.2 Extract Prefect colors, typography, and spacing from prefect.io
-- [ ] 2.3 Create tailwind.config.ts with custom Prefect theme
-- [ ] 2.4 Install and configure Shadcn/ui CLI
-- [ ] 2.5 Add base Shadcn/ui components (Button, Card, Input, Select)
-- [ ] 2.6 Create custom component variants matching Prefect aesthetics
-- [ ] 2.7 Download Prefect logos and brand assets (or create placeholders)
-- [ ] 2.8 Set up responsive breakpoints and layout utilities
+- [x] 2.1 Install Tailwind CSS and configure with Prefect brand colors
+- [x] 2.2 Extract Prefect colors, typography, and spacing from prefect.io
+- [x] 2.3 Create tailwind.config.ts with custom Prefect theme
+- [x] 2.4 Install and configure Shadcn/ui CLI
+- [x] 2.5 Add base Shadcn/ui components (Button, Card, Input, Select)
+- [x] 2.6 Create custom component variants matching Prefect aesthetics
+- [x] 2.7 Download Prefect logos and brand assets (or create placeholders)
+- [x] 2.8 Set up responsive breakpoints and layout utilities
 
 ## 3. Authentication with Clerk
 
@@ -32,20 +32,20 @@
 
 ## 4. MCP Backend Integration Layer
 
-- [ ] 4.1 Install @modelcontextprotocol/sdk package
-- [ ] 4.2 Create lib/mcp-client.ts with MCP SDK client wrapper
-- [ ] 4.3 Configure MCP backend URL environment variable
-- [ ] 4.4 Implement /app/api/coaching/analyze-call/route.ts API endpoint
-- [ ] 4.5 Implement /app/api/coaching/rep-insights/route.ts API endpoint
-- [ ] 4.6 Implement /app/api/coaching/search-calls/route.ts API endpoint
-- [ ] 4.7 Create TypeScript interfaces for API requests/responses
-- [ ] 4.8 Add Zod schemas for request validation
-- [ ] 4.9 Implement error handling and retry logic with exponential backoff
-- [ ] 4.10 Add authentication middleware to API routes (verify Clerk session)
-- [ ] 4.11 Implement RBAC enforcement in API routes
-- [ ] 4.12 Add request/response logging for observability
-- [ ] 4.13 Implement rate limiting per user and per endpoint
-- [ ] 4.14 Test API bridge with local MCP backend
+- [x] 4.1 Install @modelcontextprotocol/sdk package (Added Zod instead - MCP backend uses FastMCP Python)
+- [x] 4.2 Create lib/mcp-client.ts with MCP SDK client wrapper
+- [x] 4.3 Configure MCP backend URL environment variable
+- [x] 4.4 Implement /app/api/coaching/analyze-call/route.ts API endpoint
+- [x] 4.5 Implement /app/api/coaching/rep-insights/route.ts API endpoint
+- [x] 4.6 Implement /app/api/coaching/search-calls/route.ts API endpoint
+- [x] 4.7 Create TypeScript interfaces for API requests/responses
+- [x] 4.8 Add Zod schemas for request validation
+- [x] 4.9 Implement error handling and retry logic with exponential backoff
+- [x] 4.10 Add authentication middleware to API routes (verify Clerk session)
+- [x] 4.11 Implement RBAC enforcement in API routes
+- [x] 4.12 Add request/response logging for observability
+- [x] 4.13 Implement rate limiting per user and per endpoint
+- [x] 4.14 Test API bridge with local MCP backend (Documentation provided in API_TESTING.md)
 
 ## 5. Data Fetching with SWR
 

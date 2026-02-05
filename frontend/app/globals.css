@@ -2,26 +2,88 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    /* Prefect Brand Colors - Light Mode */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Primary - Prefect Pink */
+    --primary: 322 100% 64%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Prefect Blue */
+    --secondary: 210 100% 54%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted - Subtle gray */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 16% 47%;
+
+    /* Accent - Prefect Sunrise Orange */
+    --accent: 24 99% 67%;
+    --accent-foreground: 222 47% 11%;
+
+    /* Destructive - Error red */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 322 100% 64%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Prefect Brand Colors - Dark Mode */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Primary - Prefect Pink */
+    --primary: 322 100% 64%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Prefect Blue */
+    --secondary: 210 100% 54%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted - Subtle dark gray */
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    /* Accent - Prefect Sunrise Orange */
+    --accent: 24 99% 67%;
+    --accent-foreground: 222 47% 11%;
+
+    /* Destructive - Error red */
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 322 100% 64%;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }
