@@ -15,19 +15,53 @@ class GongSpeaker(BaseModel):
     talk_time_seconds: int = 0
 
 
-class GongTranscriptSegment(BaseModel):
-    """Single transcript segment."""
-    speaker_id: str
-    start_time: float  # seconds
-    duration: float  # seconds
+class GongSentence(BaseModel):
+    """Single sentence in a transcript monologue.
+
+    Note: Times are in milliseconds from call start, not seconds.
+    """
+    start: int  # milliseconds from call start
+    end: int  # milliseconds from call start
     text: str
-    sentiment: str | None = None
+
+
+class GongMonologue(BaseModel):
+    """Monologue (continuous speech by one speaker on a topic).
+
+    The Gong API groups transcript by speaker and topic, not individual sentences.
+    Each monologue contains multiple sentences on the same topic.
+    """
+    speaker_id: str
+    topic: str | None = None  # e.g., "Objections", "Introduction", "Product Demo"
+    sentences: list[GongSentence]
 
 
 class GongTranscript(BaseModel):
-    """Full call transcript from Gong."""
+    """Full call transcript from Gong.
+
+    Official API returns transcript as list of monologues, where each monologue
+    is a continuous block of speech by one speaker on a specific topic.
+    """
     call_id: str
-    segments: list[GongTranscriptSegment]
+    monologues: list[GongMonologue]
+
+    def get_flat_segments(self) -> list[dict]:
+        """
+        Convert monologue structure to flat segments for backward compatibility.
+
+        Returns list of dicts with: speaker_id, start_time_seconds, duration_seconds, text
+        """
+        segments = []
+        for monologue in self.monologues:
+            for sentence in monologue.sentences:
+                segments.append({
+                    "speaker_id": monologue.speaker_id,
+                    "topic": monologue.topic,
+                    "start_time_seconds": sentence.start / 1000.0,
+                    "duration_seconds": (sentence.end - sentence.start) / 1000.0,
+                    "text": sentence.text,
+                })
+        return segments
 
 
 class GongCall(BaseModel):

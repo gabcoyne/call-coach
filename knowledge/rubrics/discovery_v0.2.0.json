@@ -1,0 +1,220 @@
+{
+  "name": "Discovery Quality Rubric - Enhanced with SPICED, Challenger, and Sandler",
+  "version": "0.2.0",
+  "category": "discovery",
+  "description": "Evaluates discovery quality using 5 Wins framework enriched with SPICED (Situation-Pain-Impact-Critical Event-Decision), Challenger Sale (Teach-Tailor-Take Control), and Sandler Submarine (Pain-Budget-Decision discipline) methodologies for Fortune 50 technical sales",
+  "methodology_sources": {
+    "spiced": {
+      "origin": "Winning by Design - Modern product-led sales framework",
+      "key_insight": "Reps who uncovered Impact sold 53% more than those focused on Pain alone",
+      "best_for": "SaaS, recurring revenue, technical sales",
+      "reference": "https://winningbydesign.com/spiced-framework/"
+    },
+    "challenger_sale": {
+      "origin": "CEB/Gartner research on 6,000+ sales reps",
+      "key_insight": "Challengers represent 40% of high performers in complex B2B sales",
+      "best_for": "Complex sales, multiple stakeholders, extended cycles",
+      "reference": "https://challengerinc.com/what-is-challenger-sales-methodology/"
+    },
+    "sandler_submarine": {
+      "origin": "David Sandler - Compartmentalized qualification process",
+      "key_insight": "Qualify Pain-Budget-Decision before presenting to avoid wasted SE time",
+      "best_for": "Enterprise sales, Fortune 50 accounts, high-touch SE engagement",
+      "reference": "https://sandler.com/blog/introducing-new-sandler-submarine/"
+    }
+  },
+  "scoring_guide": {
+    "90-100": "Exceptional discovery - Deep SPICED coverage with Challenger insights and Sandler discipline. Rep taught new perspectives, quantified Impact, identified Critical Event, and qualified before presenting",
+    "80-89": "Strong discovery - Good SPICED foundation with some teaching moments. Mostly qualified before solutions. Minor gaps in Impact quantification or Critical Event urgency",
+    "70-79": "Adequate discovery - Basic qualification achieved but lacks depth. Minimal teaching, incomplete Impact exploration, or premature solution discussion",
+    "60-69": "Weak discovery - Superficial questions, jumped to demo before full qualification, missed Impact or Critical Event",
+    "0-59": "Poor discovery - Primarily presenting without understanding. No teaching, no Impact quantification, no qualification discipline"
+  },
+  "criteria": {
+    "question_quality_and_teaching": {
+      "weight": 35,
+      "description": "Quality of questions AND ability to teach insights (Challenger Sale methodology)",
+      "frameworks": ["SPICED", "Challenger Sale"],
+      "indicators": {
+        "excellent": [
+          "Open-ended questions that uncover Situation, Pain, and Impact across all 5 Wins",
+          "Teaches customer something new about their business (Challenger insight)",
+          "Reframes customer assumptions about costs, risks, or opportunities",
+          "Questions reveal hidden costs or scalability limitations (e.g., Airflow technical debt)",
+          "Brings data/examples that challenge status quo ('teach for differentiation')",
+          "Follow-up questions dig into quantified Impact, not just Pain symptoms"
+        ],
+        "poor": [
+          "Only asks about Pain without exploring Impact or Critical Event",
+          "No teaching moments - purely reactive questioning",
+          "Accepts surface-level answers without probing for business impact",
+          "Jumps to solution before understanding full Situation",
+          "Generic questions that could apply to any customer",
+          "Focuses on product features vs. business outcomes"
+        ]
+      },
+      "coaching_focus": {
+        "spiced_situation": "Establish full context before diving into Pain (tech stack, team structure, current processes)",
+        "spiced_impact": "Move beyond Pain to quantified Impact - what does poor orchestration actually cost them? (Winning by Design: Impact-focused reps sold 53% more)",
+        "challenger_teaching": "Bring insights customer hasn't considered - teach them about hidden costs, scalability risks, or industry trends they're missing"
+      }
+    },
+    "impact_quantification": {
+      "weight": 30,
+      "description": "Ability to quantify business Impact and identify Critical Events (SPICED methodology)",
+      "frameworks": ["SPICED"],
+      "indicators": {
+        "excellent": [
+          "Quantifies current state costs (e.g., '40% of 5 engineers = 2 FTEs on maintenance')",
+          "Explores opportunity cost (strategic projects on hold, delayed revenue)",
+          "Identifies measurable Impact of solving problem (time saved, cost reduction, revenue enabled)",
+          "Uncovers Critical Event driving urgency (board deadline, regulatory requirement, competitive threat)",
+          "Validates that Critical Event is customer's driver, not seller's quota deadline",
+          "Paints vivid picture of positive outcomes with case studies or data projections"
+        ],
+        "poor": [
+          "Only discusses Pain without quantifying Impact",
+          "No exploration of what problem is costing them (time, money, opportunity)",
+          "Misses Critical Event or deadline driving decision timeline",
+          "Assumes urgency without validating real business driver",
+          "Vague outcomes ('make things better') without specific metrics",
+          "No connection between Pain and measurable business impact"
+        ]
+      },
+      "coaching_focus": {
+        "impact_formula": "Current Pain × Time/Cost × Opportunity Lost = Total Impact",
+        "critical_event_discovery": "What happens if you DON'T solve this by [date]? What's driving that timeline?",
+        "quantification_questions": "How many engineers? How much time? What's the loaded cost? What revenue is delayed?"
+      }
+    },
+    "tailoring_and_control": {
+      "weight": 20,
+      "description": "Ability to tailor message to stakeholders and take control of conversation (Challenger Sale)",
+      "frameworks": ["Challenger Sale"],
+      "indicators": {
+        "excellent": [
+          "Adapts message for different stakeholders (technical vs. business vs. security)",
+          "Takes control by pressing on commitments and next steps",
+          "Comfortable discussing budget and money (not avoiding pricing conversation)",
+          "Uses customer verifiers to guide the sale ('Does that resonate?' 'Is this the priority?')",
+          "Reframes objections with teaching insights (e.g., Airflow hidden costs)",
+          "Sets clear mutual commitments (Challenger 'take control' not 'relationship builder')"
+        ],
+        "poor": [
+          "Generic pitch not adapted to specific buyer or business context",
+          "Avoids discussing budget, pricing, or commitments",
+          "Lets customer control conversation without guiding to business outcomes",
+          "Relationship-focused without challenging customer thinking",
+          "No verification that message resonates with this specific buyer",
+          "Passive about next steps - waits for customer to drive timeline"
+        ]
+      },
+      "coaching_focus": {
+        "tailor_by_persona": "CTO cares about scalability, VP Eng about team productivity, InfoSec about compliance",
+        "take_control_moments": "Press for commitments: 'If we solve X, what happens next?' 'What's preventing us from starting POC?'",
+        "money_conversation": "Challengers are comfortable with pricing discussions - don't avoid budget questions"
+      }
+    },
+    "sandler_qualification_discipline": {
+      "weight": 15,
+      "description": "Discipline to qualify Pain-Budget-Decision before presenting (Sandler Submarine)",
+      "frameworks": ["Sandler Submarine"],
+      "indicators": {
+        "excellent": [
+          "Explores Pain fully before discussing solutions or features",
+          "Validates Budget/financial commitment before technical deep-dives",
+          "Maps Decision process before building POCs or doing custom demos",
+          "Earns the right to present by completing Pain-Budget-Decision qualification",
+          "Avoids premature demos or technical discussions before qualification",
+          "Saves SE time by ensuring opportunity is qualified before heavy technical investment"
+        ],
+        "poor": [
+          "Jumps to demo or features before understanding Pain",
+          "Discusses technical solutions before validating Budget exists",
+          "Builds POCs or prototypes before understanding Decision process",
+          "Wastes SE time on unqualified opportunities",
+          "Lets customer drive to presentation before qualification complete",
+          "No discipline around 'earning the right to present'"
+        ]
+      },
+      "coaching_focus": {
+        "sandler_order": "Pain → Budget → Decision → Presentation. Close each compartment before moving to next.",
+        "pain_depth": "Don't move to Budget until Pain is fully explored and quantified (Impact)",
+        "se_time_value": "For Fortune 50 accounts, SE time is precious - qualify thoroughly before technical investment",
+        "no_premature_demos": "Resist customer requests for demo until Pain-Budget-Decision are qualified"
+      }
+    }
+  },
+  "five_wins_enhanced": {
+    "description": "5 Wins framework enriched with SPICED, Challenger, and Sandler principles",
+    "business_win": {
+      "weight": 35,
+      "spiced_components": {
+        "situation": "Full context: current state, tech stack, team structure, existing processes",
+        "pain": "Specific challenges and frustrations (emotional + rational business issues)",
+        "impact": "Quantified business outcomes: time saved, cost reduction, revenue enabled, strategic projects unblocked",
+        "critical_event": "Deadline or milestone driving urgency (Q2 planning, board review, regulatory deadline)",
+        "decision": "Decision criteria, buying committee, approval workflow, evaluation timeline"
+      },
+      "challenger_elements": {
+        "teach": "Bring insights about hidden costs of current state (e.g., Airflow technical debt, scalability limits)",
+        "tailor": "Adapt message for exec priorities (CTO: scalability, VP Eng: productivity, CFO: TCO)",
+        "take_control": "Press on commitments, discuss budget openly, verify business case strength"
+      },
+      "sandler_discipline": {
+        "pain_first": "Fully explore Pain and Impact before moving to Budget or Decision discussions",
+        "budget_qualification": "Validate financial commitment exists before building business case",
+        "decision_mapping": "Understand complete approval process before presenting solution"
+      }
+    },
+    "technical_win": {
+      "weight": 25,
+      "discovery_focus": "Technical requirements, use case alignment, infrastructure, CI/CD - but only AFTER Business Win Pain is qualified (Sandler discipline)",
+      "challenger_teaching": "Educate on technical limitations of current solution (e.g., Airflow scheduler architecture, DAG complexity issues)",
+      "sandler_timing": "Deep technical discovery comes after validating Business Pain and Budget - don't waste SE time on unqualified opps"
+    },
+    "security_win": {
+      "weight": 15,
+      "discovery_focus": "InfoSec requirements, compliance needs, review process, questionnaire timeline",
+      "critical_event": "Often the Critical Event - security review deadlines can drive entire sales timeline",
+      "sandler_timing": "Identify InfoSec stakeholders and timeline during Decision qualification phase"
+    },
+    "commercial_win": {
+      "weight": 15,
+      "discovery_focus": "Scope, usage levels, support tier, services",
+      "sandler_budget": "This IS the Budget discussion - validate willingness to invest before building custom proposals",
+      "challenger_control": "Take control of pricing discussion - don't avoid money conversation"
+    },
+    "legal_win": {
+      "weight": 10,
+      "discovery_focus": "Legal review requirements, contract terms, procurement process",
+      "sandler_decision": "Part of Decision mapping - understand legal approval workflow and timeline"
+    }
+  },
+  "examples": {
+    "spiced_impact_excellent": {
+      "quote": "You mentioned 40% maintenance time. Let's break that down - that's 2 full engineers out of your 5-person platform team, right? At $200K loaded cost, that's $400K/year just keeping the lights on. But here's what I'm hearing you're NOT able to do: real-time pipelines, ML feature engineering, data quality framework. If you could ship even one of those, what's the revenue impact?",
+      "analysis": "Excellent SPICED Impact quantification: converts percentage to FTEs to dollars (Situation), explores both cost AND opportunity cost, connects to revenue Impact. Uses Challenger teaching to reframe from 'maintenance problem' to 'revenue opportunity problem.'"
+    },
+    "critical_event_excellent": {
+      "quote": "You mentioned Q2 roadmap planning in 3 weeks. Walk me through what happens if you go into that planning meeting without a solution for this infrastructure problem. What's the executive expectation? What projects get cut?",
+      "analysis": "Excellent Critical Event discovery. Validates this is customer's real deadline (not seller's quarter-end), explores consequences of inaction, connects to exec priorities. This is what drives urgency."
+    },
+    "challenger_teaching_excellent": {
+      "quote": "Most teams running 500+ Airflow DAGs at your scale hit a wall around 800-1000 workflows. It's not just maintenance - the scheduler architecture fundamentally can't handle the concurrency. I'm curious, have you benchmarked your scheduler lag time during peak hours? Because that's usually the canary in the coal mine.",
+      "analysis": "Perfect Challenger teaching: brings insight customer likely hasn't considered (scheduler architecture limits), reframes from 'we have a problem' to 'this problem gets exponentially worse', uses industry data to challenge status quo, ends with diagnostic question."
+    },
+    "sandler_discipline_excellent": {
+      "quote": "Before we dive into a technical deep-dive or demo, I want to make sure we're solving the right problem. You've described the Pain - 50% of platform team time on maintenance. But let's talk about what it would take to fix this. If we could get that maintenance down to 10-15%, what investment would make sense? Are we talking $50K, $200K, $500K range?",
+      "analysis": "Excellent Sandler discipline. Rep resists jumping to demo, qualifies Pain is worth solving, brings up Budget openly (Challenger 'take control'), uses ranges to gauge financial commitment before investing SE time."
+    },
+    "sandler_discipline_poor": {
+      "quote": "That sounds challenging. Let me set up a demo next week and show you how Prefect solves this. I'll bring our Solutions Architect to walk through the architecture.",
+      "analysis": "Poor Sandler discipline. Rep jumps straight to demo/presentation before qualifying Pain depth, Budget, or Decision process. Commits expensive SE time without validation this is a real opportunity. This is how SE teams get burned out on 'tire kickers.'"
+    },
+    "weak_discovery_no_framework": {
+      "quote": "So you're looking for a workflow orchestration tool?",
+      "analysis": "Weak discovery across all frameworks. No Situation context, no Pain exploration, no Impact quantification, no Critical Event, no teaching, no tailoring, no qualification discipline. Pure order-taking."
+    }
+  }
+}

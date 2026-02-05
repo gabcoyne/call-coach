@@ -9,7 +9,7 @@ import httpx
 from httpx import HTTPStatusError, RequestError
 
 from config import settings
-from .types import GongCall, GongTranscript, GongTranscriptSegment, GongSpeaker
+from .types import GongCall, GongTranscript, GongMonologue, GongSentence, GongSpeaker
 
 logger = logging.getLogger(__name__)
 
@@ -25,14 +25,32 @@ class GongClient:
     Handles authentication, rate limiting, and retries.
     """
 
-    def __init__(self, api_key: str | None = None, base_url: str | None = None):
+    def __init__(
+        self,
+        api_key: str | None = None,
+        api_secret: str | None = None,
+        base_url: str | None = None,
+    ):
+        """
+        Initialize Gong API client.
+
+        Gong authentication requires BOTH access key and secret key in Basic Auth format:
+        Authorization: Basic base64(access_key:secret_key)
+
+        Args:
+            api_key: Gong access key (e.g., "UQ4SK2LPUPBCFN7Q...")
+            api_secret: Gong secret key / JWT token (e.g., "eyJhbGciOiJIUzI1NiJ9...")
+            base_url: Tenant-specific base URL (e.g., "https://us-79647.api.gong.io/v2")
+        """
         self.api_key = api_key or settings.gong_api_key
+        self.api_secret = api_secret or settings.gong_api_secret
         self.base_url = base_url or settings.gong_api_base_url
 
-        # HTTP client with auth and timeouts
+        # HTTP client with Basic Auth (access_key:secret_key)
+        # This is the correct authentication method for Gong API v2
         self.client = httpx.Client(
             base_url=self.base_url,
-            auth=(self.api_key, ""),  # Gong uses basic auth with API key as username
+            auth=(self.api_key, self.api_secret),  # Basic Auth: key:secret
             timeout=30.0,
             headers={
                 "Accept": "application/json",
@@ -139,64 +157,139 @@ class GongClient:
             custom_data=call_data.get("customData"),
         )
 
-    def get_transcript(self, call_id: str) -> GongTranscript:
+    def get_transcript(
+        self,
+        call_id: str,
+        from_datetime: str | None = None,
+        to_datetime: str | None = None,
+        call_metadata: GongCall | None = None,
+    ) -> GongTranscript:
         """
-        Fetch call transcript from Gong.
+        Fetch call transcript from Gong using the official POST /v2/calls/transcript endpoint.
+
+        The API requires a date range filter. If not provided, uses a wide range (2020-2030).
+        To fetch transcripts for specific calls, you must know their approximate date or
+        provide a wide enough date range.
 
         Args:
             call_id: Gong call ID
+            from_datetime: ISO 8601 datetime string (e.g., "2024-01-01T00:00:00Z")
+            to_datetime: ISO 8601 datetime string (e.g., "2024-12-31T23:59:59Z")
 
         Returns:
-            GongTranscript with segments
+            GongTranscript with monologues
+
+        Raises:
+            GongAPIError: If call not found or date range doesn't include call
         """
         logger.info(f"Fetching transcript for call {call_id}")
 
-        response = self._make_request("GET", f"/calls/{call_id}/transcript")
+        # Try to use call metadata for more efficient date range
+        if call_metadata and call_metadata.started and not from_datetime:
+            # Use call start date +/- 1 day for more efficient query
+            from datetime import timedelta
+            call_start = call_metadata.started
+            from_datetime = (call_start - timedelta(days=1)).isoformat()
+            to_datetime = (call_start + timedelta(days=1)).isoformat()
+            logger.info(f"Using call date range: {from_datetime} to {to_datetime}")
+        elif not from_datetime:
+            # Fall back to wide date range (inefficient but works)
+            from_datetime = "2020-01-01T00:00:00Z"
+            to_datetime = "2030-01-01T00:00:00Z"
+            logger.warning(
+                "Using wide date range for transcript fetch. "
+                "For better performance, provide call_metadata or from_datetime/to_datetime."
+            )
 
-        # Parse transcript segments
-        segments = []
-        for segment in response.get("transcript", []):
-            segments.append(
-                GongTranscriptSegment(
-                    speaker_id=segment.get("speakerId", ""),
-                    start_time=segment.get("start", 0),
-                    duration=segment.get("duration", 0),
-                    text=segment.get("text", ""),
-                    sentiment=segment.get("sentiment"),
+        response = self._make_request(
+            "POST",
+            "/calls/transcript",  # Base URL already includes /v2
+            json_data={
+                "filter": {
+                    "callIds": [call_id],
+                    "fromDateTime": from_datetime,
+                    "toDateTime": to_datetime,
+                }
+            },
+        )
+
+        # Extract transcript for this call
+        call_transcripts = response.get("callTranscripts", [])
+        if not call_transcripts:
+            raise GongAPIError(
+                f"No transcript found for call {call_id}. "
+                f"Verify call exists and date range ({from_datetime} to {to_datetime}) includes call."
+            )
+
+        transcript_data = call_transcripts[0]  # Should only be one since we filtered by callIds
+
+        # Parse monologues
+        monologues = []
+        for monologue_data in transcript_data.get("transcript", []):
+            sentences = []
+            for sentence_data in monologue_data.get("sentences", []):
+                sentences.append(
+                    GongSentence(
+                        start=sentence_data.get("start", 0),
+                        end=sentence_data.get("end", 0),
+                        text=sentence_data.get("text", ""),
+                    )
+                )
+
+            monologues.append(
+                GongMonologue(
+                    speaker_id=monologue_data.get("speakerId", ""),
+                    topic=monologue_data.get("topic"),
+                    sentences=sentences,
                 )
             )
 
         return GongTranscript(
             call_id=call_id,
-            segments=segments,
+            monologues=monologues,
         )
 
     def list_calls(
         self,
-        from_date: str | None = None,
-        to_date: str | None = None,
+        from_date: str,
+        to_date: str,
         workspace_id: str | None = None,
-        limit: int = 100,
-    ) -> list[GongCall]:
+        cursor: str | None = None,
+    ) -> tuple[list[GongCall], str | None]:
         """
-        List calls with optional filters.
+        List calls with pagination support using cursor-based iteration.
+
+        The Gong API requires both fromDateTime and toDateTime parameters.
+        Results are paginated - use the returned cursor to fetch next page.
 
         Args:
-            from_date: Start date (ISO 8601 format)
-            to_date: End date (ISO 8601 format)
-            workspace_id: Filter by workspace
-            limit: Max results to return
+            from_date: Start date (ISO 8601 format, REQUIRED)
+                      e.g., "2024-01-01T00:00:00Z"
+            to_date: End date (ISO 8601 format, REQUIRED)
+                    e.g., "2024-12-31T23:59:59Z"
+            workspace_id: Optional workspace filter
+            cursor: Pagination cursor from previous response
 
         Returns:
-            List of GongCall objects
+            Tuple of (list of GongCall objects, next cursor or None if no more pages)
+
+        Example:
+            # First page
+            calls, cursor = client.list_calls("2024-01-01T00:00:00Z", "2024-01-31T23:59:59Z")
+
+            # Next page
+            if cursor:
+                more_calls, next_cursor = client.list_calls(
+                    "2024-01-01T00:00:00Z", "2024-01-31T23:59:59Z", cursor=cursor
+                )
         """
-        logger.info(f"Listing calls: from={from_date}, to={to_date}, limit={limit}")
+        logger.info(f"Listing calls: from={from_date}, to={to_date}, cursor={cursor[:20] if cursor else None}...")
 
         params = {
             "fromDateTime": from_date,
             "toDateTime": to_date,
             "workspaceId": workspace_id,
-            "limit": limit,
+            "cursor": cursor,
         }
         # Remove None values
         params = {k: v for k, v in params.items() if v is not None}
@@ -218,7 +311,10 @@ class GongClient:
                 )
             )
 
-        return calls
+        # Extract cursor for next page (if any)
+        next_cursor = response.get("records", {}).get("cursor")
+
+        return calls, next_cursor
 
     def search_calls(
         self,
@@ -230,6 +326,11 @@ class GongClient:
         """
         Search calls by text query.
 
+        **WARNING: This endpoint does not exist in the official Gong API v2 specification.**
+
+        The Gong API does not provide a text search endpoint. To find calls, use `list_calls()`
+        with date range filters, then filter results client-side.
+
         Args:
             query: Search query
             from_date: Start date (ISO 8601 format)
@@ -238,17 +339,12 @@ class GongClient:
 
         Returns:
             List of call IDs matching query
+
+        Raises:
+            NotImplementedError: This endpoint doesn't exist in Gong API v2
         """
-        logger.info(f"Searching calls: query='{query}', limit={limit}")
-
-        params = {
-            "q": query,
-            "fromDateTime": from_date,
-            "toDateTime": to_date,
-            "limit": limit,
-        }
-        params = {k: v for k, v in params.items() if v is not None}
-
-        response = self._make_request("GET", "/calls/search", params=params)
-
-        return [call.get("id") for call in response.get("calls", []) if call.get("id")]
+        raise NotImplementedError(
+            "Gong API v2 does not provide a /calls/search endpoint. "
+            "Use list_calls() with date filters and filter results client-side instead. "
+            "See .openspec/GONG_CLIENT_AUDIT.md for details."
+        )

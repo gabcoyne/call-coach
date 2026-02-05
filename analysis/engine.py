@@ -2,6 +2,7 @@
 Core analysis engine for coaching insights.
 Integrates Claude API with caching and chunking.
 """
+import json
 import logging
 from typing import Any
 from uuid import UUID
@@ -9,13 +10,19 @@ from uuid import UUID
 from anthropic import Anthropic
 
 from config import settings
-from db import fetch_one
+from db import fetch_one, fetch_all
 from db.models import CoachingDimension
 from .cache import (
     generate_transcript_hash,
     get_cached_analysis,
     get_active_rubric_version,
     store_analysis_with_cache,
+)
+from .prompts import (
+    analyze_discovery_prompt,
+    analyze_engagement_prompt,
+    analyze_objection_handling_prompt,
+    analyze_product_knowledge_prompt,
 )
 
 logger = logging.getLogger(__name__)
@@ -78,9 +85,15 @@ def get_or_create_coaching_session(
     # Cache miss or forced reanalysis - run new analysis
     logger.info(f"Running new analysis for call {call_id}, dimension={dimension.value}")
 
-    # TODO: Phase 3 - Implement actual Claude API analysis
-    # For now, return placeholder
-    analysis_result = _run_placeholder_analysis(dimension)
+    # Get call metadata for context
+    call_metadata = fetch_one("SELECT * FROM calls WHERE id = %s", (str(call_id),))
+
+    # Run actual Claude API analysis
+    analysis_result = _run_claude_analysis(
+        dimension=dimension,
+        transcript=transcript,
+        call_metadata=call_metadata,
+    )
 
     # Store analysis with cache metadata
     session_id = store_analysis_with_cache(
@@ -189,50 +202,185 @@ def analyze_call(
     }
 
 
-def _run_placeholder_analysis(dimension: CoachingDimension) -> dict[str, Any]:
+def _run_claude_analysis(
+    dimension: CoachingDimension,
+    transcript: str,
+    call_metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """
-    Placeholder for actual Claude API analysis.
-    TODO: Phase 3 - Replace with real analysis implementation.
+    Run actual Claude API analysis for a coaching dimension.
+
+    Args:
+        dimension: Coaching dimension to analyze
+        transcript: Full call transcript
+        call_metadata: Optional call metadata for context
+
+    Returns:
+        Analysis result with scores, strengths, areas for improvement, etc.
+    """
+    logger.info(f"Running Claude analysis for dimension: {dimension.value}")
+
+    # Get rubric from database
+    rubric_row = fetch_one(
+        """
+        SELECT id, name, version, category, criteria, scoring_guide, examples
+        FROM coaching_rubrics
+        WHERE category = %s AND active = true
+        ORDER BY created_at DESC
+        LIMIT 1
+        """,
+        (dimension.value,),
+    )
+
+    if not rubric_row:
+        raise ValueError(f"No active rubric found for dimension: {dimension.value}")
+
+    rubric = {
+        "name": rubric_row["name"],
+        "version": rubric_row["version"],
+        "category": rubric_row["category"],
+        "criteria": rubric_row["criteria"],
+        "scoring_guide": rubric_row["scoring_guide"],
+        "examples": rubric_row.get("examples", {}),
+    }
+
+    # Get knowledge base if needed for product_knowledge dimension
+    knowledge_base = None
+    if dimension == CoachingDimension.PRODUCT_KNOWLEDGE:
+        kb_rows = fetch_all(
+            """
+            SELECT product, category, content
+            FROM knowledge_base
+            ORDER BY product, category
+            """
+        )
+
+        if kb_rows:
+            knowledge_base = "\n\n".join([
+                f"## {row['product'].upper()} - {row['category'].title()}\n{row['content']}"
+                for row in kb_rows
+            ])
+        else:
+            knowledge_base = "No product knowledge base loaded."
+
+    # Generate prompt using appropriate template
+    messages = _generate_prompt_for_dimension(
+        dimension=dimension,
+        transcript=transcript,
+        rubric=rubric,
+        knowledge_base=knowledge_base,
+        call_metadata=call_metadata,
+    )
+
+    # Call Claude API with prompt caching
+    try:
+        response = anthropic_client.messages.create(
+            model="claude-sonnet-4-5-20250929",
+            max_tokens=8000,  # Increased for complex discovery analysis with SPICED/Challenger/Sandler
+            temperature=0.3,
+            messages=messages,
+        )
+
+        # Extract usage statistics
+        usage = response.usage
+        tokens_used = usage.input_tokens + usage.output_tokens
+        cache_creation_tokens = getattr(usage, "cache_creation_input_tokens", 0)
+        cache_read_tokens = getattr(usage, "cache_read_input_tokens", 0)
+
+        logger.info(
+            f"Claude API call successful: "
+            f"input={usage.input_tokens}, output={usage.output_tokens}, "
+            f"cache_creation={cache_creation_tokens}, cache_read={cache_read_tokens}"
+        )
+
+        # Parse response content
+        response_text = response.content[0].text
+
+        # Try to parse as JSON (structured output)
+        try:
+            analysis_data = json.loads(response_text)
+        except json.JSONDecodeError as e:
+            # Fallback: extract JSON from markdown code blocks if present
+            if "```json" in response_text:
+                json_start = response_text.find("```json") + 7
+                json_end = response_text.find("```", json_start)
+                json_str = response_text[json_start:json_end].strip()
+                try:
+                    analysis_data = json.loads(json_str)
+                except json.JSONDecodeError as e2:
+                    logger.error(f"Failed to parse extracted JSON: {str(e2)}")
+                    logger.error(f"Response preview: {response_text[:1000]}...")
+                    logger.error(f"Response end: ...{response_text[-500:]}")
+                    raise ValueError(f"Claude response JSON is malformed: {str(e2)}")
+            else:
+                logger.error(f"No JSON code block found. Response preview: {response_text[:1000]}...")
+                logger.error(f"Response end: ...{response_text[-500:]}")
+                raise ValueError(f"Claude response is not valid JSON: {str(e)}")
+
+        # Add metadata
+        analysis_data["metadata"] = {
+            "model": "claude-sonnet-4-5-20250929",
+            "tokens_used": tokens_used,
+            "input_tokens": usage.input_tokens,
+            "output_tokens": usage.output_tokens,
+            "cache_creation_tokens": cache_creation_tokens,
+            "cache_read_tokens": cache_read_tokens,
+            "rubric_version": rubric["version"],
+        }
+
+        return analysis_data
+
+    except Exception as e:
+        logger.error(f"Claude API call failed: {e}")
+        raise
+
+
+def _generate_prompt_for_dimension(
+    dimension: CoachingDimension,
+    transcript: str,
+    rubric: dict[str, Any],
+    knowledge_base: str | None = None,
+    call_metadata: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    """
+    Generate prompt messages for a specific dimension using appropriate template.
 
     Args:
         dimension: Coaching dimension
+        transcript: Call transcript
+        rubric: Rubric data from database
+        knowledge_base: Optional knowledge base content (for product_knowledge)
+        call_metadata: Optional call metadata
 
     Returns:
-        Placeholder analysis result
+        List of message dicts formatted for Claude API
     """
-    return {
-        "score": 75,
-        "strengths": [
-            "Good engagement with prospect",
-            "Clear explanation of key concepts",
-        ],
-        "areas_for_improvement": [
-            "Could ask more discovery questions",
-            "Missed opportunity to discuss competitive advantages",
-        ],
-        "specific_examples": {
-            "good": [
-                {
-                    "quote": "Example good quote...",
-                    "timestamp": 300,
-                    "analysis": "This was effective because...",
-                }
-            ],
-            "needs_work": [
-                {
-                    "quote": "Example improvement quote...",
-                    "timestamp": 600,
-                    "analysis": "Could be improved by...",
-                }
-            ],
-        },
-        "action_items": [
-            "Practice discovery question framework",
-            "Review competitive positioning guide",
-        ],
-        "full_analysis": f"Full analysis for {dimension.value} dimension...",
-        "metadata": {
-            "model": "claude-sonnet-4.5-placeholder",
-            "tokens_used": 2500,
-        },
-    }
+    if dimension == CoachingDimension.PRODUCT_KNOWLEDGE:
+        if not knowledge_base:
+            raise ValueError("Knowledge base required for product_knowledge analysis")
+        return analyze_product_knowledge_prompt(
+            transcript=transcript,
+            rubric=rubric,
+            knowledge_base=knowledge_base,
+            call_metadata=call_metadata,
+        )
+    elif dimension == CoachingDimension.DISCOVERY:
+        return analyze_discovery_prompt(
+            transcript=transcript,
+            rubric=rubric,
+            call_metadata=call_metadata,
+        )
+    elif dimension == CoachingDimension.OBJECTION_HANDLING:
+        return analyze_objection_handling_prompt(
+            transcript=transcript,
+            rubric=rubric,
+            call_metadata=call_metadata,
+        )
+    elif dimension == CoachingDimension.ENGAGEMENT:
+        return analyze_engagement_prompt(
+            transcript=transcript,
+            rubric=rubric,
+            call_metadata=call_metadata,
+        )
+    else:
+        raise ValueError(f"Unsupported dimension: {dimension.value}")

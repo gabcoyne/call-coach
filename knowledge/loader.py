@@ -206,8 +206,14 @@ def load_product_docs() -> None:
 
     # Map files to product/category
     docs_to_load = [
+        # Prefect Platform & Features
+        (PRODUCTS_DIR / "prefect_platform_2024.md", Product.PREFECT, KnowledgeBaseCategory.FEATURE),
         (PRODUCTS_DIR / "prefect_features.md", Product.PREFECT, KnowledgeBaseCategory.FEATURE),
         (PRODUCTS_DIR / "horizon_features.md", Product.HORIZON, KnowledgeBaseCategory.FEATURE),
+        # Competitive Battlecards
+        (PRODUCTS_DIR / "battlecard_airflow.md", Product.PREFECT, KnowledgeBaseCategory.COMPETITOR),
+        (PRODUCTS_DIR / "battlecard_dagster.md", Product.PREFECT, KnowledgeBaseCategory.COMPETITOR),
+        (PRODUCTS_DIR / "battlecard_temporal.md", Product.PREFECT, KnowledgeBaseCategory.COMPETITOR),
         (PRODUCTS_DIR / "competitive_positioning.md", Product.PREFECT, KnowledgeBaseCategory.COMPETITOR),
     ]
 

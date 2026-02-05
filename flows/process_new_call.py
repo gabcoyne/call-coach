@@ -51,12 +51,13 @@ def fetch_call_from_gong(call_id: str) -> dict[str, Any]:
 
 
 @task(name="fetch_transcript_from_gong", retries=3, retry_delay_seconds=5)
-def fetch_transcript_from_gong(call_id: str) -> dict[str, Any]:
+def fetch_transcript_from_gong(call_id: str, call_metadata: dict[str, Any] | None = None) -> dict[str, Any]:
     """
     Fetch transcript from Gong API.
 
     Args:
         call_id: Gong call ID
+        call_metadata: Optional call metadata to optimize date range query
 
     Returns:
         Transcript data dict
@@ -64,7 +65,11 @@ def fetch_transcript_from_gong(call_id: str) -> dict[str, Any]:
     logger.info(f"Fetching transcript for call {call_id} from Gong API")
 
     with GongClient() as client:
-        transcript = client.get_transcript(call_id)
+        # Convert call_metadata dict back to GongCall if provided
+        from gong.types import GongCall
+        call_obj = GongCall(**call_metadata) if call_metadata else None
+
+        transcript = client.get_transcript(call_id, call_metadata=call_obj)
 
     return transcript.model_dump()
 
@@ -201,9 +206,12 @@ def store_transcript(
     """
     Store transcript in database with chunking support.
 
+    The Gong API returns transcripts as monologues (speaker + topic + sentences).
+    We flatten this to individual sentences for storage, preserving topic metadata.
+
     Args:
         call_id: Database call UUID
-        transcript_data: Transcript from Gong
+        transcript_data: Transcript from Gong (contains "monologues" list)
         speaker_mapping: Mapping of Gong speaker IDs to database UUIDs
 
     Returns:
@@ -211,43 +219,67 @@ def store_transcript(
     """
     logger.info(f"Storing transcript for call {call_id}")
 
-    segments = transcript_data["segments"]
+    monologues = transcript_data["monologues"]
+
+    # Flatten monologues to sentences for storage
+    # Each sentence gets stored as a transcript row with topic metadata
+    all_sentences = []
+    for monologue in monologues:
+        speaker_id = monologue["speaker_id"]
+        topic = monologue.get("topic")
+
+        for sentence in monologue["sentences"]:
+            all_sentences.append({
+                "speaker_id": speaker_id,
+                "topic": topic,
+                "start_ms": sentence["start"],  # milliseconds from call start
+                "end_ms": sentence["end"],
+                "text": sentence["text"],
+            })
 
     # Build full transcript for hashing
-    full_text = " ".join([seg["text"] for seg in segments])
+    full_text = " ".join([s["text"] for s in all_sentences])
     transcript_hash = generate_transcript_hash(full_text)
 
     # Count tokens to determine if chunking is needed
     total_tokens = count_tokens(full_text)
-    logger.info(f"Transcript has {total_tokens:,} tokens")
+    logger.info(f"Transcript has {total_tokens:,} tokens ({len(all_sentences)} sentences)")
 
     # Chunk if needed
     needs_chunking = total_tokens > settings.max_chunk_size_tokens
     if needs_chunking:
         logger.info(f"Transcript exceeds max size, will chunk during analysis")
 
-    # Store individual segments
-    for idx, segment in enumerate(segments):
-        speaker_id = speaker_mapping.get(segment["speaker_id"])
+    # Store individual sentences
+    # Note: timestamp_seconds field stores the START time in milliseconds (schema needs updating)
+    for idx, sentence in enumerate(all_sentences):
+        speaker_id = speaker_mapping.get(sentence["speaker_id"])
 
+        # Store topic in topics array field (JSONB or VARCHAR[])
+        # Store both start and end times in metadata until schema updated
         execute_query(
             """
             INSERT INTO transcripts (
                 call_id, speaker_id, sequence_number, timestamp_seconds,
-                text, sentiment
-            ) VALUES (%s, %s, %s, %s, %s, %s)
+                text, topics, chunk_metadata
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
             """,
             (
                 str(call_id),
                 str(speaker_id) if speaker_id else None,
                 idx,
-                int(segment["start_time"]),
-                segment["text"],
-                segment.get("sentiment"),
+                sentence["start_ms"],  # Note: Field name is misleading, stores milliseconds
+                sentence["text"],
+                [sentence["topic"]] if sentence["topic"] else [],
+                {
+                    "start_ms": sentence["start_ms"],
+                    "end_ms": sentence["end_ms"],
+                    "duration_ms": sentence["end_ms"] - sentence["start_ms"],
+                },
             ),
         )
 
-    logger.info(f"Stored {len(segments)} transcript segments")
+    logger.info(f"Stored {len(all_sentences)} transcript sentences from {len(monologues)} monologues")
     return transcript_hash
 
 
@@ -358,9 +390,11 @@ def process_new_call_flow(
                 status=WebhookEventStatus.PROCESSING,
             )
 
-        # Fetch data from Gong (runs in parallel)
+        # Fetch call metadata first (needed for efficient transcript fetch)
         gong_call = fetch_call_from_gong(gong_call_id)
-        transcript_data = fetch_transcript_from_gong(gong_call_id)
+
+        # Fetch transcript with call metadata for date range optimization
+        transcript_data = fetch_transcript_from_gong(gong_call_id, gong_call)
 
         # Store in database
         call_id = store_call_metadata(gong_call)

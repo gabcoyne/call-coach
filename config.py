@@ -17,11 +17,12 @@ class Settings(BaseSettings):
     )
 
     # Gong API
-    gong_api_key: str = Field(..., description="Gong API key for authentication")
+    gong_api_key: str = Field(..., description="Gong API access key")
+    gong_api_secret: str = Field(..., description="Gong API secret key (JWT token)")
     gong_webhook_secret: str = Field(..., description="Secret for validating webhook signatures")
     gong_api_base_url: str = Field(
-        default="https://api.gong.io/v2",
-        description="Base URL for Gong API"
+        default="https://us-79647.api.gong.io/v2",
+        description="Base URL for Gong API (tenant-specific)"
     )
 
     # Claude API

@@ -1,0 +1,140 @@
+{
+  "name": "Discovery Quality Rubric",
+  "version": "0.1.0",
+  "category": "discovery",
+  "description": "Evaluates quality of discovery questions, active listening, and comprehensive 5 Wins framework coverage (Business, Technical, Security, Commercial, Legal)",
+  "scoring_guide": {
+    "90-100": "Exceptional discovery - thorough coverage across all 5 Wins, insightful follow-up questions, active listening demonstrated",
+    "80-89": "Strong discovery - good coverage of 3-4 Wins with depth, some missed opportunities for deeper probing",
+    "70-79": "Adequate discovery - basic qualification achieved across 2-3 Wins, but lacks depth or misses key elements",
+    "60-69": "Weak discovery - superficial questions across 1-2 Wins, poor listening, minimal qualification",
+    "0-59": "Poor discovery - primarily presenting without understanding customer needs, <1 Win covered"
+  },
+  "criteria": {
+    "question_quality": {
+      "weight": 30,
+      "description": "Quality and depth of questions asked across all discovery dimensions",
+      "indicators": {
+        "excellent": [
+          "Open-ended questions that uncover business, technical, security, and commercial needs",
+          "Follow-up questions that dig deeper into responses",
+          "Questions reveal priorities and decision criteria across all stakeholder groups",
+          "Probing questions to understand pain points and requirements thoroughly"
+        ],
+        "poor": [
+          "Primarily yes/no questions",
+          "Surface-level questions without follow-up",
+          "Questions focused on product features vs. business/technical needs",
+          "Asking questions already answered in prep materials",
+          "Only focusing on one stakeholder group (e.g., engineering) without exploring others"
+        ]
+      }
+    },
+    "active_listening": {
+      "weight": 25,
+      "description": "Demonstrates listening and building on customer responses",
+      "indicators": {
+        "excellent": [
+          "References specific customer statements in responses",
+          "Asks clarifying questions before answering",
+          "Paraphrases customer concerns to confirm understanding",
+          "Connects current topic to earlier customer statements"
+        ],
+        "poor": [
+          "Interrupts customer frequently",
+          "Provides generic responses not tailored to customer input",
+          "Repeats information customer already shared",
+          "Doesn't acknowledge or build on customer concerns"
+        ]
+      }
+    },
+    "five_wins_coverage": {
+      "weight": 25,
+      "description": "Covers the comprehensive 5 Wins qualification framework (Business, Technical, Security, Commercial, Legal)",
+      "wins": {
+        "business_win": {
+          "weight": 35,
+          "components": {
+            "business_discovery": {
+              "current_state_and_problems": "Explores current challenges, pain points, and consequences of inaction",
+              "future_state_and_outcomes": "Uncovers desired outcomes and success criteria for solution",
+              "success_metrics": "Quantifies business impact (time saved, cost reduction, efficiency gains, revenue impact)",
+              "executive_priorities": "Understands executive-level goals and strategic initiatives driving this evaluation",
+              "evaluation_and_decision": "Maps out decision process, timeline, stakeholders, and approval steps"
+            },
+            "business_case": "Validates buying team can build effective case for 'Why change?', 'Why Prefect?', 'Why now?' to secure resources"
+          }
+        },
+        "technical_win": {
+          "weight": 25,
+          "components": {
+            "technical_discovery": {
+              "technical_requirements": "Identifies technical constraints, integration needs, and must-have capabilities",
+              "use_case_alignment": "Validates Prefect fits primary use cases and workflows",
+              "infrastructure_requirements": "Understands infrastructure (cloud, on-prem, hybrid), scale, and deployment preferences",
+              "ci_cd_requirements": "Maps out CI/CD integration needs and deployment pipelines",
+              "other_requirements": "Security, compliance, monitoring, observability, and operational requirements"
+            },
+            "demo_solution_presentation": "Plans tailored demo with AE and SE showing solution to business and technical discovery with all key stakeholders",
+            "poc_scoping_and_poc": "Agrees on POC scope and validates POC completion with Prefect winning voice-of-customer"
+          }
+        },
+        "security_win": {
+          "weight": 15,
+          "components": {
+            "infosec_discovery": {
+              "infosec_requirements": "Identifies security, compliance, and data privacy requirements (SOC 2, HIPAA, GDPR, etc.)",
+              "infosec_process_and_timeline": "Understands InfoSec review process, stakeholders, and timeline for approval",
+              "questionnaire": "Determines if security questionnaire is required and timeline for completion"
+            }
+          }
+        },
+        "commercial_win": {
+          "weight": 15,
+          "components": {
+            "scoping_discovery": "Determines required scope of product, usage levels, support tier, and services needed"
+          }
+        },
+        "legal_win": {
+          "weight": 10,
+          "components": {
+            "legal_discovery": "Identifies legal review requirements, contract terms concerns, procurement process, and legal stakeholders"
+          }
+        }
+      },
+      "scoring": {
+        "5_wins": "Excellent - comprehensive discovery across all dimensions",
+        "3-4_wins": "Good - solid coverage with gaps in 1-2 areas",
+        "2_wins": "Needs improvement - superficial discovery, major gaps",
+        "0-1_wins": "Poor - minimal qualification"
+      }
+    },
+    "talk_listen_ratio": {
+      "weight": 20,
+      "description": "Balance of talking vs. listening during discovery",
+      "targets": {
+        "ideal": "Customer talks 60-70% of the time",
+        "acceptable": "Customer talks 50-60%",
+        "concerning": "Customer talks <50%"
+      }
+    }
+  },
+  "examples": {
+    "strong_business_discovery": {
+      "quote": "You mentioned your data engineers spend 40% of their time debugging Airflow DAGs. Can you walk me through a recent example? What was the root cause, and how long did resolution take? More importantly, what strategic projects are on hold because of this maintenance burden? And when you think about next quarter's roadmap, what would success look like if this problem went away?",
+      "analysis": "Excellent multi-layered discovery: quantifies pain (40%), asks for specific example (current state), probes business impact (strategic projects on hold), and explores future state outcomes. Demonstrates active listening and connects to executive priorities."
+    },
+    "strong_technical_discovery": {
+      "quote": "Got it - so you're running Airflow on Kubernetes with about 500 daily DAGs. Tell me about your deployment pipeline - how do you promote DAG changes from dev to production? And when you think about integrating with your data warehouse, what are the critical requirements there?",
+      "analysis": "Covers infrastructure (Kubernetes), scale (500 DAGs), CI/CD requirements (promotion process), and integration requirements (data warehouse). Shows understanding of technical landscape and probes for specific requirements."
+    },
+    "strong_security_discovery": {
+      "quote": "I saw you're in healthcare - what compliance requirements do we need to meet? HIPAA? And walk me through your InfoSec review process - who needs to sign off, and what's the typical timeline? Do you have a standard security questionnaire we should plan for?",
+      "analysis": "Proactively addresses industry-specific compliance (HIPAA), maps InfoSec process and stakeholders, and plans ahead for questionnaire. Shows understanding of security gate in sales cycle."
+    },
+    "weak_discovery": {
+      "quote": "So you're looking for a workflow orchestration tool?",
+      "analysis": "Closed question that doesn't uncover needs. Assumes intent without exploring current challenges, desired outcomes, or any of the 5 Wins dimensions. Completely misses opportunity for comprehensive discovery."
+    }
+  }
+}
