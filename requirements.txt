@@ -1,8 +1,8 @@
 # Install the current package (coaching_mcp) in editable mode
 -e .
 
-# FastMCP for on-demand coaching tools
-fastmcp>=0.3.0
+# FastMCP for on-demand coaching tools - use latest for Horizon compatibility
+fastmcp>=2.0.0
 
 # Prefect for orchestration
 prefect>=3.0.0
