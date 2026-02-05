@@ -10,7 +10,7 @@ from typing import Any
 from fastapi import APIRouter, Request, HTTPException, status
 from pydantic import ValidationError
 
-from config import settings
+from shared import settings
 from db import execute_query, fetch_one
 from db.models import WebhookEvent, WebhookEventStatus
 from .types import GongWebhookPayload

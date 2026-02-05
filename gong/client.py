@@ -8,7 +8,7 @@ from typing import Any
 import httpx
 from httpx import HTTPStatusError, RequestError
 
-from config import settings
+from shared import settings
 from .types import GongCall, GongTranscript, GongMonologue, GongSentence, GongSpeaker
 
 logger = logging.getLogger(__name__)

@@ -9,7 +9,7 @@ from typing import Any
 
 from fastmcp import FastMCP
 
-from config import settings
+from shared import settings
 from coaching_mcp.tools.analyze_call import analyze_call_tool
 from coaching_mcp.tools.get_rep_insights import get_rep_insights_tool
 from coaching_mcp.tools.search_calls import search_calls_tool

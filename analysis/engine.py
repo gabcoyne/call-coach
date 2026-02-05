@@ -9,7 +9,7 @@ from uuid import UUID
 
 from anthropic import Anthropic
 
-from config import settings
+from shared import settings
 from db import fetch_one, fetch_all
 from db.models import CoachingDimension
 from .cache import (

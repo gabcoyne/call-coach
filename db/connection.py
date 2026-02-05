@@ -10,7 +10,7 @@ import psycopg2
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
 
-from config import settings
+from shared import settings
 
 logger = logging.getLogger(__name__)
 

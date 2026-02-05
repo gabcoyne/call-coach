@@ -7,7 +7,7 @@ from typing import Any
 
 import tiktoken
 
-from config import settings
+from shared import settings
 from db.models import ChunkMetadata
 
 logger = logging.getLogger(__name__)
