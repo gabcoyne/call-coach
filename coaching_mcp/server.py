@@ -288,30 +288,38 @@ if __name__ == "__main__":
     logger.info("Starting Gong Call Coaching MCP Server")
     logger.info("=" * 60)
 
-    # Run startup validation checks
-    try:
-        logger.info("\n🔍 Running pre-flight validation checks...")
+    # Run startup validation checks (optional - controlled by env var)
+    skip_validation = os.getenv("SKIP_VALIDATION", "false").lower() == "true"
 
-        _validate_environment()
-        _validate_database_connection()
-        _validate_gong_api()
-        _validate_anthropic_api()
+    if not skip_validation:
+        try:
+            logger.info("\n🔍 Running pre-flight validation checks...")
 
-        logger.info("\n✅ All validation checks passed!")
+            _validate_environment()
+            _validate_database_connection()
+            _validate_gong_api()
+            _validate_anthropic_api()
+
+            logger.info("\n✅ All validation checks passed!")
+            logger.info("=" * 60)
+            logger.info("🚀 MCP server ready - 3 tools registered")
+            logger.info("=" * 60)
+
+        except SystemExit:
+            # Validation failed - error already logged
+            logger.error("\n❌ Startup validation failed - server cannot start")
+            logger.error("=" * 60)
+            sys.exit(1)
+
+        except Exception as e:
+            logger.error(f"\n❌ Unexpected error during validation: {e}")
+            logger.error("=" * 60)
+            sys.exit(1)
+    else:
+        logger.info("\n⚠️  Validation skipped (SKIP_VALIDATION=true)")
         logger.info("=" * 60)
-        logger.info("🚀 MCP server ready - 3 tools registered")
+        logger.info("🚀 MCP server starting - 3 tools registered")
         logger.info("=" * 60)
-
-    except SystemExit:
-        # Validation failed - error already logged
-        logger.error("\n❌ Startup validation failed - server cannot start")
-        logger.error("=" * 60)
-        sys.exit(1)
-
-    except Exception as e:
-        logger.error(f"\n❌ Unexpected error during validation: {e}")
-        logger.error("=" * 60)
-        sys.exit(1)
 
     # Run the server
     mcp.run()
