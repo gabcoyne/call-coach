@@ -4,8 +4,8 @@ version = "0.1.0"
 description = "Gong Call Coaching Agent - AI-powered sales coaching for Prefect teams"
 requires-python = ">=3.11"
 dependencies = [
-    # FastMCP for on-demand coaching tools (pinned for cloud deployment)
-    "fastmcp==0.3.0",
+    # FastMCP for on-demand coaching tools
+    "fastmcp>=2.0.0",
     # Prefect for orchestration
     "prefect>=3.0.0",
     # Claude API for analysis (pinned for cloud deployment)

@@ -62,3 +62,4 @@ htmlcov/
 
 # Scratchpad
 scratchpad/
+node_modules/
