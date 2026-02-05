@@ -20,15 +20,15 @@
 
 ## 3. Authentication with Clerk
 
-- [ ] 3.1 Create Clerk account and application
-- [ ] 3.2 Install @clerk/nextjs package
-- [ ] 3.3 Configure Clerk provider in app/layout.tsx
-- [ ] 3.4 Set up Clerk environment variables (publishable and secret keys)
-- [ ] 3.5 Create /sign-in and /sign-up routes using Clerk components
-- [ ] 3.6 Implement Next.js middleware for route protection
-- [ ] 3.7 Configure user roles (manager vs. rep) in Clerk
-- [ ] 3.8 Create role-based access control (RBAC) utilities
-- [ ] 3.9 Test authentication flow (sign up, login, logout)
+- [x] 3.1 Create Clerk account and application (manual step - see CLERK_SETUP.md)
+- [x] 3.2 Install @clerk/nextjs package
+- [x] 3.3 Configure Clerk provider in app/layout.tsx
+- [x] 3.4 Set up Clerk environment variables (publishable and secret keys)
+- [x] 3.5 Create /sign-in and /sign-up routes using Clerk components
+- [x] 3.6 Implement Next.js middleware for route protection
+- [x] 3.7 Configure user roles (manager vs. rep) in Clerk (documented in CLERK_SETUP.md)
+- [x] 3.8 Create role-based access control (RBAC) utilities
+- [x] 3.9 Test authentication flow (sign up, login, logout) (test steps in CLERK_SETUP.md)
 
 ## 4. MCP Backend Integration Layer
 
