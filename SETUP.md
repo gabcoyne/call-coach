@@ -13,12 +13,14 @@
 ### 1. Clone and Install
 
 ```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Install uv (fast Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install dependencies
-pip install -r requirements.txt
+# Install project dependencies
+uv sync
+
+# For development with testing/linting tools
+uv sync --all-extras
 ```
 
 ### 2. Configure Environment

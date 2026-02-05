@@ -34,11 +34,13 @@ call-coach/
 
 ## Setup
 
-1. **Install dependencies**:
+1. **Install dependencies with uv**:
    ```bash
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
+   # Install uv if not already installed
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+
+   # Install project dependencies
+   uv sync
    ```
 
 2. **Configure environment**:

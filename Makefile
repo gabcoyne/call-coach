@@ -1,27 +1,30 @@
 # Makefile for Gong Call Coaching Agent
 
-.PHONY: help install test lint format clean docker-up docker-down db-migrate
+.PHONY: help install test lint format clean docker-up docker-down db-migrate sync
 
 help: ## Show this help message
 	@echo "Available commands:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-install: ## Install dependencies
-	pip install -r requirements.txt
+install: ## Install dependencies with uv
+	uv sync
+
+install-dev: ## Install with dev dependencies
+	uv sync --all-extras
 
 test: ## Run tests
-	pytest tests/ -v
+	uv run pytest tests/ -v
 
 test-cov: ## Run tests with coverage
-	pytest tests/ --cov=. --cov-report=html --cov-report=term
+	uv run pytest tests/ --cov=. --cov-report=html --cov-report=term
 
 lint: ## Run linting checks
-	ruff check .
-	mypy .
+	uv run ruff check .
+	uv run mypy .
 
 format: ## Format code
-	black .
-	ruff check --fix .
+	uv run black .
+	uv run ruff check --fix .
 
 clean: ## Clean up generated files
 	rm -rf __pycache__ .pytest_cache .mypy_cache .coverage htmlcov
@@ -41,7 +44,7 @@ db-migrate: ## Run database migrations
 	psql $(DATABASE_URL) -f db/migrations/001_initial_schema.sql
 
 webhook-server: ## Run webhook server locally
-	python webhook_server.py
+	uv run python webhook_server.py
 
 dev: docker-up ## Start local development environment
 	@echo "Waiting for services to start..."
@@ -54,13 +57,16 @@ env-example: ## Copy .env.example to .env
 	@echo "Created .env file. Please update with your credentials."
 
 kb-load: ## Load complete knowledge base (rubrics + docs)
-	python -m knowledge.loader all
+	uv run python -m knowledge.loader all
 
 kb-load-rubrics: ## Load coaching rubrics only
-	python -m knowledge.loader rubrics
+	uv run python -m knowledge.loader rubrics
 
 kb-load-docs: ## Load product documentation only
-	python -m knowledge.loader docs
+	uv run python -m knowledge.loader docs
 
 kb-verify: ## Verify knowledge base is loaded correctly
-	python -m knowledge.loader verify
+	uv run python -m knowledge.loader verify
+
+sync: ## Sync beads and commit (replaces manual git commits)
+	bd sync --flush-only
