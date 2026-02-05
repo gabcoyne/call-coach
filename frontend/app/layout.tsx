@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/navigation/sidebar";
 import { MobileNav } from "@/components/navigation/mobile-nav";
 import { UserNav } from "@/components/navigation/user-nav";
 import { Breadcrumb } from "@/components/navigation/breadcrumb";
+import { WebVitals } from "@/components/analytics/WebVitals";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body className="min-h-screen bg-background font-sans antialiased">
+          <WebVitals />
           <div className="flex h-screen overflow-hidden">
             {/* Desktop Sidebar with User Nav */}
             <div className="hidden lg:flex lg:flex-shrink-0">

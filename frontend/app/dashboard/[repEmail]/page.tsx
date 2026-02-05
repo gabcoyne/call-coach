@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useRepInsights } from "@/lib/hooks";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { ScoreTrendsChart } from "@/components/dashboard/ScoreTrendsChart";
 import { TimePeriodSelector, TimePeriod } from "@/components/dashboard/TimePeriodSelector";
 import { SkillGapCards } from "@/components/dashboard/SkillGapCards";
-import { DimensionRadarChart } from "@/components/dashboard/DimensionRadarChart";
 import { ImprovementAreas } from "@/components/dashboard/ImprovementAreas";
 import { CoachingPlanSection } from "@/components/dashboard/CoachingPlanSection";
 import { CallHistoryTable } from "@/components/dashboard/CallHistoryTable";
@@ -16,6 +15,41 @@ import { RepSelector } from "@/components/dashboard/RepSelector";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+
+// Dynamic imports for heavy chart components with loading states
+const ScoreTrendsChart = dynamic(
+  () => import("@/components/dashboard/ScoreTrendsChart").then((mod) => ({
+    default: mod.ScoreTrendsChart,
+  })),
+  {
+    loading: () => (
+      <Card className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-1/3" />
+          <div className="h-96 bg-gray-100 rounded" />
+        </div>
+      </Card>
+    ),
+    ssr: false,
+  }
+);
+
+const DimensionRadarChart = dynamic(
+  () => import("@/components/dashboard/DimensionRadarChart").then((mod) => ({
+    default: mod.DimensionRadarChart,
+  })),
+  {
+    loading: () => (
+      <Card className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-1/3" />
+          <div className="h-96 bg-gray-100 rounded" />
+        </div>
+      </Card>
+    ),
+    ssr: false,
+  }
+);
 
 interface DashboardPageProps {
   params: {
