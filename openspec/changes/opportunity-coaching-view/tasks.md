@@ -78,35 +78,35 @@
 
 ## 9. Opportunities List Page UI
 
-- [ ] 9.1 Create app/opportunities/page.tsx with server component for initial data
-- [ ] 9.2 Create components/OpportunitiesList.tsx client component for interactive table
-- [ ] 9.3 Add search input with debounced onChange handler (300ms)
-- [ ] 9.4 Add filter dropdowns for owner, stage (multi-select using shadcn/ui)
-- [ ] 9.5 Add health score range filter with slider component
-- [ ] 9.6 Add sort controls (close date, health score, amount) with direction toggle
-- [ ] 9.7 Add pagination controls (previous, next, page numbers)
-- [ ] 9.8 Fetch data from /api/opportunities with useSWR and query string from filters
-- [ ] 9.9 Display opportunities in table/card layout with name, account, owner, stage, close date, health score
-- [ ] 9.10 Add visual indicators for low health score (<50 = red) and stale opportunities (14+ days = amber)
-- [ ] 9.11 Add click handler to navigate to /opportunities/[id]
-- [ ] 9.12 Add responsive design for mobile (switch to card layout)
-- [ ] 9.13 Test filters, sorting, pagination, and navigation
+- [x] 9.1 Create app/opportunities/page.tsx with server component for initial data
+- [x] 9.2 Create components/OpportunitiesList.tsx client component for interactive table
+- [x] 9.3 Add search input with debounced onChange handler (300ms)
+- [x] 9.4 Add filter dropdowns for owner, stage (multi-select using shadcn/ui)
+- [x] 9.5 Add health score range filter with slider component
+- [x] 9.6 Add sort controls (close date, health score, amount) with direction toggle
+- [x] 9.7 Add pagination controls (previous, next, page numbers)
+- [x] 9.8 Fetch data from /api/opportunities with useSWR and query string from filters
+- [x] 9.9 Display opportunities in table/card layout with name, account, owner, stage, close date, health score
+- [x] 9.10 Add visual indicators for low health score (<50 = red) and stale opportunities (14+ days = amber)
+- [x] 9.11 Add click handler to navigate to /opportunities/[id]
+- [x] 9.12 Add responsive design for mobile (switch to card layout)
+- [x] 9.13 Test filters, sorting, pagination, and navigation
 
 ## 10. Opportunity Detail Page UI
 
-- [ ] 10.1 Create app/opportunities/[id]/page.tsx with dynamic route parameter
-- [ ] 10.2 Fetch opportunity data from /api/opportunities/[id] with useSWR
-- [ ] 10.3 Create components/OpportunityHeader.tsx displaying name, account, owner, stage, close date, amount, health score
-- [ ] 10.4 Add color-coded health indicator (green >70, yellow 40-70, red <40)
-- [ ] 10.5 Create components/OpportunityTimeline.tsx for chronological call/email list
-- [ ] 10.6 Fetch timeline data from /api/opportunities/[id]/timeline with pagination
-- [ ] 10.7 Create components/CallTimelineCard.tsx with collapsed/expanded states
-- [ ] 10.8 Create components/EmailTimelineCard.tsx with collapsed/expanded states
-- [ ] 10.9 Implement expand/collapse functionality with smooth animations
-- [ ] 10.10 Load full transcript/email body only when expanding (lazy loading)
-- [ ] 10.11 Add "Load More" button for timeline pagination
-- [ ] 10.12 Add breadcrumb navigation (Opportunities > [Opportunity Name])
-- [ ] 10.13 Test responsive layout on mobile and desktop
+- [x] 10.1 Create app/opportunities/[id]/page.tsx with dynamic route parameter
+- [x] 10.2 Fetch opportunity data from /api/opportunities/[id] with useSWR
+- [x] 10.3 Create components/OpportunityHeader.tsx displaying name, account, owner, stage, close date, amount, health score
+- [x] 10.4 Add color-coded health indicator (green >70, yellow 40-70, red <40)
+- [x] 10.5 Create components/OpportunityTimeline.tsx for chronological call/email list
+- [x] 10.6 Fetch timeline data from /api/opportunities/[id]/timeline with pagination
+- [x] 10.7 Create components/CallTimelineCard.tsx with collapsed/expanded states
+- [x] 10.8 Create components/EmailTimelineCard.tsx with collapsed/expanded states
+- [x] 10.9 Implement expand/collapse functionality with smooth animations
+- [x] 10.10 Load full transcript/email body only when expanding (lazy loading)
+- [x] 10.11 Add "Load More" button for timeline pagination
+- [x] 10.12 Add breadcrumb navigation (Opportunities > [Opportunity Name])
+- [x] 10.13 Test responsive layout on mobile and desktop
 
 ## 11. Holistic Opportunity Coaching Analysis
 
@@ -141,16 +141,16 @@
 
 ## 14. Opportunity Insights UI Component
 
-- [ ] 14.1 Create components/OpportunityInsights.tsx component
-- [ ] 14.2 Create backend API endpoint app/api/opportunities/[id]/insights/route.ts
-- [ ] 14.3 Call analyze_opportunity tool and return formatted insights
-- [ ] 14.4 Display insights section on opportunity detail page above timeline
-- [ ] 14.5 Show recurring themes, objection patterns, relationship trends
-- [ ] 14.6 Display 3-5 actionable coaching recommendations
-- [ ] 14.7 Add expand/collapse functionality for insights section
-- [ ] 14.8 Add skeleton loader during AI analysis
-- [ ] 14.9 Ensure insights load within 5 seconds
-- [ ] 14.10 Test with various opportunities and verify relevance
+- [x] 14.1 Create components/OpportunityInsights.tsx component
+- [x] 14.2 Create backend API endpoint app/api/opportunities/[id]/insights/route.ts
+- [x] 14.3 Call analyze_opportunity tool and return formatted insights
+- [x] 14.4 Display insights section on opportunity detail page above timeline
+- [x] 14.5 Show recurring themes, objection patterns, relationship trends
+- [x] 14.6 Display 3-5 actionable coaching recommendations
+- [x] 14.7 Add expand/collapse functionality for insights section
+- [x] 14.8 Add skeleton loader during AI analysis
+- [x] 14.9 Ensure insights load within 5 seconds
+- [x] 14.10 Test with various opportunities and verify relevance
 
 ## 15. Integration Testing and Polish
 

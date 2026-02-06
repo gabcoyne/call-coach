@@ -9,6 +9,7 @@ import {
   Rss,
   User,
   Phone,
+  Target,
 } from "lucide-react";
 
 const navigation = [
@@ -31,6 +32,11 @@ const navigation = [
     name: "Calls",
     href: "/calls",
     icon: Phone,
+  },
+  {
+    name: "Opportunities",
+    href: "/opportunities",
+    icon: Target,
   },
   {
     name: "Profile",
