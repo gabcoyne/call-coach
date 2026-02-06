@@ -53,6 +53,12 @@ class Role(str, Enum):
     PARTNER = "partner"
 
 
+class UserRole(str, Enum):
+    ADMIN = "admin"
+    MANAGER = "manager"
+    REP = "rep"
+
+
 class CoachingDimension(str, Enum):
     PRODUCT_KNOWLEDGE = "product_knowledge"
     DISCOVERY = "discovery"
@@ -72,6 +78,22 @@ class FeedbackType(str, Enum):
     MISSING_CONTEXT = "missing_context"
     HELPFUL = "helpful"
     NOT_HELPFUL = "not_helpful"
+
+
+# ============================================================================
+# USERS & AUTHENTICATION
+# ============================================================================
+
+
+class User(BaseModel):
+    """User account with role-based access control."""
+
+    id: UUID | None = None
+    email: str
+    name: str
+    role: UserRole
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 # ============================================================================
@@ -124,6 +146,7 @@ class Speaker(BaseModel):
     company_side: bool = False  # true = Prefect employee
     talk_time_seconds: int | None = None
     talk_time_percentage: float | None = None
+    manager_id: UUID | None = None  # References user.id of manager
 
     @field_validator("talk_time_percentage")
     def validate_talk_time_percentage(cls, v: float | None) -> float | None:

@@ -4,6 +4,8 @@ import { use, useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useRepInsights } from "@/lib/hooks/use-rep-insights";
+import { useCurrentUser } from "@/lib/hooks/use-current-user";
+import { isManager, canViewRep } from "@/lib/rbac";
 import { ScoreCard } from "@/components/coaching/ScoreCard";
 import { TrendChart, TrendDataPoint } from "@/components/coaching/TrendChart";
 import { SkillGapChart, SkillGapData } from "@/components/coaching/SkillGapChart";
@@ -69,12 +71,11 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
   const { repEmail: rawRepEmail } = use(params);
   const repEmail = decodeURIComponent(rawRepEmail);
 
-  // Check if current user is a manager
-  const isManager = user?.publicMetadata?.role === "manager";
-  const currentUserEmail = user?.emailAddresses[0]?.emailAddress;
+  // Get current user from backend
+  const { data: currentUser, isLoading: isLoadingUser, error: userError } = useCurrentUser();
 
   // Check authorization: managers can view anyone, reps can only view themselves
-  const canViewData = isManager || currentUserEmail === repEmail;
+  const canViewData = currentUser ? canViewRep(currentUser, repEmail) : false;
 
   // Fetch insights using the hook - only fetch if authorized
   const {
@@ -85,18 +86,20 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
 
   // Handle authorization redirects
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || isLoadingUser) return;
+
+    if (!currentUser) {
+      router.push("/sign-in");
+      return;
+    }
 
     if (!canViewData) {
       // Reps trying to view other reps' data get redirected to their own dashboard
-      if (currentUserEmail && currentUserEmail !== repEmail) {
-        router.push(`/dashboard/${encodeURIComponent(currentUserEmail)}`);
-      } else {
-        // No user or no email address - redirect to sign in
-        router.push("/sign-in");
+      if (currentUser.email !== repEmail) {
+        router.push(`/dashboard/${encodeURIComponent(currentUser.email)}`);
       }
     }
-  }, [isLoaded, canViewData, currentUserEmail, repEmail, router]);
+  }, [isLoaded, isLoadingUser, canViewData, currentUser, repEmail, router]);
 
   // Calculate average dimension scores
   const calculateAverageDimensionScores = () => {
@@ -274,7 +277,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
     ];
   };
 
-  if (!isLoaded) {
+  if (!isLoaded || isLoadingUser) {
     return (
       <div className="container mx-auto p-6 space-y-6">
         <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse" />

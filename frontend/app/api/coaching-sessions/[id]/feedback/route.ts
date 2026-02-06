@@ -108,9 +108,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
  * Get feedback for a coaching session.
  */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id: coachingSessionId } = await params;
+  const { id: coachingSessionId } = await params;
 
+  try {
     const result = await query(
       `
       SELECT

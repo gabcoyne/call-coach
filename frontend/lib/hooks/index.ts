@@ -65,3 +65,9 @@ export {
   type UseInfiniteFeedReturn,
   type UseFeedActionsReturn,
 } from "./useFeed";
+
+// Current User Hook
+export {
+  useCurrentUser,
+  type CurrentUser,
+} from "./use-current-user";

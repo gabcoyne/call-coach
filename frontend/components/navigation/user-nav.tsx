@@ -2,9 +2,12 @@
 
 import { UserButton, useUser } from "@clerk/nextjs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RoleBadge } from "@/components/ui/role-badge";
+import { useCurrentUser } from "@/lib/hooks/use-current-user";
 
 export function UserNav() {
   const { user, isLoaded } = useUser();
+  const { data: currentUser } = useCurrentUser();
 
   if (!isLoaded) {
     return (
@@ -29,9 +32,12 @@ export function UserNav() {
         afterSignOutUrl="/sign-in"
       />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground truncate">
-          {user?.fullName || user?.primaryEmailAddress?.emailAddress}
-        </p>
+        <div className="flex items-center gap-2 mb-1">
+          <p className="text-sm font-medium text-foreground truncate">
+            {user?.fullName || user?.primaryEmailAddress?.emailAddress}
+          </p>
+          {currentUser?.role && <RoleBadge role={currentUser.role} />}
+        </div>
         <p className="text-xs text-muted-foreground truncate">
           {user?.primaryEmailAddress?.emailAddress}
         </p>

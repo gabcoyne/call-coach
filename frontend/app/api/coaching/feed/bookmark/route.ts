@@ -12,13 +12,14 @@ const bookmarkSchema = z.object({
 async function handlePost(req: NextRequest) {
   const startTime = Date.now();
   const requestId = crypto.randomUUID();
+  let userEmail: string | null = null;
 
   try {
     const body = await req.json();
     const validatedData = bookmarkSchema.parse(body);
-    const userEmail = await getCurrentUserEmail();
+    userEmail = await getCurrentUserEmail();
 
-    logApiRequest(requestId, "POST", "/api/coaching/feed/bookmark", validatedData);
+    logApiRequest(req, userEmail || undefined, { requestId, body: validatedData });
 
     // Call MCP backend to bookmark item
     const mcpBackendUrl = process.env.MCP_BACKEND_URL || "http://localhost:8000";
@@ -40,14 +41,15 @@ async function handlePost(req: NextRequest) {
 
     const data = await mcpResponse.json();
     const duration = Date.now() - startTime;
-    logApiResponse(requestId, 200, data, duration);
+    const response = NextResponse.json(data, { status: 200 });
+    logApiResponse(req, response, userEmail || undefined, duration);
 
-    return NextResponse.json(data, { status: 200 });
+    return response;
   } catch (error) {
     const duration = Date.now() - startTime;
 
     if (error instanceof z.ZodError) {
-      logApiError(requestId, error, 400, duration);
+      logApiError(req, error, userEmail || undefined, { requestId, duration, statusCode: 400 });
       return NextResponse.json(
         {
           error: "Validation Error",
@@ -58,7 +60,7 @@ async function handlePost(req: NextRequest) {
       );
     }
 
-    logApiError(requestId, error, 500, duration);
+    logApiError(req, error, userEmail || undefined, { requestId, duration, statusCode: 500 });
     return NextResponse.json(
       {
         error: "Internal Server Error",
@@ -69,4 +71,4 @@ async function handlePost(req: NextRequest) {
   }
 }
 
-export const POST = withRateLimit(withAuthMiddleware(handlePost), 60, "bookmark");
+export const POST = withRateLimit(withAuthMiddleware(handlePost));

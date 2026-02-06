@@ -9,7 +9,7 @@ from typing import Any
 from uuid import UUID
 
 from .connection import execute_query, fetch_all, fetch_one
-from .models import CoachingDimension
+from .models import CoachingDimension, UserRole
 
 logger = logging.getLogger(__name__)
 
@@ -1000,3 +1000,117 @@ def get_feedback_by_rep(
         """,
         (rep_email, days),
     )
+
+
+# ============================================================================
+# USER QUERIES (RBAC)
+# ============================================================================
+
+
+def get_user_by_email(email: str) -> dict[str, Any] | None:
+    """
+    Get user by email address.
+
+    Args:
+        email: User email address
+
+    Returns:
+        User dict with id, email, name, role, or None if not found
+    """
+    return fetch_one(
+        "SELECT id, email, name, role, created_at, updated_at FROM users WHERE email = %s",
+        (email,),
+    )
+
+
+def get_user_by_id(user_id: str) -> dict[str, Any] | None:
+    """
+    Get user by ID.
+
+    Args:
+        user_id: User UUID
+
+    Returns:
+        User dict with id, email, name, role, or None if not found
+    """
+    return fetch_one(
+        "SELECT id, email, name, role, created_at, updated_at FROM users WHERE id = %s",
+        (user_id,),
+    )
+
+
+def get_managed_reps(manager_email: str) -> list[dict[str, Any]]:
+    """
+    Get all reps managed by a specific manager.
+
+    Args:
+        manager_email: Manager's email address
+
+    Returns:
+        List of user dicts for reps reporting to this manager
+    """
+    return fetch_all(
+        """
+        SELECT DISTINCT u.id, u.email, u.name, u.role
+        FROM users u
+        JOIN speakers s ON u.email = s.email
+        JOIN users m ON s.manager_id = m.id
+        WHERE m.email = %s
+        AND u.role = 'rep'
+        ORDER BY u.name
+        """,
+        (manager_email,),
+    )
+
+
+def get_calls_for_user(user_email: str, role: str, limit: int = 50) -> list[dict[str, Any]]:
+    """
+    Get calls filtered by user role.
+    - Reps see only their own calls
+    - Managers see their team's calls
+    - Admins see all calls
+
+    Args:
+        user_email: User's email address
+        role: User's role ('admin', 'manager', 'rep')
+        limit: Maximum number of calls to return
+
+    Returns:
+        List of call dicts
+    """
+    if role == "admin":
+        # Admins see all calls
+        return fetch_all(
+            "SELECT * FROM calls ORDER BY scheduled_at DESC NULLS LAST LIMIT %s",
+            (limit,),
+        )
+    elif role == "manager":
+        # Managers see their team's calls
+        return fetch_all(
+            """
+            SELECT DISTINCT c.*
+            FROM calls c
+            JOIN speakers s ON c.id = s.call_id
+            JOIN users u ON s.email = u.email
+            JOIN speakers s2 ON u.email = s2.email
+            JOIN users manager ON s2.manager_id = manager.id
+            WHERE manager.email = %s
+            ORDER BY c.scheduled_at DESC NULLS LAST
+            LIMIT %s
+            """,
+            (user_email, limit),
+        )
+    else:  # rep
+        # Reps see only their own calls
+        return fetch_all(
+            """
+            SELECT DISTINCT c.*
+            FROM calls c
+            JOIN speakers s ON c.id = s.call_id
+            WHERE s.email = %s
+            AND s.company_side = true
+            ORDER BY c.scheduled_at DESC NULLS LAST
+            LIMIT %s
+            """,
+            (user_email, limit),
+        )

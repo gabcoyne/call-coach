@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Search, Rss, User, Phone, Menu, X, Target } from "lucide-react";
+import { LayoutDashboard, Search, Rss, User, Phone, Menu, X, Target, Users, Shield } from "lucide-react";
+import { useCurrentUser } from "@/lib/hooks/use-current-user";
+import { isManager, isAdmin } from "@/lib/rbac";
 
 const navigation = [
   {
@@ -41,9 +43,28 @@ const navigation = [
   },
 ];
 
+const managerNavigation = [
+  {
+    name: "My Team",
+    href: "/team/dashboard",
+    icon: Users,
+  },
+];
+
+const adminNavigation = [
+  {
+    name: "Admin",
+    href: "/admin",
+    icon: Shield,
+  },
+];
+
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { data: currentUser } = useCurrentUser();
+  const userIsManager = isManager(currentUser);
+  const userIsAdmin = isAdmin(currentUser);
 
   return (
     <div className="lg:hidden">
@@ -127,6 +148,71 @@ export function MobileNav() {
                   </Link>
                 );
               })}
+
+              {/* Manager Navigation */}
+              {userIsManager && (
+                <>
+                  <div className="py-2 border-t border-border" />
+                  {managerNavigation.map((item) => {
+                    const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "group flex items-center px-3 py-3 text-base font-medium rounded-md transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            "mr-3 h-6 w-6 flex-shrink-0",
+                            isActive
+                              ? "text-primary-foreground"
+                              : "text-muted-foreground group-hover:text-accent-foreground"
+                          )}
+                        />
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </>
+              )}
+
+              {/* Admin Navigation */}
+              {userIsAdmin && (
+                <>
+                  {adminNavigation.map((item) => {
+                    const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "group flex items-center px-3 py-3 text-base font-medium rounded-md transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            "mr-3 h-6 w-6 flex-shrink-0",
+                            isActive
+                              ? "text-primary-foreground"
+                              : "text-muted-foreground group-hover:text-accent-foreground"
+                          )}
+                        />
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </>
+              )}
             </nav>
           </div>
         </div>

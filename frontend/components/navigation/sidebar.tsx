@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Search, Rss, User, Phone, Target, Settings, Shield } from "lucide-react";
+import { LayoutDashboard, Search, Rss, User, Phone, Target, Settings, Shield, Users } from "lucide-react";
+import { useCurrentUser } from "@/lib/hooks/use-current-user";
+import { isManager } from "@/lib/rbac";
 
 const navigation = [
   {
@@ -44,6 +46,14 @@ const navigation = [
   },
 ];
 
+const managerNavigation = [
+  {
+    name: "My Team",
+    href: "/team/dashboard",
+    icon: Users,
+  },
+];
+
 const adminNavigation = [
   {
     name: "Admin",
@@ -55,7 +65,8 @@ const adminNavigation = [
 export function Sidebar() {
   const pathname = usePathname();
   const { user } = useUser();
-  const isManager = user?.publicMetadata?.role === "manager";
+  const { data: currentUser } = useCurrentUser();
+  const userIsManager = isManager(currentUser);
 
   return (
     <div className="flex flex-col flex-grow border-r border-border bg-card overflow-y-auto">
@@ -100,10 +111,41 @@ export function Sidebar() {
           );
         })}
 
-        {/* Admin Navigation (Manager only) */}
-        {isManager && (
+        {/* Manager Navigation */}
+        {userIsManager && (
           <>
             <div className="py-2 border-t border-border mt-4" />
+            {managerNavigation.map((item) => {
+              const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  )}
+                >
+                  <item.icon
+                    className={cn(
+                      "mr-3 h-5 w-5 flex-shrink-0",
+                      isActive
+                        ? "text-primary-foreground"
+                        : "text-muted-foreground group-hover:text-accent-foreground"
+                    )}
+                  />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </>
+        )}
+
+        {/* Admin Navigation (Manager only) */}
+        {userIsManager && (
+          <>
             {adminNavigation.map((item) => {
               const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
               return (
