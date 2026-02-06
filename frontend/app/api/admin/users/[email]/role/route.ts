@@ -16,7 +16,7 @@ import * as db from "@/lib/db";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ email: string }> }
+  { params }: { params: { email: string } }
 ) {
   try {
     // Check authentication
@@ -47,7 +47,7 @@ export async function PUT(
       );
     }
 
-    const { email } = await params;
+    const { email } = params;
     const body = await request.json();
     const { role } = body;
 
