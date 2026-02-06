@@ -73,16 +73,18 @@ Provide a structured analysis in JSON format:
   "specific_examples": {{
     "good": [
       {{
-        "quote": "<exact quote from transcript>",
-        "timestamp": <seconds>,
-        "analysis": "<why this was effective discovery>"
+        "timestamp_start": <seconds>,
+        "timestamp_end": <seconds>,
+        "exchange_summary": "<1-2 sentence summary of multi-turn discovery dialogue>",
+        "impact": "<why this exchange demonstrates effective discovery>"
       }}
     ],
     "needs_work": [
       {{
-        "quote": "<exact quote from transcript>",
-        "timestamp": <seconds>,
-        "analysis": "<why this needs improvement>"
+        "timestamp_start": <seconds>,
+        "timestamp_end": <seconds>,
+        "exchange_summary": "<1-2 sentence summary of multi-turn discovery dialogue>",
+        "impact": "<why this exchange needs improvement>"
       }}
     ]
   }},

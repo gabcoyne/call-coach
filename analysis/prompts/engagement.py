@@ -76,16 +76,18 @@ Provide a structured analysis in JSON format:
   "specific_examples": {{
     "good": [
       {{
-        "quote": "<exact quote from transcript>",
-        "timestamp": <seconds>,
-        "analysis": "<why this was effective engagement>"
+        "timestamp_start": <seconds>,
+        "timestamp_end": <seconds>,
+        "exchange_summary": "<1-2 sentence summary of multi-turn dialogue showing strong engagement>",
+        "impact": "<why this exchange demonstrates effective engagement>"
       }}
     ],
     "needs_work": [
       {{
-        "quote": "<exact quote from transcript>",
-        "timestamp": <seconds>,
-        "analysis": "<why this needs improvement>"
+        "timestamp_start": <seconds>,
+        "timestamp_end": <seconds>,
+        "exchange_summary": "<1-2 sentence summary of multi-turn dialogue showing weak engagement>",
+        "impact": "<why this exchange needs improvement>"
       }}
     ]
   }},
@@ -123,6 +125,54 @@ Provide a structured analysis in JSON format:
     "closing_quality": "<assessment of closing>",
     "transition_quality": "<assessment of transitions between topics>"
   }},
+  "five_wins_coverage": {{
+    "business_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "business_discovery": {{
+        "current_state_and_problems": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "future_state_and_outcomes": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "success_metrics": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "executive_priorities": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "evaluation_and_decision": {{"covered": <boolean>, "notes": "<brief assessment>"}}
+      }},
+      "business_case": {{"covered": <boolean>, "notes": "<assessment of business case strength>"}}
+    }},
+    "technical_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "technical_discovery": {{
+        "technical_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "use_case_alignment": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "infrastructure_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "ci_cd_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "other_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}}
+      }},
+      "demo_solution_presentation": {{"planned": <boolean>, "notes": "<assessment>"}},
+      "poc_scoping_and_poc": {{"discussed": <boolean>, "notes": "<assessment>"}}
+    }},
+    "security_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "infosec_discovery": {{
+        "infosec_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "infosec_process_and_timeline": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "questionnaire": {{"discussed": <boolean>, "notes": "<assessment>"}}
+      }}
+    }},
+    "commercial_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "scoping_discovery": {{"covered": <boolean>, "notes": "<assessment of scope discussion>"}}
+    }},
+    "legal_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "legal_discovery": {{"covered": <boolean>, "notes": "<assessment of legal discussion>"}}
+    }},
+    "wins_count": <number of wins with >50 score>,
+    "overall_assessment": "<which wins are strong, which need work>"
+  }},
   "full_analysis": "<comprehensive 2-3 paragraph analysis>"
 }}
 
@@ -157,6 +207,13 @@ Provide a structured analysis in JSON format:
    - **Positive signals**: Questions asked, volunteered information, referenced use cases, suggested next steps, introduced stakeholders
    - **Negative signals**: One-word answers, long silences, multitasking, vague responses, asked to reschedule
    - Quote specific examples of engagement or disengagement
+
+5. **5 Wins Coverage** - Score each win 0-100 based on engagement quality during those discussions:
+   - **Business Win** (35%): Customer engagement when discussing business value, pain points, ROI
+   - **Technical Win** (25%): Technical buyer participation, questions about requirements and use cases
+   - **Security Win** (15%): InfoSec stakeholder engagement, questions about security and compliance
+   - **Commercial Win** (15%): Engagement during pricing and scope discussions
+   - **Legal Win** (10%): Legal/procurement stakeholder participation
 
 Assess the call opening (agenda setting, objective clarity) and closing (summarization, next steps, follow-up confirmation). Identify any anti-patterns (monologuing, interrupting, excessive filler words, reading script). Be specific with timestamps and quotes."""
 

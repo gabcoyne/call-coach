@@ -72,16 +72,18 @@ Provide a structured analysis in JSON format:
   "specific_examples": {{
     "good": [
       {{
-        "quote": "<exact quote from transcript>",
-        "timestamp": <seconds>,
-        "analysis": "<why this was effective objection handling>"
+        "timestamp_start": <seconds>,
+        "timestamp_end": <seconds>,
+        "exchange_summary": "<1-2 sentence summary of multi-turn objection handling dialogue>",
+        "impact": "<why this exchange demonstrates effective objection handling>"
       }}
     ],
     "needs_work": [
       {{
-        "quote": "<exact quote from transcript>",
-        "timestamp": <seconds>,
-        "analysis": "<why this needs improvement>"
+        "timestamp_start": <seconds>,
+        "timestamp_end": <seconds>,
+        "exchange_summary": "<1-2 sentence summary of multi-turn objection handling dialogue>",
+        "impact": "<why this exchange needs improvement>"
       }}
     ]
   }},
@@ -108,6 +110,54 @@ Provide a structured analysis in JSON format:
     "patterns": [
       "<observed pattern in how objections were handled>"
     ]
+  }},
+  "five_wins_coverage": {{
+    "business_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "business_discovery": {{
+        "current_state_and_problems": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "future_state_and_outcomes": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "success_metrics": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "executive_priorities": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "evaluation_and_decision": {{"covered": <boolean>, "notes": "<brief assessment>"}}
+      }},
+      "business_case": {{"covered": <boolean>, "notes": "<assessment of business case strength>"}}
+    }},
+    "technical_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "technical_discovery": {{
+        "technical_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "use_case_alignment": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "infrastructure_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "ci_cd_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "other_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}}
+      }},
+      "demo_solution_presentation": {{"planned": <boolean>, "notes": "<assessment>"}},
+      "poc_scoping_and_poc": {{"discussed": <boolean>, "notes": "<assessment>"}}
+    }},
+    "security_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "infosec_discovery": {{
+        "infosec_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "infosec_process_and_timeline": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "questionnaire": {{"discussed": <boolean>, "notes": "<assessment>"}}
+      }}
+    }},
+    "commercial_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "scoping_discovery": {{"covered": <boolean>, "notes": "<assessment of scope discussion>"}}
+    }},
+    "legal_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "legal_discovery": {{"covered": <boolean>, "notes": "<assessment of legal discussion>"}}
+    }},
+    "wins_count": <number of wins with >50 score>,
+    "overall_assessment": "<which wins are strong, which need work>"
   }},
   "full_analysis": "<comprehensive 2-3 paragraph analysis>"
 }}
@@ -138,6 +188,13 @@ Provide a structured analysis in JSON format:
    - Was alignment ensured before proceeding?
    - Did rep ask if additional concerns exist?
    - Or did rep assume resolution without confirmation?
+
+5. **5 Wins Coverage** - Score each win 0-100 based on objection handling quality:
+   - **Business Win** (35%): Business case objections handled effectively (ROI concerns, budget objections)
+   - **Technical Win** (25%): Technical fit objections addressed with depth (integration concerns, requirements gaps)
+   - **Security Win** (15%): Security/compliance objections resolved (InfoSec concerns, data privacy)
+   - **Commercial Win** (15%): Pricing/scope objections navigated (cost concerns, contract terms)
+   - **Legal Win** (10%): Legal/procurement objections managed (contract requirements, approval process)
 
 Categorize each objection by type (pricing, timing, technical_fit, competitive, other) and assess whether it was resolved. Be specific - quote the objection, the response, and explain why it was effective or needs work."""
 

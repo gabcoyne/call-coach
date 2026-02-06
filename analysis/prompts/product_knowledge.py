@@ -77,16 +77,18 @@ Provide a structured analysis in JSON format:
   "specific_examples": {{
     "good": [
       {{
-        "quote": "<exact quote from transcript>",
-        "timestamp": <seconds into call>,
-        "analysis": "<why this was effective>"
+        "timestamp_start": <seconds into call>,
+        "timestamp_end": <seconds into call>,
+        "exchange_summary": "<1-2 sentence summary of multi-turn dialogue showing effective product knowledge>",
+        "impact": "<why this exchange demonstrates strong product knowledge>"
       }}
     ],
     "needs_work": [
       {{
-        "quote": "<exact quote from transcript>",
-        "timestamp": <seconds into call>,
-        "analysis": "<why this needs improvement and how to fix>"
+        "timestamp_start": <seconds into call>,
+        "timestamp_end": <seconds into call>,
+        "exchange_summary": "<1-2 sentence summary of multi-turn dialogue showing gap in product knowledge>",
+        "impact": "<why this exchange needs improvement and how to fix>"
       }}
     ]
   }},
@@ -97,24 +99,78 @@ Provide a structured analysis in JSON format:
   "technical_accuracy": {{
     "correct_statements": [
       {{
-        "quote": "<statement>",
+        "timestamp_start": <seconds>,
+        "timestamp_end": <seconds>,
+        "exchange_summary": "<summary of accurate technical explanation>",
         "validation": "<why this is correct per knowledge base>"
       }}
     ],
     "inaccurate_statements": [
       {{
-        "quote": "<statement>",
+        "timestamp_start": <seconds>,
+        "timestamp_end": <seconds>,
+        "exchange_summary": "<summary of inaccurate statement or explanation>",
         "issue": "<what's wrong>",
         "correction": "<what should have been said>"
       }}
     ],
     "missed_opportunities": [
       {{
-        "context": "<when this came up>",
+        "timestamp_start": <seconds>,
+        "timestamp_end": <seconds>,
+        "context": "<summary of when this came up>",
         "missed_point": "<what wasn't mentioned>",
         "suggestion": "<what should have been said>"
       }}
     ]
+  }},
+  "five_wins_coverage": {{
+    "business_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "business_discovery": {{
+        "current_state_and_problems": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "future_state_and_outcomes": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "success_metrics": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "executive_priorities": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "evaluation_and_decision": {{"covered": <boolean>, "notes": "<brief assessment>"}}
+      }},
+      "business_case": {{"covered": <boolean>, "notes": "<assessment of business case strength>"}}
+    }},
+    "technical_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "technical_discovery": {{
+        "technical_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "use_case_alignment": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "infrastructure_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "ci_cd_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "other_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}}
+      }},
+      "demo_solution_presentation": {{"planned": <boolean>, "notes": "<assessment>"}},
+      "poc_scoping_and_poc": {{"discussed": <boolean>, "notes": "<assessment>"}}
+    }},
+    "security_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "infosec_discovery": {{
+        "infosec_requirements": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "infosec_process_and_timeline": {{"covered": <boolean>, "notes": "<brief assessment>"}},
+        "questionnaire": {{"discussed": <boolean>, "notes": "<assessment>"}}
+      }}
+    }},
+    "commercial_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "scoping_discovery": {{"covered": <boolean>, "notes": "<assessment of scope discussion>"}}
+    }},
+    "legal_win": {{
+      "covered": <boolean>,
+      "score": <0-100>,
+      "legal_discovery": {{"covered": <boolean>, "notes": "<assessment of legal discussion>"}}
+    }},
+    "wins_count": <number of wins with >50 score>,
+    "overall_assessment": "<which wins are strong, which need work>"
   }},
   "full_analysis": "<comprehensive 2-3 paragraph analysis>"
 }}
@@ -139,6 +195,13 @@ Provide a structured analysis in JSON format:
 4. **Use Case Relevance** (10%): Relevance of examples provided
    - Similar customer examples
    - Industry/tech stack alignment
+
+5. **5 Wins Coverage** - Score each win 0-100 based on product knowledge quality:
+   - **Technical Win** (25%): Deep technical knowledge demonstrated - use cases, infrastructure, CI/CD, POC scoping
+   - **Business Win** (35%): Product value connected to business outcomes, ROI articulated
+   - **Security Win** (15%): InfoSec requirements addressed, security features explained accurately
+   - **Commercial Win** (15%): Scope and pricing discussed with product knowledge
+   - **Legal Win** (10%): Contract terms, compliance requirements explained
 
 Be specific in your feedback. Quote exact statements from the transcript and explain why they're effective or need improvement."""
 
