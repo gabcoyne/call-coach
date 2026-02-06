@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Coaching Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .wrapper {
+            width: 100%;
+            background-color: #f5f5f5;
+            padding: 20px 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 35px 25px;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        .content {
+            padding: 30px 25px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .summary-card {
+            background-color: #eff6ff;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #2563eb;
+        }
+        .summary-card h3 {
+            color: #1e40af;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1;
+        }
+        .summary-detail {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        .score-section {
+            margin-bottom: 30px;
+        }
+        .score-section h2 {
+            color: #1e40af;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .score-card {
+            background-color: #f8fafc;
+            padding: 18px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border-left: 4px solid #cbd5e1;
+        }
+        .score-card.high {
+            border-left-color: #16a34a;
+            background-color: #f0fdf4;
+        }
+        .score-card.medium {
+            border-left-color: #eab308;
+            background-color: #fefce8;
+        }
+        .score-card.low {
+            border-left-color: #dc2626;
+            background-color: #fef2f2;
+        }
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .score-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        .score-badge {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .score-badge.high {
+            color: #16a34a;
+        }
+        .score-badge.medium {
+            color: #ca8a04;
+        }
+        .score-badge.low {
+            color: #dc2626;
+        }
+        .score-trend {
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        .trend-up {
+            color: #16a34a;
+            font-weight: 600;
+        }
+        .trend-down {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        .score-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #64748b;
+        }
+        .mini-chart {
+            width: 100%;
+            height: 4px;
+            background-color: #e2e8f0;
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .mini-chart-fill {
+            height: 100%;
+            background-color: currentColor;
+            border-radius: 2px;
+        }
+        .objection-section {
+            margin-bottom: 30px;
+        }
+        .objection-section h2 {
+            color: #1e40af;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .objection-item {
+            background-color: #fef3c7;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border-left: 4px solid #f59e0b;
+        }
+        .objection-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .objection-count {
+            font-size: 12px;
+            color: #b45309;
+        }
+        .call-list {
+            margin-bottom: 30px;
+        }
+        .call-list h2 {
+            color: #1e40af;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .call-item {
+            background-color: #f8fafc;
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid #94a3b8;
+        }
+        .call-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        .call-meta {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .action-items {
+            background-color: #fef2f2;
+            border-left: 4px solid #dc2626;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+        }
+        .action-items h2 {
+            color: #991b1b;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .action-items ol {
+            list-style-position: inside;
+            color: #7f1d1d;
+            font-size: 14px;
+        }
+        .action-items li {
+            padding: 8px 0;
+            line-height: 1.5;
+        }
+        .cta-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background-color: #1e40af;
+        }
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px 25px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+        }
+        .footer a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px 15px;
+            }
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                padding: 25px 15px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>📊 Weekly Coaching Report</h1>
+                <p>{{ rep_name }} • Week of {{ week_start }}</p>
+            </div>
+
+            <div class="content">
+                <!-- Summary Cards -->
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Overall Score</h3>
+                        <div class="summary-value">{{ overall_avg }}</div>
+                        {% if overall_trend %}
+                        <div class="summary-detail">
+                            {% if overall_trend.direction == 'up' %}
+                                📈 +{{ overall_trend.change }} from last week
+                            {% elif overall_trend.direction == 'down' %}
+                                📉 {{ overall_trend.change }} from last week
+                            {% else %}
+                                ➡️ No change from last week
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="summary-card">
+                        <h3>Activity</h3>
+                        <div class="summary-value">{{ total_calls }}</div>
+                        <div class="summary-detail">calls • {{ total_sessions }} coaching sessions</div>
+                    </div>
+                </div>
+
+                <!-- Score Breakdown -->
+                <div class="score-section">
+                    <h2>Score Breakdown by Dimension</h2>
+                    {% for dimension in dimensions %}
+                    <div class="score-card {{ dimension.css_class }}">
+                        <div class="score-header">
+                            <div>
+                                <div class="score-title">{{ dimension.label }}</div>
+                                <div class="score-stats">
+                                    Range: {{ dimension.min_score }}-{{ dimension.max_score }} |
+                                    Sessions: {{ dimension.session_count }}
+                                </div>
+                            </div>
+                            <div>
+                                <div class="score-badge {{ dimension.css_class }}">{{ dimension.avg_score }}</div>
+                                {% if dimension.trend %}
+                                <div class="score-trend">
+                                    {% if dimension.trend.direction == 'up' %}
+                                        <span class="trend-up">📈 +{{ dimension.trend.change }}</span>
+                                    {% elif dimension.trend.direction == 'down' %}
+                                        <span class="trend-down">📉 {{ dimension.trend.change }}</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mini-chart">
+                            <div class="mini-chart-fill" style="width: {{ (dimension.avg_score / 100) * 100 }}%; {% if dimension.css_class == 'high' %}color: #16a34a{% elif dimension.css_class == 'medium' %}color: #ca8a04{% else %}color: #dc2626{% endif %}"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Recurring Objections -->
+                {% if objections %}
+                <div class="objection-section">
+                    <h2>Recurring Themes & Objections</h2>
+                    {% for obj in objections %}
+                    <div class="objection-item">
+                        <div class="objection-title">{{ obj.type }}</div>
+                        <div class="objection-count">{{ obj.count }} occurrence{% if obj.count != 1 %}s{% endif %}</div>
+                        {% if obj.examples %}
+                        <div style="margin-top: 10px; font-size: 12px; color: #92400e;">
+                            {% for ex in obj.examples %}
+                            <div style="margin-bottom: 8px;">
+                                <em>{{ ex.call_title }}</em>
+                                {% if ex.quote %}
+                                <div style="margin-top: 3px; margin-left: 10px; border-left: 2px solid #f59e0b; padding-left: 10px; color: #b45309; font-style: italic;">
+                                    "{{ ex.quote }}"
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Calls List -->
+                <div class="call-list">
+                    <h2>Calls This Week</h2>
+                    {% for call in calls %}
+                    <div class="call-item">
+                        <div class="call-title">{{ call.title }}</div>
+                        <div class="call-meta">{{ call.call_type }} • {{ call.date }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Action Items -->
+                {% if action_items %}
+                <div class="action-items">
+                    <h2>Recommended Focus Areas</h2>
+                    <ol>
+                    {% for item in action_items %}
+                        <li>{{ item }}</li>
+                    {% endfor %}
+                    </ol>
+                </div>
+                {% endif %}
+
+                <!-- CTA -->
+                <div class="cta-section">
+                    <p style="margin-bottom: 15px; color: #475569;">Want to learn more? View all your coaching insights and progress</p>
+                    <a href="{{ app_url }}/dashboard" class="button">View Dashboard</a>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>Report generated: {{ generated_at }}</p>
+                <p style="margin-top: 8px;">
+                    <a href="{{ app_url }}/settings/notifications">Manage preferences</a>
+                </p>
+                <p style="margin-top: 8px;">🤖 From Call Coach</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

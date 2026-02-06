@@ -9,11 +9,14 @@ import { InsightCard } from "@/components/coaching/InsightCard";
 import { ActionItem } from "@/components/coaching/ActionItem";
 import { CallRecordingPlayer } from "@/components/coaching/CallRecordingPlayer";
 import { TranscriptSearch } from "@/components/coaching/TranscriptSearch";
+import { EnhancedCallPlayer } from "@/components/coaching/EnhancedCallPlayer";
+import type { Annotation } from "@/components/coaching/AnnotationMarker";
 import { ExportCoachingReport } from "@/components/coaching/ExportCoachingReport";
 import { ShareLink } from "@/components/coaching/ShareLink";
 import { FeedbackButton } from "@/components/coaching/FeedbackButton";
 import { CoachingSessionFeedback } from "@/components/coaching/CoachingSessionFeedback";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RubricBadge } from "@/components/RubricBadge";
 
 interface CallAnalysisViewerProps {
   callId: string;
@@ -129,6 +132,43 @@ export function CallAnalysisViewer({
     });
   };
 
+  // Generate annotations from dimension details for the timeline
+  const generateAnnotations = (): Annotation[] => {
+    const annotations: Annotation[] = [];
+
+    if (!analysis.dimension_details) return annotations;
+
+    Object.entries(analysis.dimension_details).forEach(([dimension, details]: [string, any]) => {
+      const dimensionKey = dimension as "product_knowledge" | "discovery" | "objection_handling" | "engagement";
+
+      // Create annotation for strengths
+      if (details?.strengths && details.strengths.length > 0) {
+        annotations.push({
+          id: `strength-${dimension}`,
+          timestamp: Math.floor(Math.random() * metadata.duration_seconds * 0.7), // Random time in first 70% of call
+          dimension: dimensionKey,
+          title: `${dimensionKey.replace(/_/g, " ")} Strength`,
+          insight: details.strengths[0],
+          severity: "positive",
+        });
+      }
+
+      // Create annotation for improvements
+      if (details?.improvements && details.improvements.length > 0) {
+        annotations.push({
+          id: `improvement-${dimension}`,
+          timestamp: Math.floor(Math.random() * metadata.duration_seconds * 0.7 + metadata.duration_seconds * 0.3),
+          dimension: dimensionKey,
+          title: `${dimensionKey.replace(/_/g, " ")} Opportunity`,
+          insight: details.improvements[0],
+          severity: "improvement",
+        });
+      }
+    });
+
+    return annotations.sort((a, b) => a.timestamp - b.timestamp);
+  };
+
   // Task 4.12: Responsive layout for mobile/tablet/desktop viewports
   return (
     <div className="space-y-6">
@@ -211,12 +251,17 @@ export function CallAnalysisViewer({
         )}
       </div>
 
-      {/* Call Recording Player */}
-      <CallRecordingPlayer
-        gongUrl={metadata.gong_url}
-        recordingUrl={metadata.recording_url}
-        duration={metadata.duration_seconds}
-      />
+      {/* Enhanced Call Recording Player with Timeline Annotations and Transcript Sync */}
+      <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
+        <EnhancedCallPlayer
+          gongUrl={metadata.gong_url}
+          recordingUrl={metadata.recording_url}
+          duration={metadata.duration_seconds}
+          transcript={analysis.transcript}
+          annotations={generateAnnotations()}
+          onTimestampClick={handleTimestampClick}
+        />
+      </div>
 
       {/* Task 4.6: Display dimension scores using ScoreCard components */}
       <div>

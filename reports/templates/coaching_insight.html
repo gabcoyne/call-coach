@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coaching Insight from Call Coach</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .wrapper {
+            width: 100%;
+            background-color: #f5f5f5;
+            padding: 20px 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .insight-section {
+            background-color: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .insight-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+        .insight-content {
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .quote {
+            border-left: 3px solid #cbd5e1;
+            padding-left: 15px;
+            margin: 15px 0;
+            color: #64748b;
+            font-style: italic;
+            font-size: 13px;
+        }
+        .score-indicator {
+            display: inline-block;
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #15803d;
+        }
+        .score-indicator.low {
+            background-color: #fef2f2;
+            border-left-color: #dc2626;
+            color: #991b1b;
+        }
+        .score-indicator.medium {
+            background-color: #fefce8;
+            border-left-color: #eab308;
+            color: #713f12;
+        }
+        .call-reference {
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #475569;
+        }
+        .call-reference strong {
+            color: #1e293b;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .call-time {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .cta-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 5px;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background-color: #1e40af;
+        }
+        .button.secondary {
+            background-color: #e2e8f0;
+            color: #1e293b;
+        }
+        .button.secondary:hover {
+            background-color: #cbd5e1;
+        }
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+        }
+        .footer a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .unsubscribe {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px 15px;
+            }
+            .header {
+                padding: 25px 15px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .button {
+                display: block;
+                margin: 8px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>💡 Coaching Insight</h1>
+                <p>Quick feedback from your recent call</p>
+            </div>
+
+            <div class="content">
+                <p>Hi {{ rep_name }},</p>
+
+                <p style="margin-top: 15px; color: #475569;">We've identified a key coaching opportunity from your recent call that could help you improve your sales performance.</p>
+
+                <div class="insight-section">
+                    <div class="insight-title">{{ dimension_label }}</div>
+                    <div class="insight-content">
+                        {{ insight_description }}
+
+                        {% if quote %}
+                        <div class="quote">
+                            "{{ quote }}"
+                        </div>
+                        {% endif %}
+
+                        <div class="score-indicator {{ score_class }}">
+                            <strong>Current Score:</strong> {{ current_score }}/100
+                            {% if previous_score %}
+                                (was {{ previous_score }}/100)
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if call_reference %}
+                <div class="call-reference">
+                    <strong>From: {{ call_reference.title }}</strong>
+                    {{ call_reference.type }} | {{ call_reference.date }}
+                    <div class="call-time">{{ call_reference.duration }} minutes</div>
+                </div>
+                {% endif %}
+
+                <div class="cta-section">
+                    <p style="margin-bottom: 15px; color: #475569;">Ready to dive deeper?</p>
+                    <a href="{{ app_url }}/insights/{{ insight_id }}" class="button">View Full Analysis</a>
+                    <a href="{{ app_url }}/coaching?dismiss={{ insight_id }}" class="button secondary">Dismiss</a>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>This is an automated coaching insight from Call Coach</p>
+                <p><a href="{{ app_url }}/settings/notifications">Manage notification preferences</a></p>
+                <div class="unsubscribe">
+                    <p>You're receiving this because you have coaching insights enabled. <a href="{{ app_url }}/unsubscribe?token={{ unsubscribe_token }}">Unsubscribe</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

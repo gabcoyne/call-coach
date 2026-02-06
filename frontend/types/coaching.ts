@@ -84,6 +84,7 @@ export interface RepAnalyzed {
   name: string;
   email: string | null;
   role: string | null;
+  evaluated_as_role?: "ae" | "se" | "csm"; // Role-specific rubric used for evaluation
 }
 
 export interface DimensionScores {

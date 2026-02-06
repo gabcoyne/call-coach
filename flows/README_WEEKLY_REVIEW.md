@@ -1,0 +1,330 @@
+# Weekly Review Automation Flow
+
+Automated weekly coaching report generation and distribution system.
+
+## Overview
+
+The weekly review flow (`weekly_review.py`) automatically generates comprehensive coaching reports for each sales rep every Monday at 6:00 AM UTC. Reports include:
+
+- **Coaching Scores**: Aggregated by dimension (product knowledge, discovery, objection handling, engagement)
+- **Recurring Patterns**: Common objections and themes across calls
+- **Trend Analysis**: Week-over-week score changes
+- **Personalized Recommendations**: Focus areas based on performance data
+- **Distribution**: Email delivery (optional) and Slack summaries
+
+## Features
+
+### 1. Data Collection
+- Automatically identifies reps with calls in the past week
+- Aggregates coaching scores by dimension
+- Extracts recurring objections from coaching sessions
+- Calculates trends vs. previous week
+
+### 2. Report Generation
+- **Markdown Format**: For logging and Slack
+- **HTML Email**: Rich formatting with templates
+- Personalized for each rep
+- Includes specific examples and quotes
+
+### 3. Distribution
+- **Email**: SendGrid, AWS SES, or SMTP
+- **Slack**: Team summary via webhook
+- Configurable per rep or globally
+
+## Setup
+
+### 1. Email Configuration (Optional)
+
+Choose one email provider:
+
+#### Option A: SendGrid (Recommended)
+```bash
+export SENDGRID_API_KEY="your-sendgrid-api-key"
+```
+
+#### Option B: AWS SES
+```bash
+export AWS_ACCESS_KEY_ID="your-aws-key"
+export AWS_SECRET_ACCESS_KEY="your-aws-secret"
+export AWS_DEFAULT_REGION="us-east-1"
+```
+
+#### Option C: Generic SMTP
+```bash
+export SMTP_HOST="smtp.gmail.com"
+export SMTP_PORT="587"
+export SMTP_USERNAME="your-email@gmail.com"
+export SMTP_PASSWORD="your-app-password"
+export SMTP_USE_TLS="true"
+```
+
+#### Option D: Console Output (Development)
+No configuration needed. Reports will be logged to console.
+
+### 2. Slack Configuration (Optional)
+
+Create a Slack webhook URL and configure:
+
+```bash
+export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+```
+
+### 3. Prefect Deployment
+
+Deploy the flow to Prefect Cloud:
+
+```bash
+# Using YAML configuration
+prefect deploy -f deployments/weekly_review.yaml
+
+# Or programmatically
+python -m flows.deploy_weekly_review
+```
+
+## Usage
+
+### Manual Execution
+
+Run locally for testing:
+
+```bash
+# Run for current week (last 7 days)
+python -m flows.weekly_review
+
+# Or with Python
+python -c "from flows.weekly_review import weekly_review_flow; weekly_review_flow(send_emails=False, send_slack=False)"
+```
+
+### Scheduled Execution
+
+Once deployed, the flow runs automatically every Monday at 6:00 AM UTC.
+
+Monitor executions in Prefect Cloud:
+```bash
+prefect deployment run weekly-review/weekly-review-monday-6am
+```
+
+### Custom Date Range
+
+Run for a specific week:
+
+```python
+from datetime import datetime
+from flows.weekly_review import weekly_review_flow
+
+result = weekly_review_flow(
+    week_start=datetime(2025, 1, 1),
+    week_end=datetime(2025, 1, 8),
+    send_emails=True,
+    send_slack=True
+)
+```
+
+## Architecture
+
+### Flow Structure
+
+```
+weekly_review_flow()
+├── get_reps_with_calls()              # Find reps with calls in date range
+├── For each rep:
+│   ├── get_rep_calls_for_week()       # Get call list
+│   ├── aggregate_coaching_scores()    # Calculate scores by dimension
+│   ├── identify_recurring_objections() # Extract patterns
+│   ├── calculate_trend_vs_previous_week() # Compare to last week
+│   ├── generate_rep_report_markdown() # Create markdown report
+│   ├── _prepare_email_report_data()  # Structure data for email
+│   └── send_email_report()            # Deliver email
+└── post_to_slack()                    # Team summary
+```
+
+### Data Flow
+
+1. **Query Database**: Fetch calls and coaching sessions for date range
+2. **Aggregate**: Calculate scores, identify patterns, compute trends
+3. **Generate**: Render reports using templates
+4. **Distribute**: Send via email and/or Slack
+
+### Database Queries
+
+Key tables accessed:
+- `calls` - Call metadata and timing
+- `speakers` - Rep information
+- `coaching_sessions` - Coaching scores and analysis
+- `transcripts` (indirect) - For specific examples
+
+## Report Format
+
+### Email Report
+
+HTML email with sections:
+- Summary (total calls, sessions, overall score)
+- Score breakdown by dimension with trends
+- Recurring objections with examples
+- Call list for the week
+- Recommended focus areas
+
+### Slack Summary
+
+Text summary with:
+- Total reps processed
+- Per-rep score and trend indicator
+- Overall team performance
+
+Example:
+```
+📊 Weekly Coaching Report - Week of January 06, 2025
+
+Generated reports for 5 reps:
+
+• John Doe: 85/100 📈 (+5 from last week) (8 calls)
+• Jane Smith: 78/100 📉 (-2 from last week) (6 calls)
+• ...
+
+Individual reports sent via email (if enabled)
+
+🤖 Generated by Gong Call Coaching Agent
+```
+
+## Customization
+
+### Email Template
+
+Edit `reports/templates/weekly_report.html` to customize:
+- Branding and colors
+- Section layout
+- Styling
+
+Template uses Jinja2 syntax:
+```html
+<h1>Weekly Coaching Report - {{ rep_name }}</h1>
+<p>Overall Score: {{ overall_avg }}/100</p>
+```
+
+### Report Content
+
+Modify `generate_rep_report_markdown()` to change:
+- Sections included
+- Recommendations logic
+- Formatting
+
+### Delivery Logic
+
+Update `send_email_report()` or `post_to_slack()` to:
+- Add additional channels (MS Teams, etc.)
+- Implement custom routing logic
+- Add attachments or PDFs
+
+## Monitoring
+
+### Prefect Cloud Dashboard
+
+Monitor flow runs in Prefect Cloud:
+- Execution history and status
+- Task-level timing and errors
+- Logs and artifacts
+
+### Logs
+
+Flow logs include:
+- Rep processing progress
+- Email/Slack delivery status
+- Error details with stack traces
+
+### Metrics
+
+Track via flow return value:
+```python
+{
+  "status": "completed",
+  "reps_processed": 10,
+  "reports_generated": 10,
+  "emails_sent": 8,
+  "slack_posted": true
+}
+```
+
+## Troubleshooting
+
+### No Reports Generated
+
+**Issue**: `reps_processed: 0`
+
+**Solutions**:
+- Verify calls exist in database for date range
+- Check `speakers.company_side = true` flag
+- Confirm coaching sessions exist for reps
+
+### Email Sending Failed
+
+**Issue**: `emails_sent: 0` but `reports_generated > 0`
+
+**Solutions**:
+- Verify email provider credentials in environment
+- Check sender email is verified (AWS SES, SendGrid)
+- Review logs for specific error messages
+- Test with `send_email_console()` first
+
+### Slack Posting Failed
+
+**Issue**: `slack_posted: false`
+
+**Solutions**:
+- Verify `SLACK_WEBHOOK_URL` is set correctly
+- Test webhook URL with `curl`:
+  ```bash
+  curl -X POST -H 'Content-type: application/json' \
+    --data '{"text":"Test message"}' \
+    $SLACK_WEBHOOK_URL
+  ```
+- Check webhook permissions in Slack workspace
+
+### Missing Trend Data
+
+**Issue**: Trends show as `null` or "new"
+
+**Solutions**:
+- Ensure previous week has coaching sessions
+- Verify date range calculation logic
+- Check for data gaps in `coaching_sessions` table
+
+## Performance
+
+### Typical Execution Time
+
+- Small team (5-10 reps): ~30-60 seconds
+- Medium team (20-50 reps): ~2-5 minutes
+- Large team (100+ reps): ~10-20 minutes
+
+### Optimization Tips
+
+1. **Concurrent Processing**: Flow uses `ConcurrentTaskRunner` for parallel rep processing
+2. **Database Indexes**: Ensure indexes on `coaching_sessions(rep_id, created_at)`
+3. **Caching**: Results cached per rep for retry scenarios
+4. **Batching**: Email sending parallelized automatically
+
+## Future Enhancements
+
+Potential improvements:
+
+1. **PDF Generation**: Attach PDF version of report
+2. **Interactive Dashboards**: Link to web-based drill-down views
+3. **A/B Testing**: Experiment with report formats
+4. **Predictive Insights**: ML-based performance forecasting
+5. **Multi-language**: Support for international teams
+6. **Weekly Digests**: Manager rollup reports
+
+## Related Documentation
+
+- [Flows Overview](../README.md)
+- [Database Schema](../db/migrations/001_initial_schema.sql)
+- [Email Configuration](../reports/email_sender.py)
+- [Prefect Deployments](https://docs.prefect.io/latest/concepts/deployments/)
+
+## Support
+
+For issues or questions:
+1. Check Prefect Cloud logs for error details
+2. Review this README's troubleshooting section
+3. Consult team documentation
+4. Contact DevOps/Engineering team

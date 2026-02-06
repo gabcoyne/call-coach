@@ -1,0 +1,301 @@
+---
+# Alert definitions for Call Coach monitoring
+# Integrates with Alertmanager for routing and notifications
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    service: call-coach
+    environment: "{{ ENVIRONMENT }}"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - "alertmanager:9093"
+
+rule_files:
+  - "alerts/*.yml"
+
+---
+# alerts/errors.yml
+groups:
+  - name: "Errors"
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          (rate(errors_total[5m]) > 0.05) and (rate(errors_total[5m]) > rate(errors_total offset 10m[5m]))
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+          runbook_url: "https://wiki.company.com/runbooks/high-error-rate"
+          dashboard_url: "http://grafana:3000/d/errors/error-dashboard"
+
+      - alert: SentryAlert
+        expr: |
+          increase(sentry_errors_total[15m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Increased error reporting to Sentry"
+          description: "{{ $value | humanize }} errors reported in last 15 minutes"
+
+      - alert: GongAPIErrors
+        expr: |
+          rate(gong_api_errors_total[5m]) > 0
+        for: 2m
+        labels:
+          severity: warning
+          team: integrations
+        annotations:
+          summary: "Gong API errors occurring"
+          description: "Error rate: {{ $value | humanizePercentage }}"
+
+      - alert: ClaudeAPIErrors
+        expr: |
+          (rate(claude_api_calls_total{status="error"}[5m]) / rate(claude_api_calls_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          team: ai
+        annotations:
+          summary: "Claude API error rate exceeds threshold"
+          description: "Claude API error rate: {{ $value | humanizePercentage }} (threshold: 5%)"
+
+---
+# alerts/performance.yml
+groups:
+  - name: "Performance"
+    interval: 30s
+    rules:
+      - alert: SlowAPIResponses
+        expr: |
+          histogram_quantile(0.95, rate(api_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "API responses are slow"
+          description: "95th percentile API response time: {{ $value | humanizeDuration }}"
+          runbook_url: "https://wiki.company.com/runbooks/slow-api"
+
+      - alert: HighClaudeAPILatency
+        expr: |
+          histogram_quantile(0.95, rate(claude_api_duration_seconds_bucket[5m])) > 30
+        for: 5m
+        labels:
+          severity: warning
+          team: ai
+        annotations:
+          summary: "Claude API latency is high"
+          description: "95th percentile Claude API latency: {{ $value | humanizeDuration }}"
+
+      - alert: SlowDatabaseQueries
+        expr: |
+          histogram_quantile(0.95, rate(db_query_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Database queries are slow"
+          description: "95th percentile query time: {{ $value | humanizeDuration }}"
+
+      - alert: LongCallAnalysisDuration
+        expr: |
+          histogram_quantile(0.95, rate(coaching_session_duration_seconds_bucket[5m])) > 60
+        for: 10m
+        labels:
+          severity: info
+          team: backend
+        annotations:
+          summary: "Call analysis is taking longer than usual"
+          description: "95th percentile analysis time: {{ $value | humanizeDuration }}"
+
+---
+# alerts/resources.yml
+groups:
+  - name: "Resources"
+    interval: 30s
+    rules:
+      - alert: HighMemoryUsage
+        expr: |
+          (container_memory_usage_bytes / container_spec_memory_limit_bytes) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "Container memory usage is high"
+          description: "Memory usage: {{ $value | humanizePercentage }}"
+
+      - alert: HighCPUUsage
+        expr: |
+          (rate(container_cpu_usage_seconds_total[5m]) / container_spec_cpu_quota) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "Container CPU usage is high"
+          description: "CPU usage: {{ $value | humanizePercentage }}"
+
+      - alert: DiskUsageHigh
+        expr: |
+          (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.15
+        for: 5m
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "Disk usage is critically high"
+          description: "Available disk space: {{ $value | humanizePercentage }}"
+
+      - alert: HighDatabaseConnectionUsage
+        expr: |
+          (db_connections_active / db_max_connections) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Database connection pool is nearly full"
+          description: "Active connections: {{ $value | humanizePercentage }} of max"
+
+---
+# alerts/business.yml
+groups:
+  - name: "Business Metrics"
+    interval: 30s
+    rules:
+      - alert: ZeroCoachingSessions
+        expr: |
+          increase(coaching_sessions_created_total[1h]) == 0
+        for: 2h
+        labels:
+          severity: warning
+          team: product
+        annotations:
+          summary: "No coaching sessions created in the last hour"
+          description: "Possible issue with call analysis pipeline"
+
+      - alert: ZeroCalls
+        expr: |
+          increase(calls_analyzed_total[1h]) == 0
+        for: 2h
+        labels:
+          severity: warning
+          team: product
+        annotations:
+          summary: "No calls analyzed in the last hour"
+          description: "Possible issue with Gong integration"
+
+      - alert: LowCacheHitRate
+        expr: |
+          (rate(cache_hits_total[5m]) / (rate(cache_hits_total[5m]) + rate(cache_misses_total[5m]))) < 0.3
+        for: 10m
+        labels:
+          severity: info
+          team: backend
+        annotations:
+          summary: "Cache hit rate is low"
+          description: "Hit rate: {{ $value | humanizePercentage }}"
+
+---
+# alerts/dependencies.yml
+groups:
+  - name: "Dependencies"
+    interval: 30s
+    rules:
+      - alert: DatabaseDown
+        expr: |
+          up{job="postgresql"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "PostgreSQL database is down"
+          description: "Unable to reach PostgreSQL"
+
+      - alert: RedisDown
+        expr: |
+          up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Redis cache is down"
+          description: "Unable to reach Redis"
+
+      - alert: GongAPIDown
+        expr: |
+          increase(gong_api_errors_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: critical
+          team: integrations
+        annotations:
+          summary: "Gong API is experiencing issues"
+          description: "Multiple API errors detected"
+
+---
+# alerts/tokens.yml
+groups:
+  - name: "Token Usage"
+    interval: 30s
+    rules:
+      - alert: HighTokenUsage
+        expr: |
+          (rate(claude_input_tokens_total[1h]) + rate(claude_output_tokens_total[1h])) > 1000000
+        for: 30m
+        labels:
+          severity: warning
+          team: ai
+        annotations:
+          summary: "Token usage is above threshold"
+          description: "Hourly token usage: {{ $value | humanize }}"
+
+      - alert: TokenCostAlert
+        expr: |
+          (rate(claude_input_tokens_total[1d]) + rate(claude_output_tokens_total[1d])) * 0.01 > 100
+        for: 1h
+        labels:
+          severity: info
+          team: finance
+        annotations:
+          summary: "Daily token cost is above threshold"
+          description: "Estimated daily cost: ${{ $value | humanize }}"
+
+---
+# Notification routing configuration (usually in Alertmanager config)
+# but included here for reference:
+#
+# notifications:
+#   slack:
+#     webhook_url: "{{ SLACK_WEBHOOK_URL }}"
+#     channel: "#call-coach-alerts"
+#     message_format: "verbose"
+#
+#   email:
+#     smtp_smarthost: "{{ SMTP_HOST }}:{{ SMTP_PORT }}"
+#     smtp_from: "alerts@company.com"
+#     smtp_auth_username: "{{ SMTP_USER }}"
+#     smtp_auth_password: "{{ SMTP_PASSWORD }}"
+#     recipients:
+#       - critical: "oncall@company.com"
+#       - warning: "team@company.com"
+#
+#   pagerduty:
+#     service_key: "{{ PAGERDUTY_KEY }}"
+#     routing_key: "{{ PAGERDUTY_ROUTING_KEY }}"

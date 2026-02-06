@@ -111,6 +111,8 @@ GET_LEARNING_INSIGHTS_TOOL = Tool(
     name="get_learning_insights",
     description=(
         "Compare a rep's performance to top performers on closed-won deals. "
+        "ROLE-AWARE: Automatically compares reps only to top performers in the same role "
+        "(AE to AE, SE to SE, CSM to CSM) for apples-to-apples comparison. "
         "Shows specific behavioral differences with concrete examples from successful calls. "
         "Focus areas: discovery, objections, product_knowledge, rapport, next_steps."
     ),

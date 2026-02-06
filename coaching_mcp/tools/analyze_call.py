@@ -18,9 +18,10 @@ def analyze_call_tool(
     use_cache: bool = True,
     include_transcript_snippets: bool = True,
     force_reanalysis: bool = False,
+    role: str | None = None,
 ) -> dict[str, Any]:
     """
-    Perform comprehensive coaching analysis on a call.
+    Perform comprehensive coaching analysis on a call with role-aware evaluation.
 
     Args:
         call_id: Gong call ID
@@ -28,11 +29,12 @@ def analyze_call_tool(
         use_cache: Whether to use cached results
         include_transcript_snippets: Include actual quotes
         force_reanalysis: Force new analysis even if cached
+        role: Optional role override (ae, se, csm). If not provided, auto-detects from speaker.
 
     Returns:
-        Comprehensive analysis with scores and coaching insights
+        Comprehensive analysis with scores and coaching insights evaluated against role-specific rubric
     """
-    logger.info(f"Analyzing call {call_id}")
+    logger.info(f"Analyzing call {call_id} (role override: {role})")
 
     # Step 1: Verify call exists in database
     call = fetch_one(
@@ -66,7 +68,21 @@ def analyze_call_tool(
 
     logger.info(f"Analyzing {len(dimensions)} dimensions: {dimensions}")
 
-    # Step 3: Get call participants
+    # Step 3: Detect speaker role for role-aware evaluation
+    from analysis.engine import detect_speaker_role
+
+    # Use provided role or auto-detect
+    if role:
+        valid_roles = ["ae", "se", "csm"]
+        if role not in valid_roles:
+            raise ValueError(f"Invalid role: {role}. Valid options: {valid_roles}")
+        detected_role = role
+        logger.info(f"Using provided role: {role}")
+    else:
+        detected_role = detect_speaker_role(str(db_call_id))
+        logger.info(f"Auto-detected role: {detected_role}")
+
+    # Get call participants
     speakers = fetch_all(
         """
         SELECT id, name, email, role, company_side,
@@ -185,6 +201,7 @@ def analyze_call_tool(
             "name": rep["name"] if rep else "Unknown",
             "email": rep["email"] if rep else None,
             "role": rep["role"] if rep else None,
+            "evaluated_as_role": detected_role,  # Role used for rubric evaluation
         } if rep else None,
         "scores": scores,
         "strengths": all_strengths[:10],  # Top 10

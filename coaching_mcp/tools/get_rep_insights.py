@@ -92,7 +92,10 @@ def get_rep_insights_tool(
         trends_by_dimension[dim]["scores"].append(round(float(row["avg_score"]), 1))
         trends_by_dimension[dim]["call_counts"].append(row["call_count"])
 
-    # Step 4: Identify skill gaps
+    # Step 4: Identify skill gaps (role-aware comparison)
+    # Get rep's role for fair comparison
+    rep_role = rep_info.get("role") or "ae"
+
     skill_gaps = fetch_all(
         """
         WITH rep_avg AS (
@@ -107,13 +110,16 @@ def get_rep_insights_tool(
             GROUP BY coaching_dimension
         ),
         team_avg AS (
+            -- Compare to team members with same role only
             SELECT
-                coaching_dimension,
-                AVG(score) as team_score
-            FROM coaching_sessions
-            WHERE score IS NOT NULL
-                AND created_at >= %s
-            GROUP BY coaching_dimension
+                cs.coaching_dimension,
+                AVG(cs.score) as team_score
+            FROM coaching_sessions cs
+            WHERE cs.score IS NOT NULL
+                AND cs.created_at >= %s
+                -- Filter by rubric_role in metadata to ensure apples-to-apples comparison
+                AND cs.metadata->>'rubric_role' = %s
+            GROUP BY cs.coaching_dimension
         )
         SELECT
             r.coaching_dimension as area,
@@ -131,7 +137,7 @@ def get_rep_insights_tool(
         WHERE t.team_score > r.rep_score
         ORDER BY (t.team_score - r.rep_score) DESC
         """,
-        (rep_info["id"], date_filter, date_filter),
+        (rep_info["id"], date_filter, date_filter, rep_role),
     )
 
     # Step 5: Identify improvement areas (trending up/down/stable)

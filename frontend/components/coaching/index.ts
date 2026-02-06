@@ -39,3 +39,15 @@ export type { } from './ExportCoachingReport';
 
 export { ShareLink } from './ShareLink';
 export type { } from './ShareLink';
+
+export { AnnotationMarker } from './AnnotationMarker';
+export type { Annotation } from './AnnotationMarker';
+
+export { AnnotationPopover } from './AnnotationPopover';
+export type { } from './AnnotationPopover';
+
+export { CoachingOverlay } from './CoachingOverlay';
+export type { } from './CoachingOverlay';
+
+export { ClipGenerator } from './ClipGenerator';
+export type { } from './ClipGenerator';

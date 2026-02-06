@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import type { TranscriptSegment } from "@/types/coaching";
 interface TranscriptSearchProps {
   transcript: TranscriptSegment[];
   onTimestampClick?: (timestamp: number) => void;
+  currentPlaybackTime?: number;
 }
 
 interface HighlightedSegment extends TranscriptSegment {
@@ -18,10 +19,12 @@ interface HighlightedSegment extends TranscriptSegment {
 export function TranscriptSearch({
   transcript,
   onTimestampClick,
+  currentPlaybackTime = 0,
 }: TranscriptSearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set());
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [autoScrollIndex, setAutoScrollIndex] = useState<number | null>(null);
 
   // Filter transcript based on search query
   const filteredSegments = useMemo(() => {
@@ -79,6 +82,28 @@ export function TranscriptSearch({
     ));
   };
 
+  // Auto-scroll to current playback segment
+  useEffect(() => {
+    const currentSegmentIndex = transcript.findIndex(
+      (seg) =>
+        seg.timestamp_seconds <= currentPlaybackTime &&
+        seg.timestamp_seconds + 5 > currentPlaybackTime // Assume ~5 second segments
+    );
+
+    if (currentSegmentIndex !== -1 && currentSegmentIndex !== autoScrollIndex) {
+      setAutoScrollIndex(currentSegmentIndex);
+      // Auto-expand current segment
+      const newExpanded = new Set(expandedIndices);
+      if (
+        transcript[currentSegmentIndex].text.length > 150 &&
+        !newExpanded.has(currentSegmentIndex)
+      ) {
+        newExpanded.add(currentSegmentIndex);
+        setExpandedIndices(newExpanded);
+      }
+    }
+  }, [currentPlaybackTime, transcript, expandedIndices, autoScrollIndex]);
+
   return (
     <div className="space-y-4">
       {/* Search Bar */}
@@ -128,15 +153,20 @@ export function TranscriptSearch({
           filteredSegments.map((segment, index) => {
             const isExpanded = expandedIndices.has(index);
             const isSelected = selectedIndex === index;
+            const isCurrentPlaying =
+              !searchQuery &&
+              autoScrollIndex === transcript.indexOf(segment);
             const isLongText = segment.text.length > 150;
 
             return (
               <div
                 key={index}
-                className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                  isSelected
-                    ? "bg-blue-50 border-blue-300"
-                    : "bg-white hover:bg-gray-50 border-gray-200"
+                className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                  isCurrentPlaying
+                    ? "bg-blue-100 border-blue-400 shadow-md"
+                    : isSelected
+                      ? "bg-blue-50 border-blue-300"
+                      : "bg-white hover:bg-gray-50 border-gray-200"
                 }`}
                 onClick={() => setSelectedIndex(index)}
               >
@@ -144,9 +174,17 @@ export function TranscriptSearch({
                   <div className="flex-1 min-w-0">
                     {/* Speaker and Timestamp */}
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-900">
-                        {segment.speaker}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-900">
+                          {segment.speaker}
+                        </span>
+                        {isCurrentPlaying && (
+                          <span className="inline-flex items-center gap-1 text-xs bg-blue-200 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                            <span className="inline-block w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" />
+                            Playing
+                          </span>
+                        )}
+                      </div>
                       <Button
                         variant="ghost"
                         size="sm"

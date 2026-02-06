@@ -19,10 +19,11 @@ def search_calls_tool(
     max_score: int | None = None,
     has_objection_type: str | None = None,
     topics: list[str] | None = None,
+    role: str | None = None,
     limit: int = 20,
 ) -> list[dict[str, Any]]:
     """
-    Search for calls matching specified criteria.
+    Search for calls matching specified criteria with role-aware filtering.
 
     Args:
         rep_email: Filter by sales rep email
@@ -33,12 +34,13 @@ def search_calls_tool(
         max_score: Maximum overall score
         has_objection_type: Filter for calls with specific objections
         topics: Filter by topics discussed
+        role: Filter by speaker role (ae, se, csm) - searches metadata rubric_role field
         limit: Maximum results
 
     Returns:
-        List of matching calls with metadata and scores
+        List of matching calls with metadata and scores, filtered by role if specified
     """
-    logger.info(f"Searching calls with filters: rep={rep_email}, product={product}, type={call_type}")
+    logger.info(f"Searching calls with filters: rep={rep_email}, product={product}, type={call_type}, role={role}")
 
     # Build dynamic query
     where_clauses = ["c.processed_at IS NOT NULL"]
@@ -109,6 +111,17 @@ def search_calls_tool(
             )
         """)
         params.append(topics)
+
+    # Filter by role (search in coaching_sessions metadata)
+    if role:
+        where_clauses.append("""
+            EXISTS (
+                SELECT 1 FROM coaching_sessions cs
+                WHERE cs.call_id = c.id
+                AND cs.metadata->>'rubric_role' = %s
+            )
+        """)
+        params.append(role)
 
     # Limit
     params.append(min(limit, 100))  # Cap at 100

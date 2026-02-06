@@ -263,6 +263,12 @@ def store_analysis_with_cache(
     """
     cache_key = generate_cache_key(call_id, dimension, transcript_hash, rubric_version)
 
+    import json
+
+    # Serialize JSONB fields
+    specific_examples = analysis_result.get("specific_examples")
+    metadata = analysis_result.get("metadata")
+
     execute_query(
         """
         INSERT INTO coaching_sessions (
@@ -273,8 +279,8 @@ def store_analysis_with_cache(
         ) VALUES (
             %s, %s, %s, %s, %s,
             %s, %s, %s,
-            %s, %s, %s, %s,
-            %s, %s, %s
+            %s, %s, %s, %s::jsonb,
+            %s, %s, %s::jsonb
         )
         """,
         (
@@ -289,10 +295,10 @@ def store_analysis_with_cache(
             analysis_result.get("score"),
             analysis_result.get("strengths"),
             analysis_result.get("areas_for_improvement"),
-            analysis_result.get("specific_examples"),
+            json.dumps(specific_examples) if specific_examples else None,
             analysis_result.get("action_items"),
             analysis_result.get("full_analysis"),
-            analysis_result.get("metadata"),
+            json.dumps(metadata) if metadata else None,
         ),
     )
 

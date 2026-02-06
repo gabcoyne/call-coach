@@ -339,6 +339,10 @@ def get_learning_insights(rep_email: str, focus_area: str = "discovery") -> dict
     """
     Compare rep's performance to top performers on closed-won deals.
 
+    ROLE-AWARE COMPARISON: Automatically detects the rep's role and compares them
+    ONLY to top performers in the same role (AE to AE, SE to SE, CSM to CSM).
+    This ensures apples-to-apples comparison on role-appropriate behaviors.
+
     Shows specific behavioral differences with concrete examples from successful calls.
     Focus areas: discovery, objections, product_knowledge, rapport, next_steps.
 
@@ -347,7 +351,8 @@ def get_learning_insights(rep_email: str, focus_area: str = "discovery") -> dict
         focus_area: Area to focus on (discovery, objections, product_knowledge, rapport, next_steps)
 
     Returns:
-        Behavioral differences and exemplar moments from top performers
+        Behavioral differences and exemplar moments from top performers in the same role.
+        Includes 'rep_role' and 'comparison_note' fields showing role-based filtering.
     """
     from analysis.learning_insights import get_learning_insights as _get_learning_insights
 
@@ -361,9 +366,15 @@ def analyze_call(
     use_cache: bool = True,
     include_transcript_snippets: bool = True,
     force_reanalysis: bool = False,
+    role: str | None = None,
 ) -> dict[str, Any]:
     """
-    Deep-dive analysis of a specific call with coaching insights.
+    Deep-dive analysis of a specific call with role-aware coaching insights.
+
+    ROLE-AWARE EVALUATION: Automatically detects speaker role (AE, SE, CSM) and evaluates
+    against role-specific rubrics. AEs are judged on selling skills, SEs on technical
+    communication, CSMs on relationship management. You can override auto-detection
+    with the 'role' parameter.
 
     Analyzes a Gong call across multiple coaching dimensions (product knowledge,
     discovery, objection handling, engagement) and provides detailed feedback
@@ -380,14 +391,18 @@ def analyze_call(
         use_cache: Use cached analyses if available (default: True)
         include_transcript_snippets: Include actual quotes from call (default: True)
         force_reanalysis: Bypass cache and regenerate analysis (default: False)
+        role: Override role detection (ae, se, csm). If not provided, auto-detects
+              from primary speaker's assigned role in staff_roles table.
 
     Returns:
         Comprehensive coaching analysis with scores, strengths, areas for improvement,
-        specific examples from the call, and actionable recommendations.
+        specific examples from the call, and actionable recommendations. Includes
+        'evaluated_as_role' field showing which role rubric was used.
 
     Example:
         >>> result = analyze_call("1464927526043145564", dimensions=["discovery"])
         >>> print(f"Discovery score: {result['scores']['discovery']}/100")
+        >>> print(f"Evaluated as: {result['rep_analyzed']['evaluated_as_role']}")
         >>> for strength in result['strengths']:
         >>>     print(f"✓ {strength}")
     """
@@ -397,6 +412,7 @@ def analyze_call(
         use_cache=use_cache,
         include_transcript_snippets=include_transcript_snippets,
         force_reanalysis=force_reanalysis,
+        role=role,
     )
 
 
@@ -408,6 +424,10 @@ def get_rep_insights(
 ) -> dict[str, Any]:
     """
     Performance trends and coaching history for a specific sales rep.
+
+    ROLE-AWARE BENCHMARKING: Compares rep's performance against team members in
+    the same role only. AEs are benchmarked against other AEs, SEs against SEs,
+    and CSMs against CSMs, ensuring fair and relevant comparisons.
 
     Aggregates coaching data across multiple calls to identify patterns,
     track improvement over time, and generate personalized coaching plans.
@@ -425,12 +445,14 @@ def get_rep_insights(
     Returns:
         Comprehensive rep performance data including:
         - Score trends over time for each dimension
-        - Skill gaps with priority rankings
+        - Skill gaps with priority rankings (compared to same role only)
         - Improvement areas and recent wins
         - Personalized coaching plan
+        - Rep role field showing which role cohort they're compared against
 
     Example:
         >>> insights = get_rep_insights("sarah.jones@prefect.io", time_period="last_quarter")
+        >>> print(f"Role: {insights['rep_info']['role']}")
         >>> print(f"Calls analyzed: {insights['rep_info']['calls_analyzed']}")
         >>> for gap in insights['skill_gaps']:
         >>>     print(f"Gap: {gap['area']} - Current: {gap['current_score']}, Target: {gap['target_score']}")
@@ -452,10 +474,15 @@ def search_calls(
     max_score: int | None = None,
     has_objection_type: str | None = None,
     topics: list[str] | None = None,
+    role: str | None = None,
     limit: int = 20,
 ) -> list[dict[str, Any]]:
     """
-    Find calls matching specific criteria.
+    Find calls matching specific criteria with role-aware filtering.
+
+    ROLE-AWARE SEARCH: Filter calls by speaker role (ae, se, csm) to find
+    examples relevant to specific roles. Useful for finding role-appropriate
+    training examples or comparing performance within role cohorts.
 
     Powerful search across all analyzed calls with support for multiple filters.
     Useful for finding similar situations, identifying patterns, or pulling
@@ -471,17 +498,19 @@ def search_calls(
         has_objection_type: Filter for calls with specific objection types:
                            "pricing", "timing", "technical", "competitor"
         topics: Filter by topics discussed (e.g., ["Objections", "Product Demo"])
+        role: Filter by speaker role (ae, se, csm) - only returns calls evaluated
+              with this role's rubric
         limit: Maximum number of results (default: 20, max: 100)
 
     Returns:
         List of matching calls with metadata and summary scores.
 
     Example:
-        >>> # Find all discovery calls with pricing objections
+        >>> # Find SE discovery calls with high technical scores
         >>> calls = search_calls(
+        >>>     role="se",
         >>>     call_type="discovery",
-        >>>     has_objection_type="pricing",
-        >>>     min_score=70,
+        >>>     min_score=80,
         >>>     limit=10
         >>> )
         >>> for call in calls:
@@ -496,6 +525,7 @@ def search_calls(
         max_score=max_score,
         has_objection_type=has_objection_type,
         topics=topics,
+        role=role,
         limit=limit,
     )
 

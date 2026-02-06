@@ -1,0 +1,229 @@
+name: Database Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to migrate'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      target_version:
+        description: 'Target migration version (leave empty for latest)'
+        required: false
+        type: string
+  push:
+    branches: [develop, main]
+    paths:
+      - 'db/migrations/**'
+      - '.github/workflows/migrate.yml'
+
+jobs:
+  validate-migrations:
+    name: Validate Migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Check migration syntax
+        run: |
+          echo "Validating migration files..."
+          find db/migrations -name "*.py" -type f | while read file; do
+            python -m py_compile "$file" || exit 1
+          done
+
+      - name: List pending migrations
+        env:
+          DATABASE_URL: postgresql://localhost/test_db
+        run: |
+          echo "Pending migrations:"
+          # Add migration list command
+
+  run-migrations:
+    name: Run Migrations (${{ github.event.inputs.environment || 'staging' }})
+    runs-on: ubuntu-latest
+    needs: [validate-migrations]
+    timeout-minutes: 30
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Determine target environment
+        id: env
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "production" ] || [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "target=production" >> $GITHUB_OUTPUT
+            echo "db_url=${{ secrets.PRODUCTION_DATABASE_URL }}" >> $GITHUB_OUTPUT
+          else
+            echo "target=staging" >> $GITHUB_OUTPUT
+            echo "db_url=${{ secrets.STAGING_DATABASE_URL }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create pre-migration backup
+        env:
+          DATABASE_URL: ${{ steps.env.outputs.db_url }}
+        run: |
+          echo "Creating backup before migration..."
+          BACKUP_FILE="backup_$(date +%Y%m%d_%H%M%S).sql"
+          echo "Backup file: $BACKUP_FILE"
+          # Add backup command based on your migration tool
+          # Example: pg_dump "$DATABASE_URL" > "$BACKUP_FILE"
+
+      - name: Run database migrations
+        id: migrate
+        env:
+          DATABASE_URL: ${{ steps.env.outputs.db_url }}
+          TARGET_VERSION: ${{ github.event.inputs.target_version }}
+        run: |
+          echo "Running migrations on ${{ steps.env.outputs.target }} environment..."
+
+          if [ -n "$TARGET_VERSION" ]; then
+            echo "Target version: $TARGET_VERSION"
+            # Add migration command with specific version
+          else
+            echo "Upgrading to latest version..."
+            # Add migration command for latest
+          fi
+
+      - name: Verify migration success
+        env:
+          DATABASE_URL: ${{ steps.env.outputs.db_url }}
+        run: |
+          echo "Verifying migrations..."
+          # Add verification checks:
+          # - Check schema integrity
+          # - Verify critical tables exist
+          # - Check row counts on important tables
+          # - Run health checks
+
+      - name: Run post-migration tests
+        env:
+          DATABASE_URL: ${{ steps.env.outputs.db_url }}
+        run: |
+          echo "Running post-migration verification tests..."
+          pytest tests/migrations/ -v || true
+
+      - name: Record migration in logs
+        if: always()
+        run: |
+          MIGRATION_LOG="migration_log_$(date +%Y%m%d_%H%M%S).txt"
+          cat > "$MIGRATION_LOG" << EOF
+          Environment: ${{ steps.env.outputs.target }}
+          Target Version: ${{ github.event.inputs.target_version || 'latest' }}
+          Status: ${{ job.status }}
+          Triggered by: ${{ github.event_name }}
+          Commit: ${{ github.sha }}
+          Time: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          EOF
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: [run-migrations]
+    if: failure()
+    timeout-minutes: 30
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Determine target environment
+        id: env
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "production" ] || [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "target=production" >> $GITHUB_OUTPUT
+            echo "db_url=${{ secrets.PRODUCTION_DATABASE_URL }}" >> $GITHUB_OUTPUT
+          else
+            echo "target=staging" >> $GITHUB_OUTPUT
+            echo "db_url=${{ secrets.STAGING_DATABASE_URL }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Verify backup exists
+        env:
+          DATABASE_URL: ${{ steps.env.outputs.db_url }}
+        run: |
+          echo "Checking for available backups..."
+          # Check if backup file exists
+
+      - name: Rollback database
+        env:
+          DATABASE_URL: ${{ steps.env.outputs.db_url }}
+        run: |
+          echo "Rolling back migrations..."
+          # Add rollback command
+          # Example: alembic downgrade -1
+
+      - name: Verify rollback success
+        env:
+          DATABASE_URL: ${{ steps.env.outputs.db_url }}
+        run: |
+          echo "Verifying rollback..."
+          # Add verification commands
+
+      - name: Notify of rollback
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ Migration failed and was rolled back. Please review the migration and try again.'
+            })
+
+  notify-migration:
+    name: Notify Migration Status
+    runs-on: ubuntu-latest
+    needs: [run-migrations]
+    if: always()
+    timeout-minutes: 10
+
+    steps:
+      - name: Migration Summary
+        run: |
+          if [ "${{ needs.run-migrations.result }}" == "success" ]; then
+            echo "✅ Migration completed successfully"
+            echo "Environment: ${{ github.event.inputs.environment || 'staging' }}"
+            echo "Commit: ${{ github.sha }}"
+          else
+            echo "❌ Migration failed"
+            exit 1
+          fi

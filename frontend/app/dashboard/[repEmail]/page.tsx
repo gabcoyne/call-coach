@@ -11,6 +11,13 @@ import { TeamComparisonChart, ComparisonData } from "@/components/coaching/TeamC
 import { DimensionBreakdownChart, DimensionData } from "@/components/coaching/DimensionBreakdownChart";
 import { RecentActivityFeed, ActivityItem } from "@/components/coaching/RecentActivityFeed";
 import { FeedbackStats } from "@/components/coaching/FeedbackStats";
+import {
+  ScoreTrendChart,
+  SkillGapRadar,
+  TeamComparisonBar,
+  ActivityTimeline,
+  ObjectionBreakdown,
+} from "@/components/charts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -175,6 +182,80 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
       value: dim.avgScore, // Using score as value for visualization
       score: dim.avgScore,
     }));
+  };
+
+  // Prepare data for advanced score trend chart
+  const prepareAdvancedTrendData = () => {
+    if (!insights?.score_trends) return [];
+    const dates = insights.score_trends.overall?.dates || [];
+
+    return dates.map((date, index) => {
+      const point: any = { date };
+
+      // Add overall score
+      if (insights.score_trends.overall?.scores[index] !== undefined) {
+        point.overall = insights.score_trends.overall.scores[index];
+      }
+
+      // Add top dimension scores
+      Object.keys(insights.score_trends)
+        .filter(k => k !== 'overall')
+        .slice(0, 3)
+        .forEach((dimension) => {
+          const score = insights.score_trends[dimension]?.scores[index];
+          if (score !== undefined) {
+            point[dimension] = score;
+          }
+        });
+
+      return point;
+    });
+  };
+
+  // Prepare data for skill gap radar chart (comparing to team average)
+  const prepareSkillGapRadarData = () => {
+    if (!insights?.skill_gaps) return [];
+
+    return insights.skill_gaps.map((gap) => ({
+      skill: gap.area.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+      actual: gap.current_score,
+      target: gap.target_score,
+      teamAverage: MOCK_TEAM_AVERAGES[gap.area.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())] || gap.target_score,
+    }));
+  };
+
+  // Prepare data for team comparison bar chart with percentiles
+  const prepareTeamComparisonBarData = () => {
+    const dimensionScores = calculateAverageDimensionScores();
+    return dimensionScores.map((dim, index) => ({
+      dimension: dim.displayName,
+      repScore: dim.avgScore,
+      teamAverage: MOCK_TEAM_AVERAGES[dim.displayName] || 75,
+      percentile: 50 + Math.floor(Math.random() * 50), // Mock percentile (would come from backend)
+    }));
+  };
+
+  // Prepare activity timeline data (mock data for now)
+  const prepareActivityTimelineData = () => {
+    if (!insights?.score_trends.overall?.dates) return [];
+
+    const dates = insights.score_trends.overall.dates;
+    return dates.map((date) => ({
+      date,
+      count: Math.floor(Math.random() * 5) + 1, // Mock call count per day
+      isHighActivity: Math.random() > 0.7,
+    }));
+  };
+
+  // Prepare objection breakdown data (mock for now - would need backend support)
+  const prepareObjectionBreakdownData = () => {
+    return [
+      { name: 'Budget Concerns', count: 12, successRate: 65, avgScore: 72 },
+      { name: 'Timeline Issues', count: 8, successRate: 78, avgScore: 81 },
+      { name: 'Product Fit', count: 6, successRate: 55, avgScore: 68 },
+      { name: 'Competitor Comparison', count: 5, successRate: 72, avgScore: 75 },
+      { name: 'Implementation Risk', count: 3, successRate: 85, avgScore: 88 },
+    ];
   };
 
   if (!isLoaded) {
@@ -505,6 +586,118 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
           </div>
         </section>
       ) : null}
+
+      {/* Advanced Score Trends Chart */}
+      {hasEnoughData && (
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Performance Trends (Enhanced)</h2>
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle>Score Progress Over Time</CardTitle>
+              <CardDescription>
+                Track your overall performance and top dimension scores across the selected time period
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScoreTrendChart
+                data={prepareAdvancedTrendData()}
+                dimensions={Object.keys(insights.score_trends)
+                  .filter(k => k !== 'overall')
+                  .slice(0, 3)}
+                height={350}
+                showArea={false}
+              />
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {/* Skill Gap Radar Chart */}
+      {prepareSkillGapRadarData().length > 0 && (
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Skill Gap Analysis (Radar View)</h2>
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle>Your Skills vs Team Average</CardTitle>
+              <CardDescription>
+                Compare your actual performance against team averages and target goals across all dimensions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SkillGapRadar
+                data={prepareSkillGapRadarData()}
+                compareType="team"
+                height={350}
+              />
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {/* Team Comparison Bar Chart (Enhanced) */}
+      {hasEnoughData && prepareTeamComparisonBarData().length > 0 && (
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Competitive Positioning</h2>
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle>You vs Team Benchmarks</CardTitle>
+              <CardDescription>
+                See where you rank compared to your team across all coaching dimensions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TeamComparisonBar
+                data={prepareTeamComparisonBarData()}
+                showPercentile={true}
+                height={350}
+              />
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {/* Activity Timeline */}
+      {prepareActivityTimelineData().length > 0 && (
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Activity Timeline</h2>
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle>Call Activity Heatmap</CardTitle>
+              <CardDescription>
+                Visualize your call and coaching session frequency throughout the time period
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <ActivityTimeline
+                data={prepareActivityTimelineData()}
+                metric="calls"
+              />
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {/* Objection Breakdown */}
+      {prepareObjectionBreakdownData().length > 0 && (
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Objection Handling Analysis</h2>
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle>Objection Types & Success Rates</CardTitle>
+              <CardDescription>
+                Analyze the most common objections you encounter and how successfully you handle each type
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ObjectionBreakdown
+                data={prepareObjectionBreakdownData()}
+                showDetails={false}
+                height={350}
+              />
+            </CardContent>
+          </Card>
+        </section>
+      )}
 
       {/* Recent Activity Feed */}
       <section>

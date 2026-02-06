@@ -25,6 +25,8 @@ from analysis.opportunity_coaching import (
 )
 from analysis.learning_insights import get_learning_insights
 from db import queries
+from knowledge_base.loader import KnowledgeBaseManager
+from db.models import Product, KnowledgeBaseCategory, CoachingDimension
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -83,6 +85,26 @@ class AnalyzeOpportunityRequest(BaseModel):
 class LearningInsightsRequest(BaseModel):
     rep_email: str = Field(..., description="Email of the sales rep")
     focus_area: str = Field("discovery", description="Area to focus on")
+
+
+class KnowledgeEntryRequest(BaseModel):
+    product: str = Field(..., description="Product: prefect or horizon")
+    category: str = Field(..., description="Category: feature, use_case, competitor, etc.")
+    content: str = Field(..., description="Markdown content")
+    metadata: dict[str, Any] | None = Field(None, description="Optional metadata")
+
+
+class RubricRequest(BaseModel):
+    name: str = Field(..., description="Rubric name")
+    version: str = Field(..., description="Semantic version (e.g., 1.0.0)")
+    category: str = Field(..., description="Coaching dimension category")
+    criteria: dict[str, Any] = Field(..., description="Evaluation criteria")
+    scoring_guide: dict[str, Any] = Field(..., description="Scoring guidelines")
+    examples: dict[str, Any] | None = Field(None, description="Example analyses")
+
+
+# Initialize knowledge base manager
+kb_manager = KnowledgeBaseManager()
 
 
 # Health check endpoint
@@ -218,6 +240,223 @@ async def get_learning_insights_endpoint(request: LearningInsightsRequest) -> di
         return result
     except Exception as e:
         logger.error(f"Error getting learning insights for {request.rep_email}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# KNOWLEDGE BASE ENDPOINTS
+# ============================================================================
+
+@app.get("/knowledge")
+async def list_knowledge_entries(
+    product: str | None = None,
+    category: str | None = None,
+) -> list[dict[str, Any]]:
+    """List knowledge base entries with optional filters."""
+    try:
+        product_enum = Product(product) if product else None
+        category_enum = KnowledgeBaseCategory(category) if category else None
+
+        entries = kb_manager.list_entries(product=product_enum, category=category_enum)
+
+        return [
+            {
+                "id": str(entry.id),
+                "product": entry.product.value,
+                "category": entry.category.value,
+                "content": entry.content,
+                "metadata": entry.metadata,
+                "last_updated": entry.last_updated.isoformat() if entry.last_updated else None,
+            }
+            for entry in entries
+        ]
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error listing knowledge entries: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/knowledge")
+async def create_or_update_knowledge_entry(request: KnowledgeEntryRequest) -> dict[str, Any]:
+    """Create or update a knowledge base entry."""
+    try:
+        product = Product(request.product)
+        category = KnowledgeBaseCategory(request.category)
+
+        entry = kb_manager.create_or_update_entry(
+            product=product,
+            category=category,
+            content=request.content,
+            metadata=request.metadata,
+        )
+
+        return {
+            "id": str(entry.id),
+            "product": entry.product.value,
+            "category": entry.category.value,
+            "content": entry.content,
+            "metadata": entry.metadata,
+            "last_updated": entry.last_updated.isoformat() if entry.last_updated else None,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error creating/updating knowledge entry: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/knowledge")
+async def delete_knowledge_entry(product: str, category: str) -> dict[str, bool]:
+    """Delete a knowledge base entry."""
+    try:
+        product_enum = Product(product)
+        category_enum = KnowledgeBaseCategory(category)
+
+        success = kb_manager.delete_entry(product=product_enum, category=category_enum)
+
+        if not success:
+            raise HTTPException(status_code=404, detail="Entry not found")
+
+        return {"success": True}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting knowledge entry: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/knowledge/history")
+async def get_knowledge_history(product: str, category: str) -> list[dict[str, Any]]:
+    """Get version history for a knowledge base entry."""
+    try:
+        product_enum = Product(product)
+        category_enum = KnowledgeBaseCategory(category)
+
+        history = kb_manager.get_entry_history(product=product_enum, category=category_enum)
+
+        return history
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error fetching knowledge history: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/knowledge/stats")
+async def get_knowledge_stats() -> dict[str, Any]:
+    """Get knowledge base statistics."""
+    try:
+        stats = kb_manager.get_stats()
+        return stats
+    except Exception as e:
+        logger.error(f"Error fetching knowledge stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# COACHING RUBRICS ENDPOINTS
+# ============================================================================
+
+@app.get("/knowledge/rubrics")
+async def list_rubrics(
+    category: str | None = None,
+    active_only: bool = True,
+    all_versions: bool = False,
+) -> list[dict[str, Any]]:
+    """List coaching rubrics with optional filters."""
+    try:
+        category_enum = CoachingDimension(category) if category else None
+
+        if all_versions and category_enum:
+            rubrics = kb_manager.get_rubric_versions(category_enum)
+        else:
+            rubrics = kb_manager.list_rubrics(active_only=active_only, category=category_enum)
+
+        return [
+            {
+                "id": str(rubric.id),
+                "name": rubric.name,
+                "version": rubric.version,
+                "category": rubric.category.value,
+                "criteria": rubric.criteria,
+                "scoring_guide": rubric.scoring_guide,
+                "examples": rubric.examples,
+                "active": rubric.active,
+                "created_at": rubric.created_at.isoformat() if rubric.created_at else None,
+                "deprecated_at": rubric.deprecated_at.isoformat() if rubric.deprecated_at else None,
+            }
+            for rubric in rubrics
+        ]
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error listing rubrics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/knowledge/rubrics")
+async def create_rubric(request: RubricRequest) -> dict[str, Any]:
+    """Create a new coaching rubric version."""
+    try:
+        rubric_data = {
+            "name": request.name,
+            "version": request.version,
+            "category": request.category,
+            "criteria": request.criteria,
+            "scoring_guide": request.scoring_guide,
+            "examples": request.examples or {},
+        }
+
+        rubric = kb_manager.create_rubric(rubric_data)
+
+        return {
+            "id": str(rubric.id),
+            "name": rubric.name,
+            "version": rubric.version,
+            "category": rubric.category.value,
+            "criteria": rubric.criteria,
+            "scoring_guide": rubric.scoring_guide,
+            "examples": rubric.examples,
+            "active": rubric.active,
+            "created_at": rubric.created_at.isoformat() if rubric.created_at else None,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error creating rubric: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.patch("/knowledge/rubrics/{rubric_id}")
+async def update_rubric(rubric_id: str, updates: dict[str, Any]) -> dict[str, Any]:
+    """Update rubric metadata (active status, examples)."""
+    try:
+        rubric = kb_manager.update_rubric(rubric_id, updates)
+
+        if not rubric:
+            raise HTTPException(status_code=404, detail="Rubric not found")
+
+        return {
+            "id": str(rubric.id),
+            "name": rubric.name,
+            "version": rubric.version,
+            "category": rubric.category.value,
+            "criteria": rubric.criteria,
+            "scoring_guide": rubric.scoring_guide,
+            "examples": rubric.examples,
+            "active": rubric.active,
+            "created_at": rubric.created_at.isoformat() if rubric.created_at else None,
+            "deprecated_at": rubric.deprecated_at.isoformat() if rubric.deprecated_at else None,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating rubric: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

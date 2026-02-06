@@ -1,0 +1,66 @@
+# Prefect Deployment Configuration for Weekly Review Flow
+#
+# Deploy with:
+#   prefect deploy -f deployments/weekly_review.yaml
+#
+# Or programmatically:
+#   from prefect.deployments import Deployment
+#   deployment = Deployment.build_from_flow(...)
+
+name: weekly-review-monday-6am
+description: |
+  Generate and distribute weekly coaching reports for all sales reps.
+
+  Features:
+  - Aggregates coaching scores by dimension
+  - Identifies recurring objections and themes
+  - Calculates week-over-week trends
+  - Generates personalized reports per rep
+  - Distributes via email and Slack
+
+  Scheduled to run every Monday at 6:00 AM UTC.
+
+# Flow configuration
+flow_name: weekly_review
+entrypoint: flows/weekly_review.py:weekly_review_flow
+
+# Schedule: Every Monday at 6:00 AM UTC
+schedule:
+  cron: "0 6 * * 1"
+  timezone: "UTC"
+  active: true
+
+# Work pool configuration
+# Update with your work pool name after deployment
+work_pool:
+  name: "default"
+  # For Horizon deployment:
+  # name: "horizon-agent-pool"
+
+# Parameters
+parameters:
+  week_start: null  # Auto-calculated (7 days ago)
+  week_end: null    # Auto-calculated (today)
+  send_emails: false  # Enable after email service setup
+  send_slack: true    # Enable Slack summaries
+
+# Tags for filtering and organization
+tags:
+  - weekly-review
+  - automation
+  - coaching
+  - reporting
+
+# Version tracking
+version: 1.0.0
+
+# Concurrency limit (optional)
+# Prevents multiple instances from running simultaneously
+# concurrency_limit: 1
+
+# Retry configuration
+# retries: 1
+# retry_delay_seconds: 300  # 5 minutes
+
+# Timeout (optional)
+# timeout_seconds: 3600  # 1 hour

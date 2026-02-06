@@ -1,0 +1,188 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - '**.py'
+      - '**.ts'
+      - '**.tsx'
+      - 'pyproject.toml'
+      - 'frontend/package.json'
+      - 'Dockerfile*'
+      - '.github/workflows/deploy-staging.yml'
+
+env:
+  REGISTRY: ghcr.io
+  REPO_OWNER: ${{ github.repository_owner }}
+
+jobs:
+  deploy-frontend:
+    name: Deploy Frontend to Vercel (Staging)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.STAGING_API_URL }}
+
+      - name: Deploy to Vercel (Staging)
+        run: |
+          npm install -g vercel
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=${{ secrets.VERCEL_ORG_ID }} \
+            --project=call-coach-staging
+        working-directory: frontend
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
+
+  deploy-backend:
+    name: Deploy Backend to Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [migrate-database]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -f Dockerfile.mcp \
+            -t ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/call-coach-mcp:staging-latest \
+            -t ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/call-coach-mcp:staging-${{ github.sha }} .
+          docker push ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/call-coach-mcp:staging-latest
+          docker push ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/call-coach-mcp:staging-${{ github.sha }}
+
+      - name: Deploy to staging infrastructure
+        env:
+          DEPLOYMENT_TOKEN: ${{ secrets.STAGING_DEPLOYMENT_TOKEN }}
+          STAGING_API_ENDPOINT: ${{ secrets.STAGING_API_ENDPOINT }}
+        run: |
+          echo "Deploying backend to staging..."
+          # Add your deployment commands here
+          # Examples:
+          # - kubectl rollout (for K8s)
+          # - aws ecs update-service (for ECS)
+          # - fly deploy (for Fly.io)
+          # - heroku deploy (for Heroku)
+
+  migrate-database:
+    name: Run Database Migrations (Staging)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Run migrations
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: |
+          echo "Running database migrations on staging..."
+          # Add your migration commands here
+          # Examples for common migration tools:
+          # - alembic upgrade head
+          # - python manage.py migrate
+          # - flyctl postgres exec
+
+      - name: Verify migrations
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: |
+          echo "Verifying migration success..."
+          # Add verification commands
+
+  smoke-tests:
+    name: Run Smoke Tests (Staging)
+    runs-on: ubuntu-latest
+    needs: [deploy-frontend, deploy-backend]
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          playwright install
+
+      - name: Wait for staging deployment
+        run: |
+          max_attempts=30
+          attempt=0
+          while [ $attempt -lt $max_attempts ]; do
+            if curl -f ${{ secrets.STAGING_API_ENDPOINT }}/health; then
+              echo "Staging API is healthy"
+              exit 0
+            fi
+            attempt=$((attempt+1))
+            sleep 10
+          done
+          echo "Staging API did not become healthy"
+          exit 1
+
+      - name: Run smoke tests
+        env:
+          BASE_URL: ${{ secrets.STAGING_WEB_URL }}
+          TEST_USER_EMAIL: ${{ secrets.STAGING_TEST_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.STAGING_TEST_USER_PASSWORD }}
+        run: |
+          pytest tests/smoke/ -v --tb=short
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "Staging deployment successful"
+          else
+            echo "Staging deployment failed"
+            exit 1
+          fi

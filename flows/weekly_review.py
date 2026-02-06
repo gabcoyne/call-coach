@@ -486,44 +486,46 @@ def generate_rep_report_markdown(
 
 @task(name="send_email_report", retries=2, retry_delay_seconds=30)
 def send_email_report(
-    recipient_email: str, recipient_name: str, report_markdown: str, week_start: datetime
+    recipient_email: str,
+    recipient_name: str,
+    report_data: dict[str, Any],
+    week_start: datetime,
 ) -> bool:
     """
-    Send email report to rep.
+    Send email report to rep using HTML template.
 
-    Note: This is a placeholder. Actual email sending requires:
-    - Email service configuration (SendGrid, AWS SES, etc.)
-    - Email credentials in environment
+    Requires email service configuration via environment variables.
+    Supports: SendGrid, AWS SES, SMTP, or console output (dev mode).
 
     Args:
         recipient_email: Rep's email address
         recipient_name: Rep's name
-        report_markdown: Markdown report content
+        report_data: Structured report data for template
         week_start: Start of week for subject line
 
     Returns:
         True if sent successfully, False otherwise
     """
-    logger.warning(
-        f"Email sending not implemented. Would send report to {recipient_email}"
-    )
-    logger.info(f"Report preview (first 200 chars):\n{report_markdown[:200]}")
+    from reports.email_sender import send_weekly_report_email
 
-    # TODO: Implement actual email sending
-    # Example with SendGrid:
-    # from sendgrid import SendGridAPIClient
-    # from sendgrid.helpers.mail import Mail
-    #
-    # message = Mail(
-    #     from_email='coach@prefect.io',
-    #     to_emails=recipient_email,
-    #     subject=f'Weekly Coaching Report - Week of {week_start.strftime("%b %d, %Y")}',
-    #     html_content=markdown_to_html(report_markdown)
-    # )
-    # sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-    # response = sg.send(message)
+    try:
+        success = send_weekly_report_email(
+            to_email=recipient_email,
+            to_name=recipient_name,
+            report_data=report_data,
+            provider="auto",  # Auto-detect available provider
+        )
 
-    return False  # Change to True when implemented
+        if success:
+            logger.info(f"Successfully sent email report to {recipient_email}")
+        else:
+            logger.warning(f"Failed to send email report to {recipient_email}")
+
+        return success
+
+    except Exception as e:
+        logger.error(f"Error sending email to {recipient_email}: {e}", exc_info=True)
+        return False
 
 
 @task(name="post_to_slack", retries=2, retry_delay_seconds=30)
@@ -646,9 +648,14 @@ def weekly_review_flow(
             objections = identify_recurring_objections(rep["email"], week_start, week_end)
             trends = calculate_trend_vs_previous_week(rep["email"], week_start, week_end)
 
-            # Generate report
+            # Generate markdown report (for Slack/logging)
             report_md = generate_rep_report_markdown(
                 rep, calls, scores, objections, trends, week_start, week_end
+            )
+
+            # Prepare structured report data for email template
+            report_data = _prepare_email_report_data(
+                rep, calls, scores, objections, trends, week_start
             )
 
             # Save report to database (optional - for audit trail)
@@ -659,7 +666,7 @@ def weekly_review_flow(
             # Send email if enabled
             if send_emails:
                 email_success = send_email_report(
-                    rep["email"], rep["name"], report_md, week_start
+                    rep["email"], rep["name"], report_data, week_start
                 )
                 if email_success:
                     emails_sent += 1
@@ -696,6 +703,103 @@ def weekly_review_flow(
 
     logger.info(f"Weekly review completed: {result}")
     return result
+
+
+def _prepare_email_report_data(
+    rep: dict[str, Any],
+    calls: list[dict[str, Any]],
+    scores: dict[str, Any],
+    objections: list[dict[str, Any]],
+    trends: dict[str, Any],
+    week_start: datetime,
+) -> dict[str, Any]:
+    """
+    Prepare structured data for email template rendering.
+
+    Args:
+        rep: Rep information dict
+        calls: List of calls for the week
+        scores: Aggregated scores dict
+        objections: Recurring objections list
+        trends: Trend data vs previous week
+        week_start: Start of week
+
+    Returns:
+        Dict matching email template structure
+    """
+    # Format dimensions for template
+    dimensions = []
+    for dimension in CoachingDimension:
+        dim_value = dimension.value
+        dim_scores = scores["by_dimension"].get(dim_value)
+
+        if dim_scores:
+            # Determine CSS class based on score
+            avg = dim_scores["avg_score"]
+            css_class = "high" if avg >= 80 else "medium" if avg >= 60 else "low"
+
+            dimensions.append(
+                {
+                    "label": dimension.value.replace("_", " ").title(),
+                    "avg_score": dim_scores["avg_score"],
+                    "min_score": dim_scores["min_score"],
+                    "max_score": dim_scores["max_score"],
+                    "session_count": dim_scores["session_count"],
+                    "trend": trends.get(dim_value),
+                    "css_class": css_class,
+                }
+            )
+
+    # Format calls for template
+    formatted_calls = [
+        {
+            "title": call.get("title") or "Untitled Call",
+            "call_type": (
+                call.get("call_type", "").replace("_", " ").title()
+                if call.get("call_type")
+                else "General"
+            ),
+            "date": call["scheduled_at"].strftime("%a %b %d"),
+        }
+        for call in calls
+    ]
+
+    # Generate action items
+    action_items = []
+    if scores["by_dimension"]:
+        sorted_dims = sorted(
+            scores["by_dimension"].items(), key=lambda x: x[1]["avg_score"]
+        )
+        lowest_dim = sorted_dims[0]
+        dim_label = lowest_dim[0].replace("_", " ").title()
+        action_items.append(
+            f"Focus on {dim_label} (current score: {lowest_dim[1]['avg_score']}/100)"
+        )
+
+        if len(sorted_dims) > 1:
+            second_dim = sorted_dims[1]
+            dim_label = second_dim[0].replace("_", " ").title()
+            action_items.append(
+                f"Continue improving {dim_label} (current score: {second_dim[1]['avg_score']}/100)"
+            )
+
+    if objections and len(objections) > 0:
+        top_objection = objections[0]
+        action_items.append(
+            f"Address {top_objection['type']} (recurring {top_objection['count']} times)"
+        )
+
+    return {
+        "week_start": week_start.strftime("%B %d, %Y"),
+        "total_calls": len(calls),
+        "total_sessions": scores.get("total_sessions", 0),
+        "overall_avg": scores.get("overall_avg"),
+        "overall_trend": trends.get("overall"),
+        "dimensions": dimensions,
+        "objections": objections[:5],  # Top 5
+        "calls": formatted_calls,
+        "action_items": action_items,
+    }
 
 
 def _build_slack_summary(
