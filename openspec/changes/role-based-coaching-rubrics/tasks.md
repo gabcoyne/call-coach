@@ -1,9 +1,9 @@
 ## 1. Database Schema for Staff Roles
 
-- [ ] 1.1 Create db/migrations/004_staff_roles.sql with staff_roles table (email PK, role CHECK constraint, assigned_by, assigned_at, updated_at)
-- [ ] 1.2 Add index idx_staff_roles_role on role column for filtering queries
-- [ ] 1.3 Run migration on Neon database to create staff_roles table
-- [ ] 1.4 Verify table structure with SELECT query
+- [x] 1.1 Create db/migrations/004_staff_roles.sql with staff_roles table (email PK, role CHECK constraint, assigned_by, assigned_at, updated_at)
+- [x] 1.2 Add index idx_staff_roles_role on role column for filtering queries
+- [x] 1.3 Run migration on Neon database to create staff_roles table
+- [x] 1.4 Verify table structure with SELECT query
 
 ## 2. Role-Specific Rubric JSON Files
 
