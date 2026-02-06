@@ -14,7 +14,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import * as db from "@/lib/db";
 
-export async function PUT(request: NextRequest, { params }: { params: { email: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ email: string }> }
+) {
   try {
     // Check authentication
     const { userId } = await auth();
@@ -35,7 +38,7 @@ export async function PUT(request: NextRequest, { params }: { params: { email: s
       return NextResponse.json({ error: "Manager email not found" }, { status: 400 });
     }
 
-    const { email } = params;
+    const { email } = await params;
     const body = await request.json();
     const { role } = body;
 

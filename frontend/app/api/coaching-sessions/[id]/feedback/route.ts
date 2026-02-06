@@ -22,15 +22,15 @@ const feedbackSchema = z.object({
 
 type FeedbackRequest = z.infer<typeof feedbackSchema>;
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: coachingSessionId } = await params;
+
   try {
     // Check authentication
     const user = await currentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { id: coachingSessionId } = params;
 
     // Parse and validate request body
     const body = await request.json();
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       );
     }
 
-    console.error(`Error submitting feedback for session ${params.id}:`, error);
+    console.error(`Error submitting feedback for session ${coachingSessionId}:`, error);
     return NextResponse.json({ error: "Failed to submit feedback" }, { status: 500 });
   }
 }
@@ -107,9 +107,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
  *
  * Get feedback for a coaching session.
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id: coachingSessionId } = params;
+    const { id: coachingSessionId } = await params;
 
     const result = await query(
       `
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       count: result.rows.length,
     });
   } catch (error) {
-    console.error(`Error fetching feedback for session ${params.id}:`, error);
+    console.error(`Error fetching feedback for session ${coachingSessionId}:`, error);
     return NextResponse.json({ error: "Failed to fetch feedback" }, { status: 500 });
   }
 }

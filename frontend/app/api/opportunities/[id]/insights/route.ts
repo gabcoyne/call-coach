@@ -6,9 +6,9 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Call the MCP tool via Python backend
     // This is a placeholder - in production, this would call the actual MCP server
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     return NextResponse.json(mockInsights);
   } catch (error) {
-    console.error(`Error generating insights for opportunity ${params.id}:`, error);
+    console.error(`Error generating insights for opportunity ${id}:`, error);
     return NextResponse.json({ error: "Failed to generate insights" }, { status: 500 });
   }
 }

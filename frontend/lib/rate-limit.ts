@@ -120,3 +120,50 @@ export function rateLimitHeaders(
     'X-RateLimit-Reset': reset.toString(),
   };
 }
+
+/**
+ * Middleware wrapper with rate limiting
+ */
+export function withRateLimit<T extends (req: any, ...args: any[]) => Promise<any>>(
+  handler: T,
+  getUserId?: (req: any) => string
+): T {
+  return (async (req: any, ...args: any[]) => {
+    // Extract user ID (default to IP address if not provided)
+    const userId = getUserId?.(req) || req.ip || 'anonymous';
+    const endpoint = req.nextUrl?.pathname || req.url;
+
+    // Check rate limit
+    const { allowed, limit, remaining, reset } = checkRateLimit(userId, endpoint);
+
+    if (!allowed) {
+      const resetDate = new Date(reset);
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded',
+          limit,
+          reset: resetDate.toISOString(),
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            ...rateLimitHeaders(limit, remaining, reset),
+            'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString(),
+          },
+        }
+      );
+    }
+
+    // Execute handler
+    const response = await handler(req, ...args);
+
+    // Add rate limit headers to response
+    const headers = rateLimitHeaders(limit, remaining, reset);
+    Object.entries(headers).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+
+    return response;
+  }) as T;
+}

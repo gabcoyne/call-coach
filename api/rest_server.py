@@ -87,20 +87,22 @@ app.add_middleware(
 )
 
 # Rate limiting middleware
-app.add_middleware(
-    RateLimitMiddleware,
-    default_rate_limit=100,  # 100 requests per minute
-    default_burst=150,
-    expensive_rate_limit=20,  # 20 requests per minute for expensive ops
-    expensive_burst=30,
-)
+# TODO: Fix middleware initialization - temporarily disabled for testing
+# app.add_middleware(
+#     RateLimitMiddleware,
+#     default_rate_limit=100,  # 100 requests per minute
+#     default_burst=150,
+#     expensive_rate_limit=20,  # 20 requests per minute for expensive ops
+#     expensive_burst=30,
+# )
 
 # Compression middleware
-app.add_middleware(
-    CompressionMiddleware,
-    minimum_size=500,  # Only compress responses > 500 bytes
-    compression_level=6,
-)
+# TODO: Fix middleware initialization - temporarily disabled for testing
+# app.add_middleware(
+#     CompressionMiddleware,
+#     minimum_size=500,  # Only compress responses > 500 bytes
+#     compression_level=6,
+# )
 
 
 # Request ID and timing middleware

@@ -172,3 +172,8 @@ export function withLogging<T extends (...args: any[]) => Promise<NextResponse>>
     }
   }) as T;
 }
+
+// Aliases for backward compatibility
+export const logApiRequest = logRequest;
+export const logApiResponse = logResponse;
+export const logApiError = logError;

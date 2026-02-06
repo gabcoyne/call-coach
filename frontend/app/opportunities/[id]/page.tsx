@@ -9,16 +9,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function OpportunityPage({ params }: PageProps) {
+export default async function OpportunityPage({ params }: PageProps) {
+  const { id } = await params;
+
   return (
     <div className="p-6 space-y-6">
       <Suspense fallback={<OpportunityDetailSkeleton />}>
-        <OpportunityDetail opportunityId={params.id} />
+        <OpportunityDetail opportunityId={id} />
       </Suspense>
     </div>
   );

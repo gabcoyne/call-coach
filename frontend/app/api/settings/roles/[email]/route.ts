@@ -26,7 +26,7 @@ const UpdateRoleSchema = z.object({
  *   "role": "ae" | "se" | "csm"
  * }
  */
-export async function PUT(request: NextRequest, { params }: { params: { email: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ email: string }> }) {
   try {
     // Check authentication
     const { userId } = await auth();
@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest, { params }: { params: { email: s
     }
 
     // Decode and validate email from URL
-    const staffEmail = decodeURIComponent(params.email);
+    const staffEmail = decodeURIComponent(email);
 
     // Validate that email is a Prefect email
     if (!staffEmail.endsWith("@prefect.io")) {
@@ -96,7 +96,7 @@ export async function PUT(request: NextRequest, { params }: { params: { email: s
 /**
  * DELETE handler - Remove role assignment for a staff member
  */
-export async function DELETE(request: NextRequest, { params }: { params: { email: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ email: string }> }) {
   try {
     // Check authentication
     const { userId } = await auth();
@@ -113,7 +113,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { email
     }
 
     // Decode email from URL
-    const staffEmail = decodeURIComponent(params.email);
+    const staffEmail = decodeURIComponent(email);
 
     // Validate that email is a Prefect email
     if (!staffEmail.endsWith("@prefect.io")) {

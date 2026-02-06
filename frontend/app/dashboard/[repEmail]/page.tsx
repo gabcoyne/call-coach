@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useRepInsights } from "@/lib/hooks/use-rep-insights";
@@ -45,9 +45,9 @@ const TIME_RANGE_OPTIONS = [
 ] as const;
 
 interface DashboardPageProps {
-  params: {
+  params: Promise<{
     repEmail: string;
-  };
+  }>;
 }
 
 // Mock data for team average comparison - in production this would come from the backend
@@ -65,8 +65,9 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
   const router = useRouter();
   const [timeRange, setTimeRange] = useState<TimeRange>("last_30_days");
 
-  // Decode the email from URL
-  const repEmail = decodeURIComponent(params.repEmail);
+  // Unwrap params Promise and decode email
+  const { repEmail: rawRepEmail } = use(params);
+  const repEmail = decodeURIComponent(rawRepEmail);
 
   // Check if current user is a manager
   const isManager = user?.publicMetadata?.role === "manager";

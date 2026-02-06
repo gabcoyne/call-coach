@@ -127,3 +127,6 @@ export function withAuth(
     }
   };
 }
+
+// Alias for backward compatibility
+export const withAuthMiddleware = withAuth;

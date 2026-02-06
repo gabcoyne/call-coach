@@ -6,9 +6,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db/connection";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Fetch email details
     const result = await query(
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     return NextResponse.json({ email: result.rows[0] });
   } catch (error) {
-    console.error(`Error fetching email ${params.id}:`, error);
+    console.error(`Error fetching email ${id}:`, error);
     return NextResponse.json({ error: "Failed to fetch email" }, { status: 500 });
   }
 }

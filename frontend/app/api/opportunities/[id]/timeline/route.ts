@@ -10,9 +10,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOpportunityTimeline } from "@/lib/db/opportunities";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const searchParams = request.nextUrl.searchParams;
 
     // Parse pagination
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       },
     });
   } catch (error) {
-    console.error(`Error fetching timeline for opportunity ${params.id}:`, error);
+    console.error(`Error fetching timeline for opportunity ${id}:`, error);
     return NextResponse.json({ error: "Failed to fetch timeline" }, { status: 500 });
   }
 }

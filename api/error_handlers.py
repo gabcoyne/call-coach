@@ -352,7 +352,8 @@ def setup_error_handlers(app) -> None:
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(ValidationError, validation_exception_handler)
-    app.add_exception_handler((OperationalError, InterfaceError), database_exception_handler)
+    app.add_exception_handler(OperationalError, database_exception_handler)
+    app.add_exception_handler(InterfaceError, database_exception_handler)
     app.add_exception_handler(Exception, general_exception_handler)
 
     logger.info("Error handlers registered")

@@ -6,9 +6,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db/connection";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id: callId } = params;
+    const { id: callId } = await params;
 
     const result = await query(
       `
@@ -26,7 +26,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       count: result.rows.length,
     });
   } catch (error) {
-    console.error(`Error fetching coaching sessions for call ${params.id}:`, error);
+    const { id: callId } = await params;
+    console.error(`Error fetching coaching sessions for call ${callId}:`, error);
     return NextResponse.json({ error: "Failed to fetch coaching sessions" }, { status: 500 });
   }
 }
