@@ -76,19 +76,23 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
   // Check authorization: managers can view anyone, reps can only view themselves
   const canViewData = isManager || currentUserEmail === repEmail;
 
-  // Fetch insights using the hook
+  // Fetch insights using the hook - only fetch if authorized
   const {
     data: insights,
     isLoading,
     error,
   } = useRepInsights(canViewData ? repEmail : null, { time_period: timeRange });
 
+  // Handle authorization redirects
   useEffect(() => {
-    if (isLoaded && !canViewData) {
-      // Return 403 for reps trying to view other reps' data
+    if (!isLoaded) return;
+
+    if (!canViewData) {
+      // Reps trying to view other reps' data get redirected to their own dashboard
       if (currentUserEmail && currentUserEmail !== repEmail) {
         router.push(`/dashboard/${encodeURIComponent(currentUserEmail)}`);
       } else {
+        // No user or no email address - redirect to sign in
         router.push("/sign-in");
       }
     }

@@ -33,11 +33,11 @@ export function ObjectionTypeFilter({ filters, onFiltersChange }: ObjectionTypeF
         <div className="space-y-2">
           <Label htmlFor="objection-type">Filter by Objection Handled</Label>
           <Select
-            value={filters.has_objection_type || ""}
+            value={filters.has_objection_type || "all"}
             onValueChange={(value) =>
               onFiltersChange({
                 ...filters,
-                has_objection_type: value || undefined,
+                has_objection_type: value === "all" ? undefined : value,
               })
             }
           >
@@ -45,7 +45,7 @@ export function ObjectionTypeFilter({ filters, onFiltersChange }: ObjectionTypeF
               <SelectValue placeholder="All Objection Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Objection Types</SelectItem>
+              <SelectItem value="all">All Objection Types</SelectItem>
               {OBJECTION_TYPES.map((type) => (
                 <SelectItem key={type.value} value={type.value}>
                   {type.label}

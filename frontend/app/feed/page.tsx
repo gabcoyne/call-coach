@@ -86,7 +86,7 @@ export default function FeedPage() {
   };
 
   // Flatten all feed items from paginated data
-  const allItems = data ? data.flatMap((page) => page.items) : [];
+  const allItems = data ? data.flatMap((page) => page?.items || []) : [];
   const teamInsights = data?.[0]?.team_insights || [];
   const highlights = data?.[0]?.highlights || [];
 

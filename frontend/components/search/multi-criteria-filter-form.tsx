@@ -85,14 +85,16 @@ export function MultiCriteriaFilterForm({
           <div className="space-y-2">
             <Label htmlFor="product">Product</Label>
             <Select
-              value={filters.product || ""}
-              onValueChange={(value) => updateFilter("product", value)}
+              value={filters.product || "all"}
+              onValueChange={(value) =>
+                updateFilter("product", value === "all" ? undefined : value)
+              }
             >
               <SelectTrigger id="product">
                 <SelectValue placeholder="All Products" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Products</SelectItem>
+                <SelectItem value="all">All Products</SelectItem>
                 <SelectItem value="prefect">Prefect</SelectItem>
                 <SelectItem value="horizon">Horizon</SelectItem>
                 <SelectItem value="both">Both</SelectItem>
@@ -104,14 +106,16 @@ export function MultiCriteriaFilterForm({
           <div className="space-y-2">
             <Label htmlFor="call-type">Call Type</Label>
             <Select
-              value={filters.call_type || ""}
-              onValueChange={(value) => updateFilter("call_type", value)}
+              value={filters.call_type || "all"}
+              onValueChange={(value) =>
+                updateFilter("call_type", value === "all" ? undefined : value)
+              }
             >
               <SelectTrigger id="call-type">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="discovery">Discovery</SelectItem>
                 <SelectItem value="demo">Demo</SelectItem>
                 <SelectItem value="technical_deep_dive">Technical Deep Dive</SelectItem>
