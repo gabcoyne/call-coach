@@ -28,17 +28,14 @@ repos:
         exclude: ^(\.venv|venv|build|dist)/
 
   # Type checking with MyPy
-  # NOTE: Temporarily disabled - mypy complains about project dir name with hyphen
-  # Will fix by restructuring project or using pyproject.toml name override
-  # - repo: https://github.com/pre-commit/mirrors-mypy
-  #   rev: v1.8.0
-  #   hooks:
-  #     - id: mypy
-  #       additional_dependencies: [types-requests, types-PyYAML]
-  #       args: [--ignore-missing-imports, --no-strict-optional, --namespace-packages]
-  #       exclude: ^(tests/|\.venv|venv|build|dist)/
-  #       # Only check Python package directories, not root
-  #       files: ^(db|gong|analysis|knowledge|flows|coaching_mcp|reports|monitoring|instrumentation|api|cache|middleware)/.*\.py$
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-requests, types-PyYAML]
+        args: [--ignore-missing-imports, --no-strict-optional]
+        # Exclude tests and files with pre-existing type issues
+        exclude: ^(tests/|\.venv|venv|build|dist|analysis/rubric_loader\.py|analysis/cache\.py)/
 
   # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
