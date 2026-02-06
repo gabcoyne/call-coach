@@ -21,7 +21,59 @@ from db import queries
 from db.models import CoachingDimension
 import anthropic
 
+from .rubric_loader import load_rubric
+
 logger = logging.getLogger(__name__)
+
+
+def detect_speaker_role(call_id: str) -> str:
+    """
+    Detect the role of the primary Prefect speaker on a call.
+
+    Identifies Prefect staff by @prefect.io email domain, selects primary speaker
+    by talk time, and looks up their assigned role.
+
+    Args:
+        call_id: Call UUID
+
+    Returns:
+        Role identifier ('ae', 'se', 'csm'). Defaults to 'ae' if no role assigned.
+    """
+    # Get all speakers for the call
+    speakers = queries.get_speakers_for_call(call_id)
+
+    # Filter to Prefect speakers (company_side=true and @prefect.io email)
+    prefect_speakers = [
+        s for s in speakers
+        if s.get("company_side") and s.get("email") and s["email"].endswith("@prefect.io")
+    ]
+
+    if not prefect_speakers:
+        logger.info(f"No Prefect speakers found for call {call_id}, defaulting to AE rubric")
+        return "ae"
+
+    # Select primary speaker (highest talk time)
+    primary_speaker = max(
+        prefect_speakers,
+        key=lambda s: s.get("talk_time_percentage", 0) or 0
+    )
+
+    speaker_email = primary_speaker["email"]
+    logger.info(
+        f"Primary Prefect speaker on call {call_id}: {speaker_email} "
+        f"({primary_speaker.get('talk_time_percentage', 0)}% talk time)"
+    )
+
+    # Look up role assignment
+    role = queries.get_staff_role(speaker_email)
+
+    if role:
+        logger.info(f"Speaker {speaker_email} has assigned role: {role}")
+    else:
+        logger.info(f"No role assigned for {speaker_email}, defaulting to 'ae'")
+        role = "ae"
+
+    return role
 
 
 def analyze_opportunity_patterns(opportunity_id: str) -> dict[str, Any]:

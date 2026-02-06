@@ -7,39 +7,39 @@
 
 ## 2. Role-Specific Rubric JSON Files
 
-- [ ] 2.1 Create analysis/rubrics/ directory
-- [ ] 2.2 Create analysis/rubrics/ae_rubric.json with 5 dimensions (Discovery 30%, Objection Handling 25%, Product Positioning 20%, Relationship Building 15%, Call Control 10%)
-- [ ] 2.3 Create analysis/rubrics/se_rubric.json with 5 dimensions (Technical Accuracy 35%, Architecture Fit 30%, Problem-Solution Mapping 20%, Technical Objection Resolution 10%, Collaboration with AE 5%)
-- [ ] 2.4 Create analysis/rubrics/csm_rubric.json with 5 dimensions (Value Realization 30%, Risk Identification 25%, Relationship Depth 20%, Expansion Opportunity 15%, Product Adoption 10%)
-- [ ] 2.5 Add detailed criteria arrays (3-5 items) for each dimension in all three rubrics
-- [ ] 2.6 Add scoring bands (0-49, 50-69, 70-89, 90-100) with role-specific descriptions for each dimension
-- [ ] 2.7 Verify all rubric dimension weights sum to 1.0 exactly
+- [x] 2.1 Create analysis/rubrics/ directory
+- [x] 2.2 Create analysis/rubrics/ae_rubric.json with 5 dimensions (Discovery 30%, Objection Handling 25%, Product Positioning 20%, Relationship Building 15%, Call Control 10%)
+- [x] 2.3 Create analysis/rubrics/se_rubric.json with 5 dimensions (Technical Accuracy 35%, Architecture Fit 30%, Problem-Solution Mapping 20%, Technical Objection Resolution 10%, Collaboration with AE 5%)
+- [x] 2.4 Create analysis/rubrics/csm_rubric.json with 5 dimensions (Value Realization 30%, Risk Identification 25%, Relationship Depth 20%, Expansion Opportunity 15%, Product Adoption 10%)
+- [x] 2.5 Add detailed criteria arrays (3-5 items) for each dimension in all three rubrics
+- [x] 2.6 Add scoring bands (0-49, 50-69, 70-89, 90-100) with role-specific descriptions for each dimension
+- [x] 2.7 Verify all rubric dimension weights sum to 1.0 exactly
 
 ## 3. Rubric Validation and Loading Module
 
-- [ ] 3.1 Create analysis/rubric_loader.py module
-- [ ] 3.2 Implement validate_rubric(rubric_dict) function checking required fields (role, dimensions)
-- [ ] 3.3 Implement check that dimension weights sum to 1.0 within 0.01 tolerance
-- [ ] 3.4 Implement check that each dimension has all four scoring bands (0-49, 50-69, 70-89, 90-100)
-- [ ] 3.5 Implement load_rubric(role: str) function that reads JSON and validates structure
-- [ ] 3.6 Add in-memory cache for loaded rubrics (dict keyed by role)
-- [ ] 3.7 Implement reload_rubrics() function to refresh cache from filesystem
-- [ ] 3.8 Test rubric loading with all three roles and verify validation catches malformed JSON
+- [x] 3.1 Create analysis/rubric_loader.py module
+- [x] 3.2 Implement validate_rubric(rubric_dict) function checking required fields (role, dimensions)
+- [x] 3.3 Implement check that dimension weights sum to 1.0 within 0.01 tolerance
+- [x] 3.4 Implement check that each dimension has all four scoring bands (0-49, 50-69, 70-89, 90-100)
+- [x] 3.5 Implement load_rubric(role: str) function that reads JSON and validates structure
+- [x] 3.6 Add in-memory cache for loaded rubrics (dict keyed by role)
+- [x] 3.7 Implement reload_rubrics() function to refresh cache from filesystem
+- [x] 3.8 Test rubric loading with all three roles and verify validation catches malformed JSON
 
 ## 4. Database Queries for Role Management
 
-- [ ] 4.1 Add get_staff_role(email: str) function to db/queries.py returning role or None
-- [ ] 4.2 Add upsert_staff_role(email, role, assigned_by) function for creating/updating role assignments
-- [ ] 4.3 Add delete_staff_role(email) function for removing role assignment
-- [ ] 4.4 Add list_all_staff_roles() function returning all role assignments with metadata
-- [ ] 4.5 Add get_prefect_staff() function querying speakers table for unique emails ending in '@prefect.io'
-- [ ] 4.6 Test all queries with sample data
+- [x] 4.1 Add get_staff_role(email: str) function to db/queries.py returning role or None
+- [x] 4.2 Add upsert_staff_role(email, role, assigned_by) function for creating/updating role assignments
+- [x] 4.3 Add delete_staff_role(email) function for removing role assignment
+- [x] 4.4 Add list_all_staff_roles() function returning all role assignments with metadata
+- [x] 4.5 Add get_prefect_staff() function querying speakers table for unique emails ending in '@prefect.io'
+- [x] 4.6 Test all queries with sample data
 
 ## 5. Role-Aware Coaching Analysis Engine
 
-- [ ] 5.1 Update analysis/opportunity_coaching.py to import rubric_loader
-- [ ] 5.2 Implement detect_speaker_role(call_id: str) function that finds Prefect speaker and looks up role
-- [ ] 5.3 Add fallback to 'ae' role if speaker not found in staff_roles table
+- [x] 5.1 Update analysis/opportunity_coaching.py to import rubric_loader
+- [x] 5.2 Implement detect_speaker_role(call_id: str) function that finds Prefect speaker and looks up role
+- [x] 5.3 Add fallback to 'ae' role if speaker not found in staff_roles table
 - [ ] 5.4 Update analyze_call_dimension() to call detect_speaker_role() and load appropriate rubric
 - [ ] 5.5 Pass role-specific rubric to Claude API in analysis prompt
 - [ ] 5.6 Store rubric_role in coaching_sessions.metadata JSON field

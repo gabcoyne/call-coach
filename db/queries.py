@@ -661,3 +661,99 @@ def update_sync_status(
         """,
         (entity_type, status, items_synced, errors_count, error_details),
     )
+
+
+# ============================================================================
+# STAFF ROLE QUERIES
+# ============================================================================
+
+def get_staff_role(email: str) -> str | None:
+    """
+    Get role assignment for staff member by email.
+
+    Args:
+        email: Staff member email address
+
+    Returns:
+        Role identifier ('ae', 'se', 'csm') or None if not assigned
+    """
+    result = fetch_one(
+        "SELECT role FROM staff_roles WHERE email = %s",
+        (email,),
+    )
+    return result["role"] if result else None
+
+
+def upsert_staff_role(email: str, role: str, assigned_by: str) -> None:
+    """
+    Create or update role assignment for staff member.
+
+    Args:
+        email: Staff member email address
+        role: Role identifier ('ae', 'se', 'csm')
+        assigned_by: Email of manager assigning the role
+    """
+    execute_query(
+        """
+        INSERT INTO staff_roles (email, role, assigned_by, assigned_at, updated_at)
+        VALUES (%s, %s, %s, NOW(), NOW())
+        ON CONFLICT (email) DO UPDATE SET
+            role = EXCLUDED.role,
+            assigned_by = EXCLUDED.assigned_by,
+            updated_at = NOW()
+        """,
+        (email, role, assigned_by),
+    )
+    logger.info(f"Updated role for {email}: {role} (assigned by {assigned_by})")
+
+
+def delete_staff_role(email: str) -> None:
+    """
+    Remove role assignment for staff member.
+
+    Args:
+        email: Staff member email address
+    """
+    execute_query(
+        "DELETE FROM staff_roles WHERE email = %s",
+        (email,),
+    )
+    logger.info(f"Deleted role assignment for {email}")
+
+
+def list_all_staff_roles() -> list[dict[str, Any]]:
+    """
+    Get all staff role assignments with metadata.
+
+    Returns:
+        List of role assignments with email, role, assigned_by, assigned_at, updated_at
+    """
+    return fetch_all(
+        """
+        SELECT email, role, assigned_by, assigned_at, updated_at
+        FROM staff_roles
+        ORDER BY updated_at DESC
+        """
+    )
+
+
+def get_prefect_staff() -> list[dict[str, Any]]:
+    """
+    Get all unique Prefect staff from speakers table.
+
+    Identifies staff by @prefect.io email domain.
+
+    Returns:
+        List of dicts with email, name (from most recent call)
+    """
+    return fetch_all(
+        """
+        SELECT DISTINCT ON (email)
+            email,
+            name
+        FROM speakers
+        WHERE email LIKE '%@prefect.io'
+        AND company_side = true
+        ORDER BY email
+        """
+    )

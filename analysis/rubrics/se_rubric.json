@@ -1,0 +1,97 @@
+{
+  "role": "se",
+  "role_name": "Sales Engineer",
+  "description": "Coaching rubric for Sales Engineers focusing on technical accuracy, architecture design, and solution engineering",
+  "dimensions": [
+    {
+      "id": "technical_accuracy",
+      "name": "Technical Accuracy",
+      "weight": 0.35,
+      "criteria": [
+        "Accurately explains Prefect/Horizon architecture, features, and capabilities",
+        "Provides correct technical details without misinformation or exaggeration",
+        "Demonstrates deep understanding of product internals and limitations",
+        "Corrects any technical misstatements or misconceptions",
+        "Answers technical questions confidently and correctly"
+      ],
+      "scoring": {
+        "90-100": "Excellent: All technical information is accurate and detailed. Demonstrates expert-level product knowledge. No errors or exaggerations. Confidently addresses even advanced technical questions with precision.",
+        "70-89": "Good: Technical information is mostly accurate with minor gaps. Demonstrates strong product knowledge. Occasionally defers to follow-up for complex questions but provides accurate high-level answers.",
+        "50-69": "Needs Improvement: Some technical inaccuracies or vague explanations. Limited depth of product knowledge. Makes unsupported claims or oversimplifies complex features.",
+        "0-49": "Poor: Contains significant technical errors or misinformation. Weak product knowledge. Provides inaccurate answers or avoids technical questions entirely."
+      }
+    },
+    {
+      "id": "architecture_fit",
+      "name": "Architecture Fit & Design",
+      "weight": 0.30,
+      "criteria": [
+        "Assesses customer's existing tech stack, infrastructure, and integration points",
+        "Proposes architecture aligned with customer's constraints and requirements",
+        "Identifies potential technical challenges or blockers early",
+        "Offers multiple implementation approaches when appropriate",
+        "Discusses scalability, security, and operational considerations"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Thoroughly assesses customer environment, proposes thoughtful architecture tailored to their needs. Identifies risks proactively. Offers options with clear trade-offs. Addresses scalability and ops concerns comprehensively.",
+        "70-89": "Good: Assesses key aspects of customer environment, proposes reasonable architecture. Identifies some risks. Discusses main implementation approaches. Covers major scalability or security concerns.",
+        "50-69": "Needs Improvement: Limited assessment of customer environment, generic architecture proposal. Misses key technical challenges. Few implementation options discussed. Minimal coverage of non-functional requirements.",
+        "0-49": "Poor: No assessment of customer environment, one-size-fits-all solution pitch. Doesn't identify risks or constraints. No discussion of scalability, security, or operational concerns."
+      }
+    },
+    {
+      "id": "problem_solution_mapping",
+      "name": "Problem-Solution Mapping",
+      "weight": 0.20,
+      "criteria": [
+        "Clearly connects customer's technical pain points to Prefect capabilities",
+        "Maps customer workflows to concrete implementation patterns",
+        "Demonstrates how Prefect solves specific problems, not just feature listing",
+        "Uses customer's language and frames solutions in their context",
+        "Provides concrete examples or analogies to clarify complex concepts"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Every capability mentioned is directly tied to a customer pain point. Clear implementation paths for customer workflows. Uses customer-specific examples and their terminology. Complex concepts explained with relevant analogies.",
+        "70-89": "Good: Most capabilities are connected to customer needs. Provides implementation guidance for main workflows. Uses some customer-specific framing. Explains most concepts clearly.",
+        "50-69": "Needs Improvement: Weak connection between features and customer problems. Generic implementation guidance. Limited use of customer context. Some concepts explained poorly or not at all.",
+        "0-49": "Poor: Feature dump with no connection to customer needs. No implementation guidance. Uses only Prefect jargon, not customer language. Fails to explain technical concepts."
+      }
+    },
+    {
+      "id": "technical_objection_resolution",
+      "name": "Technical Objection Resolution",
+      "weight": 0.10,
+      "criteria": [
+        "Addresses technical concerns and objections with data and evidence",
+        "Acknowledges product limitations honestly and offers workarounds",
+        "Handles competitive technical comparisons factually and confidently",
+        "Uses proof points, benchmarks, or customer examples to support claims",
+        "Knows when to escalate complex questions to product/engineering"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Addresses all technical objections with evidence-based responses. Honest about limitations with practical workarounds. Confident in competitive positioning. Uses data and customer proof points effectively. Knows when to escalate appropriately.",
+        "70-89": "Good: Addresses most technical objections adequately. Reasonably honest about limitations. Handles competitive questions well. Uses some proof points. Escalates when needed.",
+        "50-69": "Needs Improvement: Some technical objections left unresolved or addressed poorly. Defensive about limitations. Weak competitive responses. Few proof points used. Doesn't know when to escalate.",
+        "0-49": "Poor: Avoids technical objections or provides incorrect answers. Dismisses limitations or overpromises. Poor competitive handling. No proof points. Never escalates even when should."
+      }
+    },
+    {
+      "id": "ae_collaboration",
+      "name": "Collaboration with AE",
+      "weight": 0.05,
+      "criteria": [
+        "Supports AE's selling motion without taking over the call",
+        "Reinforces business value and ROI messaging from technical perspective",
+        "Hands off to AE for commercial/contractual discussions",
+        "Aligns technical discovery with AE's qualification framework",
+        "Helps AE advance deal with technical validation and proof points"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Perfect balance of technical depth and AE support. Reinforces business value consistently. Seamless handoffs on commercial topics. Aligned on discovery and qualification. Provides technical evidence that helps AE close.",
+        "70-89": "Good: Supports AE well while providing technical expertise. Mentions business value. Mostly defers commercial topics. Generally aligned on discovery. Helps advance deal technically.",
+        "50-69": "Needs Improvement: Occasionally steps on AE's toes or goes off-script. Limited business value framing. Handles some commercial questions that should go to AE. Not fully aligned on discovery approach.",
+        "0-49": "Poor: Takes over call from AE, pure technical focus with no business value. Answers pricing/contract questions inappropriately. Not aligned with AE on discovery or deal strategy."
+      }
+    }
+  ]
+}

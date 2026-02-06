@@ -1,0 +1,97 @@
+{
+  "role": "ae",
+  "role_name": "Account Executive",
+  "description": "Coaching rubric for Account Executives focusing on discovery, objection handling, and pipeline management",
+  "dimensions": [
+    {
+      "id": "discovery",
+      "name": "Discovery & Qualification",
+      "weight": 0.30,
+      "criteria": [
+        "Asks open-ended questions to uncover pain points and business challenges",
+        "Identifies budget, authority, need, and timeline (BANT)",
+        "Uncovers decision-making process and key stakeholders",
+        "Explores current workflow and tools to identify gaps",
+        "Qualifies fit and determines if opportunity is worth pursuing"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Comprehensive discovery covering all BANT criteria, deep understanding of customer pain points, clear picture of decision process and stakeholders. Asks probing follow-up questions.",
+        "70-89": "Good: Most key discovery areas explored (3-4 BANT elements), understands main pain points, identifies primary decision makers. Some follow-up questions asked but could go deeper.",
+        "50-69": "Needs Improvement: Surface-level questions only, missed 2+ BANT elements, incomplete understanding of decision process. Limited follow-up questions or probing.",
+        "0-49": "Poor: Failed to qualify opportunity properly, didn't ask discovery questions, no understanding of customer needs or decision process. Jumped straight to product pitch."
+      }
+    },
+    {
+      "id": "objection_handling",
+      "name": "Objection Handling",
+      "weight": 0.25,
+      "criteria": [
+        "Acknowledges and validates customer concerns before responding",
+        "Addresses pricing objections with value justification and ROI examples",
+        "Turns objections into opportunities to reinforce value proposition",
+        "Handles competitive comparisons confidently without disparaging competitors",
+        "Uses customer success stories and social proof to overcome hesitation"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Skillfully addresses all objections with empathy, provides compelling value-based responses, turns concerns into selling points. Uses proof points and customer examples effectively. Advances deal despite pushback.",
+        "70-89": "Good: Addresses most objections adequately, provides some value justification, uses a few customer examples. Handles competitive questions reasonably well. Keeps conversation moving forward.",
+        "50-69": "Needs Improvement: Responds to objections but without strong value framing, misses opportunities to use social proof, defensive on competitive questions. Some objections left unresolved.",
+        "0-49": "Poor: Avoids or dismisses objections, gets defensive, fails to provide value justification, no proof points or examples. Objections stall the conversation."
+      }
+    },
+    {
+      "id": "product_positioning",
+      "name": "Product Positioning",
+      "weight": 0.20,
+      "criteria": [
+        "Positions Prefect/Horizon as solution to specific customer pain points",
+        "Tailors messaging to customer's industry, use case, or technical maturity",
+        "Highlights differentiation from competitors and alternatives",
+        "Uses relevant customer success stories and use case examples",
+        "Connects product capabilities to business outcomes and ROI"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Product positioning is highly tailored to customer needs, clear connection to pain points, strong differentiation messaging. Uses compelling customer stories. Focuses on business value and outcomes, not just features.",
+        "70-89": "Good: Product positioning is relevant to customer context, mentions differentiation, includes some customer examples. Makes connection to business value in most areas.",
+        "50-69": "Needs Improvement: Generic product pitch, weak connection to customer pain points, limited differentiation messaging. Few customer examples. Focuses more on features than business value.",
+        "0-49": "Poor: Product pitch is completely generic, no tailoring to customer, no differentiation, feature dump without context. No customer examples or business value framing."
+      }
+    },
+    {
+      "id": "relationship_building",
+      "name": "Relationship Building",
+      "weight": 0.15,
+      "criteria": [
+        "Establishes rapport through active listening and empathy",
+        "Finds common ground and builds personal connection",
+        "Demonstrates genuine interest in customer's business and challenges",
+        "Uses customer's language and mirrors their communication style",
+        "Maintains professional but warm tone throughout conversation"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Strong rapport established, customer feels heard and understood, natural conversation flow. Demonstrates genuine curiosity and empathy. Customer is engaged and collaborative.",
+        "70-89": "Good: Builds adequate rapport, some personal connection, customer seems comfortable. Shows interest in customer's challenges. Conversation is professional and friendly.",
+        "50-69": "Needs Improvement: Limited rapport building, transactional tone, customer engagement is lukewarm. Misses opportunities to connect personally or show empathy.",
+        "0-49": "Poor: No rapport building, cold or robotic tone, customer seems disengaged. No attempt to establish personal connection or demonstrate genuine interest."
+      }
+    },
+    {
+      "id": "call_control",
+      "name": "Call Control & Next Steps",
+      "weight": 0.10,
+      "criteria": [
+        "Sets clear agenda and objectives at start of call",
+        "Manages time effectively and keeps conversation on track",
+        "Handles interruptions and tangents diplomatically",
+        "Gains commitment to specific next steps with dates",
+        "Confirms mutual action items and follow-up timeline"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Call is well-structured with clear agenda, efficient use of time, smooth transitions. Secures concrete next steps with specific dates and commitments. Customer agrees to clear action items.",
+        "70-89": "Good: Call has structure, manages time reasonably well, establishes next steps. Gets general commitment to follow-up but specifics could be clearer.",
+        "50-69": "Needs Improvement: Call lacks structure, runs over time or ends abruptly, vague next steps. No specific dates or commitments secured.",
+        "0-49": "Poor: No agenda, poor time management, loses control of conversation. No next steps established or call ends with 'I'll follow up later' without specifics."
+      }
+    }
+  ]
+}

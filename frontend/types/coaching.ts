@@ -68,6 +68,8 @@ export interface CallMetadata {
   call_type: string | null;
   product: string | null;
   participants: CallParticipant[];
+  gong_url?: string | null;
+  recording_url?: string | null;
 }
 
 export interface CallParticipant {
@@ -106,6 +108,12 @@ export interface ComparisonToAverage {
   sample_size: number;
 }
 
+export interface TranscriptSegment {
+  speaker: string;
+  timestamp_seconds: number;
+  text: string;
+}
+
 export interface AnalyzeCallResponse {
   call_metadata: CallMetadata;
   rep_analyzed: RepAnalyzed | null;
@@ -116,6 +124,7 @@ export interface AnalyzeCallResponse {
   action_items: string[];
   dimension_details: Record<string, DimensionAnalysis>;
   comparison_to_average: ComparisonToAverage[];
+  transcript?: TranscriptSegment[] | null;
 }
 
 export interface DimensionAnalysis {

@@ -70,3 +70,19 @@ kb-verify: ## Verify knowledge base is loaded correctly
 
 sync: ## Sync beads and commit (replaces manual git commits)
 	bd sync --flush-only
+
+rest-api: ## Start REST API server for frontend (port 8000)
+	uv run uvicorn api.rest_server:app --host 0.0.0.0 --port 8000 --reload
+
+frontend: ## Start Next.js frontend (port 3000)
+	cd frontend && npm run dev
+
+mcp-server: ## Start FastMCP server for Claude Desktop
+	uv run mcp-server-dev
+
+dev-full: ## Start both REST API and frontend
+	@echo "Starting REST API server..."
+	@make rest-api &
+	@sleep 3
+	@echo "Starting Next.js frontend..."
+	@make frontend

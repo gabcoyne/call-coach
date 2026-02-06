@@ -65,7 +65,24 @@ call-coach/
    uv run python -m knowledge.loader
    ```
 
-5. **Run FastMCP server**:
+5. **Start the REST API server** (for frontend integration):
+   ```bash
+   # Start REST API at http://localhost:8000
+   ./scripts/start-rest-api.sh
+
+   # Or manually with uvicorn
+   uv run uvicorn api.rest_server:app --host 0.0.0.0 --port 8000 --reload
+   ```
+
+6. **Start the Next.js frontend** (optional):
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   # Frontend available at http://localhost:3000
+   ```
+
+7. **Run FastMCP server** (for Claude Desktop MCP integration):
    ```bash
    # Development mode (recommended for local dev)
    uv run mcp-server-dev
@@ -74,7 +91,7 @@ call-coach/
    uv run mcp-server
    ```
 
-6. **Deploy Prefect flows** (optional):
+8. **Deploy Prefect flows** (optional):
    ```bash
    prefect deploy flows/process_new_call.py
    prefect deploy flows/weekly_review.py

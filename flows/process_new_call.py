@@ -2,6 +2,7 @@
 Prefect flow for processing new calls from Gong webhooks.
 Handles transcript fetching, chunking, and basic analysis.
 """
+import json
 import logging
 from datetime import datetime
 from typing import Any
@@ -121,7 +122,7 @@ def store_call_metadata(gong_call: dict[str, Any]) -> UUID:
         INSERT INTO calls (
             id, gong_call_id, title, scheduled_at, duration_seconds,
             call_type, product, metadata
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s::jsonb)
         """,
         (
             str(call_id),
@@ -131,7 +132,7 @@ def store_call_metadata(gong_call: dict[str, Any]) -> UUID:
             gong_call.get("duration"),
             call_type,
             product,
-            gong_call,
+            json.dumps(gong_call),
         ),
     )
 
@@ -257,12 +258,18 @@ def store_transcript(
 
         # Store topic in topics array field (JSONB or VARCHAR[])
         # Store both start and end times in metadata until schema updated
+        chunk_metadata_json = json.dumps({
+            "start_ms": sentence["start_ms"],
+            "end_ms": sentence["end_ms"],
+            "duration_ms": sentence["end_ms"] - sentence["start_ms"],
+        })
+
         execute_query(
             """
             INSERT INTO transcripts (
                 call_id, speaker_id, sequence_number, timestamp_seconds,
                 text, topics, chunk_metadata
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s::jsonb)
             """,
             (
                 str(call_id),
@@ -271,11 +278,7 @@ def store_transcript(
                 sentence["start_ms"],  # Note: Field name is misleading, stores milliseconds
                 sentence["text"],
                 [sentence["topic"]] if sentence["topic"] else [],
-                {
-                    "start_ms": sentence["start_ms"],
-                    "end_ms": sentence["end_ms"],
-                    "duration_ms": sentence["end_ms"] - sentence["start_ms"],
-                },
+                chunk_metadata_json,
             ),
         )
 

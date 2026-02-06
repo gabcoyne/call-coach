@@ -1,0 +1,97 @@
+{
+  "role": "csm",
+  "role_name": "Customer Success Manager",
+  "description": "Coaching rubric for Customer Success Managers focusing on value realization, risk management, and customer retention/expansion",
+  "dimensions": [
+    {
+      "id": "value_realization",
+      "name": "Value Realization Tracking",
+      "weight": 0.30,
+      "criteria": [
+        "Tracks metrics showing customer ROI and value from Prefect",
+        "Identifies blockers preventing customers from realizing expected value",
+        "Probes on business outcomes and success metrics customer cares about",
+        "Documents value achieved in customer's language (time saved, cost reduced, etc.)",
+        "Creates success plans with measurable milestones and goals"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Comprehensive value tracking with specific metrics and ROI. Proactively identifies and addresses value realization blockers. Deep understanding of customer success criteria. Well-documented value achievements. Clear success plan with milestones.",
+        "70-89": "Good: Tracks main value metrics, identifies some blockers. Understands key customer success outcomes. Documents value adequately. Has success plan with reasonable goals.",
+        "50-69": "Needs Improvement: Limited value tracking, vague metrics. Misses some blockers to value realization. Superficial understanding of customer success needs. Minimal documentation. Weak or generic success plan.",
+        "0-49": "Poor: No value tracking or ROI measurement. Doesn't identify blockers. No understanding of customer success criteria. No documentation of value. No success plan."
+      }
+    },
+    {
+      "id": "risk_identification",
+      "name": "Risk Identification",
+      "weight": 0.25,
+      "criteria": [
+        "Spots early warning signs of dissatisfaction, churn risk, or disengagement",
+        "Probes on renewal likelihood, budget concerns, and competitive threats",
+        "Assesses health of stakeholder relationships and executive sponsorship",
+        "Identifies technical adoption challenges or unused features",
+        "Creates mitigation plans for identified risks"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Detects all key risk signals early. Directly addresses renewal concerns and competitive threats. Thorough assessment of relationship health and adoption. Proactive mitigation plans for all major risks.",
+        "70-89": "Good: Identifies most important risks. Addresses renewal and budget concerns. Assesses key relationships. Has mitigation approach for main risks.",
+        "50-69": "Needs Improvement: Misses some risk signals. Superficial discussion of renewal. Limited relationship assessment. Reactive rather than proactive on risk mitigation.",
+        "0-49": "Poor: Doesn't detect or address risk signals. Avoids renewal discussions. No assessment of relationship health. No risk mitigation planning."
+      }
+    },
+    {
+      "id": "relationship_depth",
+      "name": "Relationship Depth",
+      "weight": 0.20,
+      "criteria": [
+        "Builds trusted advisor relationship with customer stakeholders",
+        "Demonstrates genuine partnership and investment in customer success",
+        "Expands relationships beyond initial champion to economic buyer and exec sponsor",
+        "Shows empathy and understanding of customer's business pressures",
+        "Maintains regular, proactive communication and follow-through"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Clear trusted advisor status with multiple stakeholders. Customer sees CSM as partner, not vendor. Strong relationships at multiple levels including exec sponsor. Deep empathy for customer challenges. Consistent, proactive engagement.",
+        "70-89": "Good: Strong relationship with main stakeholders. Customer trusts CSM's guidance. Some executive relationships. Shows empathy. Regular communication with good follow-through.",
+        "50-69": "Needs Improvement: Transactional relationship, limited trust. Narrow stakeholder coverage. Weak or no executive relationships. Limited empathy. Inconsistent communication or follow-through.",
+        "0-49": "Poor: No meaningful relationship, purely reactive. Customer doesn't trust CSM. Single point of contact only. No empathy. Poor communication and follow-through."
+      }
+    },
+    {
+      "id": "expansion_opportunity",
+      "name": "Expansion Opportunity Spotting",
+      "weight": 0.15,
+      "criteria": [
+        "Identifies use cases for additional seats, features, or products",
+        "Asks about adjacent teams or departments that could benefit from Prefect",
+        "Uncovers budget and timing for expansion opportunities",
+        "Positions expansion as path to greater value realization, not just upsell",
+        "Coordinates with AE on commercial expansion discussions"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Identifies multiple concrete expansion opportunities with clear business case. Understands budget and timing. Frames expansion as value driver, not just revenue. Seamless coordination with AE on commercial aspects.",
+        "70-89": "Good: Spots main expansion opportunities. Has some understanding of budget/timing. Decent value framing. Coordinates with AE on expansion discussions.",
+        "50-69": "Needs Improvement: Misses obvious expansion opportunities. Vague on budget/timing. Expansion feels like pushy upselling. Limited coordination with AE.",
+        "0-49": "Poor: Doesn't identify any expansion opportunities. No discussion of additional use cases or teams. No budget/timing awareness. No AE coordination."
+      }
+    },
+    {
+      "id": "product_adoption",
+      "name": "Product Adoption Coaching",
+      "weight": 0.10,
+      "criteria": [
+        "Identifies underutilized features that could drive more value",
+        "Provides practical guidance on best practices and implementation patterns",
+        "Shares relevant resources, documentation, or training materials",
+        "Removes technical blockers or escalates to appropriate team",
+        "Celebrates customer wins and progress milestones"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Proactively identifies adoption opportunities for underused features. Provides actionable guidance and resources. Efficiently removes blockers. Celebrates customer progress and wins. Drives increasing product usage.",
+        "70-89": "Good: Spots some adoption opportunities. Provides helpful guidance. Shares relevant resources. Resolves some blockers. Acknowledges customer progress.",
+        "50-69": "Needs Improvement: Misses adoption opportunities. Generic guidance. Limited resources shared. Slow on resolving blockers. Minimal celebration of wins.",
+        "0-49": "Poor: No adoption coaching. No guidance or resources provided. Blockers go unaddressed. Doesn't celebrate customer progress."
+      }
+    }
+  ]
+}

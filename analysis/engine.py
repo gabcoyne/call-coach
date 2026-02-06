@@ -24,6 +24,7 @@ from .prompts import (
     analyze_objection_handling_prompt,
     analyze_product_knowledge_prompt,
 )
+from .rubric_loader import load_rubric
 
 logger = logging.getLogger(__name__)
 
