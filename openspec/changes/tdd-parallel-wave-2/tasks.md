@@ -69,12 +69,18 @@
 
 ## 7. Backend Integration Tests
 
-- [ ] 7.1 Write integration test for POST endpoint creates DB record (test_api_integration.py::test_post_creates_record)
-- [ ] 7.2 Write integration test for GET endpoint retrieves record (test_api_integration.py::test_get_retrieves_record)
-- [ ] 7.3 Write integration test for auth required (test_api_integration.py::test_auth_required)
-- [ ] 7.4 Write integration test for transaction commit (test_database_integration.py::test_transaction_commit)
-- [ ] 7.5 Write integration test for transaction rollback (test_database_integration.py::test_transaction_rollback)
-- [ ] 7.6 Write integration test for connection pool under load (test_database_integration.py::test_connection_pool_load)
+- [x] 7.1 Write integration test for POST endpoint creates DB record
+      (test_api_integration.py::test_post_creates_record)
+- [x] 7.2 Write integration test for GET endpoint retrieves record
+      (test_api_integration.py::test_get_retrieves_record)
+- [x] 7.3 Write integration test for auth required
+      (test_api_integration.py::test_auth_required)
+- [x] 7.4 Write integration test for transaction commit
+      (test_database_integration.py::test_transaction_commit)
+- [x] 7.5 Write integration test for transaction rollback
+      (test_database_integration.py::test_transaction_rollback)
+- [x] 7.6 Write integration test for connection pool under load
+      (test_database_integration.py::test_connection_pool_load)
 
 ## 8. Frontend Unit Tests - Components
 
