@@ -32,6 +32,69 @@ logger = logging.getLogger(__name__)
 anthropic_client = Anthropic(api_key=settings.anthropic_api_key)
 
 
+def detect_speaker_role(call_id: str) -> str:
+    """
+    Detect the role of the primary Prefect speaker on a call.
+
+    Identifies Prefect staff by @prefect.io email domain, selects primary speaker
+    by talk time, and looks up their assigned role.
+
+    Args:
+        call_id: Call UUID
+
+    Returns:
+        Role identifier ('ae', 'se', 'csm'). Defaults to 'ae' if no role assigned.
+    """
+    from db import queries
+
+    # Get all speakers for the call
+    speakers = fetch_all(
+        """
+        SELECT id, name, email, company_side, talk_time_seconds, talk_time_percentage
+        FROM speakers
+        WHERE call_id = %s
+        """,
+        (str(call_id),)
+    )
+
+    # Filter to Prefect speakers (company_side=true and @prefect.io email)
+    prefect_speakers = [
+        s for s in speakers
+        if s.get("company_side") and s.get("email") and s["email"].endswith("@prefect.io")
+    ]
+
+    if not prefect_speakers:
+        logger.info(f"No Prefect speakers found for call {call_id}, defaulting to AE rubric")
+        return "ae"
+
+    # Select primary speaker (highest talk time)
+    primary_speaker = max(
+        prefect_speakers,
+        key=lambda s: s.get("talk_time_percentage", 0) or 0
+    )
+
+    speaker_email = primary_speaker["email"]
+    logger.info(
+        f"Primary Prefect speaker on call {call_id}: {speaker_email} "
+        f"({primary_speaker.get('talk_time_percentage', 0)}% talk time)"
+    )
+
+    # Look up role assignment
+    role_result = fetch_one(
+        "SELECT role FROM staff_roles WHERE email = %s",
+        (speaker_email,)
+    )
+
+    if role_result:
+        role = role_result["role"]
+        logger.info(f"Speaker {speaker_email} has assigned role: {role}")
+    else:
+        logger.info(f"No role assigned for {speaker_email}, defaulting to 'ae'")
+        role = "ae"
+
+    return role
+
+
 def get_or_create_coaching_session(
     call_id: UUID,
     rep_id: UUID,
@@ -89,8 +152,9 @@ def get_or_create_coaching_session(
     # Get call metadata for context
     call_metadata = fetch_one("SELECT * FROM calls WHERE id = %s", (str(call_id),))
 
-    # Run actual Claude API analysis
+    # Run actual Claude API analysis with role-aware rubric
     analysis_result = _run_claude_analysis(
+        call_id=str(call_id),
         dimension=dimension,
         transcript=transcript,
         call_metadata=call_metadata,
@@ -204,6 +268,7 @@ def analyze_call(
 
 
 def _run_claude_analysis(
+    call_id: str,
     dimension: CoachingDimension,
     transcript: str,
     call_metadata: dict[str, Any] | None = None,
@@ -212,6 +277,7 @@ def _run_claude_analysis(
     Run actual Claude API analysis for a coaching dimension.
 
     Args:
+        call_id: Call UUID for role detection
         dimension: Coaching dimension to analyze
         transcript: Full call transcript
         call_metadata: Optional call metadata for context
@@ -221,7 +287,18 @@ def _run_claude_analysis(
     """
     logger.info(f"Running Claude analysis for dimension: {dimension.value}")
 
-    # Get rubric from database
+    # Detect speaker role for role-aware rubric selection
+    speaker_role = detect_speaker_role(call_id)
+    logger.info(f"Using {speaker_role.upper()} rubric for call {call_id}")
+
+    # Load role-specific rubric
+    try:
+        role_rubric = load_rubric(speaker_role)
+    except Exception as e:
+        logger.warning(f"Failed to load role rubric for {speaker_role}, falling back to AE: {e}")
+        role_rubric = load_rubric("ae")
+
+    # Get dimension-specific rubric from database (legacy system)
     rubric_row = fetch_one(
         """
         SELECT id, name, version, category, criteria, scoring_guide, examples
@@ -243,6 +320,8 @@ def _run_claude_analysis(
         "criteria": rubric_row["criteria"],
         "scoring_guide": rubric_row["scoring_guide"],
         "examples": rubric_row.get("examples", {}),
+        "role_rubric": role_rubric,  # Add role-specific rubric context
+        "evaluated_as_role": speaker_role,  # Track which role was used
     }
 
     # Get knowledge base if needed for product_knowledge dimension
@@ -318,7 +397,7 @@ def _run_claude_analysis(
                 logger.error(f"Response end: ...{response_text[-500:]}")
                 raise ValueError(f"Claude response is not valid JSON: {str(e)}")
 
-        # Add metadata
+        # Add metadata including role used for evaluation
         analysis_data["metadata"] = {
             "model": "claude-sonnet-4-5-20250929",
             "tokens_used": tokens_used,
@@ -327,6 +406,7 @@ def _run_claude_analysis(
             "cache_creation_tokens": cache_creation_tokens,
             "cache_read_tokens": cache_read_tokens,
             "rubric_version": rubric["version"],
+            "rubric_role": rubric.get("evaluated_as_role", "ae"),  # Track which role rubric was used
         }
 
         return analysis_data

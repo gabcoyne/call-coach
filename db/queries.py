@@ -757,3 +757,238 @@ def get_prefect_staff() -> list[dict[str, Any]]:
         ORDER BY email
         """
     )
+
+
+# ============================================================================
+# COACHING FEEDBACK QUERIES
+# ============================================================================
+
+def get_feedback_for_session(coaching_session_id: str) -> list[dict[str, Any]]:
+    """Get all feedback for a coaching session."""
+    return fetch_all(
+        """
+        SELECT * FROM coaching_feedback
+        WHERE coaching_session_id = %s
+        ORDER BY created_at DESC
+        """,
+        (coaching_session_id,),
+    )
+
+
+def submit_feedback(
+    coaching_session_id: str,
+    rep_id: str,
+    feedback_type: str,
+    feedback_text: str | None = None,
+) -> str | None:
+    """
+    Submit feedback on a coaching session.
+
+    Args:
+        coaching_session_id: UUID of the coaching session
+        rep_id: UUID of the rep being coached
+        feedback_type: Type of feedback (accurate, inaccurate, missing_context, helpful, not_helpful)
+        feedback_text: Optional feedback text
+
+    Returns:
+        Feedback record ID (str) or None if failed
+    """
+    result = fetch_one(
+        """
+        INSERT INTO coaching_feedback (
+            coaching_session_id, rep_id, feedback_type, feedback_text, created_at
+        )
+        VALUES (%s, %s, %s, %s, NOW())
+        RETURNING id
+        """,
+        (coaching_session_id, rep_id, feedback_type, feedback_text),
+    )
+    return result["id"] if result else None
+
+
+def get_feedback_stats(
+    dimension: str | None = None,
+    days: int = 30,
+) -> dict[str, Any] | None:
+    """
+    Get aggregated feedback statistics for coaching quality.
+
+    Args:
+        dimension: Optional coaching dimension to filter by
+        days: Number of days to look back
+
+    Returns:
+        Stats dict with accuracy rate, helpfulness rate, etc.
+    """
+    where_clause = "cf.created_at >= NOW() - INTERVAL '%s days'" % days
+
+    if dimension:
+        where_clause += " AND cs.coaching_dimension = '%s'" % dimension
+
+    return fetch_one(
+        f"""
+        SELECT
+            COUNT(*) as total_feedback,
+            SUM(CASE WHEN cf.feedback_type = 'accurate' THEN 1 ELSE 0 END) as accurate_count,
+            SUM(CASE WHEN cf.feedback_type = 'inaccurate' THEN 1 ELSE 0 END) as inaccurate_count,
+            SUM(CASE WHEN cf.feedback_type = 'missing_context' THEN 1 ELSE 0 END) as missing_context_count,
+            SUM(CASE WHEN cf.feedback_type = 'helpful' THEN 1 ELSE 0 END) as helpful_count,
+            SUM(CASE WHEN cf.feedback_type = 'not_helpful' THEN 1 ELSE 0 END) as not_helpful_count,
+            ROUND(
+                100.0 * SUM(CASE WHEN cf.feedback_type = 'accurate' THEN 1 ELSE 0 END) /
+                NULLIF(COUNT(*), 0),
+                2
+            ) as accuracy_rate,
+            ROUND(
+                100.0 * SUM(CASE WHEN cf.feedback_type = 'helpful' THEN 1 ELSE 0 END) /
+                NULLIF(COUNT(*), 0),
+                2
+            ) as helpfulness_rate
+        FROM coaching_feedback cf
+        JOIN coaching_sessions cs ON cf.coaching_session_id = cs.id
+        WHERE {where_clause}
+        """
+    )
+
+
+def get_feedback_stats_by_dimension(
+    days: int = 30,
+) -> list[dict[str, Any]]:
+    """
+    Get feedback statistics grouped by coaching dimension.
+
+    Args:
+        days: Number of days to look back
+
+    Returns:
+        List of stats dicts per dimension
+    """
+    return fetch_all(
+        """
+        SELECT
+            cs.coaching_dimension as dimension,
+            COUNT(*) as total_feedback,
+            SUM(CASE WHEN cf.feedback_type = 'accurate' THEN 1 ELSE 0 END) as accurate_count,
+            SUM(CASE WHEN cf.feedback_type = 'inaccurate' THEN 1 ELSE 0 END) as inaccurate_count,
+            SUM(CASE WHEN cf.feedback_type = 'missing_context' THEN 1 ELSE 0 END) as missing_context_count,
+            SUM(CASE WHEN cf.feedback_type = 'helpful' THEN 1 ELSE 0 END) as helpful_count,
+            SUM(CASE WHEN cf.feedback_type = 'not_helpful' THEN 1 ELSE 0 END) as not_helpful_count,
+            ROUND(
+                100.0 * SUM(CASE WHEN cf.feedback_type = 'accurate' THEN 1 ELSE 0 END) /
+                NULLIF(COUNT(*), 0),
+                2
+            ) as accuracy_rate,
+            ROUND(
+                100.0 * SUM(CASE WHEN cf.feedback_type = 'helpful' THEN 1 ELSE 0 END) /
+                NULLIF(COUNT(*), 0),
+                2
+            ) as helpfulness_rate
+        FROM coaching_feedback cf
+        JOIN coaching_sessions cs ON cf.coaching_session_id = cs.id
+        WHERE cf.created_at >= NOW() - INTERVAL '%s days'
+        GROUP BY cs.coaching_dimension
+        ORDER BY total_feedback DESC
+        """,
+        (days,),
+    )
+
+
+def get_coaching_quality_issues(
+    days: int = 30,
+) -> list[dict[str, Any]]:
+    """
+    Identify coaching quality issues from feedback data.
+
+    Args:
+        days: Number of days to analyze
+
+    Returns:
+        List of quality issues sorted by severity
+    """
+    stats = get_feedback_stats(days=days)
+
+    if not stats or stats["total_feedback"] == 0:
+        return []
+
+    issues = []
+
+    # Issue 1: Low accuracy
+    if (stats["accuracy_rate"] or 0) < 80:
+        issues.append({
+            "type": "low_accuracy",
+            "severity": "high",
+            "message": f"Coaching accuracy is {stats['accuracy_rate']}% (target: 90%+)",
+            "metric_value": stats["accuracy_rate"],
+            "affected_count": stats["inaccurate_count"],
+        })
+
+    # Issue 2: Low helpfulness
+    if (stats["helpfulness_rate"] or 0) < 70:
+        issues.append({
+            "type": "low_helpfulness",
+            "severity": "medium",
+            "message": f"Coaching helpfulness is {stats['helpfulness_rate']}% (target: 80%+)",
+            "metric_value": stats["helpfulness_rate"],
+            "affected_count": stats["not_helpful_count"],
+        })
+
+    # Issue 3: High missing context
+    missing_context_rate = (
+        (100 * stats["missing_context_count"]) / stats["total_feedback"]
+        if stats["total_feedback"] > 0
+        else 0
+    )
+
+    if missing_context_rate > 20:
+        issues.append({
+            "type": "missing_context",
+            "severity": "medium",
+            "message": f"{missing_context_rate:.0f}% of feedback indicates missing context in coaching",
+            "metric_value": missing_context_rate,
+            "affected_count": stats["missing_context_count"],
+        })
+
+    return sorted(issues, key=lambda x: {"high": 0, "medium": 1, "low": 2}[x["severity"]])
+
+
+def get_feedback_by_rep(
+    rep_email: str,
+    days: int = 30,
+) -> dict[str, Any] | None:
+    """
+    Get feedback statistics for a specific rep.
+
+    Args:
+        rep_email: Email of the rep
+        days: Number of days to look back
+
+    Returns:
+        Stats dict with accuracy and helpfulness rates
+    """
+    return fetch_one(
+        """
+        SELECT
+            COUNT(*) as total_feedback,
+            SUM(CASE WHEN cf.feedback_type = 'accurate' THEN 1 ELSE 0 END) as accurate_count,
+            SUM(CASE WHEN cf.feedback_type = 'inaccurate' THEN 1 ELSE 0 END) as inaccurate_count,
+            SUM(CASE WHEN cf.feedback_type = 'missing_context' THEN 1 ELSE 0 END) as missing_context_count,
+            SUM(CASE WHEN cf.feedback_type = 'helpful' THEN 1 ELSE 0 END) as helpful_count,
+            SUM(CASE WHEN cf.feedback_type = 'not_helpful' THEN 1 ELSE 0 END) as not_helpful_count,
+            ROUND(
+                100.0 * SUM(CASE WHEN cf.feedback_type = 'accurate' THEN 1 ELSE 0 END) /
+                NULLIF(COUNT(*), 0),
+                2
+            ) as accuracy_rate,
+            ROUND(
+                100.0 * SUM(CASE WHEN cf.feedback_type = 'helpful' THEN 1 ELSE 0 END) /
+                NULLIF(COUNT(*), 0),
+                2
+            ) as helpfulness_rate
+        FROM coaching_feedback cf
+        JOIN coaching_sessions cs ON cf.coaching_session_id = cs.id
+        JOIN speakers s ON cf.rep_id = s.id
+        WHERE s.email = %s
+        AND cf.created_at >= NOW() - INTERVAL '%s days'
+        """,
+        (rep_email, days),
+    )

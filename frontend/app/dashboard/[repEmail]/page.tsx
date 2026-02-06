@@ -33,6 +33,16 @@ interface DashboardPageProps {
   };
 }
 
+// Mock data for team average comparison - in production this would come from the backend
+const MOCK_TEAM_AVERAGES: Record<string, number> = {
+  'Qualification Skills': 72,
+  'Discovery & Diagnosis': 68,
+  'Value Communication': 75,
+  'Objection Handling': 70,
+  'Deal Advancement': 73,
+  'Relationship Building': 76,
+};
+
 export default function RepDashboardPage({ params }: DashboardPageProps) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
@@ -116,7 +126,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
   };
 
   // Get recent calls (top 10)
-  const getRecentCalls = () => {
+  const getRecentCalls = (): ActivityItem[] => {
     if (!insights?.score_trends.overall?.dates) return [];
 
     const calls = insights.score_trends.overall.dates
@@ -130,6 +140,40 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
       .slice(0, 10);
 
     return calls;
+  };
+
+  // Prepare skill gap data for radar chart
+  const prepareSkillGapData = (): SkillGapData[] => {
+    if (!insights?.skill_gaps) return [];
+
+    return insights.skill_gaps.map((gap) => ({
+      area: gap.area.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+      current: gap.current_score,
+      target: gap.target_score,
+    }));
+  };
+
+  // Prepare team comparison data
+  const prepareTeamComparisonData = (): ComparisonData[] => {
+    const dimensionScores = calculateAverageDimensionScores();
+    return dimensionScores.map((dim) => ({
+      dimension: dim.displayName,
+      repScore: dim.avgScore,
+      teamAverage: MOCK_TEAM_AVERAGES[dim.displayName] || 75,
+    }));
+  };
+
+  // Prepare dimension breakdown data (weights)
+  const prepareDimensionBreakdownData = (): DimensionData[] => {
+    const dimensionScores = calculateAverageDimensionScores();
+    if (dimensionScores.length === 0) return [];
+
+    // Weight each dimension by 1 for equal weighting, or could be customized
+    return dimensionScores.map((dim) => ({
+      name: dim.displayName,
+      value: dim.avgScore, // Using score as value for visualization
+      score: dim.avgScore,
+    }));
   };
 
   if (!isLoaded) {
@@ -258,10 +302,14 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
   const recentCalls = getRecentCalls();
   const hasEnoughData = totalCalls >= 3;
 
+  const skillGapData = prepareSkillGapData();
+  const teamComparisonData = prepareTeamComparisonData();
+  const dimensionBreakdownData = prepareDimensionBreakdownData();
+
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-8">
       {/* Header with Back Button and Time Range Filter */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-b pb-6">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -295,8 +343,8 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
       </div>
 
       {/* Performance Overview Section */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Performance Overview</h2>
+      <section>
+        <h2 className="text-2xl font-bold mb-4">Performance Overview</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {overallScore !== null ? (
             <ScoreCard
@@ -345,17 +393,17 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </section>
 
-      {/* Performance Trend Charts */}
+      {/* Score Trends Over Time - Line Chart */}
       {hasEnoughData ? (
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Performance Trends</h2>
-          <Card>
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Score Trends Over Time</h2>
+          <Card className="border-0 shadow-sm">
             <CardHeader>
-              <CardTitle>Score Trends Over Time</CardTitle>
+              <CardTitle>Performance Trajectory</CardTitle>
               <CardDescription>
-                Track performance across different coaching dimensions
+                Track your progress across different coaching dimensions over the selected time period
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -366,7 +414,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
               />
             </CardContent>
           </Card>
-        </div>
+        </section>
       ) : (
         <Card className="border-yellow-200 bg-yellow-50">
           <CardContent className="pt-6">
@@ -377,75 +425,94 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
         </Card>
       )}
 
-      {/* Aggregated Metrics - Average Dimension Scores */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Dimension Breakdown</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {dimensionScores.map((dim) => (
-            <ScoreCard
-              key={dim.dimension}
-              score={dim.avgScore}
-              title={dim.displayName}
-            />
-          ))}
-        </div>
-      </div>
+      {/* Skill Gaps - Radar Chart */}
+      {skillGapData.length > 0 ? (
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Skill Gap Analysis</h2>
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle>Current vs Target Performance</CardTitle>
+              <CardDescription>
+                Radar chart showing your current scores compared to target goals across key skill areas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SkillGapChart
+                data={skillGapData}
+                height={350}
+              />
+            </CardContent>
+          </Card>
+        </section>
+      ) : null}
 
-      {/* Recent Calls List */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Recent Calls</h2>
-        <Card>
-          <CardContent className="pt-6">
-            {recentCalls.length > 0 ? (
-              <div className="space-y-3">
-                {recentCalls.map((call, index) => {
-                  const scoreColor = call.overall_score ? getScoreColor(call.overall_score) : null;
+      {/* Team Comparison - Bar Chart */}
+      {hasEnoughData && teamComparisonData.length > 0 ? (
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Team Performance Comparison</h2>
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle>You vs Team Average</CardTitle>
+              <CardDescription>
+                See how your scores compare to team averages across dimensions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TeamComparisonChart
+                data={teamComparisonData}
+                height={320}
+              />
+            </CardContent>
+          </Card>
+        </section>
+      ) : null}
 
-                  return (
-                    <div
-                      key={call.call_id}
-                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="text-sm text-gray-500">#{index + 1}</div>
-                        <div>
-                          <p className="text-sm font-medium">{call.call_type}</p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(call.date).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {call.overall_score !== null ? (
-                          <div
-                            className="px-3 py-1 rounded-full text-sm font-semibold"
-                            style={{
-                              backgroundColor: scoreColor?.bg,
-                              color: scoreColor?.text,
-                            }}
-                          >
-                            {call.overall_score}
-                          </div>
-                        ) : (
-                          <span className="text-sm text-gray-400">N/A</span>
-                        )}
-                        <Link
-                          href={`/calls/${call.call_id}`}
-                          className="text-sm text-blue-600 hover:text-blue-800"
-                        >
-                          View Details
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
+      {/* Dimension Breakdown - Pie Chart */}
+      {dimensionBreakdownData.length > 0 ? (
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Dimension Breakdown</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Pie Chart */}
+            <Card className="border-0 shadow-sm">
+              <CardHeader>
+                <CardTitle>Score Distribution</CardTitle>
+                <CardDescription>
+                  Visual breakdown of your average scores across all coaching dimensions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DimensionBreakdownChart
+                  data={dimensionBreakdownData}
+                  height={300}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Dimension Score Cards */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Dimension Details</h3>
+              <div className="grid gap-3 grid-cols-1">
+                {dimensionScores.map((dim) => (
+                  <ScoreCard
+                    key={dim.dimension}
+                    score={dim.avgScore}
+                    title={dim.displayName}
+                  />
+                ))}
               </div>
-            ) : (
-              <p className="text-sm text-gray-500 text-center">No calls available</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* Recent Activity Feed */}
+      <section>
+        <h2 className="text-2xl font-bold mb-4">Recent Activity</h2>
+        <RecentActivityFeed
+          activities={recentCalls}
+          limit={10}
+        />
+      </section>
     </div>
   );
 }

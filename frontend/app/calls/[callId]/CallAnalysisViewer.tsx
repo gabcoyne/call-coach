@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { ScoreCard } from "@/components/coaching/ScoreCard";
 import { InsightCard } from "@/components/coaching/InsightCard";
 import { ActionItem } from "@/components/coaching/ActionItem";
+import { CallRecordingPlayer } from "@/components/coaching/CallRecordingPlayer";
+import { TranscriptSearch } from "@/components/coaching/TranscriptSearch";
+import { ExportCoachingReport } from "@/components/coaching/ExportCoachingReport";
+import { ShareLink } from "@/components/coaching/ShareLink";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface CallAnalysisViewerProps {
@@ -19,6 +23,15 @@ export function CallAnalysisViewer({
   userRole,
 }: CallAnalysisViewerProps) {
   const { data: analysis, error, isLoading, mutate } = useCallAnalysis(callId);
+
+  const handleTimestampClick = (timestamp: number) => {
+    // This would be used to sync with audio player if available
+    const audioElement = document.querySelector("audio");
+    if (audioElement) {
+      audioElement.currentTime = timestamp;
+      audioElement.play();
+    }
+  };
 
   // Task 4.10: Loading skeletons for metadata, transcript, and insights sections
   if (isLoading) {
@@ -118,17 +131,21 @@ export function CallAnalysisViewer({
   return (
     <div className="space-y-6">
       {/* Header Actions */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <Link href="/dashboard">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
         </Link>
-        <Button onClick={() => mutate()} variant="outline" size="sm">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={() => mutate()} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+          <ExportCoachingReport analysis={analysis} callTitle={metadata.title} />
+          <ShareLink callId={callId} callTitle={metadata.title} />
+        </div>
       </div>
 
       {/* Task 4.2: Call metadata section: title, participants, date, duration, type */}
@@ -191,6 +208,13 @@ export function CallAnalysisViewer({
           </div>
         )}
       </div>
+
+      {/* Call Recording Player */}
+      <CallRecordingPlayer
+        gongUrl={metadata.gong_url}
+        recordingUrl={metadata.recording_url}
+        duration={metadata.duration_seconds}
+      />
 
       {/* Task 4.6: Display dimension scores using ScoreCard components */}
       <div>
@@ -262,8 +286,13 @@ export function CallAnalysisViewer({
       {/* Task 4.3: Transcript viewer with speaker labels and timestamps */}
       {/* Task 4.4: "Transcript not available" fallback when transcript is null */}
       <div className="border rounded-lg p-6 bg-white shadow-sm">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Transcript</h2>
-        {analysis.specific_examples ? (
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Transcript & Search</h2>
+        {analysis.transcript && analysis.transcript.length > 0 ? (
+          <TranscriptSearch
+            transcript={analysis.transcript}
+            onTimestampClick={handleTimestampClick}
+          />
+        ) : analysis.specific_examples ? (
           <div className="space-y-4">
             {/* Good Examples */}
             {analysis.specific_examples.good && analysis.specific_examples.good.length > 0 && (

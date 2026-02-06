@@ -27,3 +27,15 @@ export type { InsightCardProps } from './InsightCard';
 
 export { ActionItem } from './ActionItem';
 export type { ActionItemProps } from './ActionItem';
+
+export { CallRecordingPlayer } from './CallRecordingPlayer';
+export type { } from './CallRecordingPlayer';
+
+export { TranscriptSearch } from './TranscriptSearch';
+export type { } from './TranscriptSearch';
+
+export { ExportCoachingReport } from './ExportCoachingReport';
+export type { } from './ExportCoachingReport';
+
+export { ShareLink } from './ShareLink';
+export type { } from './ShareLink';
