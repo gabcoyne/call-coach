@@ -145,32 +145,67 @@ class GongClient:
 
     def get_call(self, call_id: str) -> GongCall:
         """
-        Fetch call metadata from Gong.
+        Fetch call metadata from Gong including participants.
+
+        Uses POST /calls/extensive to get full call details including parties,
+        since GET /calls/{id} doesn't include participant information.
 
         Args:
             call_id: Gong call ID
 
         Returns:
-            GongCall object with call metadata
+            GongCall object with call metadata and participants
         """
         logger.info(f"Fetching call metadata for {call_id}")
 
-        response = self._make_request("GET", f"/calls/{call_id}")
+        # Use /calls/extensive to get full details including parties
+        response = self._make_request(
+            "POST",
+            "/calls/extensive",
+            json_data={
+                "filter": {
+                    "callIds": [call_id],
+                    # Wide date range since we don't know call date
+                    "fromDateTime": "2020-01-01T00:00:00Z",
+                    "toDateTime": "2030-01-01T00:00:00Z",
+                },
+                "contentSelector": {
+                    "context": "Extended",
+                    "exposedFields": {
+                        "parties": True,
+                        "content": {
+                            "structure": False,
+                            "trackers": False,
+                            "topics": False,
+                            "pointsOfInterest": False,
+                        },
+                    },
+                },
+            },
+        )
 
-        # Extract call data (structure varies by endpoint)
-        call_data = response.get("call") or response
+        calls = response.get("calls", [])
+        if not calls:
+            raise GongAPIError(f"Call {call_id} not found")
 
-        # Parse speakers/participants
+        call_obj = calls[0]
+        call_data = call_obj.get("metaData", {})
+
+        # Parse speakers/participants from parties
         participants = []
-        for participant in call_data.get("participants", []):
+        for party in call_obj.get("parties", []):
+            # Skip parties without speaker_id (they didn't speak on the call)
+            if not party.get("speakerId"):
+                continue
+
             participants.append(
                 GongSpeaker(
-                    speaker_id=participant.get("id", ""),
-                    name=participant.get("name", "Unknown"),
-                    email=participant.get("emailAddress"),
-                    title=participant.get("title"),
-                    is_internal=participant.get("isInternal", False),
-                    talk_time_seconds=participant.get("speakingTime", 0),
+                    speaker_id=party.get("speakerId"),
+                    name=party.get("name", "Unknown"),
+                    email=party.get("emailAddress"),
+                    title=party.get("title"),
+                    is_internal=party.get("affiliation") == "Internal",  # Gong uses "affiliation"
+                    talk_time_seconds=party.get("speakingTime", 0),
                 )
             )
 
@@ -188,7 +223,9 @@ class GongClient:
             language=call_data.get("language"),
             workspace_id=call_data.get("workspaceId"),
             url=call_data.get("url"),
-            participants=participants,
+            participants=(
+                participants if participants else None
+            ),  # Keep None if empty for consistency
             custom_data=call_data.get("customData"),
         )
 

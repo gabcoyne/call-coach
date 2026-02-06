@@ -29,10 +29,10 @@ const customJestConfig = {
   ],
   coverageThreshold: {
     global: {
-      statements: 70,
-      branches: 60,
-      functions: 70,
-      lines: 70,
+      statements: 75,
+      branches: 75,
+      functions: 75,
+      lines: 75,
     },
   },
   testPathIgnorePatterns: ["/node_modules/", "/.next/"],

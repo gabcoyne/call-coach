@@ -6,9 +6,8 @@ import {
   canViewRepData,
   requireManager,
   getUserSession,
-  hasValidRole,
-  UserRole,
 } from '../auth'
+import { UserRole } from '../auth-utils'
 import { auth, currentUser } from '@clerk/nextjs/server'
 
 // Mock Clerk
@@ -229,29 +228,42 @@ describe('auth utilities', () => {
     })
   })
 
-  describe('hasValidRole', () => {
-    it('should return true for valid manager role', () => {
-      expect(hasValidRole({ role: 'manager' })).toBe(true)
+  describe('edge cases and error handling', () => {
+    it('should handle unauthenticated requests consistently', async () => {
+      (currentUser as jest.Mock).mockResolvedValue(null)
+
+      const role = await getCurrentUserRole()
+      const email = await getCurrentUserEmail()
+      const isManagerResult = await isManager()
+      const isRepResult = await isRep()
+      const canView = await canViewRepData('test@example.com')
+
+      expect(role).toBeNull()
+      expect(email).toBeNull()
+      expect(isManagerResult).toBe(false)
+      expect(isRepResult).toBe(false)
+      expect(canView).toBe(false)
     })
 
-    it('should return true for valid rep role', () => {
-      expect(hasValidRole({ role: 'rep' })).toBe(true)
+    it('should handle invalid role values gracefully', async () => {
+      (currentUser as jest.Mock).mockResolvedValue({
+        id: 'user-123',
+        emailAddresses: [{ emailAddress: 'test@example.com' }],
+        publicMetadata: { role: 'invalid-role' },
+      })
+
+      const role = await getCurrentUserRole()
+      expect(role).toBe(UserRole.REP) // Should default to rep
     })
 
-    it('should return false for invalid role', () => {
-      expect(hasValidRole({ role: 'admin' })).toBe(false)
-    })
+    it('should handle missing publicMetadata', async () => {
+      (currentUser as jest.Mock).mockResolvedValue({
+        id: 'user-123',
+        emailAddresses: [{ emailAddress: 'test@example.com' }],
+      })
 
-    it('should return false for non-object values', () => {
-      expect(hasValidRole(null)).toBe(false)
-      expect(hasValidRole(undefined)).toBe(false)
-      expect(hasValidRole('manager')).toBe(false)
-      expect(hasValidRole(123)).toBe(false)
-    })
-
-    it('should return false for object without role', () => {
-      expect(hasValidRole({})).toBe(false)
-      expect(hasValidRole({ name: 'test' })).toBe(false)
+      const role = await getCurrentUserRole()
+      expect(role).toBe(UserRole.REP) // Should default to rep
     })
   })
 })

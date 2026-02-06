@@ -1,5 +1,9 @@
 # Gong Call Coaching Agent for Prefect Sales Teams
 
+[![codecov](https://codecov.io/gh/gabcoyne/call-coach/branch/main/graph/badge.svg)](https://codecov.io/gh/gabcoyne/call-coach)
+[![Backend Tests](https://github.com/gabcoyne/call-coach/actions/workflows/test-backend.yml/badge.svg)](https://github.com/gabcoyne/call-coach/actions/workflows/test-backend.yml)
+[![Frontend Tests](https://github.com/gabcoyne/call-coach/actions/workflows/test-frontend.yml/badge.svg)](https://github.com/gabcoyne/call-coach/actions/workflows/test-frontend.yml)
+
 AI-powered sales coaching system that analyzes Gong calls for SEs, AEs, and CSMs across Prefect and Horizon products.
 
 ## Architecture
@@ -17,6 +21,7 @@ AI-powered sales coaching system that analyzes Gong calls for SEs, AEs, and CSMs
 - **Long Call Support**: Sliding window chunking for 60+ minute calls
 - **Real-time Ingestion**: Async webhook handling with <3s response time
 - **Trend Analysis**: Performance tracking across reps and time periods
+- **Comprehensive Testing**: 70%+ code coverage with unit, integration, and E2E tests
 
 ## Project Structure
 
@@ -525,6 +530,240 @@ npm run lint
 - Check DATABASE_URL includes `?sslmode=require`
 - Verify IP allowlist in Neon dashboard
 - Test connection: `psql $DATABASE_URL`
+
+## Testing
+
+The project uses a comprehensive test suite with unit, integration, and end-to-end tests for both backend (Python) and frontend (TypeScript/React). We follow test-driven development (TDD) practices.
+
+### Quick Start
+
+**Backend tests:**
+
+```bash
+# Run all backend tests
+pytest tests/
+
+# Run with coverage report
+pytest tests/ --cov=analysis --cov=coaching_mcp --cov=api --cov-report=html
+open htmlcov/index.html  # View coverage report
+```
+
+**Frontend tests:**
+
+```bash
+cd frontend
+
+# Run all frontend tests
+npm test
+
+# Run with coverage
+npm run test:coverage
+open coverage/lcov-report/index.html  # View coverage report
+
+# Run in watch mode (re-runs on file changes)
+npm run test:watch
+```
+
+### Test Organization
+
+**Backend structure:**
+
+```
+tests/
+├── unit/              # Fast, isolated tests
+│   ├── analysis/      # Analysis engine tests
+│   ├── api/           # API endpoint tests
+│   ├── cache/         # Caching tests
+│   └── mcp/           # MCP tools tests
+├── integration/       # Component interaction tests
+├── e2e/               # End-to-end workflow tests
+├── performance/       # Load and performance tests
+└── conftest.py        # Shared fixtures
+```
+
+**Frontend structure:**
+
+```
+frontend/
+├── __tests__/                    # Top-level tests
+├── components/ui/__tests__/      # Component tests
+├── lib/__tests__/                # Utility tests
+├── lib/hooks/__tests__/          # React hooks tests
+└── app/api/*/__tests__/          # API route tests
+```
+
+### Running Specific Tests
+
+**Backend:**
+
+```bash
+# Run specific test file
+pytest tests/analysis/test_engine.py
+
+# Run specific test function
+pytest tests/analysis/test_engine.py::test_cache_hit_prevents_api_call
+
+# Run tests matching pattern
+pytest tests/ -k "cache"  # All tests with "cache" in name
+
+# Run only unit tests (fast)
+pytest tests/ -m "not integration and not e2e"
+
+# Run in parallel (faster)
+pytest tests/ -n auto  # Uses all CPU cores
+
+# Verbose output
+pytest tests/ -v
+
+# Stop on first failure
+pytest tests/ -x
+```
+
+**Frontend:**
+
+```bash
+cd frontend
+
+# Run specific test file
+npm test -- components/ui/score-badge.test.tsx
+
+# Run tests matching pattern
+npm test -- --testNamePattern="renders correctly"
+
+# Run in CI mode
+npm run test:ci
+```
+
+### Coverage Targets
+
+The project enforces minimum coverage thresholds:
+
+**Backend:** 85% minimum coverage
+**Frontend:** 75% minimum coverage
+
+Coverage reports are generated automatically and block CI if thresholds aren't met.
+
+### Test-Driven Development (TDD)
+
+When adding new features, follow the Red-Green-Refactor cycle:
+
+1. **Red:** Write a failing test first
+2. **Green:** Write minimum code to make it pass
+3. **Refactor:** Improve code while keeping tests passing
+
+**Example workflow:**
+
+```bash
+# 1. Write failing test
+touch tests/analysis/test_new_feature.py
+
+# 2. Run test - should fail
+pytest tests/analysis/test_new_feature.py -v
+
+# 3. Implement feature
+# Edit analysis/new_feature.py
+
+# 4. Run test - should pass
+pytest tests/analysis/test_new_feature.py -v
+
+# 5. Run full test suite
+pytest tests/
+```
+
+### Pre-commit Hooks
+
+Tests run automatically before commits via pre-commit hooks.
+
+**Manual pre-commit run:**
+
+```bash
+pre-commit run --all-files
+```
+
+### Debugging Failing Tests
+
+**Quick debugging:**
+
+```bash
+# Backend: Run with debugger
+pytest tests/test_file.py --pdb
+
+# Show local variables on failure
+pytest tests/test_file.py -l
+
+# Verbose output
+pytest tests/test_file.py -vv
+
+# Frontend: Use debug()
+# See Testing Guide for details
+```
+
+### Documentation
+
+For comprehensive testing documentation:
+
+- **[Testing Guide](docs/testing-guide.md)** - TDD workflow, test types, examples, debugging
+- **[Code Review Checklist](docs/code-review.md)** - Test quality criteria
+
+### CI/CD Integration
+
+Tests run automatically in GitHub Actions on pull requests and commits. Coverage reports are uploaded as artifacts and merges are blocked if:
+
+- Tests fail
+- Coverage drops below thresholds
+
+**Pre-commit Hooks**:
+
+Tests run automatically on commit for changed files. Install hooks:
+
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install git hooks
+pre-commit install
+
+# Run manually on all files
+pre-commit run --all-files
+```
+
+### CI/CD Pipeline
+
+Tests run automatically on:
+
+- Every push to `main` or `develop` branches
+- Every pull request
+- Manual workflow dispatch
+
+**Required Checks**:
+
+- Backend: Lint, type check, unit tests (70% coverage)
+- Frontend: Lint, unit tests (70% coverage), build check
+- Both must pass before merge
+
+**Branch Protection**:
+
+Configure in GitHub Settings > Branches > Branch protection rules:
+
+1. Require status checks before merging
+2. Required checks:
+   - `Backend Tests Summary`
+   - `Frontend Tests Summary`
+   - `coverage/project`
+3. Require branches to be up to date before merging
+
+### Coverage Reports
+
+View coverage reports:
+
+- **Codecov Dashboard**: <https://codecov.io/gh/gabcoyne/call-coach>
+- **Local HTML Report**: `pytest --cov --cov-report=html` then open `htmlcov/index.html`
+- **Frontend Coverage**: `npm run test:coverage` then open `frontend/coverage/lcov-report/index.html`
+
+**Coverage Targets**:
+
+- Backend: 70% minimum (target: 80%)
+- Frontend: 70% minimum (target: 75%)
 
 ## Cost Optimization
 

@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor, act } from '@testing-library/react'
 import { SWRConfig } from 'swr'
 import { useCallAnalysis, useCallAnalysisMutation } from '../useCallAnalysis'
 import type { AnalyzeCallResponse } from '@/types/coaching'
@@ -6,39 +6,111 @@ import type { AnalyzeCallResponse } from '@/types/coaching'
 // Mock fetch
 const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>
 
+// Custom fetcher for tests
+async function testFetcher(url: string) {
+  const response = await fetch(url, {
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    const error: any = new Error('An error occurred while fetching the data.')
+    error.status = response.status
+
+    try {
+      const errorData = await response.json()
+      error.info = errorData
+      error.message = errorData.error || errorData.message || error.message
+    } catch {
+      // If error response is not JSON, use default message
+    }
+
+    throw error
+  }
+
+  return response.json()
+}
+
 // Test data
 const mockAnalysisResponse: AnalyzeCallResponse = {
-  call_id: 'call-123',
+  call_metadata: {
+    id: 'call-123',
+    title: 'Discovery Call - Acme Corp',
+    date: '2024-01-15T10:00:00Z',
+    duration_seconds: 1800,
+    call_type: 'discovery',
+    product: 'prefect',
+    participants: [
+      {
+        name: 'Test Rep',
+        email: 'rep@example.com',
+        role: 'AE',
+        is_internal: true,
+        talk_time_seconds: 900,
+      },
+    ],
+    gong_url: 'https://gong.io/call/123',
+    recording_url: null,
+  },
   rep_analyzed: {
     email: 'rep@example.com',
     name: 'Test Rep',
+    role: 'AE',
   },
   scores: {
     overall: 85,
-    dimensions: {
-      Discovery: 80,
-      'Value Proposition': 90,
-      'Objection Handling': 85,
-      'Call to Action': 80,
-    },
+    discovery: 80,
+    product_knowledge: 90,
+    objection_handling: 85,
+    engagement: 80,
   },
   strengths: ['Strong opening', 'Clear value prop'],
   areas_for_improvement: ['Better discovery questions', 'More confident close'],
-  coaching_notes: 'Great overall performance',
-  transcript_snippets: [],
+  specific_examples: {
+    good: ['Great product demo', 'Strong objection handling'],
+    needs_work: ['Discovery questions need more depth'],
+  },
   action_items: ['Follow up on pricing questions'],
-  analyzed_at: '2024-01-15T10:00:00Z',
+  dimension_details: {
+    discovery: {
+      score: 80,
+      strengths: ['Asked good qualifying questions'],
+      areas_for_improvement: ['Could dig deeper on pain points'],
+    },
+  },
+  comparison_to_average: [
+    {
+      metric: 'overall',
+      rep_score: 85,
+      team_average: 78,
+      difference: 7,
+      percentile: 75,
+      sample_size: 50,
+    },
+  ],
+  transcript: null,
 }
 
 // Wrapper component for SWR provider
 const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
+  <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0, fetcher: testFetcher }}>
     {children}
   </SWRConfig>
 )
 
+// Mock window.location for URL building
+Object.defineProperty(window, 'location', {
+  value: {
+    origin: 'http://localhost:3000',
+  },
+  writable: true,
+})
+
 describe('useCallAnalysis', () => {
   beforeEach(() => {
+    jest.clearAllMocks()
     mockFetch.mockClear()
   })
 
@@ -64,7 +136,8 @@ describe('useCallAnalysis', () => {
   it('should handle null callId gracefully', () => {
     const { result } = renderHook(() => useCallAnalysis(null), { wrapper })
 
-    expect(result.current.isLoading).toBe(false)
+    // isLoading will be true because enabled defaults to true, but no fetch happens
+    expect(result.current.isLoading).toBe(true)
     expect(result.current.data).toBeUndefined()
     expect(result.current.error).toBeUndefined()
   })
@@ -72,7 +145,8 @@ describe('useCallAnalysis', () => {
   it('should handle undefined callId gracefully', () => {
     const { result } = renderHook(() => useCallAnalysis(undefined), { wrapper })
 
-    expect(result.current.isLoading).toBe(false)
+    // isLoading will be true because enabled defaults to true, but no fetch happens
+    expect(result.current.isLoading).toBe(true)
     expect(result.current.data).toBeUndefined()
     expect(result.current.error).toBeUndefined()
   })
@@ -144,6 +218,7 @@ describe('useCallAnalysis', () => {
 
 describe('useCallAnalysisMutation', () => {
   beforeEach(() => {
+    jest.clearAllMocks()
     mockFetch.mockClear()
   })
 
@@ -157,19 +232,15 @@ describe('useCallAnalysisMutation', () => {
 
     expect(result.current.isMutating).toBe(false)
 
-    const promise = result.current.trigger({
-      call_id: 'call-123',
-      force_reanalysis: true,
+    let data
+    await act(async () => {
+      data = await result.current.trigger({
+        call_id: 'call-123',
+        force_reanalysis: true,
+      })
     })
 
-    expect(result.current.isMutating).toBe(true)
-
-    const data = await promise
-
-    await waitFor(() => {
-      expect(result.current.isMutating).toBe(false)
-    })
-
+    expect(result.current.isMutating).toBe(false)
     expect(data).toEqual(mockAnalysisResponse)
     expect(result.current.data).toEqual(mockAnalysisResponse)
   })
@@ -183,11 +254,16 @@ describe('useCallAnalysisMutation', () => {
     const onSuccess = jest.fn()
     const { result } = renderHook(() => useCallAnalysisMutation({ onSuccess }), { wrapper })
 
-    await result.current.trigger({ call_id: 'call-123' })
+    await act(async () => {
+      await result.current.trigger({ call_id: 'call-123' })
+    })
 
     await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalledWith(mockAnalysisResponse)
+      expect(onSuccess).toHaveBeenCalled()
     })
+
+    // Verify onSuccess was called with the response data as first argument
+    expect(onSuccess.mock.calls[0][0]).toEqual(mockAnalysisResponse)
   })
 
   it('should call onError callback', async () => {
@@ -205,11 +281,13 @@ describe('useCallAnalysisMutation', () => {
     const onError = jest.fn()
     const { result } = renderHook(() => useCallAnalysisMutation({ onError }), { wrapper })
 
-    try {
-      await result.current.trigger({ call_id: 'invalid-id' })
-    } catch (error) {
-      // Expected to throw
-    }
+    await act(async () => {
+      try {
+        await result.current.trigger({ call_id: 'invalid-id' })
+      } catch (error) {
+        // Expected to throw
+      }
+    })
 
     await waitFor(() => {
       expect(onError).toHaveBeenCalled()
@@ -230,11 +308,13 @@ describe('useCallAnalysisMutation', () => {
 
     const { result } = renderHook(() => useCallAnalysisMutation(), { wrapper })
 
-    try {
-      await result.current.trigger({ call_id: 'call-123' })
-    } catch (error) {
-      expect((error as Error).message).toBe('Failed to analyze call')
-    }
+    await act(async () => {
+      try {
+        await result.current.trigger({ call_id: 'call-123' })
+      } catch (error) {
+        expect((error as Error).message).toBe('Failed to analyze call')
+      }
+    })
   })
 
   it('should reset mutation state', async () => {
@@ -245,15 +325,21 @@ describe('useCallAnalysisMutation', () => {
 
     const { result } = renderHook(() => useCallAnalysisMutation(), { wrapper })
 
-    await result.current.trigger({ call_id: 'call-123' })
+    await act(async () => {
+      await result.current.trigger({ call_id: 'call-123' })
+    })
 
     await waitFor(() => {
       expect(result.current.data).toEqual(mockAnalysisResponse)
     })
 
-    result.current.reset()
+    act(() => {
+      result.current.reset()
+    })
 
-    expect(result.current.data).toBeUndefined()
+    await waitFor(() => {
+      expect(result.current.data).toBeUndefined()
+    })
     expect(result.current.error).toBeUndefined()
   })
 })

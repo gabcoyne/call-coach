@@ -20,7 +20,9 @@ docs/
 │   ├── setup.md                       # Local development setup
 │   ├── architecture.md                # System architecture
 │   ├── adding-features.md             # Feature development guide
-│   └── testing.md                     # Testing guide
+│   └── testing.md                     # Testing guide (basic)
+├── testing-guide.md                   # Comprehensive TDD guide
+├── code-review.md                     # Code review checklist
 ├── deployment/
 │   ├── environment.md                 # Environment variables reference
 │   └── vercel.md                      # Vercel deployment guide
@@ -31,7 +33,7 @@ docs/
 
 ## Files Created
 
-### Main Documentation (16 files, ~35,000 words)
+### Main Documentation (18 files, ~60,000 words)
 
 **Documentation Index**:
 
@@ -45,11 +47,14 @@ docs/
 8. docs/developers/setup.md - Local development setup
 9. docs/developers/architecture.md - System architecture
 10. docs/developers/adding-features.md - Feature development guide
-11. docs/developers/testing.md - Testing guide
-12. docs/deployment/environment.md - Environment variables reference
-13. docs/deployment/vercel.md - Vercel deployment guide
-14. docs/troubleshooting/README.md - Troubleshooting guide
-15. docs/troubleshooting/api-errors.md - API error code reference
+11. docs/developers/testing.md - Testing guide (basic)
+12. docs/testing-guide.md - Comprehensive TDD and testing guide
+13. docs/code-review.md - Code review checklist with test quality criteria
+14. docs/deployment/environment.md - Environment variables reference
+15. docs/deployment/vercel.md - Vercel deployment guide
+16. docs/troubleshooting/README.md - Troubleshooting guide
+17. docs/troubleshooting/api-errors.md - API error code reference
+18. docs/TESTING_ROLE_AWARE_TOOLS.md - Role-aware tools testing documentation
 
 ## Documentation Topics Covered
 
@@ -139,16 +144,20 @@ docs/
 - Common patterns
 - Adding coaching dimensions
 
-**Testing**:
+**Testing** (2 comprehensive guides):
 
+- Test-Driven Development (TDD) workflow and Red-Green-Refactor cycle
+- Test types: Unit, Integration, E2E, Performance
 - Running tests (Python and Frontend)
-- Test structure
-- Writing tests with examples
-- Test fixtures and mocking
+- Test structure and organization
+- Writing effective tests with 15+ examples
+- Test fixtures, factories, and mocking strategies
+- Debugging failing tests with 6+ techniques
 - Coverage goals and measurement
 - CI/CD integration
 - Performance testing
-- Best practices
+- Best practices and common pitfalls
+- Code review checklist with test quality criteria
 
 ### Deployment Documentation (2 files)
 
@@ -396,11 +405,12 @@ Start here → [docs/api/README.md](./api/README.md)
 
 ### Documentation Size
 
-- Total files: 16 markdown documents
-- Total words: ~35,000
-- Total sections: 100+ major sections
-- Total examples: 50+ code examples
+- Total files: 18 markdown documents
+- Total words: ~60,000
+- Total sections: 140+ major sections
+- Total examples: 80+ code examples
 - Total diagrams: 5+ ASCII diagrams
+- Total checklists: 3+ comprehensive checklists
 
 ### Coverage
 
@@ -439,7 +449,8 @@ Start here → [docs/api/README.md](./api/README.md)
 - [Local Setup](./developers/setup.md) - Development environment
 - [Architecture](./developers/architecture.md) - System design
 - [Adding Features](./developers/adding-features.md) - Development guide
-- [Testing](./developers/testing.md) - Test suite
+- [Testing Guide](./testing-guide.md) - Comprehensive TDD and testing guide
+- [Code Review](./code-review.md) - Review checklist and test quality criteria
 
 **Deployment Documentation**
 

@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: call-coach-test-db
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: call_coach_test
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5433:5432"
+    volumes:
+      - test-db-data:/var/lib/postgresql/data
+    command: postgres -c log_statement=all -c log_destination=stderr
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d call_coach_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis-test:
+    image: redis:7-alpine
+    container_name: call-coach-test-redis
+    ports:
+      - "6380:6379"
+    command: redis-server --save "" --appendonly no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  test-db-data:

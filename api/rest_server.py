@@ -46,10 +46,8 @@ from coaching_mcp.tools.search_calls import search_calls_tool
 from db import queries
 from db.models import CoachingDimension, KnowledgeBaseCategory, Product
 from knowledge_base.loader import KnowledgeBaseManager
-from middleware.compression import CompressionMiddleware
 
 # Import middleware
-from middleware.rate_limit import RateLimitMiddleware
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

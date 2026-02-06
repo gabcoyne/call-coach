@@ -6,9 +6,17 @@ from pathlib import Path
 import pytest
 
 # Add project root to sys.path so imports resolve to our local modules first
-# This ensures tests import from local mcp/ module instead of installed fastmcp package
+# This ensures tests import from local modules instead of installed packages
+# IMPORTANT: Insert at position 0 to override tests/api with project api/
 project_root = Path(__file__).parent.parent
+if str(project_root) in sys.path:
+    sys.path.remove(str(project_root))
 sys.path.insert(0, str(project_root))
+
+# Also remove tests directory from sys.path if present to avoid shadowing
+tests_dir = Path(__file__).parent
+if str(tests_dir) in sys.path:
+    sys.path.remove(str(tests_dir))
 
 
 @pytest.fixture

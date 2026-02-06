@@ -26,7 +26,10 @@ const UpdateRoleSchema = z.object({
  *   "role": "ae" | "se" | "csm"
  * }
  */
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ email: string }> }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ email: string }> }
+) {
   try {
     // Check authentication
     const { userId } = await auth();
@@ -96,7 +99,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 /**
  * DELETE handler - Remove role assignment for a staff member
  */
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ email: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ email: string }> }
+) {
   try {
     // Check authentication
     const { userId } = await auth();

@@ -1,0 +1,76 @@
+name: Enforce Test Quality
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  block-on-test-failure:
+    name: Block Merge on Test Failures
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check Backend Tests Status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: checkRuns } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.payload.pull_request.head.sha,
+              status: 'completed'
+            });
+
+            const backendTest = checkRuns.check_runs.find(
+              run => run.name === 'Backend Tests Summary'
+            );
+
+            if (backendTest && backendTest.conclusion !== 'success') {
+              core.setFailed('❌ Backend tests must pass before merging');
+            }
+
+      - name: Check Frontend Tests Status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: checkRuns } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.payload.pull_request.head.sha,
+              status: 'completed'
+            });
+
+            const frontendTest = checkRuns.check_runs.find(
+              run => run.name === 'Frontend Tests Summary'
+            );
+
+            if (frontendTest && frontendTest.conclusion !== 'success') {
+              core.setFailed('❌ Frontend tests must pass before merging');
+            }
+
+      - name: Check Coverage Status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: statuses } = await github.rest.repos.getCombinedStatusForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.payload.pull_request.head.sha
+            });
+
+            const codecovStatus = statuses.statuses.find(
+              status => status.context.includes('codecov')
+            );
+
+            if (codecovStatus && codecovStatus.state !== 'success') {
+              core.setFailed('❌ Coverage requirements must be met before merging');
+            }
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "✅ All test quality checks passed"
+          echo "- Backend tests: passing"
+          echo "- Frontend tests: passing"
+          echo "- Coverage requirements: met"
