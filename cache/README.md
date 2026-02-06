@@ -5,6 +5,7 @@ Comprehensive caching layer for the call-coach project achieving 60-80% cache hi
 ### Architecture
 
 #### 1. Redis Cache Layer (`redis_client.py`)
+
 - **Purpose**: Distributed caching for coaching sessions
 - **Key Pattern**: `coaching:{dimension}:{transcript_hash}:{rubric_version}`
 - **TTL**: 90 days (configurable)
@@ -15,6 +16,7 @@ Comprehensive caching layer for the call-coach project achieving 60-80% cache hi
   - Cache invalidation on rubric updates
 
 #### 2. Prompt Caching (`prompt_cache.py`)
+
 - **Purpose**: Reduce Claude API costs by 90% for repeated content
 - **Cached Content**:
   - Role-specific rubrics (AE/SE/CSM) - quarterly updates
@@ -24,11 +26,13 @@ Comprehensive caching layer for the call-coach project achieving 60-80% cache hi
 - **Savings**: ~$0.027 per cached call (vs $0.003 uncached)
 
 #### 3. Database Optimizations (`db/performance/`)
+
 - **Indexes** (`indexes.sql`): 25+ performance indexes
 - **Queries** (`query_optimization.sql`): Optimized query functions
 - **Materialized Views**: Pre-computed rep performance summaries
 
 #### 4. Cache Warming (`warming.py`)
+
 - **Purpose**: Preload frequently accessed data
 - **Schedule**: Run daily or after rubric updates
 - **Warms**:
@@ -37,6 +41,7 @@ Comprehensive caching layer for the call-coach project achieving 60-80% cache hi
   - Active rep data
 
 #### 5. Monitoring (`monitoring/cache_stats.py`)
+
 - **Metrics**:
   - Cache hit/miss rates
   - Token savings
@@ -156,16 +161,19 @@ psql $DATABASE_URL -f db/performance/query_optimization.sql
 ### Performance Targets
 
 #### Cache Hit Rates
+
 - **Target**: 60-80%
 - **Typical**: 70-75% in production
 - **Measured**: Database cache (transcript hash deduplication)
 
 #### Cost Savings
+
 - **Prompt Caching**: 90% reduction on cached content
 - **Session Caching**: 100% reduction on cache hits
 - **Estimated Monthly Savings**: $50-200 (depends on volume)
 
 #### Query Performance
+
 - **Cache Lookup**: < 10ms (Redis)
 - **Rep Performance Summary**: < 50ms (with indexes)
 - **Call Search**: < 100ms (optimized queries)
@@ -173,12 +181,14 @@ psql $DATABASE_URL -f db/performance/query_optimization.sql
 ### API Performance Features
 
 #### Compression Middleware
+
 - **Implementation**: `api/middleware/compression.py`
 - **Algorithm**: gzip
 - **Threshold**: 1KB minimum size
 - **Typical Compression**: 70-85% reduction for JSON responses
 
 #### Rate Limiting
+
 - **Implementation**: `api/middleware/rate_limit.py`
 - **Algorithm**: Token bucket
 - **Limits**:
@@ -223,7 +233,9 @@ stats = get_cache_metrics(days_back=7)
 ### Troubleshooting
 
 #### Redis Not Available
+
 Cache gracefully degrades to database-only mode:
+
 ```python
 if not redis_cache.available:
     logger.warning("Redis unavailable, using database cache only")
@@ -231,12 +243,14 @@ if not redis_cache.available:
 ```
 
 #### Low Cache Hit Rate
+
 1. Check cache TTL: `CACHE_TTL_DAYS` in settings
 2. Verify rubric versions are stable
 3. Run cache warming: `python -m cache.warming`
 4. Check Redis memory: `redis-cli INFO memory`
 
 #### Slow Query Performance
+
 1. Verify indexes applied: `SELECT * FROM get_index_usage_stats();`
 2. Analyze query plans: `SELECT analyze_query_plan('YOUR QUERY');`
 3. Refresh materialized views: `SELECT refresh_rep_performance_view();`
@@ -244,6 +258,7 @@ if not redis_cache.available:
 ### Maintenance
 
 #### Daily Tasks (Automated)
+
 ```bash
 # Cache warming
 0 2 * * * python -m cache.warming --days 30
@@ -253,6 +268,7 @@ if not redis_cache.available:
 ```
 
 #### Weekly Tasks
+
 ```bash
 # Database maintenance
 0 4 * * 0 psql $DATABASE_URL -c "SELECT maintain_performance_tables();"
@@ -262,6 +278,7 @@ python -m monitoring.cache_stats --days 7 > cache_stats_weekly.json
 ```
 
 #### Monthly Tasks
+
 - Review cache hit rates and adjust TTLs
 - Analyze index usage: `SELECT * FROM get_index_usage_stats();`
 - Review cost savings reports
@@ -270,17 +287,20 @@ python -m monitoring.cache_stats --days 7 > cache_stats_weekly.json
 ### Cost Analysis
 
 #### Without Caching
+
 - 20 calls/day × 4 dimensions = 80 analyses/day
 - 80 analyses × 30K tokens × $0.003/1K = $7.20/day
 - Monthly cost: ~$216
 
 #### With Caching (70% hit rate)
+
 - Cache hits: 56 analyses (free)
 - Cache misses: 24 analyses × $0.09 = $2.16/day
 - Monthly cost: ~$65
 - **Monthly savings: ~$151 (70%)**
 
 #### With Prompt Caching
+
 - Additional 90% reduction on rubric/KB tokens (7K tokens)
 - Savings: ~$0.019 per analysis
 - Monthly additional savings: ~$46

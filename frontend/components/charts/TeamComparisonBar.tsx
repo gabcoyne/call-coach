@@ -1,7 +1,18 @@
-'use client';
+"use client";
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
-import { SCORE_COLORS } from '@/lib/colors';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+  ReferenceLine,
+} from "recharts";
+import { SCORE_COLORS } from "@/lib/colors";
 
 export interface TeamComparisonData {
   dimension: string;
@@ -35,7 +46,7 @@ export function TeamComparisonBar({
   showPercentile = false,
   roleFilter,
   height = 350,
-  className = '',
+  className = "",
 }: TeamComparisonBarProps) {
   if (!data || data.length === 0) {
     return (
@@ -49,9 +60,8 @@ export function TeamComparisonBar({
   }
 
   // Calculate average team performance across all dimensions
-  const avgTeamScore = data.length > 0
-    ? Math.round(data.reduce((sum, d) => sum + d.teamAverage, 0) / data.length)
-    : 0;
+  const avgTeamScore =
+    data.length > 0 ? Math.round(data.reduce((sum, d) => sum + d.teamAverage, 0) / data.length) : 0;
 
   // Function to determine bar color based on rep vs team
   const getBarColor = (repScore: number, teamAverage: number) => {
@@ -77,7 +87,12 @@ export function TeamComparisonBar({
             </p>
           ))}
           <p className="text-sm text-gray-600 mt-1">
-            Difference: <span className={diff > 0 ? 'text-green-600' : diff < 0 ? 'text-red-600' : 'text-gray-600'}>{diffLabel}</span>
+            Difference:{" "}
+            <span
+              className={diff > 0 ? "text-green-600" : diff < 0 ? "text-red-600" : "text-gray-600"}
+            >
+              {diffLabel}
+            </span>
           </p>
           {showPercentile && dataPoint.percentile !== undefined && (
             <p className="text-sm text-blue-600 mt-1">Percentile: {dataPoint.percentile}th</p>
@@ -91,10 +106,7 @@ export function TeamComparisonBar({
   return (
     <div className={className}>
       <ResponsiveContainer width="100%" height={height}>
-        <BarChart
-          data={data}
-          margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
-        >
+        <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 80 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="dimension"
@@ -108,7 +120,7 @@ export function TeamComparisonBar({
             domain={[0, 100]}
             tick={{ fontSize: 12 }}
             stroke="#6b7280"
-            label={{ value: 'Score', angle: -90, position: 'insideLeft' }}
+            label={{ value: "Score", angle: -90, position: "insideLeft" }}
           />
           {/* Reference line for team average */}
           <ReferenceLine
@@ -117,26 +129,18 @@ export function TeamComparisonBar({
             strokeDasharray="5 5"
             label={{
               value: `Team Avg: ${avgTeamScore}`,
-              position: 'right',
-              fill: '#6b7280',
+              position: "right",
+              fill: "#6b7280",
               fontSize: 11,
             }}
           />
           <Tooltip content={<CustomTooltip />} />
-          <Legend wrapperStyle={{ fontSize: '12px' }} />
+          <Legend wrapperStyle={{ fontSize: "12px" }} />
 
           {/* Rep score bars */}
-          <Bar
-            dataKey="repScore"
-            fill={SCORE_COLORS.HIGH}
-            name="Your Score"
-            radius={[6, 6, 0, 0]}
-          >
+          <Bar dataKey="repScore" fill={SCORE_COLORS.HIGH} name="Your Score" radius={[6, 6, 0, 0]}>
             {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={getBarColor(entry.repScore, entry.teamAverage)}
-              />
+              <Cell key={`cell-${index}`} fill={getBarColor(entry.repScore, entry.teamAverage)} />
             ))}
           </Bar>
 
@@ -155,7 +159,8 @@ export function TeamComparisonBar({
       {roleFilter && (
         <div className="mt-4 p-3 bg-gray-50 rounded-lg">
           <p className="text-xs text-gray-600">
-            Comparing {roleFilter} • Team average across all dimensions: <span className="font-semibold">{avgTeamScore}</span>
+            Comparing {roleFilter} • Team average across all dimensions:{" "}
+            <span className="font-semibold">{avgTeamScore}</span>
           </p>
         </div>
       )}

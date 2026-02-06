@@ -26,6 +26,7 @@ FastAPI server that exposes MCP tools as REST HTTP endpoints:
 - **Type Safety**: Pydantic models for request/response validation
 
 Available endpoints:
+
 - `POST /tools/analyze_call` - Analyze a specific call
 - `POST /tools/get_rep_insights` - Get rep performance trends
 - `POST /tools/search_calls` - Search calls with filters
@@ -37,17 +38,18 @@ Available endpoints:
 TypeScript HTTP client for calling the REST API:
 
 ```typescript
-const mcpClient = new MCPClient('http://localhost:8000');
+const mcpClient = new MCPClient("http://localhost:8000");
 
 // Example usage
 const analysis = await mcpClient.analyzeCall({
-  call_id: 'call-123',
+  call_id: "call-123",
   use_cache: true,
-  include_transcript_snippets: true
+  include_transcript_snippets: true,
 });
 ```
 
 Features:
+
 - **Retry Logic**: Exponential backoff for network errors
 - **Type Safety**: Full TypeScript interfaces
 - **Error Handling**: MCPClientError with status codes
@@ -61,6 +63,7 @@ SWR-based hooks for data fetching with caching:
 - `useSearchCalls(filters)` - Search calls with debouncing
 
 Features:
+
 - **Automatic Caching**: SWR handles cache invalidation
 - **Loading States**: Built-in loading/error states
 - **Revalidation**: Background data refresh
@@ -71,6 +74,7 @@ Features:
 #### Call Analysis Page (`/frontend/app/calls/[callId]/page.tsx`)
 
 Displays comprehensive call analysis with:
+
 - Call metadata (date, duration, participants)
 - Dimension scores (product knowledge, discovery, etc.)
 - Strengths and areas for improvement
@@ -80,6 +84,7 @@ Displays comprehensive call analysis with:
 #### Rep Dashboard (`/frontend/app/dashboard/[repEmail]/page.tsx`)
 
 Shows rep performance trends:
+
 - Overall score and call count
 - Score trends over time (line chart)
 - Dimension breakdown (score cards)
@@ -88,6 +93,7 @@ Shows rep performance trends:
 #### Search Page (`/frontend/app/search/page.tsx`)
 
 Filter and search calls:
+
 - Date range filter
 - Rep email filter (managers only)
 - Call type multi-select
@@ -159,11 +165,13 @@ curl -X POST http://localhost:8000/tools/search_calls \
 ### 2. Test Frontend Pages
 
 1. **Call Analysis**: Navigate to `http://localhost:3000/calls/{call_id}`
+
    - Should show loading skeleton
    - Then display full analysis with scores
    - Error handling with retry button
 
 2. **Rep Dashboard**: Navigate to `http://localhost:3000/dashboard/{email}`
+
    - Shows performance trends
    - Score charts render correctly
    - Recent calls are listed
@@ -306,5 +314,6 @@ Monitor these metrics in production:
 See `/api/rest_server.py` for complete API documentation with Pydantic models.
 
 FastAPI automatically generates interactive docs at:
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+
+- **Swagger UI**: <http://localhost:8000/docs>
+- **ReDoc**: <http://localhost:8000/redoc>

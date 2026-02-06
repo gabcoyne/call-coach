@@ -11,6 +11,7 @@ The performance suite is organized into four main components:
 Simulates realistic user load on the API using Locust.
 
 **Features:**
+
 - 100 concurrent users simulation
 - 1000+ coaching analyses
 - Multiple search query patterns
@@ -38,6 +39,7 @@ locust -f tests/performance/load_test.py \
 ```
 
 **Metrics Collected:**
+
 - Response time percentiles (P50, P95, P99)
 - Throughput (requests/second)
 - Error rate percentage
@@ -48,6 +50,7 @@ locust -f tests/performance/load_test.py \
 Pushes the system to its limits to identify breaking points.
 
 **Features:**
+
 - Gradual ramp-up from 10 to 1000 concurrent users
 - Automatic detection of breaking points
 - Tests recovery after failures
@@ -77,6 +80,7 @@ runner.print_summary()
 ```
 
 **Key Metrics:**
+
 - Breaking point identification (users at which system fails)
 - Error rates under load
 - Response times at different concurrency levels
@@ -89,6 +93,7 @@ runner.print_summary()
 Measures performance of individual API endpoints using pytest-benchmark.
 
 **Features:**
+
 - Endpoint-specific performance measurement
 - Cache vs. non-cache comparison
 - Complex query benchmarking
@@ -111,6 +116,7 @@ pytest benchmarks/api_benchmarks.py::TestAPIBenchmarks::test_analyze_call_cached
 ```
 
 **Benchmarked Endpoints:**
+
 - `/health` - Health check
 - `/tools/analyze_call` - Call analysis (cached/uncached/with transcript)
 - `/tools/get_rep_insights` - Rep insights (7/30/90 days, with product filter)
@@ -122,6 +128,7 @@ pytest benchmarks/api_benchmarks.py::TestAPIBenchmarks::test_analyze_call_cached
 Measures database query performance and identifies optimization opportunities.
 
 **Features:**
+
 - Query execution time tracking
 - Index usage verification
 - Connection pool performance
@@ -138,6 +145,7 @@ pytest benchmarks/db_benchmarks.py -k "complex_filters" -v
 ```
 
 **Measured Queries:**
+
 - Call metadata retrieval
 - Transcript fetching
 - Rep-based searches
@@ -151,6 +159,7 @@ pytest benchmarks/db_benchmarks.py -k "complex_filters" -v
 Measures Redis cache performance.
 
 **Features:**
+
 - GET/SET operation latency
 - Cache hit/miss scenarios
 - Serialization/deserialization overhead
@@ -168,6 +177,7 @@ pytest benchmarks/cache_benchmarks.py::TestCacheBenchmarks::test_cache_hit_scena
 ```
 
 **Measured Operations:**
+
 - Cache read/write latency
 - Batch operations
 - Pattern-based invalidation
@@ -187,6 +197,7 @@ pytest tests/performance/scenarios/coaching_analysis.py -v -m performance
 ```
 
 **Tests:**
+
 - Sequential analysis of 100 calls
 - Different dimension configurations
 - Cache effectiveness measurement
@@ -202,6 +213,7 @@ pytest tests/performance/scenarios/dashboard_load.py -v -m performance
 ```
 
 **Tests:**
+
 - Single rep dashboard load
 - Multi-rep dashboard load
 - Different time periods (7/30/90 days)
@@ -218,6 +230,7 @@ pytest tests/performance/scenarios/search.py -v -m performance
 ```
 
 **Tests:**
+
 - Simple searches
 - Product-filtered searches
 - Date range searches
@@ -248,11 +261,13 @@ Report is saved to: `benchmarks/reports/performance_report.html`
 ## CI/CD Integration
 
 The performance test pipeline (`.github/workflows/performance.yml`) runs automatically on:
+
 - Every pull request
 - Every push to main/develop
 - Daily schedule (2 AM UTC)
 
 **Pipeline Steps:**
+
 1. Set up test environment (PostgreSQL, Redis)
 2. Start API server
 3. Run API benchmarks (with regression detection)
@@ -264,6 +279,7 @@ The performance test pipeline (`.github/workflows/performance.yml`) runs automat
 9. Comment on PR with results
 
 **Regression Detection:**
+
 - Fails if mean response time increases >10%
 - Compares against baseline results
 - Posts warning comments on PRs
@@ -290,15 +306,16 @@ pytest benchmarks/cache_benchmarks.py \
 
 Recommended response time targets:
 
-| Endpoint | P50 | P95 | P99 |
-|----------|-----|-----|-----|
-| `/health` | <50ms | <100ms | <200ms |
-| `/tools/analyze_call` | <1000ms | <3000ms | <5000ms |
-| `/tools/get_rep_insights` | <500ms | <2000ms | <4000ms |
-| `/tools/search_calls` | <300ms | <1000ms | <2000ms |
+| Endpoint                     | P50     | P95     | P99     |
+| ---------------------------- | ------- | ------- | ------- |
+| `/health`                    | <50ms   | <100ms  | <200ms  |
+| `/tools/analyze_call`        | <1000ms | <3000ms | <5000ms |
+| `/tools/get_rep_insights`    | <500ms  | <2000ms | <4000ms |
+| `/tools/search_calls`        | <300ms  | <1000ms | <2000ms |
 | `/tools/analyze_opportunity` | <2000ms | <5000ms | <8000ms |
 
 **System Targets:**
+
 - Error rate: <1%
 - Throughput: >50 req/s (100 concurrent users)
 - Breaking point: >500 concurrent users
@@ -307,6 +324,7 @@ Recommended response time targets:
 ## Troubleshooting
 
 ### API Server Not Responding
+
 ```bash
 # Ensure API is running
 curl http://localhost:8000/health
@@ -316,6 +334,7 @@ python -m uvicorn api.rest_server:app --host 127.0.0.1 --port 8000
 ```
 
 ### Database Connection Issues
+
 ```bash
 # Check database is running
 psql postgresql://postgres:postgres@localhost:5432/call_coaching -c "SELECT 1"
@@ -325,6 +344,7 @@ echo $DATABASE_URL
 ```
 
 ### Redis Connection Issues
+
 ```bash
 # Check Redis is running
 redis-cli ping
@@ -334,6 +354,7 @@ echo $REDIS_URL
 ```
 
 ### Benchmark Regression Detected
+
 ```bash
 # Review the detailed report
 open benchmarks/reports/performance_report.html

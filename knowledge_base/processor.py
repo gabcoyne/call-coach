@@ -2,10 +2,10 @@
 Content processor for converting scraped HTML to structured markdown.
 Handles text cleanup, code extraction, and section hierarchy.
 """
+
 import logging
 import re
 from typing import Any
-from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +187,7 @@ class CompetitiveAnalysisLoader:
             Document structure with metadata
         """
         try:
-            with open(file_path, "r") as f:
+            with open(file_path) as f:
                 content = f.read()
 
             # Parse frontmatter if present

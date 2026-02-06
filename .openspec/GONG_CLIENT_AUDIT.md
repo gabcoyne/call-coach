@@ -2,7 +2,7 @@
 
 **Date**: 2026-02-04
 **OpenAPI Spec Version**: V2 (OpenAPI 3.0.1)
-**Spec Source**: https://gong.app.gong.io/ajax/settings/api/documentation/specs?version=
+**Spec Source**: <https://gong.app.gong.io/ajax/settings/api/documentation/specs?version=>
 
 ## Summary
 
@@ -13,6 +13,7 @@ Our `gong/client.py` implementation has **critical mismatches** with the officia
 ### 1. ❌ Transcript Endpoint - DOES NOT EXIST
 
 **Our Implementation**:
+
 ```python
 # Line 154 in gong/client.py
 def get_transcript(self, call_id: str) -> GongTranscript:
@@ -20,6 +21,7 @@ def get_transcript(self, call_id: str) -> GongTranscript:
 ```
 
 **Official Spec**:
+
 ```http
 POST /v2/calls/transcript
 Content-Type: application/json
@@ -35,6 +37,7 @@ Content-Type: application/json
 ```
 
 **Response Structure**:
+
 ```json
 {
   "requestId": "4al018gzaztcr8nbukw",
@@ -61,6 +64,7 @@ Content-Type: application/json
 ```
 
 **Impact**:
+
 - **High** - This endpoint doesn't exist. GET `/calls/{id}/transcript` is **not in the official spec**.
 - Our transcript retrieval will fail in production against real Gong API
 - Data structure returned is completely different:
@@ -75,6 +79,7 @@ Content-Type: application/json
 ### 2. ⚠️ Missing /v2 Prefix on All Endpoints
 
 **Our Implementation**:
+
 ```python
 # Line 105
 response = self._make_request("GET", f"/calls/{call_id}")
@@ -87,13 +92,16 @@ response = self._make_request("GET", "/calls/search", params=params)
 ```
 
 **Official Spec**:
+
 - All endpoints are under `/v2/` prefix: `/v2/calls`, `/v2/calls/{id}`, etc.
 
 **Impact**:
+
 - **Medium** - The `base_url` in our config includes `/v2` already (see `.env.example` line 4: `GONG_API_BASE_URL=https://api.gong.io/v2`)
 - If config is correct, this works. But it's brittle and confusing.
 
 **Fix Required**: Either:
+
 1. Remove `/v2` from `GONG_API_BASE_URL` and add it to all endpoint paths, OR
 2. Document clearly that base URL must include `/v2`
 
@@ -102,6 +110,7 @@ response = self._make_request("GET", "/calls/search", params=params)
 ### 3. ❌ Search Endpoint - DOES NOT EXIST
 
 **Our Implementation**:
+
 ```python
 # Line 252 in gong/client.py
 def search_calls(self, query: str, ...) -> list[str]:
@@ -109,14 +118,17 @@ def search_calls(self, query: str, ...) -> list[str]:
 ```
 
 **Official Spec**:
+
 - No `/v2/calls/search` endpoint exists
 - The spec provides GET `/v2/calls` with filters (fromDateTime, toDateTime, workspaceId)
 - No text search capability documented
 
 **Impact**:
+
 - **High** - This endpoint doesn't exist. Calls to `search_calls()` will fail with 404.
 
 **Fix Required**: Either:
+
 1. Remove `search_calls()` method entirely, OR
 2. Implement using GET `/v2/calls` with date filters (not text search)
 
@@ -127,12 +139,14 @@ def search_calls(self, query: str, ...) -> list[str]:
 ### ✅ Get Specific Call
 
 **Our Implementation**:
+
 ```python
 # Line 105
 response = self._make_request("GET", f"/calls/{call_id}")
 ```
 
 **Official Spec**:
+
 ```http
 GET /v2/calls/{id}
 ```
@@ -140,6 +154,7 @@ GET /v2/calls/{id}
 **Status**: ✅ **Correct** (assuming base_url includes `/v2`)
 
 **Response Schema Match**:
+
 - ✅ `call.id`, `call.title`, `call.scheduled`, `call.started`, `call.duration`
 - ✅ `call.participants` → our `GongSpeaker` mapping
 - ✅ `call.direction`, `call.system`, `call.scope`, `call.media`
@@ -149,6 +164,7 @@ GET /v2/calls/{id}
 ### ✅ List Calls
 
 **Our Implementation**:
+
 ```python
 # Line 204
 response = self._make_request("GET", "/calls", params={
@@ -160,6 +176,7 @@ response = self._make_request("GET", "/calls", params={
 ```
 
 **Official Spec**:
+
 ```http
 GET /v2/calls?fromDateTime=...&toDateTime=...&workspaceId=...&cursor=...
 ```
@@ -167,6 +184,7 @@ GET /v2/calls?fromDateTime=...&toDateTime=...&workspaceId=...&cursor=...
 **Status**: ✅ **Mostly Correct**
 
 **Issues**:
+
 - ⚠️ `limit` parameter is **not in the spec** - pagination uses `cursor` instead
 - ⚠️ Missing `cursor` support for pagination (spec returns `records.cursor` for next page)
 
@@ -177,6 +195,7 @@ GET /v2/calls?fromDateTime=...&toDateTime=...&workspaceId=...&cursor=...
 ## Authentication
 
 **Our Implementation**:
+
 ```python
 # Line 34
 self.client = httpx.Client(
@@ -187,12 +206,14 @@ self.client = httpx.Client(
 ```
 
 **Official Spec**:
+
 - `securitySchemes: null` in OpenAPI spec (not documented)
 - Documentation states: "When accessed through a Bearer token authorization method, this endpoint requires the scope 'api:calls:read:basic'"
 
 **Status**: ⚠️ **Unknown**
 
 Our implementation uses **Basic Auth** (API key as username, empty password). The spec documentation mentions **Bearer token** with scopes. The credentials provided by the user:
+
 - Access Key: `UQ4SK2LPUPBCFN7QHVLH6JRYEFSXEQML`
 - Secret Key (JWT): `eyJhbGciOiJIUzI1NiJ9...`
 
@@ -205,6 +226,7 @@ Our implementation uses **Basic Auth** (API key as username, empty password). Th
 ### Transcript Structure
 
 **Our GongTranscriptSegment**:
+
 ```python
 class GongTranscriptSegment:
     speaker_id: str
@@ -215,6 +237,7 @@ class GongTranscriptSegment:
 ```
 
 **Official Spec (Monologue + Sentence)**:
+
 ```typescript
 {
   speakerId: string
@@ -230,6 +253,7 @@ class GongTranscriptSegment:
 ```
 
 **Mismatches**:
+
 - ❌ We use `start_time` + `duration`, spec uses `start` + `end`
 - ❌ We have flat segments, spec groups by speaker `Monologue` with topic
 - ❌ We expect `sentiment`, spec doesn't provide it
@@ -242,6 +266,7 @@ class GongTranscriptSegment:
 ### Immediate (Blocking Production)
 
 1. **Rewrite `get_transcript()`**:
+
    ```python
    def get_transcript(self, call_id: str) -> GongTranscript:
        """Fetch transcript using POST /v2/calls/transcript endpoint."""
@@ -263,6 +288,7 @@ class GongTranscriptSegment:
    ```
 
 2. **Update `GongTranscriptSegment` model**:
+
    - Change `start_time` + `duration` to `start` + `end`
    - Add `topic` field
    - Remove `sentiment` (not in API response)
@@ -275,11 +301,13 @@ class GongTranscriptSegment:
 ### Medium Priority
 
 4. **Fix `list_calls()` pagination**:
+
    - Remove `limit` parameter
    - Add `cursor` parameter for pagination
    - Update return type to include cursor for next page
 
 5. **Clarify `/v2` prefix handling**:
+
    - Document in README that `GONG_API_BASE_URL` must include `/v2`
    - Or refactor to add `/v2` explicitly in endpoint paths
 
@@ -290,6 +318,7 @@ class GongTranscriptSegment:
 ### Nice-to-Have
 
 7. **Generate client from OpenAPI spec**:
+
    - Use `openapi-python-client` or similar to auto-generate
    - Ensures perfect alignment with official API
 
@@ -316,8 +345,8 @@ Before Phase 3 (Webhook Processing), verify:
 ## Reference
 
 - **OpenAPI Spec**: Saved to `.openspec/gong-api-v2-openapi.json`
-- **Official Docs**: https://help.gong.io/docs/what-the-gong-api-provides
-- **Endpoint Discovery**: https://gong.app.gong.io/ajax/settings/api/documentation/specs?version=
+- **Official Docs**: <https://help.gong.io/docs/what-the-gong-api-provides>
+- **Endpoint Discovery**: <https://gong.app.gong.io/ajax/settings/api/documentation/specs?version=>
 - **Authentication**: Test both Basic Auth and Bearer Token approaches
 
 ---

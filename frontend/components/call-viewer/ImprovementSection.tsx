@@ -6,10 +6,7 @@ interface ImprovementSectionProps {
   className?: string;
 }
 
-export function ImprovementSection({
-  improvements,
-  className,
-}: ImprovementSectionProps) {
+export function ImprovementSection({ improvements, className }: ImprovementSectionProps) {
   if (!improvements || improvements.length === 0) {
     return null;
   }

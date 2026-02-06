@@ -19,8 +19,8 @@ import { isManager } from "@/lib/auth-utils";
 export default function FeedPage() {
   const { user } = useUser();
   const [filters, setFilters] = useState<FeedFilterState>({
-    typeFilter: 'all',
-    timeFilter: 'this_week',
+    typeFilter: "all",
+    timeFilter: "this_week",
   });
   const [newItemsCount, setNewItemsCount] = useState(0);
   const loaderRef = useRef<HTMLDivElement>(null);
@@ -37,17 +37,8 @@ export default function FeedPage() {
     limit: 20,
   };
 
-  const {
-    data,
-    error,
-    size,
-    setSize,
-    isLoading,
-    isLoadingMore,
-    isEmpty,
-    isReachingEnd,
-    mutate,
-  } = useInfiniteFeed(filterOptions);
+  const { data, error, size, setSize, isLoading, isLoadingMore, isEmpty, isReachingEnd, mutate } =
+    useInfiniteFeed(filterOptions);
 
   // Infinite scroll observer
   useEffect(() => {
@@ -120,15 +111,11 @@ export default function FeedPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Coaching Feed</h1>
-        <p className="text-muted-foreground mt-1">
-          Latest insights, highlights, and team updates
-        </p>
+        <p className="text-muted-foreground mt-1">Latest insights, highlights, and team updates</p>
       </div>
 
       {/* New Items Banner */}
-      {newItemsCount > 0 && (
-        <NewItemsBanner count={newItemsCount} onRefresh={handleRefresh} />
-      )}
+      {newItemsCount > 0 && <NewItemsBanner count={newItemsCount} onRefresh={handleRefresh} />}
 
       {/* Filters */}
       <FeedFilters
@@ -172,9 +159,7 @@ export default function FeedPage() {
               <CardContent className="py-12">
                 <div className="flex flex-col items-center justify-center text-center">
                   <Inbox className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-lg font-medium text-muted-foreground">
-                    No items found
-                  </p>
+                  <p className="text-lg font-medium text-muted-foreground">No items found</p>
                   <p className="mt-2 text-sm text-muted-foreground">
                     Try adjusting your filters to see more items
                   </p>
@@ -193,9 +178,7 @@ export default function FeedPage() {
             {isLoadingMore && (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-prefect-blue-600" />
-                <span className="ml-2 text-sm text-muted-foreground">
-                  Loading more...
-                </span>
+                <span className="ml-2 text-sm text-muted-foreground">Loading more...</span>
               </div>
             )}
             {isReachingEnd && allItems.length > 0 && (
@@ -211,9 +194,7 @@ export default function FeedPage() {
           {/* Team Insights - Manager Only */}
           {userIsManager && teamInsights.length > 0 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-foreground">
-                Team Insights
-              </h2>
+              <h2 className="text-lg font-semibold text-foreground">Team Insights</h2>
               {teamInsights.slice(0, 3).map((insight) => (
                 <TeamInsightCard key={insight.id} insight={insight} />
               ))}
@@ -223,9 +204,7 @@ export default function FeedPage() {
           {/* Coaching Highlights */}
           {highlights.length > 0 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-foreground">
-                Coaching Highlights
-              </h2>
+              <h2 className="text-lg font-semibold text-foreground">Coaching Highlights</h2>
               {highlights.slice(0, 3).map((highlight) => (
                 <CoachingHighlightCard key={highlight.id} highlight={highlight} />
               ))}

@@ -6,10 +6,7 @@ interface StrengthsSectionProps {
   className?: string;
 }
 
-export function StrengthsSection({
-  strengths,
-  className,
-}: StrengthsSectionProps) {
+export function StrengthsSection({ strengths, className }: StrengthsSectionProps) {
   if (!strengths || strengths.length === 0) {
     return null;
   }

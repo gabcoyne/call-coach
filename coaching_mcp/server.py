@@ -2,11 +2,11 @@
 FastMCP Server for Gong Call Coaching Agent.
 Provides on-demand coaching tools accessible via Claude Desktop.
 """
+
 import argparse
 import logging
 import os
 import sys
-from pathlib import Path
 from typing import Any
 
 from fastmcp import FastMCP
@@ -55,13 +55,13 @@ def _validate_database_connection() -> None:
     Raises:
         SystemExit: If database connection fails or required tables are missing
     """
-    from db import fetch_one, fetch_all
+    from db import fetch_all, fetch_one
 
     try:
         # Verify sslmode is present for Neon
         if "sslmode=require" not in settings.database_url:
             logger.error("✗ DATABASE_URL must include sslmode=require for Neon")
-            logger.error(f"Example: postgresql://user:pass@host/db?sslmode=require")
+            logger.error("Example: postgresql://user:pass@host/db?sslmode=require")
             sys.exit(1)
 
         # Test connection with simple query
@@ -114,7 +114,7 @@ def _validate_database_connection_only() -> None:
         # Verify sslmode is present for Neon
         if "sslmode=require" not in settings.database_url:
             logger.error("✗ DATABASE_URL must include sslmode=require for Neon")
-            logger.error(f"Example: postgresql://user:pass@host/db?sslmode=require")
+            logger.error("Example: postgresql://user:pass@host/db?sslmode=require")
             sys.exit(1)
 
         # Test connection with simple query
@@ -152,8 +152,10 @@ def _validate_gong_api(dev_mode: bool = False) -> None:
         return
 
     from datetime import datetime, timedelta
-    from gong.client import GongClient, GongAPIError
+
     import httpx
+
+    from gong.client import GongAPIError, GongClient
 
     try:
         # Create client with short timeout for validation
@@ -208,7 +210,12 @@ def _validate_gong_api(dev_mode: bool = False) -> None:
     except GongAPIError as e:
         # Check for definitive auth failures (401, 403)
         error_str = str(e)
-        if "401" in error_str or "403" in error_str or "authentication" in error_str.lower() or "unauthorized" in error_str.lower():
+        if (
+            "401" in error_str
+            or "403" in error_str
+            or "authentication" in error_str.lower()
+            or "unauthorized" in error_str.lower()
+        ):
             logger.error("✗ Gong API authentication failed")
             logger.error("Verify GONG_API_KEY and GONG_API_SECRET are correct")
             sys.exit(1)
@@ -255,6 +262,7 @@ def _validate_anthropic_api() -> None:
 
     logger.info("✓ Anthropic API key validated")
 
+
 # Initialize FastMCP server
 mcp = FastMCP("Gong Call Coaching Agent")
 
@@ -297,11 +305,11 @@ def analyze_opportunity(opportunity_id: str) -> dict[str, Any]:
         Comprehensive opportunity analysis with coaching insights
     """
     from analysis.opportunity_coaching import (
-        analyze_opportunity_patterns,
-        identify_recurring_themes,
         analyze_objection_progression,
+        analyze_opportunity_patterns,
         assess_relationship_strength,
         generate_coaching_recommendations,
+        identify_recurring_themes,
     )
     from db import queries
 
@@ -607,7 +615,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dev",
         action="store_true",
-        help="Development mode with relaxed validation (skips Gong API check, basic DB check only)"
+        help="Development mode with relaxed validation (skips Gong API check, basic DB check only)",
     )
     args = parser.parse_args()
 

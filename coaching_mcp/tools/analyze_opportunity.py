@@ -1,18 +1,19 @@
 """
 MCP tool for analyzing opportunities with holistic coaching insights.
 """
+
 import logging
 from typing import Any
 
 from mcp.server import Server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 from analysis.opportunity_coaching import (
-    analyze_opportunity_patterns,
-    identify_recurring_themes,
     analyze_objection_progression,
+    analyze_opportunity_patterns,
     assess_relationship_strength,
     generate_coaching_recommendations,
+    identify_recurring_themes,
 )
 from db import queries
 
@@ -49,7 +50,9 @@ def register_analyze_opportunity_tool(server: Server):
             # Verify opportunity exists
             opp = queries.get_opportunity(opportunity_id)
             if not opp:
-                return [TextContent(type="text", text=f"Error: Opportunity not found: {opportunity_id}")]
+                return [
+                    TextContent(type="text", text=f"Error: Opportunity not found: {opportunity_id}")
+                ]
 
             # Run all analyses
             patterns = analyze_opportunity_patterns(opportunity_id)

@@ -4,9 +4,9 @@ Dashboard Load Performance Scenario
 Tests performance of loading the rep dashboard.
 Simulates: Rep metrics, call history, trend analysis, coaching recommendations.
 """
+
 import time
-import random
-from typing import List, Dict, Any
+
 import pytest
 
 
@@ -18,17 +18,18 @@ class TestDashboardLoadScenario:
     def dashboard_client(self):
         """Create HTTP client for dashboard."""
         import httpx
+
         return httpx.Client(base_url="http://localhost:8000", timeout=60.0)
 
     @pytest.fixture
-    def rep_emails(self) -> List[str]:
+    def rep_emails(self) -> list[str]:
         """Generate test rep emails."""
         return [f"rep_{i:02d}@example.com" for i in range(1, 51)]
 
     def test_load_dashboard_single_rep(
         self,
         dashboard_client,
-        rep_emails: List[str],
+        rep_emails: list[str],
         benchmark,
     ):
         """Benchmark loading dashboard for a single rep."""
@@ -91,7 +92,7 @@ class TestDashboardLoadScenario:
             }
 
         result = benchmark(load_dashboard)
-        print(f"\nDashboard Load Time (Single Rep):")
+        print("\nDashboard Load Time (Single Rep):")
         print(f"  Rep: {result['rep_email']}")
         print(f"  Total Load Time: {result['load_time']:.3f}s")
         print(f"  Components: {result['components_loaded']}/{result['total_components']}")
@@ -99,10 +100,11 @@ class TestDashboardLoadScenario:
     def test_load_dashboard_all_reps(
         self,
         dashboard_client,
-        rep_emails: List[str],
+        rep_emails: list[str],
         benchmark,
     ):
         """Benchmark loading dashboard for all reps."""
+
         def load_all_dashboards():
             total_time = 0
             successful_loads = 0
@@ -144,7 +146,7 @@ class TestDashboardLoadScenario:
     def test_dashboard_with_different_time_periods(
         self,
         dashboard_client,
-        rep_emails: List[str],
+        rep_emails: list[str],
     ):
         """Benchmark dashboard loading with different time periods."""
         rep_email = rep_emails[0]
@@ -169,19 +171,17 @@ class TestDashboardLoadScenario:
             elapsed = time.time() - start
             results[period] = elapsed
 
-        print(f"\nDashboard Load by Time Period:")
+        print("\nDashboard Load by Time Period:")
         for period, load_time in results.items():
             print(f"  {period}: {load_time:.3f}s")
 
     def test_dashboard_concurrent_rep_views(
         self,
         dashboard_client,
-        rep_emails: List[str],
+        rep_emails: list[str],
         benchmark,
     ):
         """Benchmark concurrent dashboard views for multiple reps."""
-        import asyncio
-        import httpx
 
         async def load_dashboards_concurrent():
             # Simulate concurrent loads
@@ -217,7 +217,7 @@ class TestDashboardLoadScenario:
     def test_dashboard_with_product_filter(
         self,
         dashboard_client,
-        rep_emails: List[str],
+        rep_emails: list[str],
     ):
         """Benchmark dashboard with product filtering."""
         rep_email = rep_emails[0]
@@ -243,14 +243,14 @@ class TestDashboardLoadScenario:
             elapsed = time.time() - start
             results[product] = elapsed
 
-        print(f"\nDashboard Load with Product Filters:")
+        print("\nDashboard Load with Product Filters:")
         for product, load_time in results.items():
             print(f"  {product}: {load_time:.3f}s")
 
     def test_dashboard_metrics_calculation(
         self,
         dashboard_client,
-        rep_emails: List[str],
+        rep_emails: list[str],
         benchmark,
     ):
         """Benchmark the calculation of dashboard metrics."""
@@ -278,13 +278,13 @@ class TestDashboardLoadScenario:
             return {"total_time": total_time}
 
         result = benchmark(calculate_metrics)
-        print(f"\nDashboard Metrics Calculation:")
+        print("\nDashboard Metrics Calculation:")
         print(f"  Total Time: {result['total_time']:.3f}s")
 
     def test_dashboard_caching_benefits(
         self,
         dashboard_client,
-        rep_emails: List[str],
+        rep_emails: list[str],
     ):
         """Measure caching benefits for repeated dashboard loads."""
         rep_email = rep_emails[0]
@@ -324,7 +324,7 @@ class TestDashboardLoadScenario:
         avg_repeated = sum(repeated_times) / len(repeated_times) if repeated_times else 0
         speedup = first_load_time / avg_repeated if avg_repeated > 0 else 0
 
-        print(f"\nDashboard Caching Benefits:")
+        print("\nDashboard Caching Benefits:")
         print(f"  First Load: {first_load_time:.3f}s")
         print(f"  Cached Load (avg): {avg_repeated:.3f}s")
         print(f"  Speedup: {speedup:.2f}x")

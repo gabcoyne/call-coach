@@ -4,19 +4,21 @@ Notification delivery and orchestration flow.
 Handles sending notifications via multiple channels (email, Slack, in-app)
 based on user preferences and notification type.
 """
+
 import logging
-from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
 
 from prefect import flow, task
 from prefect.task_runners import ConcurrentTaskRunner
 
-from notifications.in_app import InAppNotification, NotificationStore, NotificationBuilder, NotificationType, NotificationPriority
-from notifications.preferences import (
-    NotificationPreferencesManager,
-    DeliveryChannel,
+from notifications.in_app import (
+    NotificationBuilder,
+    NotificationPriority,
+    NotificationStore,
+    NotificationType,
 )
+from notifications.preferences import DeliveryChannel, NotificationPreferencesManager
 from notifications.slack_formatter import SlackFormatter
 from reports.email_sender import render_html_report
 
@@ -53,8 +55,9 @@ def send_coaching_insight_email(
     Returns:
         True if sent successfully
     """
-    from reports.email_sender import send_email_sendgrid, send_email_smtp, send_email_console
     import os
+
+    from reports.email_sender import send_email_console, send_email_sendgrid, send_email_smtp
 
     try:
         context = {
@@ -65,7 +68,9 @@ def send_coaching_insight_email(
             "insight_id": insight_id,
             "app_url": app_url,
             "unsubscribe_token": "placeholder",
-            "score_class": "high" if current_score >= 80 else "medium" if current_score >= 60 else "low",
+            "score_class": (
+                "high" if current_score >= 80 else "medium" if current_score >= 60 else "low"
+            ),
         }
 
         html_content = render_html_report("coaching_insight.html", context)
@@ -151,7 +156,7 @@ def send_slack_notification(
     try:
         response = httpx.post(webhook_url, json=blocks, timeout=10.0)
         response.raise_for_status()
-        logger.info(f"Sent Slack notification")
+        logger.info("Sent Slack notification")
         return True
 
     except Exception as e:
@@ -483,7 +488,9 @@ def send_notifications_flow(
             }
             results["details"].append(request_result)
 
-    logger.info(f"Notification flow completed: {results['successful']} successful, {results['failed']} failed")
+    logger.info(
+        f"Notification flow completed: {results['successful']} successful, {results['failed']} failed"
+    )
     return results
 
 

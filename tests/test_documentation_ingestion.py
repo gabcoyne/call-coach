@@ -1,14 +1,12 @@
 """
 Tests for documentation ingestion system.
 """
-import asyncio
-import json
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from knowledge_base.processor import ContentProcessor, CompetitiveAnalysisLoader
+from knowledge_base.processor import CompetitiveAnalysisLoader, ContentProcessor
 from knowledge_base.validator import ComplianceValidator, DocumentationValidator
 
 
@@ -63,8 +61,7 @@ class TestContentProcessor:
 
         assert processor._detect_code_language("import os\nfrom pathlib import Path") == "python"
         assert (
-            processor._detect_code_language("const x = 5; async function test() {}")
-            == "javascript"
+            processor._detect_code_language("const x = 5; async function test() {}") == "javascript"
         )
         assert processor._detect_code_language("SELECT * FROM users") == "sql"
         assert processor._detect_code_language("apiVersion: v1\nkind: Pod") == "yaml"

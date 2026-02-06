@@ -84,17 +84,20 @@ High-level overview of the Call Coach system design, components, and data flow.
 **Responsibility**: Integrate with Gong API
 
 **Key Files**:
+
 - `client.py` - Gong API client with retry logic
 - `webhook.py` - Webhook receiver with HMAC verification
 - `types.py` - Type definitions (Call, Transcript, Speaker)
 
 **Features**:
+
 - Get call metadata (title, participants, duration)
 - Fetch full transcript with speaker turns
 - Verify webhook signatures
 - Handle authentication
 
 **Example Usage**:
+
 ```python
 from gong.client import GongClient
 
@@ -112,6 +115,7 @@ with GongClient() as client:
 **Responsibility**: Receive and validate Gong webhooks
 
 **Flow**:
+
 1. Receive webhook from Gong
 2. Verify HMAC signature
 3. Check idempotency (gong_webhook_id)
@@ -129,6 +133,7 @@ with GongClient() as client:
 **Key Flows**:
 
 **process_new_call.py**
+
 - Triggered by webhook
 - Tasks:
   1. Fetch call metadata from Gong
@@ -140,6 +145,7 @@ with GongClient() as client:
 - Logs all steps
 
 **weekly_review.py**
+
 - Scheduled weekly (Monday 6 AM PT)
 - Tasks:
   1. Query calls from past week
@@ -157,6 +163,7 @@ with GongClient() as client:
 **Key Components**:
 
 **engine.py** - Main orchestration
+
 ```
 Input: Transcript
   ↓
@@ -176,23 +183,27 @@ Output: Coaching insights for each dimension
 ```
 
 **chunking.py** - Handle long transcripts
+
 - Sliding window with 20% overlap
 - Token counting with tiktoken
 - Handles 60+ minute calls (>80K tokens)
 - Preserves context in chunks
 
 **cache.py** - Intelligent result caching
+
 - Key: `hash(transcript + dimension + rubric_version)`
 - TTL: 30 days
 - Hit rate: 60-80%
 - Cost savings: 60-80%
 
 **learning_insights.py** - Extract learning points
+
 - Identify key themes
 - Extract evidence with timestamps
 - Generate recommendations
 
 **opportunity_coaching.py** - Analyze patterns
+
 - Recurring themes
 - Opportunity identification
 - Trend analysis
@@ -257,6 +268,7 @@ webhook_events
 ```
 
 **Key Features**:
+
 - Partitioned `coaching_sessions` table (quarterly)
 - Indexes on critical queries
 - Full-text search on transcripts
@@ -272,6 +284,7 @@ webhook_events
 **Framework**: FastAPI
 
 **Endpoints**:
+
 - `POST /coaching/analyze-call` - Analyze single call
 - `POST /coaching/rep-insights` - Get rep performance
 - `POST /coaching/search` - Search calls
@@ -279,6 +292,7 @@ webhook_events
 - `GET /health` - Health check
 
 **Features**:
+
 - CORS middleware for frontend
 - Request validation (Pydantic)
 - Error handling and logging
@@ -293,11 +307,13 @@ webhook_events
 **Protocol**: Model Context Protocol (MCP)
 
 **Tools Registered**:
+
 1. `analyze_call` - Analyze call for coaching
 2. `get_rep_insights` - Get rep performance
 3. `search_calls` - Search calls
 
 **Features**:
+
 - Environment validation on startup
 - Database connectivity check
 - Gong API credential validation
@@ -307,16 +323,19 @@ webhook_events
 **MCP Tools**:
 
 **tools/analyze_call.py**
+
 - Input: Gong call ID, focus area
 - Output: Coaching analysis
 - Calls: Gong API, Claude API, Database
 
 **tools/get_rep_insights.py**
+
 - Input: Rep email, time period
 - Output: Performance metrics, trends
 - Calls: Database, Claude API
 
 **tools/search_calls.py**
+
 - Input: Query, filters
 - Output: Call results
 - Calls: Database, full-text search
@@ -330,6 +349,7 @@ webhook_events
 **Port**: 3000
 
 **Key Pages**:
+
 - `/dashboard` - Rep performance dashboard
 - `/calls/[callId]` - Call analysis viewer
 - `/search` - Call search interface
@@ -339,12 +359,14 @@ webhook_events
 **Authentication**: Clerk
 
 **Components**:
+
 - SWR for data fetching
 - Recharts for visualizations
 - Shadcn/ui for components
 - Tailwind CSS for styling
 
 **API Integration**:
+
 - Calls REST API at `$NEXT_PUBLIC_MCP_BACKEND_URL`
 - Role-based UI (Manager vs Rep)
 - Real-time updates
@@ -442,6 +464,7 @@ webhook_events
 **Why**: Claude API calls are expensive (~$15 per 1M tokens)
 
 **How**:
+
 - Cache key: `hash(transcript + dimension + rubric_version)`
 - TTL: 30 days
 - Invalidated only when rubric version changes
@@ -453,6 +476,7 @@ webhook_events
 **Why**: 4 dimensions analyzed independently
 
 **How**:
+
 - Use Prefect's `ConcurrentTaskRunner`
 - Each dimension analyzed in parallel
 - Results combined after all complete
@@ -464,6 +488,7 @@ webhook_events
 **Why**: Claude has context limits (long calls > 4K tokens)
 
 **How**:
+
 - Sliding window with 20% overlap
 - Token counting with tiktoken
 - Analyze chunks separately
@@ -476,6 +501,7 @@ webhook_events
 **Why**: Gong webhooks might be retried
 
 **How**:
+
 - Use `gong_webhook_id` as unique key
 - Check before processing
 - Return success even if already processed
@@ -487,6 +513,7 @@ webhook_events
 **Why**: Webhook must return <500ms
 
 **How**:
+
 - Webhook server immediately returns 200 OK
 - Queue processing in Prefect flow
 - Analysis happens asynchronously
@@ -496,41 +523,46 @@ webhook_events
 
 ## Performance Characteristics
 
-| Operation | Time | Notes |
-|-----------|------|-------|
-| Webhook response | <500ms | Target SLA |
-| Analyze call (cold) | 30-45s | Claude API call |
-| Analyze call (cached) | <1s | From database |
-| Get rep insights | 45-120s | Analyzes multiple calls |
-| Search calls | 1-5s | Database query |
-| Parse transcript | <2s | Chunking + storage |
+| Operation             | Time    | Notes                   |
+| --------------------- | ------- | ----------------------- |
+| Webhook response      | <500ms  | Target SLA              |
+| Analyze call (cold)   | 30-45s  | Claude API call         |
+| Analyze call (cached) | <1s     | From database           |
+| Get rep insights      | 45-120s | Analyzes multiple calls |
+| Search calls          | 1-5s    | Database query          |
+| Parse transcript      | <2s     | Chunking + storage      |
 
 ## Scalability
 
 ### Horizontal Scaling
 
 **Webhook Server**: Stateless, can scale horizontally
+
 - Multiple instances behind load balancer
 - Share PostgreSQL database
 - No session state
 
 **Analysis Engine**: Can handle 100+ calls/week
+
 - Bottleneck: Claude API rate limits
 - Could queue longer with Prefect
 - Would need API rate increase
 
 **REST API**: Handles 100+ concurrent users
+
 - Neon connection pool (20 max)
 - Stateless design
 
 ### Vertical Scaling
 
 **Database**: PostgreSQL with partitioning
+
 - Quarterly partitions for coaching_sessions
 - Indexes on critical queries
 - Full-text search for transcripts
 
 **Memory**: Python processes use ~200MB each
+
 - Efficient token counting with tiktoken
 - Streaming responses when possible
 

@@ -88,10 +88,7 @@ export function PaginationControls({
       {/* Page size selector */}
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground">Per page:</span>
-        <Select
-          value={String(pageSize)}
-          onValueChange={(value) => onPageSizeChange(Number(value))}
-        >
+        <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
           <SelectTrigger className="w-[80px]">
             <SelectValue />
           </SelectTrigger>

@@ -8,14 +8,14 @@ Provides:
 """
 
 from instrumentation.logger import (
-    setup_structured_logging,
-    get_logger,
     get_correlation_id,
+    get_logger,
     set_correlation_id,
+    setup_structured_logging,
 )
 from instrumentation.profiler import (
-    get_performance_profiler,
     get_cpu_profiler,
+    get_performance_profiler,
     get_slow_request_detector,
     initialize_profiling,
     profile_request,

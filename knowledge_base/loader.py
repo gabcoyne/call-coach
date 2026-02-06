@@ -4,6 +4,7 @@ Knowledge Base Management with Version Control
 Manages loading, updating, and versioning of knowledge base entries
 including product documentation and coaching rubrics.
 """
+
 import hashlib
 import json
 import logging
@@ -311,9 +312,7 @@ class KnowledgeBaseManager:
         # Check if version already exists
         existing = self.get_rubric(category, rubric_data["version"], active_only=False)
         if existing:
-            raise ValueError(
-                f"Rubric {category.value} v{rubric_data['version']} already exists"
-            )
+            raise ValueError(f"Rubric {category.value} v{rubric_data['version']} already exists")
 
         # Deprecate previous active version
         execute_query(
@@ -366,9 +365,7 @@ class KnowledgeBaseManager:
         params = list(update_fields.values())
         params.append(str(rubric_id))
 
-        execute_query(
-            f"UPDATE coaching_rubrics SET {set_clause} WHERE id = %s", tuple(params)
-        )
+        execute_query(f"UPDATE coaching_rubrics SET {set_clause} WHERE id = %s", tuple(params))
 
         logger.info(f"Updated rubric {rubric_id}")
 
@@ -508,12 +505,8 @@ class KnowledgeBaseManager:
             "knowledge_base_entries": kb_count["count"] if kb_count else 0,
             "active_rubrics": rubric_count["count"] if rubric_count else 0,
             "total_rubric_versions": total_rubrics["count"] if total_rubrics else 0,
-            "entries_by_product": {
-                row["product"]: row["count"] for row in entries_by_product
-            },
-            "rubrics_by_category": {
-                row["category"]: row["count"] for row in rubrics_by_category
-            },
+            "entries_by_product": {row["product"]: row["count"] for row in entries_by_product},
+            "rubrics_by_category": {row["category"]: row["count"] for row in rubrics_by_category},
         }
 
 

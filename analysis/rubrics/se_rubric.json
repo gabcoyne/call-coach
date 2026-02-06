@@ -24,7 +24,7 @@
     {
       "id": "architecture_fit",
       "name": "Architecture Fit & Design",
-      "weight": 0.30,
+      "weight": 0.3,
       "criteria": [
         "Assesses customer's existing tech stack, infrastructure, and integration points",
         "Proposes architecture aligned with customer's constraints and requirements",
@@ -42,7 +42,7 @@
     {
       "id": "problem_solution_mapping",
       "name": "Problem-Solution Mapping",
-      "weight": 0.20,
+      "weight": 0.2,
       "criteria": [
         "Clearly connects customer's technical pain points to Prefect capabilities",
         "Maps customer workflows to concrete implementation patterns",
@@ -60,7 +60,7 @@
     {
       "id": "technical_objection_resolution",
       "name": "Technical Objection Resolution",
-      "weight": 0.10,
+      "weight": 0.1,
       "criteria": [
         "Addresses technical concerns and objections with data and evidence",
         "Acknowledges product limitations honestly and offers workarounds",

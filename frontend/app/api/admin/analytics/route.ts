@@ -13,10 +13,7 @@ export async function GET(request: NextRequest) {
     // Check authentication
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - please sign in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
     }
 
     // Check manager authorization
@@ -24,10 +21,7 @@ export async function GET(request: NextRequest) {
     const userRole = user?.publicMetadata?.role;
 
     if (userRole !== "manager") {
-      return NextResponse.json(
-        { error: "Forbidden - manager access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
     }
 
     // Coaching dimensions with score distributions

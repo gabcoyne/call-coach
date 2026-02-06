@@ -10,16 +10,16 @@ Generates comprehensive weekly coaching reports for each rep, including:
 
 Scheduled to run every Monday at 6am.
 """
+
 import json
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
-from uuid import UUID
 
 from prefect import flow, task
 from prefect.task_runners import ConcurrentTaskRunner
 
-from db import fetch_all, fetch_one, queries
+from db import fetch_all
 from db.models import CoachingDimension
 
 logger = logging.getLogger(__name__)
@@ -137,9 +137,7 @@ def aggregate_coaching_scores(
     )
 
     # Calculate overall average
-    overall_avg = (
-        sum(score["avg_score"] for score in scores) / len(scores) if scores else None
-    )
+    overall_avg = sum(score["avg_score"] for score in scores) / len(scores) if scores else None
 
     result = {
         "by_dimension": {
@@ -247,9 +245,7 @@ def identify_recurring_objections(
                     )
 
     # Sort by frequency
-    result = sorted(
-        objection_patterns.values(), key=lambda x: x["count"], reverse=True
-    )
+    result = sorted(objection_patterns.values(), key=lambda x: x["count"], reverse=True)
 
     logger.info(f"Identified {len(result)} objection patterns for {rep_email}")
     return result
@@ -314,9 +310,9 @@ def calculate_trend_vs_previous_week(
             "current_score": overall_current,
             "previous_score": overall_previous,
             "change": round(overall_change, 1),
-            "percent_change": round((overall_change / overall_previous * 100), 1)
-            if overall_previous > 0
-            else 0,
+            "percent_change": (
+                round((overall_change / overall_previous * 100), 1) if overall_previous > 0 else 0
+            ),
             "direction": (
                 "up" if overall_change > 0 else "down" if overall_change < 0 else "stable"
             ),
@@ -376,7 +372,11 @@ def generate_rep_report_markdown(
         overall_line = f"- **Overall Score:** {scores['overall_avg']}/100"
         if "overall" in trends:
             trend = trends["overall"]
-            emoji = "📈" if trend["direction"] == "up" else "📉" if trend["direction"] == "down" else "➡️"
+            emoji = (
+                "📈"
+                if trend["direction"] == "up"
+                else "📉" if trend["direction"] == "down" else "➡️"
+            )
             overall_line += f" {emoji} ({trend['change']:+.1f} from last week)"
         report_lines.append(overall_line)
 
@@ -413,9 +413,7 @@ def generate_rep_report_markdown(
     if objections:
         report_lines.extend(["---", "", "## Recurring Themes & Objections", ""])
         for obj in objections[:5]:  # Top 5
-            report_lines.extend(
-                [f"### {obj['type']} ({obj['count']} occurrences)", ""]
-            )
+            report_lines.extend([f"### {obj['type']} ({obj['count']} occurrences)", ""])
 
             if obj["examples"]:
                 report_lines.append("**Examples:**")
@@ -435,7 +433,11 @@ def generate_rep_report_markdown(
     for call in calls:
         call_title = call.get("title") or "Untitled Call"
         call_date = call["scheduled_at"].strftime("%a %b %d")
-        call_type = call.get("call_type", "").replace("_", " ").title() if call.get("call_type") else "General"
+        call_type = (
+            call.get("call_type", "").replace("_", " ").title()
+            if call.get("call_type")
+            else "General"
+        )
         report_lines.append(f"- **{call_title}** ({call_type}) - {call_date}")
 
     # Action items
@@ -451,14 +453,10 @@ def generate_rep_report_markdown(
 
     # Generate recommendations based on lowest scores
     if scores["by_dimension"]:
-        sorted_dims = sorted(
-            scores["by_dimension"].items(), key=lambda x: x[1]["avg_score"]
-        )
+        sorted_dims = sorted(scores["by_dimension"].items(), key=lambda x: x[1]["avg_score"])
         lowest_dim = sorted_dims[0]
         dim_label = lowest_dim[0].replace("_", " ").title()
-        report_lines.append(
-            f"1. **{dim_label}** - Current score: {lowest_dim[1]['avg_score']}/100"
-        )
+        report_lines.append(f"1. **{dim_label}** - Current score: {lowest_dim[1]['avg_score']}/100")
 
         if len(sorted_dims) > 1:
             second_dim = sorted_dims[1]
@@ -474,7 +472,15 @@ def generate_rep_report_markdown(
             f"3. **Address {top_objection['type']}** - Recurring {top_objection['count']} times"
         )
 
-    report_lines.extend(["", "---", "", f"*Report generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}*", ""])
+    report_lines.extend(
+        [
+            "",
+            "---",
+            "",
+            f"*Report generated: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M UTC')}*",
+            "",
+        ]
+    )
 
     return "\n".join(report_lines)
 
@@ -540,8 +546,9 @@ def post_to_slack(summary_text: str, webhook_url: str | None = None) -> bool:
     Returns:
         True if posted successfully, False otherwise
     """
-    from coaching_mcp.shared import settings
     import httpx
+
+    from coaching_mcp.shared import settings
 
     url = webhook_url or settings.slack_webhook_url
 
@@ -612,7 +619,7 @@ def weekly_review_flow(
 
     # Default to last 7 days if not specified
     if not week_end:
-        week_end = datetime.now(timezone.utc)
+        week_end = datetime.now(UTC)
     if not week_start:
         week_start = week_end - timedelta(days=7)
 
@@ -767,9 +774,7 @@ def _prepare_email_report_data(
     # Generate action items
     action_items = []
     if scores["by_dimension"]:
-        sorted_dims = sorted(
-            scores["by_dimension"].items(), key=lambda x: x[1]["avg_score"]
-        )
+        sorted_dims = sorted(scores["by_dimension"].items(), key=lambda x: x[1]["avg_score"])
         lowest_dim = sorted_dims[0]
         dim_label = lowest_dim[0].replace("_", " ").title()
         action_items.append(
@@ -816,9 +821,7 @@ def _build_slack_summary(
     ]
 
     # Sort by overall score (highest first)
-    sorted_stats = sorted(
-        stats, key=lambda x: x.get("overall_score") or 0, reverse=True
-    )
+    sorted_stats = sorted(stats, key=lambda x: x.get("overall_score") or 0, reverse=True)
 
     for stat in sorted_stats:
         name = stat["name"]
@@ -842,7 +845,7 @@ def _build_slack_summary(
             "",
             "_Individual reports sent via email (if enabled)_",
             "",
-            f"🤖 Generated by Gong Call Coaching Agent",
+            "🤖 Generated by Gong Call Coaching Agent",
         ]
     )
 

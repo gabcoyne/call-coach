@@ -8,8 +8,8 @@ This package provides:
 - Performance monitoring
 """
 
-from .rate_limit import RateLimitMiddleware
 from .compression import CompressionMiddleware
+from .rate_limit import RateLimitMiddleware
 
 __all__ = [
     "RateLimitMiddleware",

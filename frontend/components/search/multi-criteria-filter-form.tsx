@@ -61,12 +61,7 @@ export function MultiCriteriaFilterForm({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Search Filters</CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onReset}
-            className="h-8 px-2"
-          >
+          <Button variant="ghost" size="sm" onClick={onReset} className="h-8 px-2">
             <X className="h-4 w-4 mr-1" />
             Reset
           </Button>
@@ -119,9 +114,7 @@ export function MultiCriteriaFilterForm({
                 <SelectItem value="">All Types</SelectItem>
                 <SelectItem value="discovery">Discovery</SelectItem>
                 <SelectItem value="demo">Demo</SelectItem>
-                <SelectItem value="technical_deep_dive">
-                  Technical Deep Dive
-                </SelectItem>
+                <SelectItem value="technical_deep_dive">Technical Deep Dive</SelectItem>
                 <SelectItem value="negotiation">Negotiation</SelectItem>
               </SelectContent>
             </Select>
@@ -135,15 +128,11 @@ export function MultiCriteriaFilterForm({
               type="datetime-local"
               value={
                 filters.date_range?.start
-                  ? new Date(filters.date_range.start)
-                      .toISOString()
-                      .slice(0, 16)
+                  ? new Date(filters.date_range.start).toISOString().slice(0, 16)
                   : ""
               }
               onChange={(e) => {
-                const value = e.target.value
-                  ? new Date(e.target.value).toISOString()
-                  : "";
+                const value = e.target.value ? new Date(e.target.value).toISOString() : "";
                 updateDateRange("start", value);
               }}
             />
@@ -161,9 +150,7 @@ export function MultiCriteriaFilterForm({
                   : ""
               }
               onChange={(e) => {
-                const value = e.target.value
-                  ? new Date(e.target.value).toISOString()
-                  : "";
+                const value = e.target.value ? new Date(e.target.value).toISOString() : "";
                 updateDateRange("end", value);
               }}
             />

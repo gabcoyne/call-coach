@@ -83,15 +83,16 @@ npm test -- --updateSnapshot
 Tests for utility functions, helpers, and pure logic.
 
 **Example**:
+
 ```typescript
 // lib/__tests__/utils.test.ts
-import { cn } from '../utils'
+import { cn } from "../utils";
 
-describe('cn utility', () => {
-  it('should merge class names', () => {
-    expect(cn('px-2', 'py-1')).toBe('px-2 py-1')
-  })
-})
+describe("cn utility", () => {
+  it("should merge class names", () => {
+    expect(cn("px-2", "py-1")).toBe("px-2 py-1");
+  });
+});
 ```
 
 **Coverage**: Utility functions in `lib/`
@@ -103,20 +104,21 @@ describe('cn utility', () => {
 Tests for custom React hooks, especially SWR hooks.
 
 **Example**:
+
 ```typescript
 // lib/hooks/__tests__/useCallAnalysis.test.tsx
-import { renderHook, waitFor } from '@testing-library/react'
-import { useCallAnalysis } from '../useCallAnalysis'
+import { renderHook, waitFor } from "@testing-library/react";
+import { useCallAnalysis } from "../useCallAnalysis";
 
-describe('useCallAnalysis', () => {
-  it('should fetch call analysis', async () => {
-    const { result } = renderHook(() => useCallAnalysis('call-123'))
+describe("useCallAnalysis", () => {
+  it("should fetch call analysis", async () => {
+    const { result } = renderHook(() => useCallAnalysis("call-123"));
 
     await waitFor(() => {
-      expect(result.current.data).toBeDefined()
-    })
-  })
-})
+      expect(result.current.data).toBeDefined();
+    });
+  });
+});
 ```
 
 **Coverage**: All hooks in `lib/hooks/`
@@ -128,6 +130,7 @@ describe('useCallAnalysis', () => {
 Tests for UI components focusing on rendering and user interactions.
 
 **Example**:
+
 ```typescript
 // components/ui/__tests__/button.test.tsx
 import { render, screen } from '@testing-library/react'
@@ -156,27 +159,28 @@ describe('Button', () => {
 Tests for API routes with mocked MCP backend.
 
 **Example**:
+
 ```typescript
 // app/api/coaching/analyze-call/__tests__/route.test.ts
-import { POST } from '../route'
-import { mcpClient } from '@/lib/mcp-client'
+import { POST } from "../route";
+import { mcpClient } from "@/lib/mcp-client";
 
-jest.mock('@/lib/mcp-client')
+jest.mock("@/lib/mcp-client");
 
-describe('POST /api/coaching/analyze-call', () => {
-  it('should analyze call successfully', async () => {
-    mcpClient.analyzeCall.mockResolvedValue(mockResponse)
+describe("POST /api/coaching/analyze-call", () => {
+  it("should analyze call successfully", async () => {
+    mcpClient.analyzeCall.mockResolvedValue(mockResponse);
 
-    const request = new NextRequest('http://localhost', {
-      method: 'POST',
-      body: JSON.stringify({ call_id: 'call-123' }),
-    })
+    const request = new NextRequest("http://localhost", {
+      method: "POST",
+      body: JSON.stringify({ call_id: "call-123" }),
+    });
 
-    const response = await POST(request, mockAuthContext)
+    const response = await POST(request, mockAuthContext);
 
-    expect(response.status).toBe(200)
-  })
-})
+    expect(response.status).toBe(200);
+  });
+});
 ```
 
 **Coverage**: API routes in `app/api/`
@@ -186,6 +190,7 @@ describe('POST /api/coaching/analyze-call', () => {
 Tests for authentication flows, RBAC, and Clerk integration.
 
 **Scenarios**:
+
 - Sign up flow
 - Sign in flow
 - Role assignment (manager vs. rep)
@@ -197,20 +202,21 @@ Tests for authentication flows, RBAC, and Clerk integration.
 Tests for mobile, tablet, and desktop viewports.
 
 **Example**:
+
 ```typescript
-describe('Mobile responsiveness', () => {
+describe("Mobile responsiveness", () => {
   beforeEach(() => {
-    window.matchMedia = jest.fn().mockImplementation(query => ({
-      matches: query === '(max-width: 768px)',
+    window.matchMedia = jest.fn().mockImplementation((query) => ({
+      matches: query === "(max-width: 768px)",
       media: query,
       // ...
-    }))
-  })
+    }));
+  });
 
-  it('should show mobile menu on small screens', () => {
+  it("should show mobile menu on small screens", () => {
     // Test mobile-specific behavior
-  })
-})
+  });
+});
 ```
 
 ## Writing Tests
@@ -218,53 +224,58 @@ describe('Mobile responsiveness', () => {
 ### Best Practices
 
 1. **Test Behavior, Not Implementation**
+
    ```typescript
    // Good: Test what user sees
-   expect(screen.getByText('Analysis complete')).toBeInTheDocument()
+   expect(screen.getByText("Analysis complete")).toBeInTheDocument();
 
    // Bad: Test internal state
-   expect(component.state.isLoading).toBe(false)
+   expect(component.state.isLoading).toBe(false);
    ```
 
 2. **Use Semantic Queries**
+
    ```typescript
    // Prefer (in order):
-   screen.getByRole('button', { name: /submit/i })
-   screen.getByLabelText('Email')
-   screen.getByText('Welcome')
+   screen.getByRole("button", { name: /submit/i });
+   screen.getByLabelText("Email");
+   screen.getByText("Welcome");
 
    // Avoid:
-   screen.getByTestId('submit-button')
+   screen.getByTestId("submit-button");
    ```
 
 3. **Async Testing**
+
    ```typescript
    // Use waitFor for async assertions
    await waitFor(() => {
-     expect(screen.getByText('Loaded')).toBeInTheDocument()
-   })
+     expect(screen.getByText("Loaded")).toBeInTheDocument();
+   });
 
    // Use findBy for elements that appear asynchronously
-   const element = await screen.findByText('Loaded')
+   const element = await screen.findByText("Loaded");
    ```
 
 4. **User Event Simulation**
+
    ```typescript
    // Use user-event for realistic interactions
-   const user = userEvent.setup()
-   await user.click(button)
-   await user.type(input, 'test@example.com')
+   const user = userEvent.setup();
+   await user.click(button);
+   await user.type(input, "test@example.com");
    ```
 
 5. **Mocking API Calls**
+
    ```typescript
    // Mock fetch for API tests
    global.fetch = jest.fn(() =>
      Promise.resolve({
        ok: true,
-       json: () => Promise.resolve({ data: 'mock' }),
+       json: () => Promise.resolve({ data: "mock" }),
      })
-   ) as jest.Mock
+   ) as jest.Mock;
    ```
 
 ### Test Structure
@@ -365,6 +376,7 @@ npx lighthouse http://localhost:3000 --only-categories=accessibility
 ```
 
 **Target Scores**:
+
 - Accessibility: 95+
 - Best Practices: 90+
 - Performance: 85+
@@ -382,6 +394,7 @@ npm run analyze
 ```
 
 **Bundle Size Targets**:
+
 - First Load JS: < 200 KB
 - Total Page Size: < 500 KB
 - Time to Interactive (TTI): < 3s
@@ -399,23 +412,25 @@ k6 run load-test.js
 ```
 
 **Example k6 script**:
+
 ```javascript
-import http from 'k6/http'
-import { check, sleep } from 'k6'
+import http from "k6/http";
+import { check, sleep } from "k6";
 
 export const options = {
   vus: 50, // 50 virtual users
-  duration: '30s',
-}
+  duration: "30s",
+};
 
 export default function () {
-  const res = http.get('http://localhost:3000/api/coaching/analyze-call')
-  check(res, { 'status is 200': (r) => r.status === 200 })
-  sleep(1)
+  const res = http.get("http://localhost:3000/api/coaching/analyze-call");
+  check(res, { "status is 200": (r) => r.status === 200 });
+  sleep(1);
 }
 ```
 
 **Performance Targets**:
+
 - API response time (p95): < 500ms
 - API response time (p99): < 1s
 - Throughput: > 100 req/s
@@ -442,7 +457,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: npm ci
@@ -473,27 +488,30 @@ npx husky add .husky/pre-commit "npm test -- --onlyChanged"
 ### Common Issues
 
 1. **Tests timing out**
+
    ```typescript
    // Increase timeout for slow tests
-   it('should complete', async () => {
+   it("should complete", async () => {
      // ...
-   }, 10000) // 10 second timeout
+   }, 10000); // 10 second timeout
    ```
 
 2. **Mock not working**
+
    ```typescript
    // Clear mocks between tests
    beforeEach(() => {
-     jest.clearAllMocks()
-   })
+     jest.clearAllMocks();
+   });
    ```
 
 3. **Act warnings**
+
    ```typescript
    // Wrap state updates in act
    await waitFor(() => {
-     expect(screen.getByText('Updated')).toBeInTheDocument()
-   })
+     expect(screen.getByText("Updated")).toBeInTheDocument();
+   });
    ```
 
 4. **Module resolution errors**

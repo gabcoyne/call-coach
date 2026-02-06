@@ -9,16 +9,19 @@ This document describes the SWR (Stale-While-Revalidate) data fetching implement
 ### Core Components
 
 1. **Global SWR Configuration** (`lib/swr-config.ts`)
+
    - Default fetcher with authentication
    - Revalidation settings
    - Error retry logic with exponential backoff
    - Utility functions for API URL building and error handling
 
 2. **SWR Provider** (`lib/swr-provider.tsx`)
+
    - Wraps the application with global SWR configuration
    - Should be added to root layout.tsx
 
 3. **Custom Hooks** (`lib/hooks/`)
+
    - `useCallAnalysis` - Fetch call analysis data
    - `useRepInsights` - Fetch rep performance insights
    - `useSearchCalls` - Search calls with filters
@@ -89,9 +92,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <ClerkProvider>
-          <SWRProvider>
-            {children}
-          </SWRProvider>
+          <SWRProvider>{children}</SWRProvider>
         </ClerkProvider>
       </body>
     </html>
@@ -171,13 +172,7 @@ function CallSearch() {
   if (isLoading) return <div>Searching...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-  return (
-    <div>
-      {data?.map((call) => (
-        <CallCard key={call.call_id} call={call} />
-      ))}
-    </div>
-  );
+  return <div>{data?.map((call) => <CallCard key={call.call_id} call={call} />)}</div>;
 }
 ```
 
@@ -359,6 +354,7 @@ All hooks are designed to work seamlessly with the backend API routes:
 - `/api/coaching/search-calls` - Call search endpoint
 
 The hooks automatically:
+
 - Include credentials (Clerk session cookies)
 - Set appropriate headers
 - Handle authentication errors

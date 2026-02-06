@@ -29,10 +29,7 @@ function formatDate(dateString: string | null): string {
   }
 }
 
-function calculateTalkTimePercentage(
-  talkTimeSeconds: number,
-  totalDuration: number
-): number {
+function calculateTalkTimePercentage(talkTimeSeconds: number, totalDuration: number): number {
   if (totalDuration === 0) return 0;
   return Math.round((talkTimeSeconds / totalDuration) * 100);
 }
@@ -56,9 +53,7 @@ export function CallMetadataHeader({ metadata }: CallMetadataHeaderProps) {
               {metadata.call_type && (
                 <div className="flex items-center gap-1">
                   <VideoIcon className="h-4 w-4" />
-                  <span className="capitalize">
-                    {metadata.call_type.replace(/_/g, " ")}
-                  </span>
+                  <span className="capitalize">{metadata.call_type.replace(/_/g, " ")}</span>
                 </div>
               )}
             </div>

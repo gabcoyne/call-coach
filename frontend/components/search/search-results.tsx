@@ -72,11 +72,7 @@ export function SearchResults({ results, isLoading }: SearchResultsProps) {
       </div>
 
       {/* Results Display */}
-      {viewMode === "card" ? (
-        <CardView results={results} />
-      ) : (
-        <TableView results={results} />
-      )}
+      {viewMode === "card" ? <CardView results={results} /> : <TableView results={results} />}
     </div>
   );
 }
@@ -88,9 +84,7 @@ function CardView({ results }: { results: CallSearchResult[] }) {
         <Card key={result.call_id} className="hover:shadow-lg transition-shadow">
           <CardHeader>
             <div className="flex items-start justify-between gap-2">
-              <CardTitle className="text-base line-clamp-2">
-                {result.title}
-              </CardTitle>
+              <CardTitle className="text-base line-clamp-2">{result.title}</CardTitle>
               {result.overall_score !== null && (
                 <ScoreBadge score={result.overall_score} size="sm" />
               )}
@@ -168,17 +162,12 @@ function TableView({ results }: { results: CallSearchResult[] }) {
             </thead>
             <tbody>
               {results.map((result) => (
-                <tr
-                  key={result.call_id}
-                  className="border-b hover:bg-muted/50 transition-colors"
-                >
+                <tr key={result.call_id} className="border-b hover:bg-muted/50 transition-colors">
                   <td className="p-3">
                     <div className="line-clamp-1 max-w-xs">{result.title}</div>
                   </td>
                   <td className="p-3 text-sm text-muted-foreground">
-                    {result.date
-                      ? new Date(result.date).toLocaleDateString()
-                      : "—"}
+                    {result.date ? new Date(result.date).toLocaleDateString() : "—"}
                   </td>
                   <td className="p-3">
                     {result.call_type && (

@@ -23,10 +23,7 @@ export async function GET(request: NextRequest) {
     // Check authentication
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - please sign in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
     }
 
     // Check manager authorization
@@ -34,10 +31,7 @@ export async function GET(request: NextRequest) {
     const userRole = user?.publicMetadata?.role;
 
     if (userRole !== "manager") {
-      return NextResponse.json(
-        { error: "Forbidden - manager access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
     }
 
     // Get all Prefect staff emails from speakers table
@@ -47,9 +41,7 @@ export async function GET(request: NextRequest) {
     const roleAssignments = await db.list_all_staff_roles();
 
     // Create a map of email -> role assignment
-    const roleMap = new Map(
-      roleAssignments.map((r: any) => [r.email, r])
-    );
+    const roleMap = new Map(roleAssignments.map((r: any) => [r.email, r]));
 
     // Merge staff with their role assignments
     const staffWithRoles = prefectStaff.map((staff: any) => {
@@ -77,7 +69,6 @@ export async function GET(request: NextRequest) {
       total: staffWithRoles.length,
       with_roles: roleAssignments.length,
     });
-
   } catch (error: any) {
     console.error("Failed to list staff roles:", error);
     return NextResponse.json(

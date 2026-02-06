@@ -4,12 +4,9 @@ API Endpoint Benchmarks
 Measures performance of individual API endpoints using pytest-benchmark.
 Tracks performance over time and detects regressions.
 """
-import pytest
-import httpx
-from typing import Dict, List
-import json
-from pathlib import Path
 
+import httpx
+import pytest
 
 # Baseline thresholds for performance regression detection
 PERFORMANCE_THRESHOLDS = {
@@ -43,6 +40,7 @@ class TestAPIBenchmarks:
 
     def test_health_check(self, benchmark, api_client):
         """Benchmark health check endpoint."""
+
         def make_request():
             response = api_client.get("/health")
             assert response.status_code == 200
@@ -152,6 +150,7 @@ class TestAPIBenchmarks:
 
     def test_search_calls_simple(self, benchmark, api_client):
         """Benchmark search_calls with minimal filters."""
+
         def make_request():
             response = api_client.post(
                 "/tools/search_calls",
@@ -165,6 +164,7 @@ class TestAPIBenchmarks:
 
     def test_search_calls_with_product_filter(self, benchmark, api_client, test_data):
         """Benchmark search_calls with product filter."""
+
         def make_request():
             response = api_client.post(
                 "/tools/search_calls",
@@ -246,6 +246,7 @@ class TestAPIBenchmarkRegression:
 
     def test_no_regression_health(self, benchmark, api_client):
         """Ensure health check doesn't regress."""
+
         def make_request():
             api_client.get("/health")
 
@@ -271,6 +272,7 @@ class TestAPIBenchmarkRegression:
 
     def test_no_regression_search_calls(self, benchmark, api_client):
         """Ensure search_calls doesn't regress."""
+
         def make_request():
             api_client.post(
                 "/tools/search_calls",

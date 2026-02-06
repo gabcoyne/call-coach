@@ -4,7 +4,7 @@
 - [x] 1.2 Enable email/password authentication method in Clerk Dashboard
 - [x] 1.3 Enable Google OAuth authentication method in Clerk Dashboard
 - [x] 1.4 Configure publicMetadata schema to include `role` field (string type)
-- [x] 1.5 Copy publishable key (pk_test_*) and secret key (sk_test_*) from Clerk Dashboard
+- [x] 1.5 Copy publishable key (pk*test\*\*) and secret key (sk*test\*\*) from Clerk Dashboard
 - [x] 1.6 Update frontend/.env.local with NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 - [x] 1.7 Update frontend/.env.local with CLERK_SECRET_KEY
 - [x] 1.8 Restart Next.js dev server and verify app loads without authentication error
@@ -131,10 +131,10 @@
 
 - [ ] 10.1 Connect GitHub repository to Vercel account
 - [ ] 10.2 Configure Vercel project settings: framework (Next.js), root directory (frontend/)
-- [ ] 10.3 Add production environment variable: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY (pk_live_*)
-- [ ] 10.4 Add production environment variable: CLERK_SECRET_KEY (sk_live_*)
+- [ ] 10.3 Add production environment variable: NEXT*PUBLIC_CLERK_PUBLISHABLE_KEY (pk_live*\*)
+- [ ] 10.4 Add production environment variable: CLERK*SECRET_KEY (sk_live*\*)
 - [ ] 10.5 Add production environment variable: NEXT_PUBLIC_MCP_BACKEND_URL (production backend URL)
-- [ ] 10.6 Add production environment variable: NEXT_PUBLIC_APP_URL (https://coaching.prefect.io)
+- [ ] 10.6 Add production environment variable: NEXT_PUBLIC_APP_URL (<https://coaching.prefect.io>)
 - [ ] 10.7 Configure custom domain: coaching.prefect.io pointing to Vercel
 - [ ] 10.8 Enable Vercel Analytics in project settings
 - [x] 10.9 Configure security headers in vercel.json: CSP, HSTS, X-Frame-Options

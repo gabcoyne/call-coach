@@ -1,10 +1,8 @@
 """Tests for transcript chunking module."""
+
 import pytest
-from analysis.chunking import (
-    chunk_transcript,
-    split_by_speakers,
-    calculate_chunk_tokens,
-)
+
+from analysis.chunking import calculate_chunk_tokens, chunk_transcript, split_by_speakers
 
 
 @pytest.fixture

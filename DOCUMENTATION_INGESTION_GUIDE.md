@@ -9,25 +9,29 @@ Built a complete product documentation ingestion system for Call Coach. This sys
 ### Core Ingestion System
 
 1. **`knowledge_base/scrapers/base_scraper.py`**
+
    - Abstract base class for all scrapers
    - Implements rate limiting, retry logic, session management
    - Respectful crawling with user-agent and delay handling
    - ~150 lines
 
 2. **`knowledge_base/scrapers/prefect_docs.py`**
-   - Scrapes https://docs.prefect.io
+
+   - Scrapes <https://docs.prefect.io>
    - Handles pagination and breadth limiting (500 pages max)
    - Categorizes content (guide, concept, API, tutorial, FAQ)
    - Extracts code examples and section structure
    - ~160 lines
 
 3. **`knowledge_base/scrapers/horizon_docs.py`**
+
    - Scrapes Prefect Horizon documentation
    - Categories: account management, configuration, deployment, auth, integrations
    - Similar rate limiting and retry patterns
    - ~160 lines
 
 4. **`knowledge_base/processor.py`**
+
    - Converts raw HTML to structured markdown
    - ContentProcessor class handles:
      - Text cleaning and normalization
@@ -38,6 +42,7 @@ Built a complete product documentation ingestion system for Call Coach. This sys
    - ~280 lines
 
 5. **`knowledge_base/db_loader.py`**
+
    - Database integration for storing documents
    - KnowledgeBaseDBLoader class manages:
      - Document upsert (insert/update)
@@ -57,6 +62,7 @@ Built a complete product documentation ingestion system for Call Coach. This sys
 ### Orchestration & Scripts
 
 7. **`scripts/ingest_docs.py`**
+
    - Main ingestion pipeline script
    - DocumentationIngestionPipeline class:
      - Orchestrates scraping, processing, storage
@@ -93,6 +99,7 @@ Built a complete product documentation ingestion system for Call Coach. This sys
 ### Documentation & Tests
 
 10. **`knowledge_base/INGESTION_README.md`**
+
     - Comprehensive documentation
     - Architecture overview
     - Usage examples (CLI, Python API, Prefect)
@@ -101,6 +108,7 @@ Built a complete product documentation ingestion system for Call Coach. This sys
     - ~400 lines
 
 11. **`tests/test_documentation_ingestion.py`**
+
     - Unit tests for all components
     - Tests for:
       - Content processing and cleaning
@@ -183,6 +191,7 @@ Built a complete product documentation ingestion system for Call Coach. This sys
 ## Key Features
 
 ### 1. Respectful Web Scraping
+
 - 2-second rate limiting between requests
 - Proper User-Agent identification
 - Exponential backoff on failures
@@ -190,6 +199,7 @@ Built a complete product documentation ingestion system for Call Coach. This sys
 - Async operations for performance
 
 ### 2. Smart Content Processing
+
 - HTML to markdown conversion
 - Code language auto-detection (Python, JavaScript, SQL, YAML, JSON, etc.)
 - Section hierarchy extraction
@@ -197,6 +207,7 @@ Built a complete product documentation ingestion system for Call Coach. This sys
 - Content length validation
 
 ### 3. Change Detection
+
 - SHA256 hashing of content
 - Database version tracking
 - Automatic change flagging
@@ -204,12 +215,14 @@ Built a complete product documentation ingestion system for Call Coach. This sys
 - Content similarity scoring
 
 ### 4. Validation Layers
+
 - **Structure**: Required fields, URL format, content length
 - **Compliance**: SEO metadata, accessibility standards
 - **Links**: Concurrent HTTP validation, status tracking
 - **Completeness**: Section count, code example presence
 
 ### 5. Database Integration
+
 - Upsert semantics (insert or update)
 - Version history with timestamps
 - Ingestion job tracking
@@ -217,6 +230,7 @@ Built a complete product documentation ingestion system for Call Coach. This sys
 - Link validation persistence
 
 ### 6. Scheduling & Orchestration
+
 - Prefect flow for weekly updates
 - Job status tracking
 - Error handling and retries
@@ -226,6 +240,7 @@ Built a complete product documentation ingestion system for Call Coach. This sys
 ## Integration Points
 
 ### 1. Coaching System
+
 ```python
 # Get product knowledge from ingested docs
 from knowledge_base.db_loader import KnowledgeBaseDBLoader
@@ -240,6 +255,7 @@ for doc in prefect_docs:
 ```
 
 ### 2. Search & Retrieval
+
 ```python
 # Get document sections for semantic search
 from knowledge_base.db_loader import KnowledgeBaseDBLoader
@@ -250,6 +266,7 @@ from knowledge_base.db_loader import KnowledgeBaseDBLoader
 ```
 
 ### 3. Monitoring Dashboard
+
 ```python
 # Track ingestion health
 from knowledge_base.db_loader import KnowledgeBaseDBLoader
@@ -262,6 +279,7 @@ print(f"Updated: {summary['total_updated']}")
 ```
 
 ### 4. Admin Notifications
+
 ```python
 # Changes are reported via Prefect artifacts
 # Accessible at: Prefect Cloud > Artifacts > knowledge-base-update
@@ -271,6 +289,7 @@ print(f"Updated: {summary['total_updated']}")
 ## Usage Patterns
 
 ### One-Time Ingestion
+
 ```bash
 # Ingest all sources
 python scripts/ingest_docs.py
@@ -283,6 +302,7 @@ python scripts/ingest_docs.py --output /custom/path
 ```
 
 ### Programmatic Usage
+
 ```python
 import asyncio
 from scripts.ingest_docs import DocumentationIngestionPipeline
@@ -300,6 +320,7 @@ asyncio.run(main())
 ```
 
 ### Scheduled Updates (Prefect)
+
 ```bash
 # Deploy the flow
 prefect deploy flows/update_knowledge.py
@@ -316,6 +337,7 @@ prefect worker start -p default
 ## Configuration Customization
 
 ### Adjust Rate Limiting
+
 ```python
 from knowledge_base.scrapers.prefect_docs import PrefectDocsScraper
 
@@ -324,11 +346,13 @@ scraper.rate_limit_delay = 5.0  # 5 seconds between requests
 ```
 
 ### Limit Crawl Depth
+
 ```python
 scraper.max_pages = 100  # Smaller scope for testing
 ```
 
 ### Content Length Constraints
+
 ```python
 processor = ContentProcessor()
 processor.min_content_length = 200
@@ -336,6 +360,7 @@ processor.max_content_length = 100000
 ```
 
 ### Link Validation Timeout
+
 ```python
 validator = DocumentationValidator(timeout=60)
 ```
@@ -343,29 +368,34 @@ validator = DocumentationValidator(timeout=60)
 ## Database Schema
 
 ### knowledge_base
+
 - Primary table for all documents
 - Stores cleaned markdown content
 - Tracks product, category, last update
 
 ### knowledge_base_versions
+
 - Complete history of document changes
 - SHA256 content hashing
 - Change detection triggers
 - Previous version access
 
 ### ingestion_jobs
+
 - One record per pipeline run
 - Tracks scraping, processing, storage stats
 - Error logging
 - Performance metrics
 
 ### document_sections
+
 - Indexed sections for search
 - Supports vector embeddings
 - Links back to parent document
 - Code example indicators
 
 ### knowledge_base_links
+
 - All links extracted from documents
 - Validation status and timestamps
 - HTTP status codes
@@ -374,24 +404,28 @@ validator = DocumentationValidator(timeout=60)
 ## Performance Considerations
 
 ### Scraping
+
 - Async HTTP operations for concurrency
 - Rate limiting to avoid DoS
 - Exponential backoff for failures
 - Session pooling efficiency
 
 ### Processing
+
 - Single-pass HTML parsing
 - Regex-based text cleaning
 - Lazy section extraction
 - Memory-efficient for large documents
 
 ### Database
+
 - Bulk insert support
 - Indexed queries for common patterns
 - Version table partitioning ready
 - Connection pooling via psycopg2-binary
 
 ### Validation
+
 - Concurrent link checking (batch)
 - Early exit on structural failures
 - Lazy metadata computation
@@ -399,6 +433,7 @@ validator = DocumentationValidator(timeout=60)
 ## Testing
 
 Run tests:
+
 ```bash
 # All ingestion tests
 pytest tests/test_documentation_ingestion.py -v
@@ -411,6 +446,7 @@ pytest tests/test_documentation_ingestion.py --cov=knowledge_base --cov-report=h
 ```
 
 Coverage includes:
+
 - Text processing and cleaning
 - Document structure validation
 - Link extraction and validation
@@ -421,6 +457,7 @@ Coverage includes:
 ## Future Enhancements
 
 ### Phase 1 (Current)
+
 - [x] Web scraping infrastructure
 - [x] Content processing pipeline
 - [x] Database integration
@@ -429,6 +466,7 @@ Coverage includes:
 - [x] Prefect orchestration
 
 ### Phase 2 (Next)
+
 - [ ] Vector embeddings for semantic search
 - [ ] Real-time link checking
 - [ ] A/B testing impact on coaching
@@ -436,6 +474,7 @@ Coverage includes:
 - [ ] Multi-language support
 
 ### Phase 3 (Future)
+
 - [ ] Automatic competitor analysis
 - [ ] Customer case study extraction
 - [ ] Pricing intelligence
@@ -445,6 +484,7 @@ Coverage includes:
 ## Monitoring & Maintenance
 
 ### Weekly Checks
+
 ```sql
 -- Check ingestion success rate
 SELECT source, COUNT(*),
@@ -469,6 +509,7 @@ GROUP BY product, category;
 ```
 
 ### Error Patterns
+
 - If scraper hangs: Check network, increase timeout
 - If links fail: May be behind auth, check robots.txt
 - If storage fails: Verify database migrations applied
@@ -477,6 +518,7 @@ GROUP BY product, category;
 ## Troubleshooting
 
 ### Database Migration Issues
+
 ```bash
 # Check if migrations are applied
 psql $DATABASE_URL -c "SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename;"
@@ -486,6 +528,7 @@ psql $DATABASE_URL -f db/migrations/005_knowledge_base_ingestion.sql
 ```
 
 ### Import Errors
+
 ```bash
 # Ensure dependencies installed
 pip install beautifulsoup4 pyyaml
@@ -495,6 +538,7 @@ pip install -e .
 ```
 
 ### Scraper Blocking
+
 ```bash
 # Check if site blocks bot User-Agent
 # Edit scraper to identify as browser if needed
@@ -504,6 +548,7 @@ pip install -e .
 ## Summary
 
 The documentation ingestion system is production-ready with:
+
 - 2,000+ lines of code across 6 core modules
 - Comprehensive error handling and validation
 - Database schema for versioning and change tracking
@@ -512,6 +557,7 @@ The documentation ingestion system is production-ready with:
 - Detailed documentation and guides
 
 Integration with Call Coach enables:
+
 1. Always up-to-date product knowledge
 2. Competitive intelligence tracking
 3. Better coaching context

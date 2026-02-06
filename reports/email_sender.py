@@ -7,10 +7,10 @@ Supports multiple email providers:
 - SMTP (generic)
 - Console logging (for development)
 """
+
 import logging
 import os
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -87,9 +87,7 @@ def send_email_sendgrid(
             logger.info(f"Email sent successfully to {to_email} via SendGrid")
             return True
         else:
-            logger.error(
-                f"SendGrid API returned status {response.status_code}: {response.body}"
-            )
+            logger.error(f"SendGrid API returned status {response.status_code}: {response.body}")
             return False
 
     except ImportError:

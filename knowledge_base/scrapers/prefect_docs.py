@@ -2,6 +2,7 @@
 Scraper for Prefect documentation (docs.prefect.io).
 Extracts features, use cases, API documentation, and tutorials.
 """
+
 import logging
 from typing import Any
 from urllib.parse import urljoin

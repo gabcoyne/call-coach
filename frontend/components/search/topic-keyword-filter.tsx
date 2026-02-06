@@ -14,10 +14,7 @@ interface TopicKeywordFilterProps {
   onFiltersChange: (filters: Partial<SearchCallsRequest>) => void;
 }
 
-export function TopicKeywordFilter({
-  filters,
-  onFiltersChange,
-}: TopicKeywordFilterProps) {
+export function TopicKeywordFilter({ filters, onFiltersChange }: TopicKeywordFilterProps) {
   const [inputValue, setInputValue] = useState("");
 
   const topics = filters.topics || [];
@@ -85,11 +82,7 @@ export function TopicKeywordFilter({
               <Label>Active Topics ({topics.length})</Label>
               <div className="flex flex-wrap gap-2">
                 {topics.map((topic) => (
-                  <Badge
-                    key={topic}
-                    variant="secondary"
-                    className="pl-2 pr-1 py-1"
-                  >
+                  <Badge key={topic} variant="secondary" className="pl-2 pr-1 py-1">
                     {topic}
                     <button
                       onClick={() => removeTopic(topic)}
@@ -104,8 +97,7 @@ export function TopicKeywordFilter({
           )}
 
           <p className="text-sm text-muted-foreground">
-            Search for calls containing specific topics or keywords in
-            transcripts and analysis
+            Search for calls containing specific topics or keywords in transcripts and analysis
           </p>
         </div>
       </CardContent>

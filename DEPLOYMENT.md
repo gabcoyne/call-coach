@@ -165,6 +165,7 @@ psql $DATABASE_URL -c "\\dt"
 ```
 
 Expected tables:
+
 - `calls`
 - `opportunities`
 - `emails`
@@ -251,6 +252,7 @@ git push origin main
 ```
 
 Vercel will:
+
 1. Detect the push
 2. Run build command
 3. Deploy to production
@@ -384,18 +386,20 @@ curl -X POST \
 To change cron schedule:
 
 1. Edit `vercel.json`:
+
    ```json
    {
      "crons": [
        {
          "path": "/api/cron/daily-sync",
-         "schedule": "0 */4 * * *"  // Every 4 hours
+         "schedule": "0 */4 * * *" // Every 4 hours
        }
      ]
    }
    ```
 
 2. Commit and push:
+
    ```bash
    git add vercel.json
    git commit -m "chore: update cron schedule"
@@ -424,6 +428,7 @@ Monitor deployments:
 **Symptom**: Build fails with TypeScript errors
 
 **Solution**:
+
 ```bash
 # Test build locally
 cd frontend
@@ -438,6 +443,7 @@ npm run lint
 **Symptom**: "Connection refused" or "Too many connections"
 
 **Solution**:
+
 - Verify `DATABASE_URL` uses pooler endpoint
 - Reduce `DATABASE_POOL_MAX_SIZE` to match Neon plan limits
 - Check Neon dashboard for connection count
@@ -447,6 +453,7 @@ npm run lint
 **Symptom**: API requests timeout after function is idle
 
 **Solution**:
+
 - Increase function `maxDuration` in `vercel.json`
 - Optimize database queries
 - Consider Vercel Pro plan for faster cold starts
@@ -456,6 +463,7 @@ npm run lint
 **Symptom**: Sync doesn't run or fails silently
 
 **Solution**:
+
 - Check function logs in Vercel dashboard
 - Verify `CRON_SECRET` is set correctly
 - Test endpoint manually with curl
@@ -556,7 +564,7 @@ vercel rollback <deployment-url>
 Before going live:
 
 - [ ] All environment variables use production values
-- [ ] Clerk uses live keys (pk_live_*, sk_live_*)
+- [ ] Clerk uses live keys (pk*live\*\*, sk*live\*\*)
 - [ ] Database uses strong passwords
 - [ ] CRON_SECRET is securely generated
 - [ ] CSP headers configured (in vercel.json)
@@ -575,6 +583,7 @@ Before going live:
 - **Clerk Docs**: [clerk.com/docs](https://clerk.com/docs)
 
 For issues, check:
+
 1. Vercel build logs
 2. Function runtime logs
 3. Database connection status
@@ -612,18 +621,21 @@ Regular maintenance tasks:
 Vercel pricing (as of 2025):
 
 **Hobby Plan** (Free):
+
 - 100 GB bandwidth
 - Serverless function execution
 - Automatic HTTPS
 - Suitable for: Development, small teams
 
 **Pro Plan** ($20/month):
+
 - 1 TB bandwidth
 - Faster builds and cold starts
 - Commercial use
 - Suitable for: Production deployment
 
 **Additional Costs**:
+
 - Neon Postgres: Free tier includes 0.5 GB storage
 - Clerk: Free tier includes 10,000 MAUs
 - Anthropic: Pay-as-you-go API usage

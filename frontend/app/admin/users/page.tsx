@@ -75,9 +75,7 @@ export default function AdminUsersPage() {
       const query = searchQuery.toLowerCase();
       setFilteredStaff(
         staff.filter(
-          (s) =>
-            s.email.toLowerCase().includes(query) ||
-            s.name.toLowerCase().includes(query)
+          (s) => s.email.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)
         )
       );
     }
@@ -159,9 +157,7 @@ export default function AdminUsersPage() {
       }
 
       // Update local state
-      setStaff((prev) =>
-        prev.map((s) => (s.email === email ? { ...s, role: role || null } : s))
-      );
+      setStaff((prev) => prev.map((s) => (s.email === email ? { ...s, role: role || null } : s)));
 
       // Show success
       const action = role ? `assigned ${role} role` : "role removed";
@@ -204,16 +200,9 @@ export default function AdminUsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">User Management</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage staff roles and permissions
-          </p>
+          <p className="text-muted-foreground mt-1">Manage staff roles and permissions</p>
         </div>
-        <Button
-          onClick={fetchUsers}
-          variant="outline"
-          size="sm"
-          className="gap-2"
-        >
+        <Button onClick={fetchUsers} variant="outline" size="sm" className="gap-2">
           <RefreshCw className="h-4 w-4" />
           Refresh
         </Button>
@@ -276,9 +265,7 @@ export default function AdminUsersPage() {
                       <td className="py-3 px-4">
                         <span className="font-medium">{member.name}</span>
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-600">
-                        {member.email}
-                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-600">{member.email}</td>
                       <td className="py-3 px-4">
                         {member.role ? (
                           <span className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800">
@@ -292,10 +279,7 @@ export default function AdminUsersPage() {
                         <Select
                           value={selectedRole[member.email] || ""}
                           onValueChange={(value) =>
-                            handleRoleChange(
-                              member.email,
-                              value === "none" ? "" : value
-                            )
+                            handleRoleChange(member.email, value === "none" ? "" : value)
                           }
                         >
                           <SelectTrigger className="w-32">
@@ -341,9 +325,10 @@ export default function AdminUsersPage() {
       </Card>
 
       {/* Alert Dialog */}
-      <AlertDialog open={alertDialog.open} onOpenChange={(open) =>
-        setAlertDialog({ ...alertDialog, open })
-      }>
+      <AlertDialog
+        open={alertDialog.open}
+        onOpenChange={(open) => setAlertDialog({ ...alertDialog, open })}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -355,9 +340,7 @@ export default function AdminUsersPage() {
                 : `Are you sure you want to remove the manager role from ${alertDialog.email}?`}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogAction onClick={handleConfirm}>
-            Confirm
-          </AlertDialogAction>
+          <AlertDialogAction onClick={handleConfirm}>Confirm</AlertDialogAction>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
         </AlertDialogContent>
       </AlertDialog>

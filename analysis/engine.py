@@ -2,6 +2,7 @@
 Core analysis engine for coaching insights.
 Integrates Claude API with caching and chunking.
 """
+
 import json
 import logging
 from typing import Any
@@ -10,12 +11,13 @@ from uuid import UUID
 from anthropic import Anthropic
 
 from coaching_mcp.shared import settings
-from db import fetch_one, fetch_all
+from db import fetch_all, fetch_one
 from db.models import CoachingDimension
+
 from .cache import (
     generate_transcript_hash,
-    get_cached_analysis,
     get_active_rubric_version,
+    get_cached_analysis,
     store_analysis_with_cache,
 )
 from .prompts import (
@@ -45,7 +47,6 @@ def detect_speaker_role(call_id: str) -> str:
     Returns:
         Role identifier ('ae', 'se', 'csm'). Defaults to 'ae' if no role assigned.
     """
-    from db import queries
 
     # Get all speakers for the call
     speakers = fetch_all(
@@ -54,12 +55,13 @@ def detect_speaker_role(call_id: str) -> str:
         FROM speakers
         WHERE call_id = %s
         """,
-        (str(call_id),)
+        (str(call_id),),
     )
 
     # Filter to Prefect speakers (company_side=true and @prefect.io email)
     prefect_speakers = [
-        s for s in speakers
+        s
+        for s in speakers
         if s.get("company_side") and s.get("email") and s["email"].endswith("@prefect.io")
     ]
 
@@ -68,10 +70,7 @@ def detect_speaker_role(call_id: str) -> str:
         return "ae"
 
     # Select primary speaker (highest talk time)
-    primary_speaker = max(
-        prefect_speakers,
-        key=lambda s: s.get("talk_time_percentage", 0) or 0
-    )
+    primary_speaker = max(prefect_speakers, key=lambda s: s.get("talk_time_percentage", 0) or 0)
 
     speaker_email = primary_speaker["email"]
     logger.info(
@@ -80,10 +79,7 @@ def detect_speaker_role(call_id: str) -> str:
     )
 
     # Look up role assignment
-    role_result = fetch_one(
-        "SELECT role FROM staff_roles WHERE email = %s",
-        (speaker_email,)
-    )
+    role_result = fetch_one("SELECT role FROM staff_roles WHERE email = %s", (speaker_email,))
 
     if role_result:
         role = role_result["role"]
@@ -336,10 +332,12 @@ def _run_claude_analysis(
         )
 
         if kb_rows:
-            knowledge_base = "\n\n".join([
-                f"## {row['product'].upper()} - {row['category'].title()}\n{row['content']}"
-                for row in kb_rows
-            ])
+            knowledge_base = "\n\n".join(
+                [
+                    f"## {row['product'].upper()} - {row['category'].title()}\n{row['content']}"
+                    for row in kb_rows
+                ]
+            )
         else:
             knowledge_base = "No product knowledge base loaded."
 
@@ -393,7 +391,9 @@ def _run_claude_analysis(
                     logger.error(f"Response end: ...{response_text[-500:]}")
                     raise ValueError(f"Claude response JSON is malformed: {str(e2)}")
             else:
-                logger.error(f"No JSON code block found. Response preview: {response_text[:1000]}...")
+                logger.error(
+                    f"No JSON code block found. Response preview: {response_text[:1000]}..."
+                )
                 logger.error(f"Response end: ...{response_text[-500:]}")
                 raise ValueError(f"Claude response is not valid JSON: {str(e)}")
 
@@ -406,7 +406,9 @@ def _run_claude_analysis(
             "cache_creation_tokens": cache_creation_tokens,
             "cache_read_tokens": cache_read_tokens,
             "rubric_version": rubric["version"],
-            "rubric_role": rubric.get("evaluated_as_role", "ae"),  # Track which role rubric was used
+            "rubric_role": rubric.get(
+                "evaluated_as_role", "ae"
+            ),  # Track which role rubric was used
         }
 
         return analysis_data

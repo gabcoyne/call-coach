@@ -56,10 +56,7 @@ export function WebVitals() {
         const longTaskObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
             if (entry.duration > 50) {
-              console.warn(
-                `[Performance] Long Task detected: ${entry.duration}ms`,
-                entry
-              );
+              console.warn(`[Performance] Long Task detected: ${entry.duration}ms`, entry);
             }
           }
         });
@@ -99,14 +96,10 @@ export function usePerformanceMetric(metricName: string) {
         window.performance.mark(endMark);
         window.performance.measure(metricName, startMark, endMark);
 
-        const measure = window.performance
-          .getEntriesByName(metricName)
-          .pop() as PerformanceMeasure;
+        const measure = window.performance.getEntriesByName(metricName).pop() as PerformanceMeasure;
 
         if (measure) {
-          console.log(
-            `[Custom Metric] ${metricName}: ${measure.duration.toFixed(2)}ms`
-          );
+          console.log(`[Custom Metric] ${metricName}: ${measure.duration.toFixed(2)}ms`);
 
           // Clean up marks and measures
           window.performance.clearMarks(startMark);

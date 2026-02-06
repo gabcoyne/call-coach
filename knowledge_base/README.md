@@ -38,21 +38,25 @@ scripts/
 ### Command Line
 
 **Load initial knowledge base:**
+
 ```bash
 python scripts/load_initial_knowledge.py
 ```
 
 **Verify knowledge base:**
+
 ```bash
 python scripts/load_initial_knowledge.py --verify-only
 ```
 
 **Export to JSON:**
+
 ```bash
 python scripts/load_initial_knowledge.py --export ./export
 ```
 
 **Show statistics:**
+
 ```bash
 python scripts/load_initial_knowledge.py --stats
 ```
@@ -105,11 +109,13 @@ stats = manager.get_stats()
 ### REST API
 
 **List knowledge entries:**
+
 ```bash
 GET /knowledge?product=prefect&category=feature
 ```
 
 **Create/update entry:**
+
 ```bash
 POST /knowledge
 {
@@ -121,16 +127,19 @@ POST /knowledge
 ```
 
 **Get version history:**
+
 ```bash
 GET /knowledge/history?product=prefect&category=feature
 ```
 
 **List rubrics:**
+
 ```bash
 GET /knowledge/rubrics?category=discovery&active_only=true
 ```
 
 **Create rubric:**
+
 ```bash
 POST /knowledge/rubrics
 {
@@ -143,6 +152,7 @@ POST /knowledge/rubrics
 ```
 
 **Update rubric metadata:**
+
 ```bash
 PATCH /knowledge/rubrics/{rubric_id}
 {
@@ -152,6 +162,7 @@ PATCH /knowledge/rubrics/{rubric_id}
 ```
 
 **Get statistics:**
+
 ```bash
 GET /knowledge/stats
 ```
@@ -161,6 +172,7 @@ GET /knowledge/stats
 Access the admin interface at: `http://localhost:3000/admin/knowledge`
 
 Features:
+
 - Upload/edit product documentation
 - Create new rubric versions
 - View version history
@@ -172,12 +184,14 @@ Features:
 ### Knowledge Entries
 
 Each knowledge entry automatically tracks:
+
 - **Content hash**: SHA256 of content for change detection
 - **Version number**: Auto-incremented with each change
 - **Version history**: List of previous versions with timestamps
 - **Metadata**: Custom metadata including author and timestamps
 
 Example version history:
+
 ```json
 {
   "version": 3,
@@ -200,11 +214,13 @@ Example version history:
 ### Coaching Rubrics
 
 Rubrics use semantic versioning (MAJOR.MINOR.PATCH):
+
 - **MAJOR**: Breaking changes to evaluation criteria
 - **MINOR**: Backward-compatible additions
 - **PATCH**: Bug fixes or clarifications
 
 When a new version is created:
+
 1. Previous active version is automatically deprecated
 2. New version becomes active
 3. All versions remain in database for historical analysis
@@ -213,6 +229,7 @@ When a new version is created:
 ## Data Model
 
 ### Knowledge Entry
+
 ```python
 {
   "id": "uuid",
@@ -230,6 +247,7 @@ When a new version is created:
 ```
 
 ### Coaching Rubric
+
 ```python
 {
   "id": "uuid",
@@ -255,6 +273,7 @@ When a new version is created:
 ## Categories
 
 ### Knowledge Base Categories
+
 - **feature**: Product features and capabilities
 - **differentiation**: How we differ from competitors
 - **use_case**: Customer use cases and success stories
@@ -262,6 +281,7 @@ When a new version is created:
 - **competitor**: Competitive battlecards and positioning
 
 ### Coaching Dimensions
+
 - **product_knowledge**: Technical accuracy and product expertise
 - **discovery**: Discovery question quality and customer understanding
 - **objection_handling**: Objection identification and resolution
@@ -272,16 +292,19 @@ When a new version is created:
 If migrating from the old `knowledge/` directory:
 
 1. Run migration script:
+
 ```bash
 python scripts/load_initial_knowledge.py
 ```
 
 2. Verify data:
+
 ```bash
 python scripts/load_initial_knowledge.py --verify-only
 ```
 
 3. Export for backup:
+
 ```bash
 python scripts/load_initial_knowledge.py --export ./backup
 ```
@@ -304,21 +327,25 @@ npm test -- frontend/app/admin/knowledge
 ## Troubleshooting
 
 **Issue**: Rubric version already exists
+
 ```
 Solution: Increment version number (e.g., 1.0.0 → 1.0.1)
 ```
 
 **Issue**: Invalid category
+
 ```
 Solution: Use valid categories from db.models enums
 ```
 
 **Issue**: JSON parse error in rubric
+
 ```
 Solution: Validate JSON syntax in criteria and scoring_guide
 ```
 
 **Issue**: Version history not showing
+
 ```
 Solution: Content must change for new version to be tracked
 ```
@@ -335,6 +362,7 @@ Solution: Content must change for new version to be tracked
 ## Support
 
 For issues or questions:
+
 - Check logs: `logs/knowledge_base.log`
 - Review API docs: `http://localhost:8000/docs`
-- Contact: engineering@prefect.io
+- Contact: <engineering@prefect.io>

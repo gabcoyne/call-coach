@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { FileQuestion, Home } from "lucide-react";
 
 export default function NotFound() {
@@ -29,9 +36,7 @@ export default function NotFound() {
             </Link>
           </Button>
           <Button variant="outline" asChild className="w-full">
-            <Link href="/dashboard">
-              Go to dashboard
-            </Link>
+            <Link href="/dashboard">Go to dashboard</Link>
           </Button>
         </CardFooter>
       </Card>

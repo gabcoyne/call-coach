@@ -50,6 +50,7 @@ Test individual components in isolation using mocks.
 **Coverage**: >70% target for all modules
 
 **Example**:
+
 ```python
 def test_analyze_call_basic(mock_settings, mock_db):
     result = analyze_call_tool(call_id='test-123')
@@ -63,6 +64,7 @@ Test interactions between components (marked with `@pytest.mark.integration`)
 **Run**: `pytest tests/ -v -m integration`
 
 **Example**:
+
 ```python
 @pytest.mark.integration
 def test_analysis_pipeline():
@@ -75,11 +77,13 @@ def test_analysis_pipeline():
 Test complete user workflows through the UI with Playwright.
 
 **Requirements**:
-- Running frontend at http://localhost:3000
+
+- Running frontend at <http://localhost:3000>
 - Running backend API
 - Valid test user credentials
 
 **Run**:
+
 ```bash
 export BASE_URL=http://localhost:3000
 export TEST_USER_EMAIL=user@example.com
@@ -88,6 +92,7 @@ pytest e2e/ -v -m e2e
 ```
 
 **Example**:
+
 ```python
 @pytest.mark.asyncio
 async def test_login_flow(page: Page, base_url):
@@ -99,15 +104,17 @@ async def test_login_flow(page: Page, base_url):
 
 Test API performance under load with Locust.
 
-**Requirements**: Running API on http://localhost:8000
+**Requirements**: Running API on <http://localhost:8000>
 
 **Run**:
+
 ```bash
 python scripts/load_test.py
 # Opens http://localhost:8089 for web UI
 ```
 
 **Configure**:
+
 ```bash
 export LOAD_TEST_USERS=50
 export LOAD_TEST_SPAWN_RATE=5
@@ -405,10 +412,12 @@ pytest e2e/ --trace on
 ### GitHub Actions
 
 Tests run automatically on:
+
 - Push to main/develop
 - Pull requests
 
 View results:
+
 1. Go to GitHub repo
 2. Click "Actions" tab
 3. View workflow runs

@@ -4,9 +4,10 @@ Slack notification formatter for coaching insights and alerts.
 Formats coaching data into Slack Block Kit blocks for rich, interactive messages.
 Supports multiple notification types with appropriate styling and CTAs.
 """
+
 import logging
-from typing import Any
 from datetime import datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 

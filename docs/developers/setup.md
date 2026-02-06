@@ -60,18 +60,21 @@ LOG_LEVEL=INFO
 ### Getting Credentials
 
 **Anthropic API Key:**
-1. Go to https://console.anthropic.com/settings/keys
+
+1. Go to <https://console.anthropic.com/settings/keys>
 2. Create new API key
 3. Copy and paste into `.env`
 
 **Gong API Credentials:**
-1. Log in to Gong (https://gong.app.gong.io)
+
+1. Log in to Gong (<https://gong.app.gong.io>)
 2. Go to Settings → Integrations → API
 3. Copy API key and secret
 4. Find your tenant URL (usually `https://us-XXXXX.api.gong.io/v2`)
 
 **Neon Database:**
-1. Create account at https://console.neon.tech
+
+1. Create account at <https://console.neon.tech>
 2. Create new project
 3. Copy connection string (must include `?sslmode=require`)
 4. Example: `postgresql://user:pass@ep-abc123.us-east-2.aws.neon.tech/callcoach?sslmode=require`
@@ -103,6 +106,7 @@ psql $DATABASE_URL -c "\dt"
 ## Step 4: Start Backend Services
 
 **Terminal 1 - FastMCP Server (MCP tools)**:
+
 ```bash
 # Navigate to project root
 cd /Users/gcoyne/src/prefect/call-coach
@@ -120,6 +124,7 @@ uv run mcp-server-dev
 ```
 
 **Terminal 2 - REST API Server** (for frontend integration):
+
 ```bash
 cd /Users/gcoyne/src/prefect/call-coach
 
@@ -180,18 +185,22 @@ npm run dev
 
 Open your browser and test:
 
-1. **Frontend**: http://localhost:3000
+1. **Frontend**: <http://localhost:3000>
+
    - Should show landing page
    - Try signing in with Clerk
 
-2. **API Docs**: http://localhost:8001/docs
+2. **API Docs**: <http://localhost:8001/docs>
+
    - Interactive Swagger UI
    - Can test API endpoints
 
-3. **API ReDoc**: http://localhost:8001/redoc
+3. **API ReDoc**: <http://localhost:8001/redoc>
+
    - Alternative API documentation
 
 4. **Health Check**:
+
    ```bash
    curl http://localhost:8001/coaching/health
    # Expected: {"status": "healthy"}
@@ -202,6 +211,7 @@ Open your browser and test:
 ### Backend Development
 
 **Make changes to Python code:**
+
 ```bash
 # Edit files in:
 # - coaching_mcp/
@@ -214,6 +224,7 @@ Open your browser and test:
 ```
 
 **Run tests:**
+
 ```bash
 pytest tests/ -v
 
@@ -225,6 +236,7 @@ pytest tests/ --cov=coaching_mcp --cov-report=html
 ```
 
 **Check code quality:**
+
 ```bash
 # Format code
 black coaching_mcp/ analysis/ db/
@@ -239,6 +251,7 @@ mypy coaching_mcp/
 ### Frontend Development
 
 **Make changes to React code:**
+
 ```bash
 # Edit files in:
 # - frontend/app/
@@ -250,6 +263,7 @@ mypy coaching_mcp/
 ```
 
 **Run tests:**
+
 ```bash
 cd frontend
 
@@ -264,6 +278,7 @@ npm run test:coverage
 ```
 
 **Format and lint:**
+
 ```bash
 cd frontend
 
@@ -277,6 +292,7 @@ npm run lint
 ### Database Changes
 
 **Create a new migration:**
+
 ```bash
 # Create migration file
 touch db/migrations/002_add_new_table.sql
@@ -296,6 +312,7 @@ psql $DATABASE_URL -c "\dt"
 ### Test Analysis of a Call
 
 **Using REST API:**
+
 ```bash
 # Get a real Gong call ID from your account first
 CALL_ID="1464927526043145564"
@@ -306,6 +323,7 @@ curl -X POST http://localhost:8001/coaching/analyze-call \
 ```
 
 **Using Python:**
+
 ```python
 from coaching_mcp.tools.analyze_call import analyze_call_tool
 
@@ -360,6 +378,7 @@ npm update
 ### Backend Won't Start
 
 **Error: `ModuleNotFoundError`**
+
 ```bash
 # Install missing dependencies
 uv pip install -e .
@@ -372,6 +391,7 @@ uv pip install -e ".[dev]"
 ```
 
 **Error: `Database connection failed`**
+
 ```bash
 # Check DATABASE_URL format
 echo $DATABASE_URL
@@ -384,6 +404,7 @@ psql $DATABASE_URL -c "SELECT 1"
 ```
 
 **Error: `401 Unauthorized` on Gong API**
+
 ```bash
 # Verify credentials
 echo $GONG_API_KEY
@@ -399,6 +420,7 @@ curl -H "Authorization: Bearer $GONG_API_SECRET" \
 ### Frontend Won't Start
 
 **Error: `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY not found`**
+
 ```bash
 # Check .env.local exists in frontend/
 ls frontend/.env.local
@@ -409,6 +431,7 @@ cp frontend/.env.example frontend/.env.local
 ```
 
 **Error: `Port 3000 already in use`**
+
 ```bash
 # Find process using port 3000
 lsof -i :3000
@@ -421,6 +444,7 @@ npm run dev -- -p 3001
 ```
 
 **Error: `API calls returning 404`**
+
 ```bash
 # Check NEXT_PUBLIC_MCP_BACKEND_URL in .env.local
 cat frontend/.env.local | grep MCP_BACKEND
@@ -435,6 +459,7 @@ curl http://localhost:8001/health
 ### Tests Failing
 
 **Python tests fail:**
+
 ```bash
 # Run with verbose output
 pytest tests/ -vv
@@ -447,6 +472,7 @@ pytest tests/test_analysis.py -v -m "not integration"
 ```
 
 **Frontend tests fail:**
+
 ```bash
 cd frontend
 
@@ -502,6 +528,7 @@ docker-compose logs -f
 ### IDE Setup
 
 **VS Code:**
+
 ```bash
 # Install extensions
 - Python
@@ -523,6 +550,7 @@ docker-compose logs -f
 ```
 
 **PyCharm:**
+
 - Open project
 - Go to Settings → Project → Python Interpreter
 - Click gear icon → Add → Existing Environment
@@ -546,4 +574,4 @@ docker-compose logs -f
 
 ---
 
-**Your local environment is ready!** Start developing at http://localhost:3000
+**Your local environment is ready!** Start developing at <http://localhost:3000>

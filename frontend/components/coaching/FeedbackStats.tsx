@@ -1,20 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  AlertCircle,
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
+import { AlertCircle, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface QualityIssue {
@@ -72,9 +61,7 @@ export function FeedbackStats({
         params.append("time_period", timePeriod);
         if (repEmail) params.append("rep_email", repEmail);
 
-        const response = await fetch(
-          `/api/coaching-sessions/feedback-stats?${params}`
-        );
+        const response = await fetch(`/api/coaching-sessions/feedback-stats?${params}`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch feedback stats");
@@ -85,9 +72,7 @@ export function FeedbackStats({
         setError(null);
       } catch (err) {
         console.error("Error fetching feedback stats:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to load statistics"
-        );
+        setError(err instanceof Error ? err.message : "Failed to load statistics");
       } finally {
         setIsLoading(false);
       }
@@ -103,9 +88,7 @@ export function FeedbackStats({
           <CardTitle>Coaching Quality Metrics</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            Loading statistics...
-          </div>
+          <div className="text-center py-8 text-muted-foreground">Loading statistics...</div>
         </CardContent>
       </Card>
     );
@@ -152,9 +135,7 @@ export function FeedbackStats({
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-              <div className="text-3xl font-bold">
-                {overall_stats.accuracy_rate?.toFixed(0)}%
-              </div>
+              <div className="text-3xl font-bold">{overall_stats.accuracy_rate?.toFixed(0)}%</div>
               <div className="text-xs text-muted-foreground">
                 <div className="font-semibold text-green-600">
                   {overall_stats.accurate_count} accurate
@@ -172,9 +153,7 @@ export function FeedbackStats({
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">
-              Helpfulness Rate
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Helpfulness Rate</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
@@ -237,32 +216,21 @@ export function FeedbackStats({
       {dimension_stats.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">
-              By Coaching Dimension
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">By Coaching Dimension</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {dimension_stats.map((d) => (
-                <div
-                  key={d.dimension}
-                  className="rounded-lg border p-3 space-y-2"
-                >
-                  <div className="font-semibold capitalize">
-                    {d.dimension.replace(/_/g, " ")}
-                  </div>
+                <div key={d.dimension} className="rounded-lg border p-3 space-y-2">
+                  <div className="font-semibold capitalize">{d.dimension.replace(/_/g, " ")}</div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <div className="text-muted-foreground">Accuracy</div>
-                      <div className="text-lg font-semibold">
-                        {d.accuracy_rate?.toFixed(0)}%
-                      </div>
+                      <div className="text-lg font-semibold">{d.accuracy_rate?.toFixed(0)}%</div>
                     </div>
                     <div>
                       <div className="text-muted-foreground">Helpfulness</div>
-                      <div className="text-lg font-semibold">
-                        {d.helpfulness_rate?.toFixed(0)}%
-                      </div>
+                      <div className="text-lg font-semibold">{d.helpfulness_rate?.toFixed(0)}%</div>
                     </div>
                   </div>
                   <div className="text-xs text-muted-foreground">
@@ -286,12 +254,9 @@ export function FeedbackStats({
               Total feedback entries: <strong>{overall_stats.total_feedback}</strong>
             </div>
             <div>
-              Missing context mentions:{" "}
-              <strong>{overall_stats.missing_context_count}</strong>
+              Missing context mentions: <strong>{overall_stats.missing_context_count}</strong>
             </div>
-            <div className="pt-2 text-xs">
-              Data from {stats.time_period.replace(/_/g, " ")}
-            </div>
+            <div className="pt-2 text-xs">Data from {stats.time_period.replace(/_/g, " ")}</div>
           </div>
         </CardContent>
       </Card>

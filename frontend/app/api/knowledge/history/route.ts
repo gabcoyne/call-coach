@@ -44,9 +44,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching knowledge history:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch knowledge history" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch knowledge history" }, { status: 500 });
   }
 }

@@ -178,11 +178,13 @@ NEXT_PUBLIC_MCP_BACKEND_URL=https://coaching-api.prefect.io
 ### Examples of What Goes Where
 
 **Public variables** (safe for client):
+
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - needed for Clerk client SDK
 - `NEXT_PUBLIC_MCP_BACKEND_URL` - needed for client-side API calls
 - `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` - URL redirect paths
 
 **Secret variables** (server-only):
+
 - `CLERK_SECRET_KEY` - used for server-side Clerk operations
 - API keys for external services
 - Database connection strings (if added)
@@ -192,6 +194,7 @@ NEXT_PUBLIC_MCP_BACKEND_URL=https://coaching-api.prefect.io
 1. Go to your Vercel project dashboard
 2. Navigate to **Settings → Environment Variables**
 3. Add each variable with appropriate scope:
+
    - **Production**: Only for production deployments
    - **Preview**: For PR preview deployments
    - **Development**: For local development (optional, use `.env.local` instead)
@@ -220,6 +223,7 @@ console.log('Clerk secret configured:', !!process.env.CLERK_SECRET_KEY);
 **Cause**: Missing or incorrect Clerk keys
 
 **Solution**:
+
 1. Verify keys are set in `.env.local` (dev) or Vercel dashboard (production)
 2. Check keys match your Clerk application (dev vs. production instance)
 3. Ensure `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` starts with `pk_`
@@ -230,6 +234,7 @@ console.log('Clerk secret configured:', !!process.env.CLERK_SECRET_KEY);
 **Cause**: Incorrect or unreachable backend URL
 
 **Solution**:
+
 1. Verify `NEXT_PUBLIC_MCP_BACKEND_URL` is set correctly
 2. For local dev, ensure MCP server is running on specified port
 3. For production, verify backend URL is accessible and CORS is configured
@@ -240,6 +245,7 @@ console.log('Clerk secret configured:', !!process.env.CLERK_SECRET_KEY);
 **Cause**: Next.js caches environment variables
 
 **Solution**:
+
 1. **Local dev**: Restart the dev server (`npm run dev`)
 2. **Vercel**: Redeploy the application after changing environment variables
 3. Clear browser cache if public variables changed
@@ -249,6 +255,7 @@ console.log('Clerk secret configured:', !!process.env.CLERK_SECRET_KEY);
 **Cause**: Variables not configured in Vercel dashboard
 
 **Solution**:
+
 1. Go to Vercel project → Settings → Environment Variables
 2. Add all required variables with correct scope (Production/Preview)
 3. Trigger new deployment to apply changes

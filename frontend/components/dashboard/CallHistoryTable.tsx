@@ -22,19 +22,19 @@ interface CallHistoryTableProps {
   onCallClick?: (callId: string) => void;
 }
 
-type SortField = 'date' | 'score' | 'duration';
-type SortDirection = 'asc' | 'desc';
+type SortField = "date" | "score" | "duration";
+type SortDirection = "asc" | "desc";
 
 export function CallHistoryTable({ calls, onCallClick }: CallHistoryTableProps) {
-  const [sortField, setSortField] = useState<SortField>('date');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [sortField, setSortField] = useState<SortField>("date");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDirection('desc');
+      setSortDirection("desc");
     }
   };
 
@@ -42,38 +42,38 @@ export function CallHistoryTable({ calls, onCallClick }: CallHistoryTableProps) 
     let comparison = 0;
 
     switch (sortField) {
-      case 'date':
+      case "date":
         const dateA = a.date ? new Date(a.date).getTime() : 0;
         const dateB = b.date ? new Date(b.date).getTime() : 0;
         comparison = dateA - dateB;
         break;
-      case 'score':
+      case "score":
         comparison = (a.overall_score ?? 0) - (b.overall_score ?? 0);
         break;
-      case 'duration':
+      case "duration":
         comparison = a.duration_seconds - b.duration_seconds;
         break;
     }
 
-    return sortDirection === 'asc' ? comparison : -comparison;
+    return sortDirection === "asc" ? comparison : -comparison;
   });
 
   const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return 'N/A';
+    if (!dateStr) return "N/A";
     const date = new Date(dateStr);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(date);
   };
 
   const formatDuration = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    return `${minutes}:${secs.toString().padStart(2, "0")}`;
   };
 
   if (calls.length === 0) {
@@ -96,7 +96,7 @@ export function CallHistoryTable({ calls, onCallClick }: CallHistoryTableProps) 
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleSort('date')}
+                  onClick={() => handleSort("date")}
                   className="gap-1 -ml-4"
                 >
                   Date
@@ -110,7 +110,7 @@ export function CallHistoryTable({ calls, onCallClick }: CallHistoryTableProps) 
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleSort('duration')}
+                  onClick={() => handleSort("duration")}
                   className="gap-1 -ml-4"
                 >
                   Duration
@@ -121,7 +121,7 @@ export function CallHistoryTable({ calls, onCallClick }: CallHistoryTableProps) 
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleSort('score')}
+                  onClick={() => handleSort("score")}
                   className="gap-1 -ml-4"
                 >
                   Score
@@ -133,20 +133,13 @@ export function CallHistoryTable({ calls, onCallClick }: CallHistoryTableProps) 
           </thead>
           <tbody>
             {sortedCalls.map((call) => (
-              <tr
-                key={call.call_id}
-                className="border-b hover:bg-gray-50 transition-colors"
-              >
-                <td className="py-3 px-4 text-sm text-muted-foreground">
-                  {formatDate(call.date)}
-                </td>
-                <td className="py-3 px-4 text-sm font-medium max-w-xs truncate">
-                  {call.title}
-                </td>
+              <tr key={call.call_id} className="border-b hover:bg-gray-50 transition-colors">
+                <td className="py-3 px-4 text-sm text-muted-foreground">{formatDate(call.date)}</td>
+                <td className="py-3 px-4 text-sm font-medium max-w-xs truncate">{call.title}</td>
                 <td className="py-3 px-4 text-sm">
                   {call.call_type ? (
                     <Badge variant="outline" className="capitalize">
-                      {call.call_type.replace('_', ' ')}
+                      {call.call_type.replace("_", " ")}
                     </Badge>
                   ) : (
                     <span className="text-muted-foreground">N/A</span>

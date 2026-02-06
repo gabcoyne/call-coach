@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import * as Accordion from '@radix-ui/react-accordion';
-import { CheckCircle, AlertCircle, ChevronDown } from 'lucide-react';
+import * as Accordion from "@radix-ui/react-accordion";
+import { CheckCircle, AlertCircle, ChevronDown } from "lucide-react";
 
 export interface InsightCardProps {
   /** Title of the insight (e.g., "Discovery Quality", "Objection Handling") */
@@ -27,7 +27,7 @@ export function InsightCard({
   strengths = [],
   improvements = [],
   defaultOpen = false,
-  className = '',
+  className = "",
 }: InsightCardProps) {
   const hasContent = strengths.length > 0 || improvements.length > 0;
 
@@ -35,7 +35,7 @@ export function InsightCard({
     <Accordion.Root
       type="single"
       collapsible
-      defaultValue={defaultOpen ? 'content' : undefined}
+      defaultValue={defaultOpen ? "content" : undefined}
       className={`border rounded-lg ${className}`}
     >
       <Accordion.Item value="content">
@@ -51,9 +51,7 @@ export function InsightCard({
 
         <Accordion.Content className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
           <div className="p-4 pt-0 space-y-4">
-            {!hasContent && (
-              <p className="text-sm text-gray-500">No insights available</p>
-            )}
+            {!hasContent && <p className="text-sm text-gray-500">No insights available</p>}
 
             {/* Strengths Section */}
             {strengths.length > 0 && (
@@ -64,10 +62,7 @@ export function InsightCard({
                 </h4>
                 <ul className="space-y-2">
                   {strengths.map((strength, index) => (
-                    <li
-                      key={index}
-                      className="text-sm text-gray-600 flex items-start gap-2"
-                    >
+                    <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
                       <span className="text-green-600 mt-0.5">•</span>
                       <span>{strength}</span>
                     </li>
@@ -85,10 +80,7 @@ export function InsightCard({
                 </h4>
                 <ul className="space-y-2">
                   {improvements.map((improvement, index) => (
-                    <li
-                      key={index}
-                      className="text-sm text-gray-600 flex items-start gap-2"
-                    >
+                    <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
                       <span className="text-amber-600 mt-0.5">•</span>
                       <span>{improvement}</span>
                     </li>

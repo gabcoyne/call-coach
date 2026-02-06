@@ -178,7 +178,7 @@ Or with locust CLI:
 locust -f scripts/load_test.py --host http://localhost:8000 --users 10 --spawn-rate 2
 ```
 
-Open web UI at http://localhost:8089
+Open web UI at <http://localhost:8089>
 
 Configure load test with environment variables:
 
@@ -237,7 +237,8 @@ pytest tests/ -v -m "not slow"
 Test complete user flows through the application UI.
 
 Requires:
-- Running Next.js frontend at http://localhost:3000
+
+- Running Next.js frontend at <http://localhost:3000>
 - Running FastAPI backend
 - Valid test user credentials
 
@@ -275,7 +276,7 @@ pytest e2e/ -v -m e2e
 
 **page**: Browser page instance
 
-**base_url**: Application URL (default: http://localhost:3000)
+**base_url**: Application URL (default: <http://localhost:3000>)
 
 **test_user**: Test user credentials
 
@@ -315,6 +316,7 @@ pytest tests/ --cov --cov-report=term-missing
 ### GitHub Actions
 
 Tests run automatically on:
+
 - Push to main/develop branches
 - Pull requests
 

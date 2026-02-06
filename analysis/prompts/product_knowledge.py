@@ -2,6 +2,7 @@
 Product knowledge analysis prompt template.
 Evaluates technical accuracy and ability to connect features to business value.
 """
+
 from typing import Any
 
 
@@ -170,13 +171,13 @@ Please analyze this call for product knowledge quality according to the rubric a
                 {
                     "type": "text",
                     "text": system_prompt,
-                    "cache_control": {"type": "ephemeral"}  # Cache rubric + knowledge base
+                    "cache_control": {"type": "ephemeral"},  # Cache rubric + knowledge base
                 },
                 {
                     "type": "text",
                     "text": user_prompt,
-                }
-            ]
+                },
+            ],
         }
     ]
 
@@ -202,22 +203,22 @@ def _format_criteria(criteria: dict[str, Any]) -> str:
     """Format evaluation criteria."""
     lines = []
     for criterion, details in criteria.items():
-        weight = details.get('weight', 0)
-        description = details.get('description', '')
+        weight = details.get("weight", 0)
+        description = details.get("description", "")
         lines.append(f"### {criterion.replace('_', ' ').title()} ({weight}%)")
         lines.append(f"{description}\n")
 
-        if 'indicators' in details:
-            indicators = details['indicators']
-            if 'excellent' in indicators:
+        if "indicators" in details:
+            indicators = details["indicators"]
+            if "excellent" in indicators:
                 lines.append("**Excellent indicators:**")
-                for indicator in indicators['excellent']:
+                for indicator in indicators["excellent"]:
                     lines.append(f"- {indicator}")
                 lines.append("")
 
-            if 'poor' in indicators:
+            if "poor" in indicators:
                 lines.append("**Poor indicators:**")
-                for indicator in indicators['poor']:
+                for indicator in indicators["poor"]:
                     lines.append(f"- {indicator}")
                 lines.append("")
 

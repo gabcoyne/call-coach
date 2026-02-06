@@ -32,26 +32,31 @@ Sales managers and coaches currently lack a modern, intuitive interface to inter
 ## Impact
 
 **New Codebase:**
+
 - New `frontend/` directory with Next.js application
 - Separate git repository or monorepo structure (to be decided in design phase)
 
 **Backend Dependencies:**
+
 - Requires MCP backend to expose REST API endpoints or WebSocket bridge for web clients
 - May need to add CORS configuration to FastMCP server
 - Authentication layer needed (JWT tokens, API keys, or session-based auth)
 
 **Infrastructure:**
+
 - Vercel project and deployment pipeline
 - Environment variables for MCP backend URL, auth credentials, and feature flags
 - Domain/subdomain configuration (e.g., coaching.prefect.io)
 
 **User Impact:**
+
 - Sales managers get self-service access to coaching insights
 - Reps can view their own performance data and coaching recommendations
 - Reduces dependency on Claude Desktop for accessing coaching features
 - Enables mobile access to coaching data
 
 **Security Considerations:**
+
 - Authentication required to prevent unauthorized access to coaching data
 - Role-based access control (managers see all reps, reps see only their own data)
 - Secure communication with backend (HTTPS, API key validation)

@@ -23,7 +23,7 @@ from typing import Any
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from db import execute_query, execute_many, fetch_all, fetch_one
+from db import execute_many, fetch_all
 
 # Configure logging
 logging.basicConfig(
@@ -42,20 +42,57 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 FIRST_NAMES = [
-    "John", "Sarah", "Mike", "Lisa", "Alex", "Emma", "David", "Jessica",
-    "Robert", "Michelle", "James", "Lauren", "Michael", "Amanda", "Christopher"
+    "John",
+    "Sarah",
+    "Mike",
+    "Lisa",
+    "Alex",
+    "Emma",
+    "David",
+    "Jessica",
+    "Robert",
+    "Michelle",
+    "James",
+    "Lauren",
+    "Michael",
+    "Amanda",
+    "Christopher",
 ]
 
 LAST_NAMES = [
-    "Smith", "Chen", "Rodriguez", "Kim", "Wong", "Johnson", "Williams",
-    "Park", "Patel", "Lee", "Kumar", "Garcia", "Martinez", "Lopez", "Davis"
+    "Smith",
+    "Chen",
+    "Rodriguez",
+    "Kim",
+    "Wong",
+    "Johnson",
+    "Williams",
+    "Park",
+    "Patel",
+    "Lee",
+    "Kumar",
+    "Garcia",
+    "Martinez",
+    "Lopez",
+    "Davis",
 ]
 
 COMPANY_NAMES = [
-    "Acme Corporation", "TechStart Inc", "DataFlow Systems", "CloudNative Co",
-    "RetailMax", "FinServe Group", "MedicalTech Solutions", "EduPlatform LLC",
-    "LogisticsPro Inc", "AnalyticsHub Corp", "SecureNet Systems", "AppBuilder Labs",
-    "DataOps Solutions", "CloudFirst Technologies", "InnovateX Partners"
+    "Acme Corporation",
+    "TechStart Inc",
+    "DataFlow Systems",
+    "CloudNative Co",
+    "RetailMax",
+    "FinServe Group",
+    "MedicalTech Solutions",
+    "EduPlatform LLC",
+    "LogisticsPro Inc",
+    "AnalyticsHub Corp",
+    "SecureNet Systems",
+    "AppBuilder Labs",
+    "DataOps Solutions",
+    "CloudFirst Technologies",
+    "InnovateX Partners",
 ]
 
 CALL_TITLES = [
@@ -73,7 +110,7 @@ CALL_TITLES = [
     "Final Contract Review",
     "Kickoff Call",
     "Success Planning",
-    "Quarterly Business Review"
+    "Quarterly Business Review",
 ]
 
 COACHING_DIMENSIONS = ["product_knowledge", "discovery", "objection_handling", "engagement"]
@@ -95,7 +132,7 @@ TRANSCRIPT_TEMPLATES = {
             "prospect": "Integration is manual and brittle. We spend too much time on {operational_burden}.",
             "ae": "What's the impact on your business? How much time and resources is this consuming?",
             "prospect": "We estimate we're losing about {time_investment} a week in manual effort.",
-        }
+        },
     ],
     "demo": [
         {
@@ -123,7 +160,7 @@ TRANSCRIPT_TEMPLATES = {
             "prospect": "We need to work within a {budget_constraint} budget.",
             "ae": "I understand. Let me put together a customized proposal that addresses your budget.",
         }
-    ]
+    ],
 }
 
 PAIN_POINTS = [
@@ -138,14 +175,29 @@ PAIN_POINTS = [
 
 SOLUTIONS = ["Airflow", "Dask", "Luigi", "Oozie", "Spark", "custom Python scripts"]
 TECH_STACKS = ["Snowflake", "Postgres", "S3", "Kafka", "dbt", "Spark", "Jupyter", "Lambda"]
-USE_CASES = ["customer analytics", "ML training", "ETL", "real-time processing", "data migration", "compliance reporting"]
+USE_CASES = [
+    "customer analytics",
+    "ML training",
+    "ETL",
+    "real-time processing",
+    "data migration",
+    "compliance reporting",
+]
 
-OPPORTUNITY_STAGES = ["Discovery", "Demo", "Technical Deep Dive", "Negotiation", "Closed Won", "Closed Lost"]
+OPPORTUNITY_STAGES = [
+    "Discovery",
+    "Demo",
+    "Technical Deep Dive",
+    "Negotiation",
+    "Closed Won",
+    "Closed Lost",
+]
 OPPORTUNITY_AMOUNTS = [50000, 75000, 100000, 150000, 200000, 250000, 300000]
 
 # ============================================================================
 # FIXTURES GENERATOR
 # ============================================================================
+
 
 class FixturesGenerator:
     """Generate realistic sample data for testing."""
@@ -165,6 +217,7 @@ class FixturesGenerator:
 
         if seed is not None:
             import random
+
             random.seed(seed)
 
         # Track created entities
@@ -350,7 +403,9 @@ class FixturesGenerator:
     # TRANSCRIPT GENERATION
     # ========================================================================
 
-    def generate_transcripts(self, speakers_for_calls: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def generate_transcripts(
+        self, speakers_for_calls: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Generate realistic transcripts for calls."""
         logger.info("Generating transcripts...")
 
@@ -404,7 +459,9 @@ class FixturesGenerator:
         logger.info(f"Generated {len(transcripts)} transcript lines")
         return transcripts
 
-    def _generate_transcript_line(self, call_type: str, is_company: bool, prospect: dict[str, Any] | None) -> str:
+    def _generate_transcript_line(
+        self, call_type: str, is_company: bool, prospect: dict[str, Any] | None
+    ) -> str:
         """Generate a realistic transcript line."""
         import random
 
@@ -465,7 +522,12 @@ class FixturesGenerator:
         # Fill in placeholders
         topics = ["orchestration", "pipelines", "workflows", "data integration", "scheduling"]
         solutions = ["Airflow", "custom scripts", "Dagster", "Prefect"]
-        problems = ["brittle retry logic", "manual intervention", "slow deployment", "scaling issues"]
+        problems = [
+            "brittle retry logic",
+            "manual intervention",
+            "slow deployment",
+            "scaling issues",
+        ]
         actions = ["visualize", "configure", "monitor", "debug", "optimize"]
         competitors = ["Airflow", "Dagster", "Oozie", "Luigi"]
         features = ["error handling", "retries", "monitoring", "alerting", "versioning"]
@@ -474,8 +536,18 @@ class FixturesGenerator:
         aspects = ["error handling", "retries", "scalability", "security", "performance"]
         integrations = ["Kubernetes", "Docker", "Git", "Slack", "Email"]
         concerns = ["failover", "data consistency", "security", "audit logging", "compliance"]
-        usecases = ["100M+ events/day", "real-time processing", "ML training", "complex dependencies"]
-        features_list = ["encryption at rest", "role-based access control", "audit logging", "data residency"]
+        usecases = [
+            "100M+ events/day",
+            "real-time processing",
+            "ML training",
+            "complex dependencies",
+        ]
+        features_list = [
+            "encryption at rest",
+            "role-based access control",
+            "audit logging",
+            "data residency",
+        ]
 
         return (
             template.replace("{topic}", random.choice(topics))
@@ -499,7 +571,9 @@ class FixturesGenerator:
     # COACHING SESSIONS GENERATION
     # ========================================================================
 
-    def generate_coaching_sessions(self, speakers_for_calls: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def generate_coaching_sessions(
+        self, speakers_for_calls: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Generate coaching sessions with varied scores."""
         logger.info("Generating coaching sessions...")
 
@@ -550,7 +624,9 @@ class FixturesGenerator:
                         "areas_for_improvement": improvements,
                         "specific_examples": examples,
                         "action_items": action_items,
-                        "full_analysis": self._generate_full_analysis(dimension, score, strengths, improvements),
+                        "full_analysis": self._generate_full_analysis(
+                            dimension, score, strengths, improvements
+                        ),
                     }
                     sessions.append(session)
 
@@ -592,7 +668,9 @@ class FixturesGenerator:
         import random
 
         dimension_strengths = strengths_map.get(dimension, [])
-        return random.sample(dimension_strengths, min(random.randint(2, 3), len(dimension_strengths)))
+        return random.sample(
+            dimension_strengths, min(random.randint(2, 3), len(dimension_strengths))
+        )
 
     def _generate_improvements(self, dimension: str) -> list[str]:
         """Generate improvement areas for a coaching dimension."""
@@ -626,7 +704,9 @@ class FixturesGenerator:
         import random
 
         dimension_improvements = improvements_map.get(dimension, [])
-        return random.sample(dimension_improvements, min(random.randint(1, 2), len(dimension_improvements)))
+        return random.sample(
+            dimension_improvements, min(random.randint(1, 2), len(dimension_improvements))
+        )
 
     def _generate_specific_examples(self, dimension: str) -> dict[str, Any]:
         """Generate specific transcript examples for coaching."""
@@ -671,14 +751,18 @@ class FixturesGenerator:
         num_items = max(1, 3 - (score // 33))
         return random.sample(base_items, num_items)
 
-    def _generate_full_analysis(self, dimension: str, score: int, strengths: list[str], improvements: list[str]) -> str:
+    def _generate_full_analysis(
+        self, dimension: str, score: int, strengths: list[str], improvements: list[str]
+    ) -> str:
         """Generate a full analysis narrative."""
         rating = "excellent" if score >= 85 else "good" if score >= 70 else "needs improvement"
 
         analysis = f"Overall {rating} performance on {dimension.replace('_', ' ')}. "
         analysis += f"The rep demonstrated {len(strengths)} key strengths: {', '.join(strengths[:2]).lower()}. "
         analysis += f"Focus areas for continued development include: {', '.join(improvements[:2]).lower()}. "
-        analysis += "Recommend focused practice on identified areas and reviewing past call recordings."
+        analysis += (
+            "Recommend focused practice on identified areas and reviewing past call recordings."
+        )
 
         return analysis
 
@@ -698,13 +782,17 @@ class FixturesGenerator:
         for opp in self.created_opportunities:
             # Assign 1-3 calls to each opportunity
             num_calls = random.randint(1, 3)
-            assigned_calls = random.sample(self.created_calls, min(num_calls, len(self.created_calls)))
+            assigned_calls = random.sample(
+                self.created_calls, min(num_calls, len(self.created_calls))
+            )
 
             for call in assigned_calls:
-                call_opps.append({
-                    "call_id": call["id"],
-                    "opportunity_id": opp["id"],
-                })
+                call_opps.append(
+                    {
+                        "call_id": call["id"],
+                        "opportunity_id": opp["id"],
+                    }
+                )
 
         logger.info(f"Generated {len(call_opps)} call-opportunity links")
         return call_opps
@@ -761,8 +849,16 @@ class FixturesGenerator:
                     .replace("{prospect_name}", prospect_name)
                     .replace("{pain_point}", random.choice(PAIN_POINTS))
                     .replace("{tech_stack}", random.choice(TECH_STACKS))
-                    .replace("{timeline}", random.choice(["in two weeks", "next month", "in three weeks"]))
-                    .replace("{recommendation}", random.choice(["starting with a 4-week POC", "a phased rollout", "an MVP first"]))
+                    .replace(
+                        "{timeline}",
+                        random.choice(["in two weeks", "next month", "in three weeks"]),
+                    )
+                    .replace(
+                        "{recommendation}",
+                        random.choice(
+                            ["starting with a 4-week POC", "a phased rollout", "an MVP first"]
+                        ),
+                    )
                 )
 
                 email = {
@@ -771,12 +867,16 @@ class FixturesGenerator:
                     "opportunity_id": opp["id"],
                     "subject": subject,
                     "sender_email": ae["email"],
-                    "recipients": [f"{random.choice(FIRST_NAMES).lower()}@{opp['account_name'].replace(' ', '').lower()}.com"],
+                    "recipients": [
+                        f"{random.choice(FIRST_NAMES).lower()}@{opp['account_name'].replace(' ', '').lower()}.com"
+                    ],
                     "sent_at": opp["created_at"] + timedelta(days=random.randint(1, 30)),
                     "body_snippet": body[:200] + "...",
                     "metadata": {
                         "thread_id": f"thread-{len(emails):04d}",
-                        "has_attachment": random.choice([True, False, False]),  # 33% have attachments
+                        "has_attachment": random.choice(
+                            [True, False, False]
+                        ),  # 33% have attachments
                     },
                 }
                 emails.append(email)
@@ -858,7 +958,9 @@ class FixturesGenerator:
             # Insert call speakers
             call_speaker_params = []
             for call in self.created_calls:
-                call_speakers = [s for s in self._all_speakers_for_calls if s["call_id"] == call["id"]]
+                call_speakers = [
+                    s for s in self._all_speakers_for_calls if s["call_id"] == call["id"]
+                ]
                 for s in call_speakers:
                     call_speaker_params.append(
                         (
@@ -941,10 +1043,7 @@ class FixturesGenerator:
                 counts["opportunities"] = len(opp_params)
 
             # Insert call-opportunity links
-            call_opp_params = [
-                (c["call_id"], c["opportunity_id"])
-                for c in self._all_call_opps
-            ]
+            call_opp_params = [(c["call_id"], c["opportunity_id"]) for c in self._all_call_opps]
             if call_opp_params:
                 execute_many(
                     """
@@ -1027,9 +1126,9 @@ class FixturesGenerator:
 
     def generate_all(self) -> dict[str, int]:
         """Generate all fixtures and insert into database."""
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info("Starting fixtures generation")
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info(f"Configuration: {self.num_calls} calls, {self.days_back} days lookback")
         logger.info("")
 
@@ -1047,10 +1146,10 @@ class FixturesGenerator:
         counts = self.insert_all_data()
 
         logger.info("")
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info("Fixtures generation complete!")
-        logger.info("="*80)
-        logger.info(f"Created:")
+        logger.info("=" * 80)
+        logger.info("Created:")
         logger.info(f"  - {counts['speakers']} Prefect employees (speakers)")
         logger.info(f"  - {counts['calls']} calls")
         logger.info(f"  - {counts['call_speakers']} call participants")
@@ -1070,26 +1169,30 @@ class FixturesGenerator:
         """Display summary statistics about generated data."""
         try:
             # Calls by type
-            call_types = fetch_all("""
+            call_types = fetch_all(
+                """
                 SELECT call_type, COUNT(*) as count
                 FROM calls
                 WHERE created_at > NOW() - INTERVAL '1 day'
                 GROUP BY call_type
                 ORDER BY count DESC
-            """)
+            """
+            )
             if call_types:
                 logger.info("Calls by type:")
                 for row in call_types:
                     logger.info(f"  - {row.get('call_type', 'unknown')}: {row['count']}")
 
             # Coaching sessions by dimension
-            dimensions = fetch_all("""
+            dimensions = fetch_all(
+                """
                 SELECT coaching_dimension, COUNT(*) as count, AVG(score) as avg_score
                 FROM coaching_sessions
                 WHERE created_at > NOW() - INTERVAL '1 day'
                 GROUP BY coaching_dimension
                 ORDER BY count DESC
-            """)
+            """
+            )
             if dimensions:
                 logger.info("Coaching sessions by dimension:")
                 for row in dimensions:
@@ -1099,13 +1202,15 @@ class FixturesGenerator:
                     )
 
             # Opportunities by stage
-            stages = fetch_all("""
+            stages = fetch_all(
+                """
                 SELECT stage, COUNT(*) as count
                 FROM opportunities
                 WHERE created_at > NOW() - INTERVAL '1 day'
                 GROUP BY stage
                 ORDER BY count DESC
-            """)
+            """
+            )
             if stages:
                 logger.info("Opportunities by stage:")
                 for row in stages:
@@ -1118,6 +1223,7 @@ class FixturesGenerator:
 # ============================================================================
 # CLI
 # ============================================================================
+
 
 def main():
     """Main entry point for fixtures generation."""

@@ -4,16 +4,17 @@ Sentry error tracking and exception reporting.
 Captures exceptions with rich context including user information, call IDs,
 request correlation IDs, and performance metrics for debugging and monitoring.
 """
+
 import logging
 import os
-from typing import Any, Optional
 from datetime import datetime
+from typing import Any
 
 import sentry_sdk
 from sentry_sdk.integrations.fastapi import FastApiIntegration
-from sentry_sdk.integrations.starlette import StarletteIntegration
-from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.httpx import HttpxIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations.starlette import StarletteIntegration
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +24,8 @@ class SentryConfig:
 
     def __init__(
         self,
-        dsn: Optional[str] = None,
-        environment: Optional[str] = None,
+        dsn: str | None = None,
+        environment: str | None = None,
         traces_sample_rate: float = 0.1,
         profiles_sample_rate: float = 0.1,
         error_sample_rate: float = 1.0,
@@ -94,9 +95,9 @@ class SentryConfig:
 
 def capture_exception(
     exception: Exception,
-    context: Optional[dict[str, Any]] = None,
+    context: dict[str, Any] | None = None,
     level: str = "error",
-) -> Optional[str]:
+) -> str | None:
     """
     Capture an exception with context.
 
@@ -132,7 +133,14 @@ def capture_exception(
 
             # Set additional context data
             for key, value in context.items():
-                if key not in ["user_id", "email", "call_id", "rep_id", "opportunity_id", "correlation_id"]:
+                if key not in [
+                    "user_id",
+                    "email",
+                    "call_id",
+                    "rep_id",
+                    "opportunity_id",
+                    "correlation_id",
+                ]:
                     scope.set_context("request_context", {key: value})
 
         # Capture exception with level
@@ -144,9 +152,9 @@ def capture_exception(
 
 def capture_message(
     message: str,
-    context: Optional[dict[str, Any]] = None,
+    context: dict[str, Any] | None = None,
     level: str = "info",
-) -> Optional[str]:
+) -> str | None:
     """
     Capture a message with context.
 
@@ -159,10 +167,7 @@ def capture_message(
         Event ID for tracking, or None if Sentry is disabled
     """
     if not sentry_sdk.Hub.current.client:
-        logger.log(
-            getattr(logging, level.upper(), logging.INFO),
-            message
-        )
+        logger.log(getattr(logging, level.upper(), logging.INFO), message)
         return None
 
     with sentry_sdk.push_scope() as scope:
@@ -179,7 +184,7 @@ def add_breadcrumb(
     message: str,
     category: str = "custom",
     level: str = "info",
-    data: Optional[dict[str, Any]] = None,
+    data: dict[str, Any] | None = None,
 ) -> None:
     """
     Add a breadcrumb for request tracing.
@@ -202,7 +207,7 @@ def add_breadcrumb(
     )
 
 
-def set_user_context(user_id: str, email: Optional[str] = None) -> None:
+def set_user_context(user_id: str, email: str | None = None) -> None:
     """
     Set user context for error tracking.
 
@@ -213,10 +218,7 @@ def set_user_context(user_id: str, email: Optional[str] = None) -> None:
     if not sentry_sdk.Hub.current.client:
         return
 
-    sentry_sdk.set_user({
-        "id": user_id,
-        **({"email": email} if email else {})
-    })
+    sentry_sdk.set_user({"id": user_id, **({"email": email} if email else {})})
 
 
 def set_tags(tags: dict[str, str]) -> None:
@@ -234,7 +236,7 @@ def set_tags(tags: dict[str, str]) -> None:
 
 
 # Global Sentry configuration instance
-_sentry_config: Optional[SentryConfig] = None
+_sentry_config: SentryConfig | None = None
 
 
 def get_sentry_config() -> SentryConfig:
@@ -246,8 +248,8 @@ def get_sentry_config() -> SentryConfig:
 
 
 def initialize_sentry(
-    dsn: Optional[str] = None,
-    environment: Optional[str] = None,
+    dsn: str | None = None,
+    environment: str | None = None,
 ) -> bool:
     """Initialize Sentry monitoring."""
     config = SentryConfig(dsn=dsn, environment=environment)

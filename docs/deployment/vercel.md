@@ -4,7 +4,7 @@ Deploy the Next.js frontend to Vercel and connect to backend services.
 
 ## Prerequisites
 
-- Vercel account (create free at https://vercel.com)
+- Vercel account (create free at <https://vercel.com>)
 - GitHub repository with code
 - Backend API running (REST API on port 8001)
 - Clerk account for authentication
@@ -38,7 +38,7 @@ npm start
 
 **Option A: Existing Vercel Account**
 
-1. Go to https://vercel.com/dashboard
+1. Go to <https://vercel.com/dashboard>
 2. Click "Add New..." → "Project"
 3. Select GitHub repository
 4. Choose `call-coach` project
@@ -46,7 +46,7 @@ npm start
 
 **Option B: New Vercel Account**
 
-1. Go to https://vercel.com
+1. Go to <https://vercel.com>
 2. Click "Start Deploying"
 3. Choose "Continue with GitHub"
 4. Authorize Vercel to access your repositories
@@ -86,11 +86,13 @@ Or custom: coach.your-company.com
 ### Deployment Options
 
 **Auto-Deploy on Push**:
+
 - Automatic: Every push to main → production
 - Enable: Vercel → Project Settings → Git
 - Check: "Deploy on push" is enabled
 
 **Preview Deployments**:
+
 - Automatic: Every PR gets preview URL
 - Share preview URL with team
 - Test before merging to main
@@ -101,7 +103,7 @@ Or custom: coach.your-company.com
 
 ### Update Clerk URLs
 
-1. Go to Clerk Dashboard: https://dashboard.clerk.com
+1. Go to Clerk Dashboard: <https://dashboard.clerk.com>
 2. Select your application
 3. Go to Settings → URLs
 4. Update URLs for production:
@@ -193,12 +195,14 @@ NEXT_PUBLIC_MCP_BACKEND_URL=https://call-coach.vercel.app/api
 Backend runs on different server (recommended for larger deployments):
 
 1. Deploy backend to:
+
    - AWS EC2, Lambda, or similar
    - Google Cloud, Azure
    - Heroku, Railway, Render
    - Your own servers
 
 2. Ensure backend is publicly accessible:
+
    ```
    https://api.your-company.com
    ```
@@ -232,18 +236,20 @@ app.add_middleware(
 
 1. Push code to GitHub main branch
 2. Vercel automatically starts build
-3. Monitor build progress at https://vercel.com/dashboard
+3. Monitor build progress at <https://vercel.com/dashboard>
 4. Build takes 2-5 minutes
 5. Once done, app is live at `call-coach.vercel.app`
 
 ### Subsequent Deployments
 
 **Automatic** (recommended):
+
 - Just push to main
 - Vercel builds and deploys automatically
 - Takes ~2-5 minutes
 
 **Manual**:
+
 1. Go to Vercel Dashboard
 2. Select project
 3. Click "Deploy" button
@@ -291,6 +297,7 @@ fetch('https://api.your-company.com/health')
 4. Should get results from backend
 
 If fails, check:
+
 - Backend URL in environment variables
 - Backend is running
 - CORS is configured
@@ -303,7 +310,8 @@ If fails, check:
 ### View Logs
 
 **Vercel Frontend Logs**:
-1. Go to https://vercel.com/dashboard
+
+1. Go to <https://vercel.com/dashboard>
 2. Select project
 3. Go to "Deployments"
 4. Click deployment
@@ -316,6 +324,7 @@ Depends on backend hosting platform.
 ### Performance Monitoring
 
 **Vercel Analytics**:
+
 1. Go to project → "Analytics"
 2. View:
    - Page load times
@@ -324,6 +333,7 @@ Depends on backend hosting platform.
    - Top pages
 
 **Monitor Key Metrics**:
+
 - Page load time: Target <3 seconds
 - Time to interactive: Target <5 seconds
 - Error rate: Target <0.1%
@@ -360,17 +370,20 @@ git push origin main
 ### "Build Failed"
 
 **Check logs in Vercel**:
+
 1. Go to Deployments → Failed deployment
 2. Scroll to "Build Log"
 3. Look for error message
 
 **Common causes**:
+
 - Missing environment variable
 - TypeScript error
 - Import error
 - Dependency not installed
 
 **Solution**:
+
 ```bash
 # Test locally
 npm run build
@@ -389,11 +402,13 @@ git push
 ### "App Shows 404"
 
 **Causes**:
+
 - Build failed (check logs)
 - Wrong framework detected
 - Next.js output directory missing
 
 **Solution**:
+
 ```bash
 # Verify vercel.json doesn't have conflicting config
 cat vercel.json
@@ -424,6 +439,7 @@ fetch('https://api.your-backend.com/health')
 ```
 
 **Solutions**:
+
 1. Update environment variable in Vercel
 2. Redeploy: Go to Deployments → Redeploy
 3. Clear browser cache: Ctrl+Shift+Delete
@@ -451,6 +467,7 @@ fetch('https://api.your-backend.com/health')
 4. Redeploy
 
 **Redeploy after Clerk changes**:
+
 ```bash
 # In Vercel: Deployments → Redeploy
 # Or push new commit
@@ -466,17 +483,20 @@ git push
 **Optimize performance**:
 
 1. **Enable Next.js Image Optimization**:
+
    ```
    Settings → Image Optimization: Enabled
    ```
 
 2. **Use Vercel Analytics**:
+
    ```
    Project → Analytics
    Check which pages are slow
    ```
 
 3. **Optimize Clerk**:
+
    - Reduce calls to Clerk API
    - Cache authentication state
    - Use SWR for data fetching
@@ -512,6 +532,7 @@ Before going live, verify:
 ### Health Checks
 
 **Weekly**:
+
 ```bash
 # Monitor API
 curl https://call-coach.vercel.app/api/health
@@ -523,6 +544,7 @@ curl https://call-coach.vercel.app/api/gong-status
 ```
 
 **Monthly**:
+
 - Review analytics
 - Check error rates
 - Update dependencies
@@ -530,10 +552,10 @@ curl https://call-coach.vercel.app/api/gong-status
 
 ### Get Help
 
-- **Vercel Docs**: https://vercel.com/docs
-- **Next.js Docs**: https://nextjs.org
-- **Clerk Docs**: https://clerk.com/docs
+- **Vercel Docs**: <https://vercel.com/docs>
+- **Next.js Docs**: <https://nextjs.org>
+- **Clerk Docs**: <https://clerk.com/docs>
 
 ---
 
-**Deployment complete!** Your app is now live at https://call-coach.vercel.app
+**Deployment complete!** Your app is now live at <https://call-coach.vercel.app>

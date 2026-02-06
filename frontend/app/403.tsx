@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ShieldAlert, Home, ArrowLeft } from "lucide-react";
 
 interface ForbiddenPageProps {
@@ -22,7 +29,7 @@ interface ForbiddenPageProps {
  */
 export default function ForbiddenPage({
   message = "You don't have permission to access this page",
-  returnUrl = "/dashboard"
+  returnUrl = "/dashboard",
 }: ForbiddenPageProps) {
   const router = useRouter();
 
@@ -36,9 +43,7 @@ export default function ForbiddenPage({
             </div>
           </div>
           <CardTitle className="text-2xl">Access Denied</CardTitle>
-          <CardDescription>
-            {message}
-          </CardDescription>
+          <CardDescription>{message}</CardDescription>
         </CardHeader>
         <CardContent className="text-center">
           <p className="text-6xl font-bold text-muted-foreground/20">403</p>
@@ -49,11 +54,7 @@ export default function ForbiddenPage({
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-2">
-          <Button
-            onClick={() => router.back()}
-            variant="outline"
-            className="w-full gap-2"
-          >
+          <Button onClick={() => router.back()} variant="outline" className="w-full gap-2">
             <ArrowLeft className="h-4 w-4" />
             Go back
           </Button>

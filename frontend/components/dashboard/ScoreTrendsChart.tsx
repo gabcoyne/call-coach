@@ -18,24 +18,24 @@ interface ScoreTrendsChartProps {
 }
 
 const DIMENSION_COLORS = {
-  product_knowledge: '#2563eb', // blue
-  discovery: '#16a34a', // green
-  objection_handling: '#ea580c', // orange
-  engagement: '#9333ea', // purple
-  overall: '#0f172a', // dark
+  product_knowledge: "#2563eb", // blue
+  discovery: "#16a34a", // green
+  objection_handling: "#ea580c", // orange
+  engagement: "#9333ea", // purple
+  overall: "#0f172a", // dark
 };
 
 const DIMENSION_LABELS = {
-  product_knowledge: 'Product Knowledge',
-  discovery: 'Discovery',
-  objection_handling: 'Objection Handling',
-  engagement: 'Engagement',
-  overall: 'Overall',
+  product_knowledge: "Product Knowledge",
+  discovery: "Discovery",
+  objection_handling: "Objection Handling",
+  engagement: "Engagement",
+  overall: "Overall",
 };
 
 export function ScoreTrendsChart({ scoreTrends, showTeamAverage = false }: ScoreTrendsChartProps) {
   // Transform data for Recharts
-  const dimensions = Object.keys(scoreTrends).filter(d => d !== 'overall');
+  const dimensions = Object.keys(scoreTrends).filter((d) => d !== "overall");
 
   if (dimensions.length === 0) {
     return (
@@ -54,7 +54,7 @@ export function ScoreTrendsChart({ scoreTrends, showTeamAverage = false }: Score
   const chartData = dates.map((date, index) => {
     const dataPoint: any = { date };
 
-    dimensions.forEach(dimension => {
+    dimensions.forEach((dimension) => {
       const scores = scoreTrends[dimension]?.scores || [];
       dataPoint[dimension] = scores[index] ?? null;
     });
@@ -65,7 +65,7 @@ export function ScoreTrendsChart({ scoreTrends, showTeamAverage = false }: Score
   // Format date for display
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
+    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
   };
 
   return (
@@ -78,24 +78,20 @@ export function ScoreTrendsChart({ scoreTrends, showTeamAverage = false }: Score
             dataKey="date"
             tickFormatter={formatDate}
             stroke="#64748b"
-            style={{ fontSize: '12px' }}
+            style={{ fontSize: "12px" }}
           />
-          <YAxis
-            domain={[0, 100]}
-            stroke="#64748b"
-            style={{ fontSize: '12px' }}
-          />
+          <YAxis domain={[0, 100]} stroke="#64748b" style={{ fontSize: "12px" }} />
           <Tooltip
             labelFormatter={formatDate}
-            formatter={(value: any) => [`${value}`, '']}
+            formatter={(value: any) => [`${value}`, ""]}
             contentStyle={{
-              backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
+              backgroundColor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
             }}
           />
           <Legend
-            wrapperStyle={{ fontSize: '14px' }}
+            wrapperStyle={{ fontSize: "14px" }}
             formatter={(value) => DIMENSION_LABELS[value as keyof typeof DIMENSION_LABELS] || value}
           />
           {dimensions.map((dimension) => (
@@ -104,7 +100,7 @@ export function ScoreTrendsChart({ scoreTrends, showTeamAverage = false }: Score
               type="monotone"
               dataKey={dimension}
               name={DIMENSION_LABELS[dimension as keyof typeof DIMENSION_LABELS] || dimension}
-              stroke={DIMENSION_COLORS[dimension as keyof typeof DIMENSION_COLORS] || '#000000'}
+              stroke={DIMENSION_COLORS[dimension as keyof typeof DIMENSION_COLORS] || "#000000"}
               strokeWidth={2}
               dot={{ r: 4 }}
               activeDot={{ r: 6 }}

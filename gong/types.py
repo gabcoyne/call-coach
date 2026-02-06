@@ -1,4 +1,5 @@
 """Type definitions for Gong API responses."""
+
 from datetime import datetime
 from typing import Any
 
@@ -7,6 +8,7 @@ from pydantic import BaseModel
 
 class GongSpeaker(BaseModel):
     """Speaker information from Gong."""
+
     speaker_id: str
     name: str
     email: str | None = None
@@ -20,6 +22,7 @@ class GongSentence(BaseModel):
 
     Note: Times are in milliseconds from call start, not seconds.
     """
+
     start: int  # milliseconds from call start
     end: int  # milliseconds from call start
     text: str
@@ -31,6 +34,7 @@ class GongMonologue(BaseModel):
     The Gong API groups transcript by speaker and topic, not individual sentences.
     Each monologue contains multiple sentences on the same topic.
     """
+
     speaker_id: str
     topic: str | None = None  # e.g., "Objections", "Introduction", "Product Demo"
     sentences: list[GongSentence]
@@ -42,6 +46,7 @@ class GongTranscript(BaseModel):
     Official API returns transcript as list of monologues, where each monologue
     is a continuous block of speech by one speaker on a specific topic.
     """
+
     call_id: str
     monologues: list[GongMonologue]
 
@@ -54,18 +59,21 @@ class GongTranscript(BaseModel):
         segments = []
         for monologue in self.monologues:
             for sentence in monologue.sentences:
-                segments.append({
-                    "speaker_id": monologue.speaker_id,
-                    "topic": monologue.topic,
-                    "start_time_seconds": sentence.start / 1000.0,
-                    "duration_seconds": (sentence.end - sentence.start) / 1000.0,
-                    "text": sentence.text,
-                })
+                segments.append(
+                    {
+                        "speaker_id": monologue.speaker_id,
+                        "topic": monologue.topic,
+                        "start_time_seconds": sentence.start / 1000.0,
+                        "duration_seconds": (sentence.end - sentence.start) / 1000.0,
+                        "text": sentence.text,
+                    }
+                )
         return segments
 
 
 class GongCall(BaseModel):
     """Call metadata from Gong."""
+
     id: str
     title: str | None = None
     scheduled: datetime | None = None
@@ -85,6 +93,7 @@ class GongCall(BaseModel):
 
 class GongWebhookPayload(BaseModel):
     """Webhook payload from Gong."""
+
     event: str
     resource_type: str
     resource_id: str

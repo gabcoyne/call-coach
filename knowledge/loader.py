@@ -2,13 +2,14 @@
 Knowledge base loader for coaching rubrics and product documentation.
 Loads structured content into the database for use in coaching analysis.
 """
+
 import json
 import logging
 from pathlib import Path
 from typing import Any
 
 from db import execute_query, fetch_one
-from db.models import CoachingDimension, Product, KnowledgeBaseCategory
+from db.models import CoachingDimension, KnowledgeBaseCategory, Product
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,9 @@ def load_rubric_from_file(rubric_path: Path) -> dict[str, Any]:
     try:
         CoachingDimension(category)
     except ValueError:
-        raise ValueError(f"Invalid category '{category}' in {rubric_path}. Must be one of: {[d.value for d in CoachingDimension]}")
+        raise ValueError(
+            f"Invalid category '{category}' in {rubric_path}. Must be one of: {[d.value for d in CoachingDimension]}"
+        )
 
     return rubric
 
@@ -69,7 +72,7 @@ def insert_rubric_to_db(rubric: dict[str, Any]) -> str:
         SELECT id FROM coaching_rubrics
         WHERE category = %s AND version = %s
         """,
-        (rubric["category"], rubric["version"])
+        (rubric["category"], rubric["version"]),
     )
 
     if existing:
@@ -83,7 +86,7 @@ def insert_rubric_to_db(rubric: dict[str, Any]) -> str:
         SET active = false, deprecated_at = NOW()
         WHERE category = %s AND active = true
         """,
-        (rubric["category"],)
+        (rubric["category"],),
     )
 
     # Insert new rubric
@@ -100,8 +103,8 @@ def insert_rubric_to_db(rubric: dict[str, Any]) -> str:
             json.dumps(rubric["criteria"]),
             json.dumps(rubric["scoring_guide"]),
             json.dumps(rubric.get("examples", {})),
-            True  # New rubric is active
-        )
+            True,  # New rubric is active
+        ),
     )
 
     # Fetch inserted ID
@@ -110,7 +113,7 @@ def insert_rubric_to_db(rubric: dict[str, Any]) -> str:
         SELECT id FROM coaching_rubrics
         WHERE category = %s AND version = %s
         """,
-        (rubric["category"], rubric["version"])
+        (rubric["category"], rubric["version"]),
     )
 
     logger.info(f"Inserted rubric {rubric['name']} v{rubric['version']}")
@@ -169,7 +172,7 @@ def load_product_doc(doc_path: Path, product: Product, category: KnowledgeBaseCa
         SELECT id FROM knowledge_base
         WHERE product = %s AND category = %s
         """,
-        (product.value, category.value)
+        (product.value, category.value),
     )
 
     if existing:
@@ -180,7 +183,7 @@ def load_product_doc(doc_path: Path, product: Product, category: KnowledgeBaseCa
             SET content = %s, last_updated = NOW()
             WHERE product = %s AND category = %s
             """,
-            (content, product.value, category.value)
+            (content, product.value, category.value),
         )
         logger.info(f"Updated {product.value} {category.value}")
     else:
@@ -190,12 +193,7 @@ def load_product_doc(doc_path: Path, product: Product, category: KnowledgeBaseCa
             INSERT INTO knowledge_base (product, category, content, metadata)
             VALUES (%s, %s, %s, %s)
             """,
-            (
-                product.value,
-                category.value,
-                content,
-                json.dumps({"source_file": doc_path.name})
-            )
+            (product.value, category.value, content, json.dumps({"source_file": doc_path.name})),
         )
         logger.info(f"Inserted {product.value} {category.value}")
 
@@ -213,8 +211,16 @@ def load_product_docs() -> None:
         # Competitive Battlecards
         (PRODUCTS_DIR / "battlecard_airflow.md", Product.PREFECT, KnowledgeBaseCategory.COMPETITOR),
         (PRODUCTS_DIR / "battlecard_dagster.md", Product.PREFECT, KnowledgeBaseCategory.COMPETITOR),
-        (PRODUCTS_DIR / "battlecard_temporal.md", Product.PREFECT, KnowledgeBaseCategory.COMPETITOR),
-        (PRODUCTS_DIR / "competitive_positioning.md", Product.PREFECT, KnowledgeBaseCategory.COMPETITOR),
+        (
+            PRODUCTS_DIR / "battlecard_temporal.md",
+            Product.PREFECT,
+            KnowledgeBaseCategory.COMPETITOR,
+        ),
+        (
+            PRODUCTS_DIR / "competitive_positioning.md",
+            Product.PREFECT,
+            KnowledgeBaseCategory.COMPETITOR,
+        ),
     ]
 
     for doc_path, product, category in docs_to_load:
@@ -263,14 +269,10 @@ def verify_knowledge_base() -> dict[str, Any]:
     logger.info("Verifying knowledge base")
 
     # Count active rubrics
-    rubrics_count = fetch_one(
-        "SELECT COUNT(*) as count FROM coaching_rubrics WHERE active = true"
-    )
+    rubrics_count = fetch_one("SELECT COUNT(*) as count FROM coaching_rubrics WHERE active = true")
 
     # Count knowledge base entries
-    kb_count = fetch_one(
-        "SELECT COUNT(*) as count FROM knowledge_base"
-    )
+    kb_count = fetch_one("SELECT COUNT(*) as count FROM knowledge_base")
 
     # Get rubric versions
     rubrics = fetch_one(
@@ -294,8 +296,8 @@ def verify_knowledge_base() -> dict[str, Any]:
 
     # Validate
     results["valid"] = (
-        results["active_rubrics"] == results["expected_rubrics"] and
-        results["knowledge_base_entries"] == results["expected_kb_entries"]
+        results["active_rubrics"] == results["expected_rubrics"]
+        and results["knowledge_base_entries"] == results["expected_kb_entries"]
     )
 
     if results["valid"]:
@@ -310,8 +312,7 @@ if __name__ == "__main__":
     import sys
 
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     if len(sys.argv) > 1:

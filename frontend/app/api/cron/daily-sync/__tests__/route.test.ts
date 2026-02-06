@@ -1,15 +1,15 @@
-import { NextRequest } from 'next/server';
-import { POST, GET } from '../route';
-import { exec } from 'child_process';
+import { NextRequest } from "next/server";
+import { POST, GET } from "../route";
+import { exec } from "child_process";
 
 // Mock child_process
-jest.mock('child_process');
+jest.mock("child_process");
 const mockExec = exec as jest.MockedFunction<typeof exec>;
 
-describe('GET /api/cron/daily-sync', () => {
-  it('should return cron job configuration', async () => {
-    const request = new NextRequest('http://localhost/api/cron/daily-sync', {
-      method: 'GET',
+describe("GET /api/cron/daily-sync", () => {
+  it("should return cron job configuration", async () => {
+    const request = new NextRequest("http://localhost/api/cron/daily-sync", {
+      method: "GET",
     });
 
     const response = await GET(request);
@@ -17,15 +17,15 @@ describe('GET /api/cron/daily-sync', () => {
 
     expect(response.status).toBe(200);
     expect(data).toMatchObject({
-      job: 'daily-gong-sync',
-      schedule: '0 6 * * *',
+      job: "daily-gong-sync",
+      schedule: "0 6 * * *",
       description: expect.any(String),
     });
   });
 });
 
-describe('POST /api/cron/daily-sync', () => {
-  const mockCronSecret = 'test-cron-secret-123';
+describe("POST /api/cron/daily-sync", () => {
+  const mockCronSecret = "test-cron-secret-123";
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -36,11 +36,11 @@ describe('POST /api/cron/daily-sync', () => {
     delete process.env.CRON_SECRET;
   });
 
-  it('should reject unauthorized requests', async () => {
-    const request = new NextRequest('http://localhost/api/cron/daily-sync', {
-      method: 'POST',
+  it("should reject unauthorized requests", async () => {
+    const request = new NextRequest("http://localhost/api/cron/daily-sync", {
+      method: "POST",
       headers: {
-        'Authorization': 'Bearer wrong-secret',
+        Authorization: "Bearer wrong-secret",
       },
     });
 
@@ -48,12 +48,12 @@ describe('POST /api/cron/daily-sync', () => {
 
     expect(response.status).toBe(401);
     const data = await response.json();
-    expect(data).toEqual({ error: 'Unauthorized' });
+    expect(data).toEqual({ error: "Unauthorized" });
   });
 
-  it('should reject requests without authorization header', async () => {
-    const request = new NextRequest('http://localhost/api/cron/daily-sync', {
-      method: 'POST',
+  it("should reject requests without authorization header", async () => {
+    const request = new NextRequest("http://localhost/api/cron/daily-sync", {
+      method: "POST",
     });
 
     const response = await POST(request);
@@ -61,23 +61,23 @@ describe('POST /api/cron/daily-sync', () => {
     expect(response.status).toBe(401);
   });
 
-  it('should execute sync successfully with valid authorization', async () => {
+  it("should execute sync successfully with valid authorization", async () => {
     // Mock successful execution
     const mockStdout = JSON.stringify({
-      status: 'success',
+      status: "success",
       opportunities: { synced: 10, errors: 0 },
       associations: { calls_linked: 25, emails_synced: 15 },
     });
 
     mockExec.mockImplementation((command: any, options: any, callback: any) => {
-      callback(null, { stdout: mockStdout, stderr: '' });
+      callback(null, { stdout: mockStdout, stderr: "" });
       return {} as any;
     });
 
-    const request = new NextRequest('http://localhost/api/cron/daily-sync', {
-      method: 'POST',
+    const request = new NextRequest("http://localhost/api/cron/daily-sync", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${mockCronSecret}`,
+        Authorization: `Bearer ${mockCronSecret}`,
       },
     });
 
@@ -86,29 +86,29 @@ describe('POST /api/cron/daily-sync', () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data).toMatchObject({
-      job: 'daily-gong-sync',
-      status: 'success',
+      job: "daily-gong-sync",
+      status: "success",
       output: expect.any(String),
     });
     expect(data.startTime).toBeTruthy();
     expect(data.endTime).toBeTruthy();
   });
 
-  it('should handle sync failures gracefully', async () => {
+  it("should handle sync failures gracefully", async () => {
     // Mock failed execution
-    const mockError = new Error('Python script failed') as any;
-    mockError.stdout = 'Partial output';
-    mockError.stderr = 'Error details';
+    const mockError = new Error("Python script failed") as any;
+    mockError.stdout = "Partial output";
+    mockError.stderr = "Error details";
 
     mockExec.mockImplementation((command: any, options: any, callback: any) => {
       callback(mockError);
       return {} as any;
     });
 
-    const request = new NextRequest('http://localhost/api/cron/daily-sync', {
-      method: 'POST',
+    const request = new NextRequest("http://localhost/api/cron/daily-sync", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${mockCronSecret}`,
+        Authorization: `Bearer ${mockCronSecret}`,
       },
     });
 
@@ -118,22 +118,22 @@ describe('POST /api/cron/daily-sync', () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data).toMatchObject({
-      job: 'daily-gong-sync',
-      status: 'failed',
+      job: "daily-gong-sync",
+      status: "failed",
       error: expect.any(String),
     });
   });
 
-  it('should allow requests in development without CRON_SECRET', async () => {
+  it("should allow requests in development without CRON_SECRET", async () => {
     delete process.env.CRON_SECRET;
 
     mockExec.mockImplementation((command: any, options: any, callback: any) => {
-      callback(null, { stdout: 'Success', stderr: '' });
+      callback(null, { stdout: "Success", stderr: "" });
       return {} as any;
     });
 
-    const request = new NextRequest('http://localhost/api/cron/daily-sync', {
-      method: 'POST',
+    const request = new NextRequest("http://localhost/api/cron/daily-sync", {
+      method: "POST",
     });
 
     const response = await POST(request);
@@ -142,23 +142,23 @@ describe('POST /api/cron/daily-sync', () => {
     expect(response.status).toBe(200);
   });
 
-  it('should execute with correct Python command', async () => {
+  it("should execute with correct Python command", async () => {
     mockExec.mockImplementation((command: any, options: any, callback: any) => {
-      callback(null, { stdout: 'Success', stderr: '' });
+      callback(null, { stdout: "Success", stderr: "" });
       return {} as any;
     });
 
-    const request = new NextRequest('http://localhost/api/cron/daily-sync', {
-      method: 'POST',
+    const request = new NextRequest("http://localhost/api/cron/daily-sync", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${mockCronSecret}`,
+        Authorization: `Bearer ${mockCronSecret}`,
       },
     });
 
     await POST(request);
 
     expect(mockExec).toHaveBeenCalledWith(
-      expect.stringContaining('uv run python -m flows.daily_gong_sync'),
+      expect.stringContaining("uv run python -m flows.daily_gong_sync"),
       expect.objectContaining({
         timeout: 280000, // 280s timeout
         maxBuffer: 10 * 1024 * 1024, // 10MB
@@ -167,19 +167,19 @@ describe('POST /api/cron/daily-sync', () => {
     );
   });
 
-  it('should handle timeout errors', async () => {
-    const timeoutError = new Error('Execution timed out') as any;
-    timeoutError.code = 'ETIMEDOUT';
+  it("should handle timeout errors", async () => {
+    const timeoutError = new Error("Execution timed out") as any;
+    timeoutError.code = "ETIMEDOUT";
 
     mockExec.mockImplementation((command: any, options: any, callback: any) => {
       callback(timeoutError);
       return {} as any;
     });
 
-    const request = new NextRequest('http://localhost/api/cron/daily-sync', {
-      method: 'POST',
+    const request = new NextRequest("http://localhost/api/cron/daily-sync", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${mockCronSecret}`,
+        Authorization: `Bearer ${mockCronSecret}`,
       },
     });
 
@@ -187,7 +187,7 @@ describe('POST /api/cron/daily-sync', () => {
 
     expect(response.status).toBe(200);
     const data = await response.json();
-    expect(data.status).toBe('failed');
-    expect(data.error).toContain('timed out');
+    expect(data.status).toBe("failed");
+    expect(data.error).toContain("timed out");
   });
 });

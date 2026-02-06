@@ -2,6 +2,7 @@
 Live integration tests for Gong API client.
 Tests against real Gong API using credentials from .env
 """
+
 import logging
 from datetime import datetime, timedelta
 
@@ -32,7 +33,7 @@ def test_list_calls():
 
         if calls:
             first_call = calls[0]
-            logger.info(f"\nFirst call details:")
+            logger.info("\nFirst call details:")
             logger.info(f"  ID: {first_call.id}")
             logger.info(f"  Title: {first_call.title}")
             logger.info(f"  Started: {first_call.started}")
@@ -99,7 +100,7 @@ def test_get_transcript(call_id: str, call_metadata=None):
 
             if monologue.sentences:
                 first_sentence = monologue.sentences[0]
-                logger.info(f"    First sentence:")
+                logger.info("    First sentence:")
                 logger.info(f"      Time: {first_sentence.start}ms - {first_sentence.end}ms")
                 logger.info(f"      Text: {first_sentence.text[:100]}...")
 
@@ -124,7 +125,7 @@ def test_search_calls():
             client.search_calls("prefect", from_date="2024-01-01T00:00:00Z")
             logger.error("✗ search_calls() should have raised NotImplementedError!")
         except NotImplementedError as e:
-            logger.info(f"✓ Correctly raised NotImplementedError:")
+            logger.info("✓ Correctly raised NotImplementedError:")
             logger.info(f"  {str(e)}")
 
 

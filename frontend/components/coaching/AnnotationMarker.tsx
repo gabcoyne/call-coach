@@ -82,7 +82,9 @@ export function AnnotationMarker({
 
         {/* Dot at top */}
         <div
-          className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 ${config.color} rounded-full border-2 border-white shadow-md transition-all ${
+          className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 ${
+            config.color
+          } rounded-full border-2 border-white shadow-md transition-all ${
             isHovered ? "w-4 h-4 -translate-y-2" : ""
           }`}
         />
@@ -91,17 +93,13 @@ export function AnnotationMarker({
         {isHovered && (
           <div className="absolute left-1/2 transform -translate-x-1/2 -top-32 z-50 w-48 bg-white rounded-lg shadow-lg border border-gray-200 p-3 pointer-events-auto">
             <div className="flex items-start gap-2">
-              <Icon className={`h-4 w-4 ${config.color.replace("bg-", "text-")} flex-shrink-0 mt-0.5`} />
+              <Icon
+                className={`h-4 w-4 ${config.color.replace("bg-", "text-")} flex-shrink-0 mt-0.5`}
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-gray-900">
-                  {config.label}
-                </p>
-                <p className="text-xs font-medium text-gray-700 mt-0.5">
-                  {annotation.title}
-                </p>
-                <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                  {annotation.insight}
-                </p>
+                <p className="text-xs font-semibold text-gray-900">{config.label}</p>
+                <p className="text-xs font-medium text-gray-700 mt-0.5">{annotation.title}</p>
+                <p className="text-xs text-gray-600 mt-1 line-clamp-2">{annotation.insight}</p>
               </div>
             </div>
             <button

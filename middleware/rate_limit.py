@@ -4,12 +4,12 @@ Rate limiting middleware using token bucket algorithm.
 Implements per-user and per-endpoint rate limits with configurable
 burst capacity and refill rate.
 """
+
 import logging
 import time
-from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass
 from threading import Lock
-from typing import Callable
 
 from fastapi import Request, Response, status
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -29,6 +29,7 @@ class TokenBucket:
     - Each request consumes 1 token
     - If bucket is empty, request is rejected
     """
+
     capacity: int
     refill_rate: float  # tokens per second
     tokens: float
@@ -45,10 +46,7 @@ class TokenBucket:
         elapsed = now - self.last_refill
 
         # Refill bucket based on elapsed time
-        self.tokens = min(
-            self.capacity,
-            self.tokens + (elapsed * self.refill_rate)
-        )
+        self.tokens = min(self.capacity, self.tokens + (elapsed * self.refill_rate))
         self.last_refill = now
 
         # Try to consume tokens
@@ -161,9 +159,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         # Try to consume token
         if not bucket.consume():
             # Rate limit exceeded
-            logger.warning(
-                f"Rate limit exceeded for {user_id} on {request.url.path}"
-            )
+            logger.warning(f"Rate limit exceeded for {user_id} on {request.url.path}")
 
             # Add rate limit headers
             response = JSONResponse(
@@ -201,7 +197,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         now = time.time()
         with self.lock:
             expired_keys = [
-                key for key, bucket in self.user_buckets.items()
+                key
+                for key, bucket in self.user_buckets.items()
                 if now - bucket.last_refill > max_age_seconds
             ]
             for key in expired_keys:

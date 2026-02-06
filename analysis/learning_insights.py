@@ -10,23 +10,22 @@ COACHING PHILOSOPHY:
 - Compare behavioral patterns, not just scores
 - Focus on actionable differences the rep can learn from
 """
+
 import json
 import logging
 from typing import Any
 
+import anthropic
+
 from coaching_mcp.shared import settings
 from db import queries
 from db.models import CoachingDimension
-import anthropic
 
 logger = logging.getLogger(__name__)
 
 
 def find_similar_won_opportunities(
-    rep_email: str,
-    product: str | None = None,
-    rep_role: str | None = None,
-    limit: int = 50
+    rep_email: str, product: str | None = None, rep_role: str | None = None, limit: int = 50
 ) -> list[dict[str, Any]]:
     """
     Find closed-won opportunities by top performers in similar product/size and same role.
@@ -62,7 +61,7 @@ def find_similar_won_opportunities(
 
         if owner_emails:
             # Query staff_roles for these emails
-            placeholders = ','.join(['%s'] * len(owner_emails))
+            placeholders = ",".join(["%s"] * len(owner_emails))
             roles_query = f"SELECT email, role FROM staff_roles WHERE email IN ({placeholders})"
             role_results = fetch_all(roles_query, tuple(owner_emails))
 
@@ -71,7 +70,8 @@ def find_similar_won_opportunities(
 
             # Filter opportunities to only those owned by same role
             won_opps = [
-                opp for opp in won_opps
+                opp
+                for opp in won_opps
                 if opp.get("owner_email") and email_to_role.get(opp["owner_email"]) == rep_role
             ]
 
@@ -83,9 +83,7 @@ def find_similar_won_opportunities(
 
 
 def aggregate_coaching_patterns(
-    opportunities: list[dict[str, Any]],
-    focus_area: str,
-    role_filter: str | None = None
+    opportunities: list[dict[str, Any]], focus_area: str, role_filter: str | None = None
 ) -> dict[str, Any]:
     """
     Aggregate coaching scores and patterns across opportunities, optionally filtered by role.
@@ -143,13 +141,19 @@ def aggregate_coaching_patterns(
                             "score": score,
                             "feedback": session.get("feedback"),
                             "transcript_excerpt": transcript[:1000] if transcript else "",
-                            "call_date": call["scheduled_at"].isoformat() if call.get("scheduled_at") else None,
+                            "call_date": (
+                                call["scheduled_at"].isoformat()
+                                if call.get("scheduled_at")
+                                else None
+                            ),
                         }
                     )
 
     patterns["total_calls_analyzed"] = len(all_scores)
     patterns["average_score"] = sum(all_scores) / len(all_scores) if all_scores else 0
-    patterns["high_scoring_examples"] = sorted(high_score_examples, key=lambda x: x["score"], reverse=True)[:5]
+    patterns["high_scoring_examples"] = sorted(
+        high_score_examples, key=lambda x: x["score"], reverse=True
+    )[:5]
 
     return patterns
 
@@ -185,7 +189,9 @@ def extract_exemplar_moments(
     return exemplars
 
 
-def get_learning_insights(rep_email: str, focus_area: str, rep_role: str | None = None) -> dict[str, Any]:
+def get_learning_insights(
+    rep_email: str, focus_area: str, rep_role: str | None = None
+) -> dict[str, Any]:
     """
     Compare rep's patterns to top performers in the same role and generate learning insights.
 
@@ -201,10 +207,7 @@ def get_learning_insights(rep_email: str, focus_area: str, rep_role: str | None 
 
     # Detect rep's role if not provided
     if not rep_role:
-        role_result = fetch_one(
-            "SELECT role FROM staff_roles WHERE email = %s",
-            (rep_email,)
-        )
+        role_result = fetch_one("SELECT role FROM staff_roles WHERE email = %s", (rep_email,))
         rep_role = role_result["role"] if role_result else "ae"  # Default to AE
         logger.info(f"Detected role for {rep_email}: {rep_role}")
 
@@ -242,7 +245,7 @@ def get_learning_insights(rep_email: str, focus_area: str, rep_role: str | None 
     role_names = {
         "ae": "Account Executive",
         "se": "Sales Engineer",
-        "csm": "Customer Success Manager"
+        "csm": "Customer Success Manager",
     }
     role_display = role_names.get(rep_role, rep_role.upper())
 
@@ -297,7 +300,7 @@ Use specific examples from the top performer calls. No encouragement - just show
             "opportunities": top_performer_patterns["opportunity_count"],
             "calls": top_performer_patterns["total_calls_analyzed"],
             "average_score": round(top_performer_patterns["average_score"], 1),
-            "note": f"All examples from {role_names.get(rep_role, rep_role.upper())}s with closed-won deals"
+            "note": f"All examples from {role_names.get(rep_role, rep_role.upper())}s with closed-won deals",
         },
         "behavioral_differences": response.content[0].text,
         "exemplar_moments": exemplars,

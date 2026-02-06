@@ -21,6 +21,7 @@ All analysis uses **Claude AI** to deeply understand sales conversations and pro
 Call Coach analyzes every call across **4 key coaching dimensions**:
 
 1. **Discovery** (Learning customer needs)
+
    - Understanding the customer's business challenges
    - Asking qualifying questions
    - Identifying pain points and priorities
@@ -28,6 +29,7 @@ Call Coach analyzes every call across **4 key coaching dimensions**:
    - Uncovering decision criteria
 
 2. **Product Knowledge** (Demonstrating expertise)
+
    - Accurate product feature explanation
    - Relevant use case examples
    - Competitive positioning
@@ -35,6 +37,7 @@ Call Coach analyzes every call across **4 key coaching dimensions**:
    - Connecting features to customer needs
 
 3. **Objection Handling** (Overcoming concerns)
+
    - Listening to and understanding objections
    - Addressing concerns with evidence
    - Value-based responses to pricing
@@ -71,11 +74,13 @@ Analysis covers two product lines:
 ### Step 1: Access the Platform
 
 **Option A: Web Dashboard** (Recommended)
+
 1. Navigate to the Call Coach dashboard
 2. Sign in with your Prefect email
 3. Complete Clerk authentication setup (one-time)
 
 **Option B: Claude Desktop** (For power users)
+
 1. Ensure MCP server is running locally
 2. Add to Claude Desktop configuration
 3. Ask Claude questions about calls naturally
@@ -91,6 +96,7 @@ Your personal dashboard shows:
 - **Coaching Plan** - Personalized next steps
 
 Example dashboard data:
+
 ```
 This Month: 82 average
 ├─ Discovery: 80 (trend: improving +5)
@@ -152,20 +158,24 @@ Next Steps:
 Each analysis includes:
 
 **Findings** - What was observed in the call
+
 - Positive findings show what went well
 - Improvement findings show opportunities
 
 **Recommendations** - Specific actions to improve
+
 - Actionable and skill-specific
 - Prioritized by impact
 - Include supporting evidence
 
 **Evidence** - Direct quotes from the call
+
 - Shows exactly where findings are based
 - Includes timestamp in call
 - Provides context for recommendations
 
 **Score Interpretation**:
+
 - **90-100**: Excellent performance, minimal improvement needed
 - **80-89**: Good performance, some opportunities to build on strength
 - **70-79**: Average performance, meaningful improvement possible
@@ -186,6 +196,7 @@ Use **Call Search** to find similar calls:
 4. Compare results to see patterns
 
 Example search:
+
 ```
 Query: "discovery"
 Filters:
@@ -200,6 +211,7 @@ Results: 12 calls found
 ```
 
 Pick the highest-scoring call and study:
+
 1. What did the rep do differently?
 2. How did they structure the discovery?
 3. What questions did they ask?
@@ -210,21 +222,25 @@ Pick the highest-scoring call and study:
 Based on your skill gaps, create a focused improvement plan:
 
 **Step 1: Identify Priority Gaps**
+
 - Review your last 10 calls
 - Find the lowest-scoring dimension
 - Check if it's declining over time
 
 **Step 2: Set a Specific Goal**
+
 - Example: "Improve objection handling from 75 to 85 in 30 days"
 - Break it down: "+2-3 points per week"
 
 **Step 3: Take Action**
+
 - Find high-scoring calls in the area
 - Practice specific scenarios (role-play)
 - Study competitor objections
 - Shadow top performers
 
 **Step 4: Measure Progress**
+
 - Review your scores weekly
 - Compare to baseline
 - Celebrate improvements
@@ -288,24 +304,28 @@ Priority 2: Discovery Depth (Medium)
 When analyzing a call, you'll see:
 
 ### Call Summary
+
 - Call title and date
 - Duration and participants
 - Product discussed
 - Call outcome (if tracked)
 
 ### Dimension Breakdown
+
 - Score for each dimension (0-100)
 - Specific findings (strengths and gaps)
 - Actionable recommendations
 - Supporting evidence with timestamps
 
 ### Full Transcript
+
 - Complete call transcript with timestamps
 - Speaker identification
 - Search across transcript
 - Jump to specific moments in recording
 
 ### Coaching Recommendations
+
 - Prioritized action items
 - Skill development suggestions
 - Resources and references
@@ -316,6 +336,7 @@ When analyzing a call, you'll see:
 ### Quick Search
 
 Find calls by keywords:
+
 ```
 Search: "pricing objection"
 Results: All calls mentioning pricing or objections
@@ -343,12 +364,14 @@ Results: 3 calls found
 ### Saved Searches
 
 Save frequent searches:
+
 1. Create a filtered search
 2. Click "Save Search"
 3. Name it (e.g., "High-Scoring Discovery Calls")
 4. Access from sidebar
 
 Suggested saved searches:
+
 - "My highest scoring calls" - Min score 90
 - "Discovery calls" - Type: Discovery
 - "Objection handling practice" - Keywords: objection, pricing
@@ -361,6 +384,7 @@ Every Monday, you receive an automated report:
 ### Report Contents
 
 **Your Performance This Week**
+
 ```
 Calls Analyzed: 5
 Average Score: 83/100
@@ -369,6 +393,7 @@ Best Call: 94/100
 ```
 
 **Dimension Breakdown**
+
 ```
 Discovery: 81 (down 2 from last week)
 Product Knowledge: 89 (up 3)
@@ -377,12 +402,14 @@ Engagement: 86 (up 4)
 ```
 
 **Key Insights**
+
 - Highlighted patterns in your calls
 - Compared to team averages
 - Progress on goals
 - Learning opportunities
 
 **Recommended Actions**
+
 - Specific next steps based on this week
 - Skill development suggestions
 - Calls to study from top performers
@@ -394,6 +421,7 @@ See [Weekly Reports Guide](./weekly-reports.md) for details.
 ### If You're a Sales Rep
 
 You can:
+
 - View your own call analyses
 - See your personal dashboard
 - Create coaching plans
@@ -401,6 +429,7 @@ You can:
 - Compare to team averages (anonymized)
 
 You cannot:
+
 - See other reps' detailed call data
 - View other reps' dashboards
 - Export rep data
@@ -408,6 +437,7 @@ You cannot:
 ### If You're a Manager
 
 You can:
+
 - View all team members' analyses
 - Compare rep performance
 - Identify team skill gaps
@@ -420,32 +450,38 @@ See [Role Management Guide](./role-management.md) for details.
 ## Tips & Best Practices
 
 ### 1. Review Calls Regularly
+
 - Review analyses within 24 hours while call is fresh
 - Note key learnings
 - Update your practice
 
 ### 2. Learn from Top Performers
+
 - Find calls with 90+ scores
 - Study what made them successful
 - Identify patterns in their approach
 
 ### 3. Focus on One Dimension
+
 - Pick your lowest dimension
 - Find 3 calls with 85+ scores in that area
 - Practice the techniques used
 
 ### 4. Use Evidence-Based Feedback
+
 - Reference specific quotes and timestamps
 - Use as training material
 - Share with manager for coaching
 
 ### 5. Track Your Progress
+
 - Set weekly improvement targets (+2-3 points)
 - Review trends monthly
 - Celebrate wins
 - Adjust strategy as needed
 
 ### 6. Create Group Studies
+
 - Use Call Search to find interesting calls
 - Share with team members
 - Discuss in team meetings
@@ -456,6 +492,7 @@ See [Role Management Guide](./role-management.md) for details.
 ### "Call not found in database"
 
 The call hasn't been processed yet. This can happen if:
+
 1. Call is still being transferred from Gong (wait 5-10 minutes)
 2. Gong webhook wasn't received
 3. Call ID is incorrect
@@ -467,6 +504,7 @@ The call hasn't been processed yet. This can happen if:
 This happens with very long calls (60+ minutes). This is normal.
 
 **Typical times**:
+
 - Standard call (15-30 min): 30-45 seconds
 - Long call (45-60 min): 60-90 seconds
 - Very long call (60+ min): Up to 3 minutes
@@ -476,6 +514,7 @@ This happens with very long calls (60+ minutes). This is normal.
 Scores are based on Claude's analysis of the transcript and can vary based on context.
 
 **To review**:
+
 1. Check the "Evidence" section - see exact quotes
 2. Read recommendations - understand the reasoning
 3. Share feedback with your manager if needed

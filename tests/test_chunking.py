@@ -1,11 +1,12 @@
 """Tests for transcript chunking functionality."""
+
 import pytest
 
 from analysis.chunking import (
     chunk_transcript,
-    reconstruct_full_transcript,
     count_tokens,
     get_chunk_context,
+    reconstruct_full_transcript,
 )
 
 

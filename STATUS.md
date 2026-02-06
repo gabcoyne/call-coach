@@ -24,6 +24,7 @@ Gong Webhooks → FastAPI Server → Prefect Flows → Neon Postgres
 ### Completed Components
 
 #### Database Layer
+
 - ✅ Complete schema with 14 tables
 - ✅ Partitioned `coaching_sessions` table (quarterly partitions)
 - ✅ Indexes for all critical queries
@@ -34,12 +35,14 @@ Gong Webhooks → FastAPI Server → Prefect Flows → Neon Postgres
 - ✅ Query helper functions
 
 **Files:**
+
 - `db/migrations/001_initial_schema.sql` (540 lines)
 - `db/connection.py` - Connection pool management
 - `db/models.py` - Pydantic models with enums
 - `db/queries.py` - High-level query abstractions
 
 #### Gong Integration
+
 - ✅ Gong API client with retries
 - ✅ Webhook signature verification (HMAC-SHA256)
 - ✅ FastAPI endpoint for receiving webhooks
@@ -47,21 +50,25 @@ Gong Webhooks → FastAPI Server → Prefect Flows → Neon Postgres
 - ✅ Type definitions for Gong responses
 
 **Files:**
+
 - `gong/client.py` - API client for calls and transcripts
 - `gong/webhook.py` - Webhook handler with security
 - `gong/types.py` - Pydantic models for Gong data
 
 #### Transcript Processing
+
 - ✅ Token counting with tiktoken
 - ✅ Sliding window chunking with overlap
 - ✅ Chunk reconstruction
 - ✅ Context tracking for multi-chunk analysis
 
 **Files:**
+
 - `analysis/chunking.py` - Chunking utilities
 - `tests/test_chunking.py` - Comprehensive test suite
 
 #### Caching System
+
 - ✅ SHA256 transcript hashing
 - ✅ Cache key generation (transcript + rubric version)
 - ✅ Cache lookup with TTL
@@ -69,9 +76,11 @@ Gong Webhooks → FastAPI Server → Prefect Flows → Neon Postgres
 - ✅ Rubric version tracking for invalidation
 
 **Files:**
+
 - `analysis/cache.py` - Intelligent caching implementation
 
 #### Prefect Flows
+
 - ✅ `process_new_call_flow` - End-to-end webhook processing
 - ✅ Concurrent task runner for parallel operations
 - ✅ Retry logic and error handling
@@ -79,9 +88,11 @@ Gong Webhooks → FastAPI Server → Prefect Flows → Neon Postgres
 - ✅ Webhook status updates
 
 **Files:**
+
 - `flows/process_new_call.py` - Main ingestion flow
 
 #### Configuration & Infrastructure
+
 - ✅ Pydantic Settings for env management
 - ✅ Docker Compose for local development
 - ✅ Dockerfiles for webhook and MCP servers
@@ -89,6 +100,7 @@ Gong Webhooks → FastAPI Server → Prefect Flows → Neon Postgres
 - ✅ Test fixtures and pytest configuration
 
 **Files:**
+
 - `config.py` - Settings with validation
 - `docker-compose.yml` - Local dev environment
 - `webhook_server.py` - FastAPI application
@@ -125,12 +137,14 @@ psql $DATABASE_URL -c "\dt"
 ### TODO
 
 1. **Create Coaching Rubrics**
+
    - [ ] `knowledge/rubrics/discovery_v1.json`
    - [ ] `knowledge/rubrics/product_knowledge_v1.json`
    - [ ] `knowledge/rubrics/objection_handling_v1.json`
    - [ ] `knowledge/rubrics/engagement_v1.json`
 
 2. **Create Product Documentation**
+
    - [ ] `knowledge/products/prefect_features.md`
    - [ ] `knowledge/products/horizon_features.md`
    - [ ] `knowledge/products/competitive_positioning.md`
@@ -151,12 +165,14 @@ psql $DATABASE_URL -c "\dt"
 ### TODO
 
 1. **Prompt Templates**
+
    - [ ] `analysis/prompts/product_knowledge.py`
    - [ ] `analysis/prompts/discovery.py`
    - [ ] `analysis/prompts/objection_handling.py`
    - [ ] `analysis/prompts/engagement.py`
 
 2. **Claude Integration**
+
    - [ ] Replace placeholder in `analysis/engine.py`
    - [ ] Implement prompt caching
    - [ ] Token usage tracking
@@ -178,11 +194,13 @@ psql $DATABASE_URL -c "\dt"
 ### TODO
 
 1. **MCP Server Setup**
+
    - [ ] Initialize FastMCP project structure
    - [ ] Connection to Neon database
    - [ ] Authentication middleware
 
 2. **Implement 9 Tools**
+
    - [ ] `analyze_call`
    - [ ] `get_rep_insights`
    - [ ] `search_calls`
@@ -209,6 +227,7 @@ psql $DATABASE_URL -c "\dt"
 ### TODO
 
 1. **Weekly Review Flow**
+
    - [ ] `flows/weekly_review.py`
    - [ ] Batch call analysis
    - [ ] Trend computation
@@ -231,17 +250,20 @@ psql $DATABASE_URL -c "\dt"
 ### TODO
 
 1. **Error Handling**
+
    - [ ] Comprehensive retry logic
    - [ ] Circuit breakers
    - [ ] Graceful degradation
 
 2. **Monitoring**
+
    - [ ] Cost tracking dashboard
    - [ ] Cache hit rate monitoring
    - [ ] Latency tracking
    - [ ] Error alerting
 
 3. **Security**
+
    - [ ] Webhook signature audit
    - [ ] Database encryption at rest
    - [ ] API key rotation procedure
@@ -258,11 +280,13 @@ psql $DATABASE_URL -c "\dt"
 ## Cost Projections
 
 ### Current Status
+
 - **Phase 1:** No Claude API calls yet - $0/month
 - **Database:** Neon Starter ($19/month estimated)
 - **Prefect:** Included in existing Horizon plan
 
 ### Expected (Post Phase 3)
+
 - **Without optimization:** ~$1,787/month (100 calls/week)
 - **With caching:** ~$317/month (82% reduction)
 - **Per call:** $3.17 (vs. $17.87 baseline)
@@ -270,11 +294,13 @@ psql $DATABASE_URL -c "\dt"
 ## Known Issues
 
 ### Non-Blocking
+
 1. Placeholder analysis in `analysis/engine.py` - Will be replaced in Phase 3
 2. No actual Gong API credentials configured - Need from sales team
 3. MCP server not implemented yet - Planned for Phase 4
 
 ### Potential Future Issues
+
 1. **Rate limiting:** May need to implement backoff for Gong API
 2. **Token limits:** 60+ minute calls may need special handling
 3. **Cache warming:** First week will have low cache hit rate
@@ -282,17 +308,20 @@ psql $DATABASE_URL -c "\dt"
 ## Next Steps
 
 **Immediate (This Week):**
+
 1. ✅ Complete Phase 1 implementation
 2. Request coaching rubrics from sales leadership
 3. Collect product documentation from SEs
 4. Set up Neon database in production
 
 **Next Week:**
+
 1. Phase 2: Load knowledge base
 2. Phase 3: Begin Claude API integration
 3. Create test dataset with sample calls
 
 **Month 1 Goal:**
+
 - Phases 1-3 complete
 - End-to-end analysis working
 - Cache hit rate >60%
@@ -315,6 +344,7 @@ psql $DATABASE_URL -c "\dt"
 ---
 
 **Status Legend:**
+
 - ✅ Complete
 - 🔄 In Progress
 - ⏳ Pending

@@ -1,70 +1,70 @@
 // Learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom'
+import "@testing-library/jest-dom";
 
 // Mock Next.js router
-jest.mock('next/navigation', () => ({
+jest.mock("next/navigation", () => ({
   useRouter() {
     return {
       push: jest.fn(),
       replace: jest.fn(),
       prefetch: jest.fn(),
       back: jest.fn(),
-      pathname: '/',
+      pathname: "/",
       query: {},
-      asPath: '/',
-    }
+      asPath: "/",
+    };
   },
   usePathname() {
-    return '/'
+    return "/";
   },
   useSearchParams() {
-    return new URLSearchParams()
+    return new URLSearchParams();
   },
   useParams() {
-    return {}
+    return {};
   },
-}))
+}));
 
 // Mock Clerk authentication
-jest.mock('@clerk/nextjs/server', () => ({
+jest.mock("@clerk/nextjs/server", () => ({
   auth: jest.fn(() => ({
-    userId: 'test-user-id',
-    sessionId: 'test-session-id',
+    userId: "test-user-id",
+    sessionId: "test-session-id",
   })),
   currentUser: jest.fn(() => ({
-    id: 'test-user-id',
-    emailAddresses: [{ emailAddress: 'test@example.com' }],
-    publicMetadata: { role: 'rep' },
+    id: "test-user-id",
+    emailAddresses: [{ emailAddress: "test@example.com" }],
+    publicMetadata: { role: "rep" },
   })),
   ClerkProvider: ({ children }) => children,
-}))
+}));
 
-jest.mock('@clerk/nextjs', () => ({
+jest.mock("@clerk/nextjs", () => ({
   useUser: jest.fn(() => ({
     isSignedIn: true,
     user: {
-      id: 'test-user-id',
-      emailAddresses: [{ emailAddress: 'test@example.com' }],
-      publicMetadata: { role: 'rep' },
+      id: "test-user-id",
+      emailAddresses: [{ emailAddress: "test@example.com" }],
+      publicMetadata: { role: "rep" },
     },
   })),
   useAuth: jest.fn(() => ({
     isSignedIn: true,
-    userId: 'test-user-id',
-    sessionId: 'test-session-id',
+    userId: "test-user-id",
+    sessionId: "test-session-id",
   })),
   SignIn: () => <div>Sign In</div>,
   SignUp: () => <div>Sign Up</div>,
   UserButton: () => <div>User Button</div>,
-}))
+}));
 
 // Mock fetch globally
-global.fetch = jest.fn()
+global.fetch = jest.fn();
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -74,7 +74,7 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
-})
+});
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
@@ -82,12 +82,12 @@ global.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
   observe() {}
   takeRecords() {
-    return []
+    return [];
   }
   unobserve() {}
-}
+};
 
 // Reset mocks between tests
 beforeEach(() => {
-  jest.clearAllMocks()
-})
+  jest.clearAllMocks();
+});

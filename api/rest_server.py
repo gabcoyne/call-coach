@@ -12,6 +12,7 @@ Production Features:
 - Request/response logging
 - Performance monitoring
 """
+
 import logging
 import time
 import uuid
@@ -22,32 +23,33 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
+from analysis.learning_insights import get_learning_insights
+from analysis.opportunity_coaching import (
+    analyze_objection_progression,
+    analyze_opportunity_patterns,
+    assess_relationship_strength,
+    generate_coaching_recommendations,
+    identify_recurring_themes,
+)
+
+# Import error handlers
+from api.error_handlers import setup_error_handlers
+from api.monitoring import router as monitoring_router
+
+# Import versioned API routers
+from api.v1 import router as v1_router
+
 # Import MCP tool implementations
 from coaching_mcp.tools.analyze_call import analyze_call_tool
 from coaching_mcp.tools.get_rep_insights import get_rep_insights_tool
 from coaching_mcp.tools.search_calls import search_calls_tool
-from analysis.opportunity_coaching import (
-    analyze_opportunity_patterns,
-    identify_recurring_themes,
-    analyze_objection_progression,
-    assess_relationship_strength,
-    generate_coaching_recommendations,
-)
-from analysis.learning_insights import get_learning_insights
 from db import queries
+from db.models import CoachingDimension, KnowledgeBaseCategory, Product
 from knowledge_base.loader import KnowledgeBaseManager
-from db.models import Product, KnowledgeBaseCategory, CoachingDimension
+from middleware.compression import CompressionMiddleware
 
 # Import middleware
 from middleware.rate_limit import RateLimitMiddleware
-from middleware.compression import CompressionMiddleware
-
-# Import error handlers
-from api.error_handlers import setup_error_handlers
-
-# Import versioned API routers
-from api.v1 import router as v1_router
-from api.monitoring import router as monitoring_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -70,7 +72,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # Next.js dev server
         "http://localhost:3001",  # Alternative port
-        "https://*.vercel.app",   # Vercel preview deployments
+        "https://*.vercel.app",  # Vercel preview deployments
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -128,7 +130,7 @@ async def add_request_context(request: Request, call_next):
             "path": request.url.path,
             "status_code": response.status_code,
             "duration_ms": float(response.headers["X-Response-Time"].rstrip("ms")),
-        }
+        },
     )
 
     return response
@@ -347,6 +349,7 @@ async def get_learning_insights_endpoint(request: LearningInsightsRequest) -> di
 # KNOWLEDGE BASE ENDPOINTS
 # ============================================================================
 
+
 @app.get("/knowledge")
 async def list_knowledge_entries(
     product: str | None = None,
@@ -460,6 +463,7 @@ async def get_knowledge_stats() -> dict[str, Any]:
 # COACHING RUBRICS ENDPOINTS
 # ============================================================================
 
+
 @app.get("/knowledge/rubrics")
 async def list_rubrics(
     category: str | None = None,
@@ -565,8 +569,7 @@ async def update_rubric(rubric_id: str, updates: dict[str, Any]) -> dict[str, An
 async def http_exception_handler(request: Request, exc: HTTPException):
     """Handle HTTP exceptions with consistent error format."""
     return JSONResponse(
-        status_code=exc.status_code,
-        content={"error": exc.detail, "status_code": exc.status_code}
+        status_code=exc.status_code, content={"error": exc.detail, "status_code": exc.status_code}
     )
 
 
@@ -575,8 +578,7 @@ async def general_exception_handler(request: Request, exc: Exception):
     """Handle unexpected errors."""
     logger.error(f"Unexpected error: {exc}", exc_info=True)
     return JSONResponse(
-        status_code=500,
-        content={"error": "Internal server error", "detail": str(exc)}
+        status_code=500, content={"error": "Internal server error", "detail": str(exc)}
     )
 
 

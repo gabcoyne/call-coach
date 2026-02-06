@@ -2,12 +2,13 @@
 Base scraper class with common functionality for respectful web crawling.
 Implements rate limiting, retries, and session management.
 """
+
 import asyncio
 import logging
 import time
 from abc import ABC, abstractmethod
 from typing import Any
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlparse
 
 import httpx
 from bs4 import BeautifulSoup
@@ -91,11 +92,9 @@ class BaseScraper(ABC):
                 return response.text
 
             except httpx.HTTPError as e:
-                logger.warning(
-                    f"Attempt {attempt + 1}/{self.max_retries} failed for {url}: {e}"
-                )
+                logger.warning(f"Attempt {attempt + 1}/{self.max_retries} failed for {url}: {e}")
                 if attempt < self.max_retries - 1:
-                    await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                    await asyncio.sleep(2**attempt)  # Exponential backoff
                 else:
                     logger.error(f"Failed to fetch {url} after {self.max_retries} attempts")
                     return None

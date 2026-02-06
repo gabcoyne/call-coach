@@ -16,30 +16,18 @@ import { z } from "zod";
 
 // Validation schema for feedback submission
 const feedbackSchema = z.object({
-  feedback_type: z.enum([
-    "accurate",
-    "inaccurate",
-    "missing_context",
-    "helpful",
-    "not_helpful",
-  ]),
+  feedback_type: z.enum(["accurate", "inaccurate", "missing_context", "helpful", "not_helpful"]),
   feedback_text: z.string().max(1000).optional(),
 });
 
 type FeedbackRequest = z.infer<typeof feedbackSchema>;
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     // Check authentication
     const user = await currentUser();
     if (!user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id: coachingSessionId } = params;
@@ -58,10 +46,7 @@ export async function POST(
     );
 
     if (sessionResult.rows.length === 0) {
-      return NextResponse.json(
-        { error: "Coaching session not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Coaching session not found" }, { status: 404 });
     }
 
     const session = sessionResult.rows[0];
@@ -79,19 +64,11 @@ export async function POST(
       VALUES ($1, $2, $3, $4, NOW())
       RETURNING id, coaching_session_id, feedback_type, feedback_text, created_at
       `,
-      [
-        coachingSessionId,
-        repId,
-        validatedData.feedback_type,
-        validatedData.feedback_text || null,
-      ]
+      [coachingSessionId, repId, validatedData.feedback_type, validatedData.feedback_text || null]
     );
 
     if (feedbackResult.rows.length === 0) {
-      return NextResponse.json(
-        { error: "Failed to record feedback" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to record feedback" }, { status: 500 });
     }
 
     const feedback = feedbackResult.rows[0];
@@ -120,14 +97,8 @@ export async function POST(
       );
     }
 
-    console.error(
-      `Error submitting feedback for session ${params.id}:`,
-      error
-    );
-    return NextResponse.json(
-      { error: "Failed to submit feedback" },
-      { status: 500 }
-    );
+    console.error(`Error submitting feedback for session ${params.id}:`, error);
+    return NextResponse.json({ error: "Failed to submit feedback" }, { status: 500 });
   }
 }
 
@@ -136,10 +107,7 @@ export async function POST(
  *
  * Get feedback for a coaching session.
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id: coachingSessionId } = params;
 
@@ -159,13 +127,7 @@ export async function GET(
       count: result.rows.length,
     });
   } catch (error) {
-    console.error(
-      `Error fetching feedback for session ${params.id}:`,
-      error
-    );
-    return NextResponse.json(
-      { error: "Failed to fetch feedback" },
-      { status: 500 }
-    );
+    console.error(`Error fetching feedback for session ${params.id}:`, error);
+    return NextResponse.json({ error: "Failed to fetch feedback" }, { status: 500 });
   }
 }

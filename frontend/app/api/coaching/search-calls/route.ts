@@ -6,12 +6,12 @@
  * Find calls matching specific criteria with filtering and sorting.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { mcpClient } from '@/lib/mcp-client';
-import { searchCallsRequestSchema } from '@/types/coaching';
-import { withAuth, apiError, canAccessRepData } from '@/lib/auth-middleware';
-import { checkRateLimit, rateLimitHeaders } from '@/lib/rate-limit';
-import { logRequest, logResponse, logError } from '@/lib/api-logger';
+import { NextRequest, NextResponse } from "next/server";
+import { mcpClient } from "@/lib/mcp-client";
+import { searchCallsRequestSchema } from "@/types/coaching";
+import { withAuth, apiError, canAccessRepData } from "@/lib/auth-middleware";
+import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
+import { logRequest, logResponse, logError } from "@/lib/api-logger";
 
 export const POST = withAuth(async (req: NextRequest, authContext) => {
   const startTime = Date.now();
@@ -21,10 +21,10 @@ export const POST = withAuth(async (req: NextRequest, authContext) => {
     logRequest(req, authContext.userId);
 
     // Check rate limit
-    const rateLimit = checkRateLimit(authContext.userId, '/api/coaching/search-calls');
+    const rateLimit = checkRateLimit(authContext.userId, "/api/coaching/search-calls");
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: 'Rate limit exceeded' },
+        { error: "Rate limit exceeded" },
         {
           status: 429,
           headers: rateLimitHeaders(rateLimit.limit, rateLimit.remaining, rateLimit.reset),
@@ -37,11 +37,7 @@ export const POST = withAuth(async (req: NextRequest, authContext) => {
     const validationResult = searchCallsRequestSchema.safeParse(body);
 
     if (!validationResult.success) {
-      return apiError(
-        'Invalid request parameters',
-        400,
-        validationResult.error.format()
-      );
+      return apiError("Invalid request parameters", 400, validationResult.error.format());
     }
 
     const params = validationResult.data;
@@ -50,14 +46,11 @@ export const POST = withAuth(async (req: NextRequest, authContext) => {
     // Reps can only search their own calls, managers can search all
     if (params.rep_email) {
       if (!canAccessRepData(authContext, params.rep_email)) {
-        return apiError(
-          'Forbidden: You can only search your own calls',
-          403
-        );
+        return apiError("Forbidden: You can only search your own calls", 403);
       }
     } else {
       // If no rep_email specified and user is a rep, default to their email
-      if (authContext.role === 'rep') {
+      if (authContext.role === "rep") {
         params.rep_email = authContext.email;
       }
     }
@@ -84,6 +77,6 @@ export const POST = withAuth(async (req: NextRequest, authContext) => {
       return apiError(error.message, 500);
     }
 
-    return apiError('Internal server error', 500);
+    return apiError("Internal server error", 500);
   }
 });

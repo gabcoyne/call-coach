@@ -3,11 +3,14 @@
 ## Completed Tasks (Tasks 8-10)
 
 ### Task 8 & 9: Role Assignment UI with Bulk Operations ✅
+
 **Files Created:**
+
 - `frontend/app/settings/roles/page.tsx` - Manager-only role assignment page
 - `frontend/components/RoleAssignmentTable.tsx` - Full-featured table component
 
 **Features Implemented:**
+
 - Manager-only authorization guard (redirects non-managers to 403)
 - Staff list with current role assignments
 - Search by name or email
@@ -20,19 +23,24 @@
 - Responsive design for mobile/tablet/desktop
 
 **Backend APIs Used:**
+
 - `GET /api/settings/roles` - List all staff with roles
 - `PUT /api/settings/roles/[email]` - Update individual role
 - `DELETE /api/settings/roles/[email]` - Remove role assignment
 
 ### Task 10: Call Detail Page Rubric Badge ✅
+
 **Files Created:**
+
 - `frontend/components/RubricBadge.tsx` - Role-specific rubric indicator
 
 **Files Modified:**
+
 - `frontend/types/coaching.ts` - Added `evaluated_as_role` to `RepAnalyzed` interface
 - `frontend/app/calls/[callId]/CallAnalysisViewer.tsx` - Added RubricBadge display
 
 **Features Implemented:**
+
 - Colored badge showing which rubric was used (AE=blue, SE=green, CSM=purple)
 - Tooltip with full role name and dimension breakdown
 - Displays only when `rep_analyzed.evaluated_as_role` is present in API response
@@ -41,14 +49,18 @@
 ## Remaining Tasks (Tasks 11-12)
 
 ### Task 11: Rep Dashboard Role-Specific Metrics ⚠️
+
 **Status:** Requires backend data integration
 
 **Required Changes:**
+
 1. **API Enhancement Needed:**
+
    - `GET /api/coaching/rep-insights` should return the rep's assigned role
    - Include role-specific dimension weights in response
 
 2. **Frontend Changes:**
+
    ```typescript
    // In frontend/app/dashboard/[repEmail]/page.tsx
 
@@ -79,10 +91,13 @@
    - Consider role-specific color themes (matching RubricBadge)
 
 ### Task 12: Opportunity Insights Role-Aware Aggregation ⚠️
+
 **Status:** Requires backend MCP tool updates
 
 **Required Changes:**
+
 1. **Backend MCP Tool:** `coaching_mcp/tools/analyze_opportunity.py`
+
    ```python
    # 1. Detect roles of all Prefect speakers on opportunity calls
    speakers_with_roles = []
@@ -113,6 +128,7 @@
    ```
 
 2. **Frontend Component:** `frontend/components/opportunities/OpportunityInsights.tsx`
+
    ```typescript
    // 1. Update interface to support role-grouped insights
    interface OpportunityInsights {
@@ -159,6 +175,7 @@
 ## Testing Checklist
 
 ### Task 8 & 9: Role Assignment UI ✅
+
 - [x] Manager can access `/settings/roles` page
 - [x] Non-manager redirected to 403
 - [ ] Search filters staff list correctly
@@ -171,6 +188,7 @@
 - [ ] Responsive on mobile devices
 
 ### Task 10: Rubric Badge ✅
+
 - [x] Badge displays on call detail page
 - [ ] Badge shows correct role (AE/SE/CSM)
 - [ ] Badge colors match role (blue/green/purple)
@@ -178,6 +196,7 @@
 - [ ] Badge only appears when evaluated_as_role is present
 
 ### Task 11: Rep Dashboard (Pending)
+
 - [ ] Dashboard fetches rep's assigned role
 - [ ] Role-specific dimensions are emphasized
 - [ ] Dimension weights displayed (e.g., "Discovery: 30%")
@@ -185,6 +204,7 @@
 - [ ] Dimensions not in rubric are de-emphasized or hidden
 
 ### Task 12: Opportunity Insights (Pending)
+
 - [ ] Calls grouped by speaker role
 - [ ] Separate performance sections per role
 - [ ] Role badges on call timeline
@@ -193,19 +213,22 @@
 ## API Endpoints Reference
 
 ### Existing Endpoints
+
 - `GET /api/settings/roles` - List all staff with role assignments
 - `PUT /api/settings/roles/[email]` - Update staff role
 - `DELETE /api/settings/roles/[email]` - Remove staff role
 - `GET /api/coaching/analyze-call?call_id=...` - Get call analysis (includes evaluated_as_role)
 
 ### Needed Endpoints (for Tasks 11-12)
+
 - `GET /api/coaching/rep-insights?rep_email=...` should include:
+
   ```json
   {
     "rep_info": {
       "assigned_role": "ae",
       "rubric_weights": {
-        "discovery": 0.30,
+        "discovery": 0.3,
         "objection_handling": 0.25
       }
     }
@@ -213,6 +236,7 @@
   ```
 
 - `GET /api/opportunities/[id]/insights` should include:
+
   ```json
   {
     "insights": {
@@ -225,6 +249,7 @@
 ## Rubric Configuration Reference
 
 **AE (Account Executive) Dimensions:**
+
 - Discovery & Qualification: 30%
 - Objection Handling: 25%
 - Product Positioning: 20%
@@ -232,6 +257,7 @@
 - Call Control: 10%
 
 **SE (Sales Engineer) Dimensions:**
+
 - Technical Accuracy: 35%
 - Architecture Fit: 30%
 - Problem-Solution Mapping: 20%
@@ -239,6 +265,7 @@
 - Collaboration with AE: 5%
 
 **CSM (Customer Success Manager) Dimensions:**
+
 - Value Realization: 30%
 - Risk Identification: 25%
 - Relationship Depth: 20%
@@ -248,16 +275,19 @@
 ## Next Steps
 
 1. **Immediate (can be done now):**
+
    - Test role assignment UI end-to-end with real manager account
    - Verify rubric badge displays correctly on analyzed calls
    - Test bulk assignment with 10+ staff members
 
 2. **Short-term (requires backend work):**
+
    - Add rep role to rep-insights API response
    - Implement dashboard dimension emphasis based on role
    - Test dashboard shows different metrics for AE vs SE vs CSM
 
 3. **Medium-term (requires MCP tool updates):**
+
    - Update analyze_opportunity MCP tool to group by role
    - Modify opportunity insights component for role sections
    - Test opportunity with mixed AE+SE calls shows separate evaluations

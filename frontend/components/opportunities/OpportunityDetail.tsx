@@ -64,11 +64,7 @@ export function OpportunityDetail({ opportunityId }: OpportunityDetailProps) {
       <div className="space-y-4">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push("/opportunities")}
-          >
+          <Button variant="ghost" size="sm" onClick={() => router.push("/opportunities")}>
             <ArrowLeft className="h-4 w-4 mr-1" />
             Opportunities
           </Button>
@@ -96,11 +92,7 @@ export function OpportunityDetail({ opportunityId }: OpportunityDetailProps) {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => router.push("/opportunities")}
-        >
+        <Button variant="ghost" size="sm" onClick={() => router.push("/opportunities")}>
           <ArrowLeft className="h-4 w-4 mr-1" />
           Opportunities
         </Button>

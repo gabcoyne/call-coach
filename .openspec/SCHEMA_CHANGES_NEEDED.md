@@ -148,6 +148,7 @@ ALTER TABLE transcripts ADD COLUMN IF NOT EXISTS chunk_metadata JSONB;
 
 1. Create new `transcript_sentences` table with proper schema
 2. Migrate existing data:
+
    ```sql
    INSERT INTO transcript_sentences (
        call_id, speaker_id, sequence_number,
@@ -162,6 +163,7 @@ ALTER TABLE transcripts ADD COLUMN IF NOT EXISTS chunk_metadata JSONB;
        chunk_metadata - 'topic'  -- Remove topic from metadata
    FROM transcripts;
    ```
+
 3. Update all queries to use new table
 4. Drop old `transcripts` table
 

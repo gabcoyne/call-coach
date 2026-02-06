@@ -25,12 +25,14 @@ A comprehensive guide for sales managers and reps using the AI-powered call coac
 The platform has two user roles with different permissions:
 
 **Sales Rep**:
+
 - View your own call analyses and performance data
 - Track your progress over time
 - Access personalized coaching recommendations
 - Search and review your past calls
 
 **Sales Manager**:
+
 - All rep capabilities plus:
 - View all team members' data
 - Compare rep performance against team averages
@@ -63,11 +65,13 @@ The dashboard shows your performance across four key dimensions:
 4. **Engagement**: Building rapport and keeping prospects engaged
 
 **Time Period Selector**:
+
 - Click the dropdown in the top-right to change the time range
 - Options: Last 7 days, 30 days, quarter, year, or all time
 - Charts update automatically when you change the period
 
 **Interpreting Scores**:
+
 - **80-100**: Excellent performance, maintain your approach
 - **60-79**: Good performance with room for improvement
 - **40-59**: Needs improvement, review coaching recommendations
@@ -86,6 +90,7 @@ To view detailed analysis of a specific call:
 Each call analysis includes:
 
 **Call Metadata**:
+
 - Call title and date
 - Duration
 - Call type (discovery, demo, technical, negotiation)
@@ -93,30 +98,37 @@ Each call analysis includes:
 - Participants list with talk time breakdown
 
 **Overall Score Badge**:
+
 - Color-coded score (green = 80+, yellow = 60-79, red = below 60)
 - Overall coaching score for the call
 
 **Dimension Scores**:
+
 - Individual scores for each of the four dimensions
 - Click each dimension card to see detailed analysis
 
 **Strengths**:
+
 - What you did well on this call
 - Specific examples from the transcript (highlighted in green)
 
 **Areas for Improvement**:
+
 - Specific areas to work on
 - Examples from the transcript where you could improve (highlighted in yellow)
 
 **Action Items**:
+
 - Concrete next steps to improve
 - Can be checked off as you complete them
 
 **Transcript Snippets**:
+
 - Key moments from the call
 - Click timestamps to jump to that moment in Gong (if available)
 
 **Export Options**:
+
 - **Share**: Generate a shareable link for your manager or peers
 - **Export PDF**: Download the analysis as a PDF for offline review
 
@@ -136,6 +148,7 @@ Use the Search page to find specific calls:
 #### Quick Filter Presets
 
 Click preset buttons for common searches:
+
 - **My Calls This Week**: Your calls from the last 7 days
 - **High Performers**: Your calls scoring 80+
 - **Needs Review**: Your calls scoring below 60
@@ -144,15 +157,18 @@ Click preset buttons for common searches:
 #### Search Results
 
 **View Options**:
+
 - **Card View**: Visual cards with key information
 - **Table View**: Compact table with sortable columns
 
 **Sorting**:
+
 - Sort by date (newest/oldest)
 - Sort by score (highest/lowest)
 - Sort by duration
 
 **Pagination**:
+
 - 20 results per page (default)
 - Adjust page size: 10, 20, 50, or 100 results
 
@@ -168,6 +184,7 @@ Save frequently used searches for quick access:
 #### Exporting Results
 
 Export search results as CSV or Excel:
+
 1. Run your search
 2. Click "Export" button
 3. Choose format (CSV or Excel)
@@ -178,16 +195,19 @@ Export search results as CSV or Excel:
 The Feed page shows chronological updates:
 
 **Feed Item Types**:
+
 - **Call Analyses**: New call analyses completed
 - **Highlights**: Exceptional moments from your calls
 - **Milestones**: Achievements and progress markers
 
 **Filtering the Feed**:
+
 - **Type Filter**: Show all or filter by specific item types
 - **Time Filter**: Today, this week, this month, or custom range
 - **New Items Badge**: Shows count of unread items
 
 **Feed Actions**:
+
 - **Bookmark**: Save important items for later review
 - **Share**: Share highlights with your team
 - **Dismiss**: Remove items from your feed
@@ -197,6 +217,7 @@ The Feed page shows chronological updates:
 Access your profile from the user menu (top-right avatar):
 
 **Profile Settings**:
+
 - View your name, email, and role
 - Update your profile photo
 - Change password
@@ -213,6 +234,7 @@ Managers have access to all rep features plus additional team management capabil
 From your dashboard, access team data:
 
 **Rep Selector Dropdown**:
+
 - Click the dropdown in the top-right to view any team member's dashboard
 - Select "Team Overview" to see aggregate team metrics
 - Switch between reps to compare performance
@@ -222,15 +244,18 @@ From your dashboard, access team data:
 When viewing a specific rep's dashboard, you'll see:
 
 **Individual Performance**:
+
 - Same view as reps see of their own data
 - All scores, trends, and insights
 
 **Team Comparison Overlay**:
+
 - Gray line on charts showing team average
 - Percentile indicators showing where the rep ranks
 - Sample size shown for statistical context
 
 **Coaching Notes Section** (Manager-only):
+
 - Add private coaching notes visible only to managers
 - Document 1-on-1 coaching sessions
 - Track improvement plans
@@ -240,11 +265,13 @@ When viewing a specific rep's dashboard, you'll see:
 Access team-wide insights from the Feed page:
 
 **Team Insight Cards** (Manager-only):
+
 - Team performance trends
 - Department-wide achievements
 - Comparative analysis across reps
 
 **Types of Team Insights**:
+
 - **Trends**: Team average scores over time
 - **Comparisons**: How different reps compare on specific dimensions
 - **Achievements**: Team milestones and collective improvements
@@ -254,10 +281,12 @@ Access team-wide insights from the Feed page:
 Managers can search across all team members' calls:
 
 **Additional Search Options**:
+
 - **Rep Filter**: Select specific rep(s) or search all
 - **Multiple Reps**: Select multiple reps to compare
 
 **Use Cases**:
+
 - Find best-in-class examples of objection handling
 - Identify common patterns across low-scoring calls
 - Locate specific customer conversations for review
@@ -283,6 +312,7 @@ Managers can search across all team members' calls:
 **Using Highlights**:
 
 Highlights show exceptional moments across all calls:
+
 - Share positive highlights in team meetings
 - Use as training examples in onboarding
 - Recognize reps publicly for great performance
@@ -298,18 +328,21 @@ Highlights show exceptional moments across all calls:
 Each dimension is scored 0-100 based on AI analysis of the call transcript:
 
 1. **Product Knowledge** (0-100):
+
    - Accuracy of product information
    - Depth of technical understanding
    - Appropriate use of features in context
    - Competitive positioning
 
 2. **Discovery** (0-100):
+
    - Quality of questions asked
    - Uncovering pain points and requirements
    - Understanding customer context
    - Identifying decision-makers
 
 3. **Objection Handling** (0-100):
+
    - Recognizing objections early
    - Empathy and acknowledgment
    - Providing relevant solutions
@@ -322,38 +355,45 @@ Each dimension is scored 0-100 based on AI analysis of the call transcript:
    - Energy and enthusiasm
 
 **Overall Score**:
+
 - Weighted average of dimension scores
 - Accounts for call type (e.g., discovery calls weight Discovery higher)
 
 ### Caching and Analysis Updates
 
 **How Caching Works**:
+
 - First analysis of a call is cached for 24 hours
 - Subsequent views load instantly from cache
 - "Force Reanalysis" button available if needed (e.g., after transcript correction)
 
 **When to Force Reanalysis**:
+
 - If you believe the transcript was updated in Gong
 - If dimension scores seem incorrect
 - After product knowledge updates (rare)
 
 **Analysis Latency**:
+
 - First analysis: 30-60 seconds (analyzing transcript)
 - Cached results: Instant (<1 second)
 
 ### Data Privacy and Security
 
 **What Data Is Stored**:
+
 - Call metadata (title, date, participants)
 - Analysis results (scores, insights, action items)
 - User profiles and roles
 
 **What Data Is NOT Stored**:
+
 - Full call transcripts (retrieved from Gong on-demand)
 - Audio or video recordings
 - Customer contact information (beyond names)
 
 **Access Control**:
+
 - Reps can only see their own data
 - Managers can see all team data
 - No external sharing (all data stays within Prefect)
@@ -363,12 +403,14 @@ Each dimension is scored 0-100 based on AI analysis of the call transcript:
 The platform is fully responsive and works on mobile devices:
 
 **Mobile Features**:
+
 - Simplified navigation (hamburger menu)
 - Touch-friendly controls
 - Responsive charts and tables
 - All core features available
 
 **Best Practices on Mobile**:
+
 - Use landscape mode for charts
 - Use search filters to narrow results
 - Export data for offline review on desktop
@@ -380,21 +422,25 @@ The platform is fully responsive and works on mobile devices:
 ### For Sales Reps
 
 **Daily Habits**:
+
 - Review call analyses within 24 hours of each call
 - Check action items and incorporate into next calls
 - Track your improvement trends weekly
 
 **Weekly Habits**:
+
 - Review your dashboard to spot trends
 - Compare current week to previous week
 - Identify one skill gap to focus on
 
 **Monthly Habits**:
+
 - Review your coaching plan and adjust priorities
 - Celebrate improvements and wins
 - Set new goals based on progress
 
 **Making the Most of Coaching**:
+
 - Don't take feedback personally - it's data-driven
 - Focus on specific examples and action items
 - Ask your manager to review specific calls with you
@@ -403,18 +449,21 @@ The platform is fully responsive and works on mobile devices:
 ### For Sales Managers
 
 **Effective Coaching**:
+
 - Use data to guide coaching, not replace human judgment
 - Reference specific transcript examples in coaching sessions
 - Celebrate improvements publicly, address gaps privately
 - Track coaching effectiveness over time
 
 **Team Development**:
+
 - Share best practices from high-scoring calls
 - Create a library of excellent examples for each dimension
 - Rotate teaching moments among different reps
 - Foster peer learning and coaching
 
 **Data-Driven Decisions**:
+
 - Use trends to inform training priorities
 - Identify systemic issues vs. individual gaps
 - Measure coaching impact with before/after scores
@@ -494,6 +543,7 @@ A: See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for common issues and solution
 ### Providing Feedback
 
 We welcome feedback to improve the platform:
+
 - Report bugs or issues to your IT team
 - Suggest features to your manager
 - Participate in user feedback sessions
@@ -501,6 +551,7 @@ We welcome feedback to improve the platform:
 ### Training Sessions
 
 New user onboarding includes:
+
 - Platform overview (30 minutes)
 - Role-specific training (rep or manager)
 - Q&A session
@@ -529,14 +580,15 @@ New user onboarding includes:
 
 ### Screenshots Placeholders
 
-*[Note: Screenshots will be added in a future update showing:]*
-- *Dashboard overview for reps*
-- *Dashboard overview for managers*
-- *Call analysis page*
-- *Search page with filters*
-- *Feed page*
-- *Profile page*
-- *Mobile navigation*
+_[Note: Screenshots will be added in a future update showing:]_
+
+- _Dashboard overview for reps_
+- _Dashboard overview for managers_
+- _Call analysis page_
+- _Search page with filters_
+- _Feed page_
+- _Profile page_
+- _Mobile navigation_
 
 ---
 

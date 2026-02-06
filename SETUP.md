@@ -143,6 +143,7 @@ python -m knowledge.loader --type products
 - [x] Idempotency handling
 
 **Verification:**
+
 ```bash
 # Test webhook endpoint
 curl -X POST http://localhost:8000/webhooks/gong \
@@ -164,6 +165,7 @@ psql $DATABASE_URL -c "SELECT * FROM webhook_events LIMIT 5;"
 - [ ] Query utilities
 
 **Next Steps:**
+
 1. Create `knowledge/rubrics/discovery_rubric_v1.json`
 2. Create `knowledge/products/prefect_features.md`
 3. Implement `knowledge/loader.py`
@@ -178,6 +180,7 @@ psql $DATABASE_URL -c "SELECT * FROM webhook_events LIMIT 5;"
 - [ ] Token usage tracking
 
 **Next Steps:**
+
 1. Implement actual Claude API calls in `analysis/engine.py`
 2. Create prompt templates in `analysis/prompts/`
 3. Add parallel execution with Prefect `.map()`
@@ -298,6 +301,7 @@ print(result)
 ## Support
 
 For issues or questions:
+
 1. Check logs in respective services
 2. Review error messages in database (`webhook_events.error_message`, `analysis_runs.error_message`)
 3. Consult implementation plan for architecture details

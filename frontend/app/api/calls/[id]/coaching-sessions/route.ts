@@ -6,10 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db/connection";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id: callId } = params;
 
@@ -30,9 +27,6 @@ export async function GET(
     });
   } catch (error) {
     console.error(`Error fetching coaching sessions for call ${params.id}:`, error);
-    return NextResponse.json(
-      { error: "Failed to fetch coaching sessions" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch coaching sessions" }, { status: 500 });
   }
 }

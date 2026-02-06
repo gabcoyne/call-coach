@@ -98,7 +98,10 @@ export default function ProfilePage() {
   };
 
   const userEmail = user?.emailAddresses?.[0]?.emailAddress || "Not available";
-  const userInitials = user?.firstName?.substring(0, 1).toUpperCase() || user?.emailAddresses?.[0]?.emailAddress?.substring(0, 1).toUpperCase() || "U";
+  const userInitials =
+    user?.firstName?.substring(0, 1).toUpperCase() ||
+    user?.emailAddresses?.[0]?.emailAddress?.substring(0, 1).toUpperCase() ||
+    "U";
 
   return (
     <div className="p-6 space-y-6">
@@ -112,7 +115,13 @@ export default function ProfilePage() {
 
       {/* Status Message */}
       {message && (
-        <div className={`p-4 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+        <div
+          className={`p-4 rounded-lg ${
+            message.type === "success"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
           {message.text}
         </div>
       )}
@@ -215,9 +224,7 @@ export default function ProfilePage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label className="text-muted-foreground">Primary Email</Label>
-            <div className="p-3 bg-muted rounded-md text-foreground font-medium">
-              {userEmail}
-            </div>
+            <div className="p-3 bg-muted rounded-md text-foreground font-medium">{userEmail}</div>
           </div>
           <p className="text-sm text-muted-foreground">
             To change your email address, please manage your account in Clerk settings.

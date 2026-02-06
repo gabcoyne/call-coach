@@ -223,14 +223,17 @@ def collect_metrics():
 Set up alerts for:
 
 1. **High Error Rate**
+
    - Metric: `error_rate > 0.05` (5%)
    - Action: Page on-call, investigate logs
 
 2. **Rate Limit Hits**
+
    - Metric: `rate_limit_hits > 100/hour`
    - Action: Notify team, review user patterns
 
 3. **Slow Response Times**
+
    - Metric: `response_time_ms.p95 > 1000`
    - Action: Check database performance, review logs
 
@@ -346,6 +349,7 @@ DATABASE_POOL_MAX_SIZE=10  # Reduce from 20
 **Solution**:
 
 1. Check if indexes are being used:
+
    ```bash
    psql $DATABASE_URL -c "
    EXPLAIN ANALYZE
@@ -354,6 +358,7 @@ DATABASE_POOL_MAX_SIZE=10  # Reduce from 20
    ```
 
 2. Verify index exists and is valid:
+
    ```bash
    psql $DATABASE_URL -c "
    SELECT indexname, indexdef
@@ -363,6 +368,7 @@ DATABASE_POOL_MAX_SIZE=10  # Reduce from 20
    ```
 
 3. Run ANALYZE to update statistics:
+
    ```bash
    psql $DATABASE_URL -c "ANALYZE calls;"
    ```

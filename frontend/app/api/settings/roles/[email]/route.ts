@@ -26,18 +26,12 @@ const UpdateRoleSchema = z.object({
  *   "role": "ae" | "se" | "csm"
  * }
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { email: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { email: string } }) {
   try {
     // Check authentication
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - please sign in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
     }
 
     // Check manager authorization
@@ -46,17 +40,11 @@ export async function PUT(
     const managerEmail = user?.emailAddresses?.[0]?.emailAddress;
 
     if (userRole !== "manager") {
-      return NextResponse.json(
-        { error: "Forbidden - manager access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
     }
 
     if (!managerEmail) {
-      return NextResponse.json(
-        { error: "Manager email not found" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Manager email not found" }, { status: 400 });
     }
 
     // Decode and validate email from URL
@@ -96,7 +84,6 @@ export async function PUT(
       assigned_by: managerEmail,
       message: `Role updated to ${role.toUpperCase()} for ${staffEmail}`,
     });
-
   } catch (error: any) {
     console.error("Failed to update staff role:", error);
     return NextResponse.json(
@@ -109,18 +96,12 @@ export async function PUT(
 /**
  * DELETE handler - Remove role assignment for a staff member
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { email: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { email: string } }) {
   try {
     // Check authentication
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - please sign in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
     }
 
     // Check manager authorization
@@ -128,10 +109,7 @@ export async function DELETE(
     const userRole = user?.publicMetadata?.role;
 
     if (userRole !== "manager") {
-      return NextResponse.json(
-        { error: "Forbidden - manager access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
     }
 
     // Decode email from URL
@@ -153,7 +131,6 @@ export async function DELETE(
       email: staffEmail,
       message: `Role assignment removed for ${staffEmail}`,
     });
-
   } catch (error: any) {
     console.error("Failed to delete staff role:", error);
     return NextResponse.json(

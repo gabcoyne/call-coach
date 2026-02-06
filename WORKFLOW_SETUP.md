@@ -14,6 +14,7 @@ Created structured planning artifacts for the entire project using the `spec-dri
 **Change:** `call-coach-foundation`
 
 **Artifacts (4/4 complete):**
+
 1. ✅ **proposal.md** - Why, what, capabilities, impact
 2. ✅ **design.md** - 7 critical architectural decisions
 3. ✅ **specs/** - 4 capability specifications with requirements
@@ -26,6 +27,7 @@ Created hierarchical issue tracking with dependencies:
 **Epic:** `bd-31h` - Gong Call Coaching Agent - Complete Implementation
 
 **Phases:**
+
 - ✅ `bd-31h.1` - Phase 1: Foundation (CLOSED)
 - ⏳ `bd-31h.2` - Phase 2: Knowledge Base (READY)
 - 🔒 `bd-31h.3` - Phase 3: Analysis Engine (blocked by Phase 2)
@@ -45,6 +47,7 @@ Created hierarchical issue tracking with dependencies:
 **Why:** Automate AI-powered coaching for sales calls, reducing manual review time by 80%.
 
 **New Capabilities (9):**
+
 1. webhook-ingestion
 2. call-processing
 3. transcript-chunking
@@ -70,6 +73,7 @@ Created hierarchical issue tracking with dependencies:
 ### Specs (What Requirements)
 
 #### webhook-ingestion (5 requirements)
+
 - Signature verification (HMAC-SHA256)
 - Idempotency (via webhook ID)
 - Response time (<500ms)
@@ -77,6 +81,7 @@ Created hierarchical issue tracking with dependencies:
 - Status tracking
 
 #### intelligent-caching (8 requirements)
+
 - Transcript hashing
 - Cache key composition
 - Cache lookup with TTL
@@ -85,6 +90,7 @@ Created hierarchical issue tracking with dependencies:
 - Cache statistics
 
 #### coaching-analysis (8 requirements)
+
 - Multi-dimensional analysis (4 dimensions)
 - Scoring (0-100 with justification)
 - Specific examples (quotes + timestamps)
@@ -95,6 +101,7 @@ Created hierarchical issue tracking with dependencies:
 - Error handling
 
 #### mcp-tools (7 requirements)
+
 - analyze_call
 - get_rep_insights
 - search_calls
@@ -106,6 +113,7 @@ Created hierarchical issue tracking with dependencies:
 ### Tasks (Implementation Checklist)
 
 **Phase 1 (16/16 complete):** ✅
+
 - Database schema, indexes, models
 - Gong API client
 - Webhook endpoint with security
@@ -138,10 +146,12 @@ Blocked:          5 (Phases 3-7)
 ```
 
 **Ready Work:**
+
 1. `bd-31h` (Epic) - Overall project tracking
 2. `bd-31h.2` (Phase 2) - Knowledge Base - Ready to start!
 
 **Next Steps:**
+
 ```bash
 bd update bd-31h.2 --status in_progress
 # ... work on Phase 2 ...
@@ -153,6 +163,7 @@ bd close bd-31h.2 --reason "Phase 2 complete"
 ## Workflow Commands
 
 ### OpenSpec
+
 ```bash
 # View change status
 openspec status --change "call-coach-foundation"
@@ -168,6 +179,7 @@ openspec archive --change "call-coach-foundation"
 ```
 
 ### Beads
+
 ```bash
 # See ready work
 bd ready
@@ -218,12 +230,14 @@ call-coach/
 ## What Changed from Original Approach
 
 **Before:**
+
 - Jumped straight to implementation
 - Manual git commits
 - No structured planning artifacts
 - No task tracking between sessions
 
 **Now:**
+
 - ✅ OpenSpec planning artifacts (proposal, design, specs, tasks)
 - ✅ Beads for persistent task tracking
 - ✅ Sequential dependencies preventing premature work

@@ -4,9 +4,9 @@ Prefect flow for scheduled knowledge base updates.
 Runs weekly to refresh product documentation, detect changes,
 and notify admins of significant updates.
 """
+
 import asyncio
 import json
-import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -195,9 +195,7 @@ def detect_changes(storage_results: dict) -> dict[str, Any]:
     changes = {
         "new_documents": storage_results.get("stored", 0),
         "updated_documents": storage_results.get("updated", 0),
-        "has_changes": (
-            storage_results.get("stored", 0) + storage_results.get("updated", 0) > 0
-        ),
+        "has_changes": (storage_results.get("stored", 0) + storage_results.get("updated", 0) > 0),
         "errors": storage_results.get("errors", []),
     }
 
@@ -225,18 +223,18 @@ def notify_admins(changes: dict[str, Any], ingestion_results: dict):
     message = "Knowledge Base Update Summary\n"
     message += f"Time: {datetime.now().isoformat()}\n\n"
 
-    message += f"Ingestion Results:\n"
+    message += "Ingestion Results:\n"
     message += f"  Prefect docs: {ingestion_results.get('prefect_count', 0)}\n"
     message += f"  Horizon docs: {ingestion_results.get('horizon_count', 0)}\n"
     message += f"  Competitive: {ingestion_results.get('competitive_count', 0)}\n"
     message += f"  Total: {ingestion_results.get('total', 0)}\n\n"
 
-    message += f"Changes:\n"
+    message += "Changes:\n"
     message += f"  New documents: {changes['new_documents']}\n"
     message += f"  Updated documents: {changes['updated_documents']}\n\n"
 
     if ingestion_results.get("errors"):
-        message += f"Errors:\n"
+        message += "Errors:\n"
         for error in ingestion_results["errors"]:
             message += f"  - {error}\n"
 

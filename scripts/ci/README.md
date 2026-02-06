@@ -20,6 +20,7 @@ The CI/CD pipeline is implemented using GitHub Actions and includes:
 Runs on every push to main/develop and on pull requests.
 
 **Jobs:**
+
 - **Lint & Format** - Ruff and Black checks
 - **Type Check** - MyPy type checking
 - **Unit & Integration Tests** - Pytest with coverage reporting
@@ -28,6 +29,7 @@ Runs on every push to main/develop and on pull requests.
   - Tests run on Python 3.11 and 3.12
 
 **Triggering:**
+
 ```bash
 # Automatic on push to main/develop
 # Automatic on PR to main/develop
@@ -39,15 +41,18 @@ Runs on every push to main/develop and on pull requests.
 Builds Docker images for MCP server and webhook server.
 
 **Images:**
+
 - `ghcr.io/<owner>/call-coach-mcp:tag`
 - `ghcr.io/<owner>/call-coach-webhook:tag`
 
 **Tags:**
+
 - Branch name (e.g., `develop`, `main`)
 - Commit SHA with branch prefix (e.g., `develop-abc123def`)
 - Semantic version tags for releases
 
 **Permissions Required:**
+
 ```
 packages: write
 contents: read
@@ -58,6 +63,7 @@ contents: read
 Automatically deploys to staging on push to develop branch.
 
 **Steps:**
+
 1. Run database migrations
 2. Build Docker images
 3. Deploy frontend to Vercel (staging project)
@@ -65,6 +71,7 @@ Automatically deploys to staging on push to develop branch.
 5. Run smoke tests
 
 **Required Secrets:**
+
 - `STAGING_DATABASE_URL` - PostgreSQL connection string
 - `STAGING_API_URL` - API endpoint for frontend config
 - `STAGING_API_ENDPOINT` - Backend health check URL
@@ -80,6 +87,7 @@ Automatically deploys to staging on push to develop branch.
 Triggers on version tags (e.g., `v1.0.0`).
 
 **Steps:**
+
 1. Run full test suite (70% coverage minimum, with 80% enforced for production)
 2. Build and push production Docker images
 3. Run database migrations with backup
@@ -90,12 +98,14 @@ Triggers on version tags (e.g., `v1.0.0`).
 **Tags:** Must follow semantic versioning: `v[MAJOR].[MINOR].[PATCH]`
 
 Example:
+
 ```bash
 git tag v1.2.3
 git push origin v1.2.3
 ```
 
 **Required Secrets:**
+
 - `PRODUCTION_DATABASE_URL`
 - `PRODUCTION_API_URL`
 - `PRODUCTION_API_ENDPOINT`
@@ -107,10 +117,12 @@ git push origin v1.2.3
 Safely runs database migrations with rollback capabilities.
 
 **Triggers:**
+
 - Manual trigger via `workflow_dispatch` (specify environment and target version)
 - Automatic on changes to migration files in develop/main
 
 **Features:**
+
 - Pre-migration backup creation
 - Migration validation
 - Post-migration verification
@@ -120,6 +132,7 @@ Safely runs database migrations with rollback capabilities.
 **Usage:**
 
 Manual trigger via GitHub Actions UI:
+
 ```
 Workflow: Database Migration
 Inputs:
@@ -128,6 +141,7 @@ Inputs:
 ```
 
 Or via GitHub CLI:
+
 ```bash
 gh workflow run migrate.yml -f environment=staging
 ```
@@ -137,6 +151,7 @@ gh workflow run migrate.yml -f environment=staging
 Comprehensive security checks running on every push and scheduled weekly.
 
 **Checks:**
+
 1. **pip-audit** - Python dependency vulnerability scanning
 2. **npm audit** - Node.js dependency vulnerability scanning
 3. **Bandit** - Python code security scanning
@@ -147,6 +162,7 @@ Comprehensive security checks running on every push and scheduled weekly.
 8. **Secret Scanning** - TruffleHog secret detection
 
 **Results:**
+
 - SARIF reports uploaded to GitHub Security tab
 - Artifacts uploaded for manual review
 - Summaries posted in PR comments
@@ -156,11 +172,13 @@ Comprehensive security checks running on every push and scheduled weekly.
 Automated release process with version bumping and changelog generation.
 
 **Triggers:**
+
 - Manual via `workflow_dispatch` with inputs:
   - Version type: `major`, `minor`, `patch`, or `prerelease`
   - Prerelease suffix (for prerelease versions): `alpha`, `beta`, `rc`
 
 **Steps:**
+
 1. Calculate next version based on type
 2. Generate changelog from commits
 3. Update version in `pyproject.toml`
@@ -191,26 +209,31 @@ gh workflow run release.yml -f version_type=minor
 Store these as repository secrets in GitHub Settings:
 
 **Database:**
+
 - `STAGING_DATABASE_URL` - PostgreSQL URL for staging
 - `PRODUCTION_DATABASE_URL` - PostgreSQL URL for production
 
 **API Endpoints:**
+
 - `STAGING_API_URL` - Staging API base URL
 - `STAGING_API_ENDPOINT` - Health check endpoint
 - `PRODUCTION_API_URL` - Production API base URL
 - `PRODUCTION_API_ENDPOINT` - Production health check
 
 **Frontend URLs:**
+
 - `STAGING_WEB_URL` - Staging web application URL
 - `PRODUCTION_WEB_URL` - Production web application URL
 
 **Vercel:**
+
 - `VERCEL_TOKEN` - Vercel authentication token
 - `VERCEL_ORG_ID` - Vercel organization ID
 - `VERCEL_PROJECT_ID` - Production project ID
 - `VERCEL_PROJECT_ID_STAGING` - Staging project ID
 
 **Test Credentials:**
+
 - `STAGING_TEST_USER_EMAIL` - Test user email
 - `STAGING_TEST_USER_PASSWORD` - Test user password
 - `TEST_USER_EMAIL` - Test user email for CI
@@ -219,6 +242,7 @@ Store these as repository secrets in GitHub Settings:
 - `TEST_REP_EMAIL` - Sample representative email
 
 **Deployment:**
+
 - `STAGING_DEPLOYMENT_TOKEN` - Token for staging deployments
 - `PRODUCTION_DEPLOYMENT_TOKEN` - Token for production deployments
 
@@ -411,10 +435,12 @@ For CodeQL/Semgrep false positives:
 The following workflows must pass before merging to main:
 
 1. **Test Suite** (`tests.yml`)
+
    - All matrix configurations must pass
    - Coverage must be >= 70%
 
 2. **Build** (`build.yml`)
+
    - Docker images must build successfully
 
 3. **Security** (`security.yml`)
@@ -426,6 +452,7 @@ The following workflows must pass before merging to main:
 ### GitHub Notifications
 
 Watch for:
+
 - Red X on PRs = check failed
 - Yellow indicator = check running
 - Green check = all passed
@@ -437,6 +464,7 @@ Failures automatically post PR comments highlighting issues.
 ### GitHub Security Advisories
 
 Monitor the Security tab for:
+
 - Secret scanning alerts
 - Dependabot alerts
 - Code scanning alerts

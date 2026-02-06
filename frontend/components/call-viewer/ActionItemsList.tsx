@@ -10,10 +10,7 @@ interface ActionItemsListProps {
   className?: string;
 }
 
-export function ActionItemsList({
-  actionItems,
-  className,
-}: ActionItemsListProps) {
+export function ActionItemsList({ actionItems, className }: ActionItemsListProps) {
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
 
   if (!actionItems || actionItems.length === 0) {
@@ -39,9 +36,7 @@ export function ActionItemsList({
     <Card className={className}>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            Action Items
-          </CardTitle>
+          <CardTitle className="flex items-center gap-2">Action Items</CardTitle>
           <span className="text-sm text-muted-foreground">
             {completedCount} / {totalCount} completed
           </span>

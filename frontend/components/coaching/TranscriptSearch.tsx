@@ -57,9 +57,7 @@ export function TranscriptSearch({
     const secs = Math.floor(seconds % 60);
 
     if (hours > 0) {
-      return `${hours}:${mins.toString().padStart(2, "0")}:${secs
-        .toString()
-        .padStart(2, "0")}`;
+      return `${hours}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     }
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
@@ -71,11 +69,7 @@ export function TranscriptSearch({
     return parts.map((part, idx) => (
       <span
         key={idx}
-        className={
-          part.toLowerCase() === query.toLowerCase()
-            ? "bg-yellow-200 font-medium"
-            : ""
-        }
+        className={part.toLowerCase() === query.toLowerCase() ? "bg-yellow-200 font-medium" : ""}
       >
         {part}
       </span>
@@ -154,8 +148,7 @@ export function TranscriptSearch({
             const isExpanded = expandedIndices.has(index);
             const isSelected = selectedIndex === index;
             const isCurrentPlaying =
-              !searchQuery &&
-              autoScrollIndex === transcript.indexOf(segment);
+              !searchQuery && autoScrollIndex === transcript.indexOf(segment);
             const isLongText = segment.text.length > 150;
 
             return (
@@ -175,9 +168,7 @@ export function TranscriptSearch({
                     {/* Speaker and Timestamp */}
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-900">
-                          {segment.speaker}
-                        </span>
+                        <span className="text-sm font-medium text-gray-900">{segment.speaker}</span>
                         {isCurrentPlaying && (
                           <span className="inline-flex items-center gap-1 text-xs bg-blue-200 text-blue-700 px-2 py-0.5 rounded-full font-medium">
                             <span className="inline-block w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" />
@@ -202,10 +193,7 @@ export function TranscriptSearch({
                     <p className="text-sm text-gray-700 leading-relaxed">
                       {isLongText && !isExpanded ? (
                         <>
-                          {highlightText(
-                            segment.text.substring(0, 150),
-                            searchQuery
-                          )}
+                          {highlightText(segment.text.substring(0, 150), searchQuery)}
                           ...
                         </>
                       ) : (

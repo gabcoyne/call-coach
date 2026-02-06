@@ -15,18 +15,21 @@ The weekly review flow (`weekly_review.py`) automatically generates comprehensiv
 ## Features
 
 ### 1. Data Collection
+
 - Automatically identifies reps with calls in the past week
 - Aggregates coaching scores by dimension
 - Extracts recurring objections from coaching sessions
 - Calculates trends vs. previous week
 
 ### 2. Report Generation
+
 - **Markdown Format**: For logging and Slack
 - **HTML Email**: Rich formatting with templates
 - Personalized for each rep
 - Includes specific examples and quotes
 
 ### 3. Distribution
+
 - **Email**: SendGrid, AWS SES, or SMTP
 - **Slack**: Team summary via webhook
 - Configurable per rep or globally
@@ -38,11 +41,13 @@ The weekly review flow (`weekly_review.py`) automatically generates comprehensiv
 Choose one email provider:
 
 #### Option A: SendGrid (Recommended)
+
 ```bash
 export SENDGRID_API_KEY="your-sendgrid-api-key"
 ```
 
 #### Option B: AWS SES
+
 ```bash
 export AWS_ACCESS_KEY_ID="your-aws-key"
 export AWS_SECRET_ACCESS_KEY="your-aws-secret"
@@ -50,6 +55,7 @@ export AWS_DEFAULT_REGION="us-east-1"
 ```
 
 #### Option C: Generic SMTP
+
 ```bash
 export SMTP_HOST="smtp.gmail.com"
 export SMTP_PORT="587"
@@ -59,6 +65,7 @@ export SMTP_USE_TLS="true"
 ```
 
 #### Option D: Console Output (Development)
+
 No configuration needed. Reports will be logged to console.
 
 ### 2. Slack Configuration (Optional)
@@ -100,6 +107,7 @@ python -c "from flows.weekly_review import weekly_review_flow; weekly_review_flo
 Once deployed, the flow runs automatically every Monday at 6:00 AM UTC.
 
 Monitor executions in Prefect Cloud:
+
 ```bash
 prefect deployment run weekly-review/weekly-review-monday-6am
 ```
@@ -148,6 +156,7 @@ weekly_review_flow()
 ### Database Queries
 
 Key tables accessed:
+
 - `calls` - Call metadata and timing
 - `speakers` - Rep information
 - `coaching_sessions` - Coaching scores and analysis
@@ -158,6 +167,7 @@ Key tables accessed:
 ### Email Report
 
 HTML email with sections:
+
 - Summary (total calls, sessions, overall score)
 - Score breakdown by dimension with trends
 - Recurring objections with examples
@@ -167,11 +177,13 @@ HTML email with sections:
 ### Slack Summary
 
 Text summary with:
+
 - Total reps processed
 - Per-rep score and trend indicator
 - Overall team performance
 
 Example:
+
 ```
 📊 Weekly Coaching Report - Week of January 06, 2025
 
@@ -191,11 +203,13 @@ Individual reports sent via email (if enabled)
 ### Email Template
 
 Edit `reports/templates/weekly_report.html` to customize:
+
 - Branding and colors
 - Section layout
 - Styling
 
 Template uses Jinja2 syntax:
+
 ```html
 <h1>Weekly Coaching Report - {{ rep_name }}</h1>
 <p>Overall Score: {{ overall_avg }}/100</p>
@@ -204,6 +218,7 @@ Template uses Jinja2 syntax:
 ### Report Content
 
 Modify `generate_rep_report_markdown()` to change:
+
 - Sections included
 - Recommendations logic
 - Formatting
@@ -211,6 +226,7 @@ Modify `generate_rep_report_markdown()` to change:
 ### Delivery Logic
 
 Update `send_email_report()` or `post_to_slack()` to:
+
 - Add additional channels (MS Teams, etc.)
 - Implement custom routing logic
 - Add attachments or PDFs
@@ -220,6 +236,7 @@ Update `send_email_report()` or `post_to_slack()` to:
 ### Prefect Cloud Dashboard
 
 Monitor flow runs in Prefect Cloud:
+
 - Execution history and status
 - Task-level timing and errors
 - Logs and artifacts
@@ -227,6 +244,7 @@ Monitor flow runs in Prefect Cloud:
 ### Logs
 
 Flow logs include:
+
 - Rep processing progress
 - Email/Slack delivery status
 - Error details with stack traces
@@ -234,6 +252,7 @@ Flow logs include:
 ### Metrics
 
 Track via flow return value:
+
 ```python
 {
   "status": "completed",
@@ -251,6 +270,7 @@ Track via flow return value:
 **Issue**: `reps_processed: 0`
 
 **Solutions**:
+
 - Verify calls exist in database for date range
 - Check `speakers.company_side = true` flag
 - Confirm coaching sessions exist for reps
@@ -260,6 +280,7 @@ Track via flow return value:
 **Issue**: `emails_sent: 0` but `reports_generated > 0`
 
 **Solutions**:
+
 - Verify email provider credentials in environment
 - Check sender email is verified (AWS SES, SendGrid)
 - Review logs for specific error messages
@@ -270,13 +291,16 @@ Track via flow return value:
 **Issue**: `slack_posted: false`
 
 **Solutions**:
+
 - Verify `SLACK_WEBHOOK_URL` is set correctly
 - Test webhook URL with `curl`:
+
   ```bash
   curl -X POST -H 'Content-type: application/json' \
     --data '{"text":"Test message"}' \
     $SLACK_WEBHOOK_URL
   ```
+
 - Check webhook permissions in Slack workspace
 
 ### Missing Trend Data
@@ -284,6 +308,7 @@ Track via flow return value:
 **Issue**: Trends show as `null` or "new"
 
 **Solutions**:
+
 - Ensure previous week has coaching sessions
 - Verify date range calculation logic
 - Check for data gaps in `coaching_sessions` table
@@ -324,6 +349,7 @@ Potential improvements:
 ## Support
 
 For issues or questions:
+
 1. Check Prefect Cloud logs for error details
 2. Review this README's troubleshooting section
 3. Consult team documentation

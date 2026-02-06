@@ -13,9 +13,7 @@ interface ShareAnalysisProps {
 export function ShareAnalysis({ callId, className }: ShareAnalysisProps) {
   const [copied, setCopied] = useState(false);
 
-  const shareUrl = `${
-    typeof window !== "undefined" ? window.location.origin : ""
-  }/calls/${callId}`;
+  const shareUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/calls/${callId}`;
 
   const handleCopyLink = async () => {
     try {
@@ -40,11 +38,7 @@ export function ShareAnalysis({ callId, className }: ShareAnalysisProps) {
           <div className="flex-1 p-2 text-sm bg-muted rounded-md overflow-x-auto">
             <code className="text-xs">{shareUrl}</code>
           </div>
-          <Button
-            onClick={handleCopyLink}
-            variant={copied ? "default" : "outline"}
-            size="sm"
-          >
+          <Button onClick={handleCopyLink} variant={copied ? "default" : "outline"} size="sm">
             {copied ? (
               <>
                 <Check className="h-4 w-4 mr-2" />
@@ -59,8 +53,7 @@ export function ShareAnalysis({ callId, className }: ShareAnalysisProps) {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          Anyone with this link can view the call analysis (authentication
-          required)
+          Anyone with this link can view the call analysis (authentication required)
         </p>
       </CardContent>
     </Card>

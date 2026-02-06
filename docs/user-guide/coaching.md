@@ -11,6 +11,7 @@ When you analyze a call, you receive detailed feedback across four dimensions. T
 ### Discovery (Learning Customer Needs)
 
 **What we measure:**
+
 - How well you identified customer challenges
 - Quality of qualifying questions
 - Understanding of decision criteria
@@ -20,6 +21,7 @@ When you analyze a call, you receive detailed feedback across four dimensions. T
 **Score interpretation:**
 
 **90-100: Excellent Discovery**
+
 - Deeply understood customer needs
 - Asked great qualifying questions
 - Uncovered all key pain points
@@ -27,6 +29,7 @@ When you analyze a call, you receive detailed feedback across four dimensions. T
 - Customer felt heard and understood
 
 Example strong discovery:
+
 ```
 "What's your current workflow for managing data pipelines?"
 "How long does that process typically take?"
@@ -36,24 +39,28 @@ Example strong discovery:
 ```
 
 **80-89: Good Discovery**
+
 - Solid understanding of needs
 - Asked most important questions
 - Minor gaps in exploration
 - Could go deeper on timeline/budget
 
 Improvement opportunity:
+
 ```
 You asked about pain points but didn't explore timeline
 Add: "When do you need this resolved?"
 ```
 
 **70-79: Average Discovery**
+
 - Identified main pain point
 - Missed deeper exploration
 - Could qualify better
 - Didn't fully understand decision process
 
 Recommended focus:
+
 ```
 Add discovery questions about:
 1. Current solution details
@@ -63,12 +70,14 @@ Add discovery questions about:
 ```
 
 **Below 70: Needs Improvement**
+
 - Missed key discovery elements
 - Moved to product discussion too early
 - Didn't fully understand customer
 - Recommend coaching before next calls
 
 Action steps:
+
 ```
 1. Review discovery question framework
 2. Practice discovery scenarios
@@ -80,6 +89,7 @@ Action steps:
 ### Product Knowledge (Demonstrating Expertise)
 
 **What we measure:**
+
 - Accurate feature explanations
 - Relevant use case examples
 - Competitive positioning
@@ -89,6 +99,7 @@ Action steps:
 **Score interpretation:**
 
 **90-100: Exceptional Product Knowledge**
+
 - Answered all customer questions accurately
 - Provided relevant use case examples
 - Connected features to customer needs
@@ -96,6 +107,7 @@ Action steps:
 - Clear, technical where appropriate
 
 Strengths to maintain:
+
 ```
 "You explained our workflow automation clearly"
 "Great example comparing their use case to similar customer"
@@ -103,24 +115,28 @@ Strengths to maintain:
 ```
 
 **80-89: Strong Product Knowledge**
+
 - Accurately answered questions
 - Generally relevant examples
 - Some positioning gaps
 - Could be more technical in places
 
 Areas to develop:
+
 ```
 "Add more data validation features to comparison"
 "Prepare cloud deployment architecture diagram"
 ```
 
 **70-79: Adequate Knowledge**
+
 - Mostly accurate answers
 - Some gaps in features/details
 - Weak competitive positioning
 - Missed opportunities to showcase value
 
 Development plan:
+
 ```
 1. Product training modules
 2. Feature deep-dive sessions
@@ -129,12 +145,14 @@ Development plan:
 ```
 
 **Below 70: Knowledge Gaps**
+
 - Inaccurate information shared
 - Couldn't answer questions
 - Poor positioning
 - Confused customer further
 
 Immediate action:
+
 ```
 1. Complete product certification
 2. Shadow product expert
@@ -145,6 +163,7 @@ Immediate action:
 ### Objection Handling (Overcoming Concerns)
 
 **What we measure:**
+
 - Understanding the real objection
 - Addressing concerns with evidence
 - Building confidence in solution
@@ -154,6 +173,7 @@ Immediate action:
 **Score interpretation:**
 
 **90-100: Expert Objection Handling**
+
 - Understood objection deeply
 - Responded with confidence and evidence
 - Customer concerns addressed
@@ -161,6 +181,7 @@ Immediate action:
 - Moved deal forward
 
 Example strong response:
+
 ```
 Objection: "Your solution is too expensive"
 Response: "I understand budget is important. Let's look
@@ -170,24 +191,28 @@ to $150K, paying for itself in implementation savings alone."
 ```
 
 **80-89: Good Objection Handling**
+
 - Addressed main concern
 - Could add more evidence
 - Slight positioning gap
 - Overall effective
 
 Improvement idea:
+
 ```
 Add: "Let me show you the ROI calculation"
 Add: "Here's how similar customers handled this"
 ```
 
 **70-79: Moderate Handling**
+
 - Partially addressed objection
 - Defensive tone possible
 - Didn't fully resolve concern
 - Relationship slightly damaged
 
 Development needed:
+
 ```
 1. Objection handling training
 2. Practice with role-play
@@ -197,12 +222,14 @@ Development needed:
 ```
 
 **Below 70: Struggled with Objection**
+
 - Didn't address concern
 - Became defensive
 - Customer unconvinced
 - Deal risk increased
 
 Recommended coaching:
+
 ```
 1. Complete objection handling certification
 2. Shadow objection handling expert
@@ -214,6 +241,7 @@ Recommended coaching:
 **Common objections and handling strategies:**
 
 **Pricing Objection**
+
 ```
 Objection: "You're more expensive than [competitor]"
 Response: "Let me explain the difference. While our
@@ -223,6 +251,7 @@ of ownership is actually lower. Here's the breakdown..."
 ```
 
 **Technical Objection**
+
 ```
 Objection: "Will this integrate with our [system]?"
 Response: "Great question. We have pre-built connectors
@@ -231,6 +260,7 @@ data flows between systems."
 ```
 
 **Timeline Objection**
+
 ```
 Objection: "We're not ready to implement until Q3"
 Response: "That timeline makes sense. What if we did a
@@ -239,6 +269,7 @@ you're ready to scale when Q3 arrives."
 ```
 
 **Competitive Objection**
+
 ```
 Objection: "[Competitor] can do the same thing cheaper"
 Response: "I hear you. Let me show you what [Competitor]
@@ -250,6 +281,7 @@ customers chose us for these exact differentiators."
 ### Engagement (Building Relationships)
 
 **What we measure:**
+
 - Rapport and connection with customer
 - Active listening and empathy
 - Clear, engaging communication
@@ -260,6 +292,7 @@ customers chose us for these exact differentiators."
 **Score interpretation:**
 
 **90-100: Exceptional Engagement**
+
 - Excellent rapport throughout call
 - Customer felt valued and heard
 - Natural, authentic conversation
@@ -267,6 +300,7 @@ customers chose us for these exact differentiators."
 - Customer wants to continue relationship
 
 Signs of excellent engagement:
+
 ```
 - Customer laughing/relaxed
 - Customer asking follow-up questions
@@ -277,12 +311,14 @@ Signs of excellent engagement:
 ```
 
 **80-89: Strong Engagement**
+
 - Good rapport established
 - Customer seems interested
 - Could be more warm/personal
 - Some authenticity moments missed
 
 Ways to improve:
+
 ```
 - More personal questions about customer
 - References to customer's specific situation
@@ -291,12 +327,14 @@ Ways to improve:
 ```
 
 **70-79: Adequate Engagement**
+
 - Professional tone maintained
 - Some rapport gaps
 - Transactional feel possible
 - Customer seems neutral
 
 Development areas:
+
 ```
 1. Active listening training
 2. Empathy practice
@@ -306,12 +344,14 @@ Development areas:
 ```
 
 **Below 70: Engagement Lacking**
+
 - Distant or formal tone
 - Customer seems disengaged
 - Poor listening evident
 - Relationship at risk
 
 Coaching recommended:
+
 ```
 1. Practice active listening
 2. Learn customer's industry
@@ -323,21 +363,25 @@ Coaching recommended:
 **Improving engagement:**
 
 1. **Listen More Than You Talk**
+
    - Customer should talk 50-60% of time
    - Ask follow-up questions
    - Pause for customer response
 
 2. **Use Customer's Language**
+
    - Listen for industry terminology
    - Repeat their phrasing
    - Match their style (formal/casual)
 
 3. **Ask Personal Questions**
+
    - "How long have you been in this role?"
    - "What brought you to this company?"
    - "What's your biggest frustration?"
 
 4. **Show Genuine Interest**
+
    - Take notes on their situation
    - Reference their details later
    - Remember personal details
@@ -355,16 +399,19 @@ Coaching recommended:
 Each dimension includes:
 
 **Score: XX/100**
+
 - Visual representation (progress bar)
 - Percentile vs team (if available)
 - Trend indicator (↑ improving, ↓ declining, → stable)
 
 **Key Findings**
+
 1. Strengths (what went well)
 2. Improvement opportunities (what to work on)
 3. Evidence (specific quotes with timestamps)
 
 **Recommendations**
+
 1. Immediate actions
 2. Longer-term development
 3. Learning resources
@@ -421,10 +468,12 @@ Resources:
 After analyzing a call, take 1-2 immediate actions:
 
 1. **Identify the top gap**
+
    - What's the single biggest opportunity?
    - What would most improve your score?
 
 2. **Choose one action**
+
    - Don't try to change everything
    - Focus on impact
    - Build on success
@@ -436,6 +485,7 @@ After analyzing a call, take 1-2 immediate actions:
    - Get feedback from manager
 
 Example:
+
 ```
 Call analyzed: Discovery call, score 82
 Gap: Didn't ask about timeline/budget
@@ -456,6 +506,7 @@ Practice:
 Build on immediate actions with deeper development:
 
 1. **Find high-scoring examples**
+
    ```
    Search: [Dimension] + high score
    Filter: Min score 90
@@ -463,6 +514,7 @@ Build on immediate actions with deeper development:
    ```
 
 2. **Study the pattern**
+
    ```
    Watch each call
    Take notes on:
@@ -473,6 +525,7 @@ Build on immediate actions with deeper development:
    ```
 
 3. **Practice the skill**
+
    ```
    Role-play scenarios weekly
    Get manager feedback
@@ -480,6 +533,7 @@ Build on immediate actions with deeper development:
    ```
 
 4. **Apply to real calls**
+
    ```
    Use new skill in actual calls
    Review your analysis
@@ -492,6 +546,7 @@ Build on immediate actions with deeper development:
 Build sustainable improvement across all dimensions:
 
 1. **Set dimension goals**
+
    ```
    Current: 78/100 (Objection Handling)
    Goal: 88/100 (in 30 days)
@@ -499,6 +554,7 @@ Build sustainable improvement across all dimensions:
    ```
 
 2. **Create learning plan**
+
    ```
    Week 1: Foundation building
    Week 2: Specific technique practice
@@ -507,6 +563,7 @@ Build sustainable improvement across all dimensions:
    ```
 
 3. **Track progress**
+
    ```
    Monthly scores:
    Jan: 78 → Feb: 81 → Mar: 84 → Apr: 87
@@ -515,6 +572,7 @@ Build sustainable improvement across all dimensions:
    ```
 
 4. **Celebrate wins**
+
    ```
    Share improvements with manager
    Recognize in team meetings
@@ -526,11 +584,13 @@ Build sustainable improvement across all dimensions:
 ### Sharing Analysis with Manager
 
 1. **Schedule coaching session**
+
    - Share specific call analysis
    - Focus on 1-2 dimensions
    - Discuss action plan
 
 2. **Use evidence**
+
    - Reference specific quotes
    - Show scoring methodology
    - Discuss recommendations together
@@ -541,6 +601,7 @@ Build sustainable improvement across all dimensions:
    - Establish coaching timeline
 
 Example coaching conversation:
+
 ```
 Manager: "Let's look at your discovery score. You got 82,
 which is good, but I see opportunities in timeline/budget
@@ -566,12 +627,14 @@ your style. Let's role-play. I'll be the customer."
 Call Coach data is valuable for performance discussions:
 
 1. **Quantifiable metrics**
+
    - Specific dimension scores
    - Trend analysis
    - Peer comparison
    - Improvement trajectory
 
 2. **Growth evidence**
+
    - Before/after comparisons
    - Skill development timeline
    - Coaching impact
@@ -599,6 +662,7 @@ A: Yes! High-scoring calls are great learning tools. Ask permission from the rep
 
 **Q: How does coaching translate to results?**
 A: Better call performance should lead to:
+
 - Higher win rates
 - Larger deal sizes
 - Faster sales cycles

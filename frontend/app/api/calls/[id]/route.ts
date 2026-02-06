@@ -6,10 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db/connection";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
 
@@ -39,9 +36,6 @@ export async function GET(
     return NextResponse.json({ call: result.rows[0] });
   } catch (error) {
     console.error(`Error fetching call ${params.id}:`, error);
-    return NextResponse.json(
-      { error: "Failed to fetch call" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch call" }, { status: 500 });
   }
 }

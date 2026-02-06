@@ -21,10 +21,7 @@ interface Preset {
   requiresManager?: boolean;
 }
 
-export function QuickFilterPresets({
-  onPresetSelect,
-  currentUserEmail,
-}: QuickFilterPresetsProps) {
+export function QuickFilterPresets({ onPresetSelect, currentUserEmail }: QuickFilterPresetsProps) {
   const { user } = useUser();
   const userRole = user?.publicMetadata?.role as string | undefined;
   const isManager = userRole === "manager";
@@ -112,9 +109,7 @@ export function QuickFilterPresets({
   ];
 
   // Filter presets based on user role
-  const availablePresets = presets.filter(
-    (preset) => !preset.requiresManager || isManager
-  );
+  const availablePresets = presets.filter((preset) => !preset.requiresManager || isManager);
 
   return (
     <Card>
@@ -142,9 +137,7 @@ export function QuickFilterPresets({
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground text-left">
-                {preset.description}
-              </p>
+              <p className="text-xs text-muted-foreground text-left">{preset.description}</p>
             </Button>
           ))}
         </div>

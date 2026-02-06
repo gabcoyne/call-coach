@@ -9,18 +9,14 @@ Provides:
 - Alerting rules and configurations
 """
 
+from monitoring.metrics import get_metrics, initialize_metrics, track_api_call
 from monitoring.sentry import (
-    initialize_sentry,
+    add_breadcrumb,
     capture_exception,
     capture_message,
-    add_breadcrumb,
-    set_user_context,
+    initialize_sentry,
     set_tags,
-)
-from monitoring.metrics import (
-    get_metrics,
-    initialize_metrics,
-    track_api_call,
+    set_user_context,
 )
 
 __all__ = [

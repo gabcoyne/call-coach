@@ -67,6 +67,7 @@ All have realistic names and @prefect.io email addresses.
 ### Calls
 
 Each call includes:
+
 - Realistic title from actual sales call types
 - Random date within the lookback period
 - Duration between 10-90 minutes
@@ -76,6 +77,7 @@ Each call includes:
 ### Call Participants
 
 Each call has:
+
 - 1-2 Prefect employees (company-side speakers)
 - 1-3 prospect/customer participants
 - Talk time breakdown and percentages
@@ -84,6 +86,7 @@ Each call has:
 ### Transcripts
 
 Generated with:
+
 - 10-20 transcript lines per call
 - Realistic dialogue based on call type
 - Sentiment labels (positive, neutral, negative)
@@ -93,6 +96,7 @@ Generated with:
 ### Coaching Sessions
 
 For each call, generates 0-3 coaching sessions with:
+
 - One of 4 dimensions: product_knowledge, discovery, objection_handling, engagement
 - Score between 0-100 (correlated with dimension)
 - 2-3 strength areas specific to the dimension
@@ -106,6 +110,7 @@ For each call, generates 0-3 coaching sessions with:
 ### Opportunities
 
 Generated with:
+
 - Realistic company names and deal stages
 - Random amounts between $50k-$300k
 - Health scores from 30-95
@@ -117,6 +122,7 @@ Generated with:
 ### Emails
 
 For each opportunity:
+
 - 2-5 realistic sales emails
 - Subject lines matching call topics
 - Bodies with realistic sales language
@@ -134,6 +140,7 @@ uv run python scripts/generate_fixtures.py --demo-account
 ```
 
 This generates:
+
 - 50 calls across 6 months of history
 - 100+ transcripts
 - 30+ coaching sessions
@@ -207,6 +214,7 @@ The script requires:
 ## Logging
 
 All operations are logged to `logs/generate_fixtures.log` with:
+
 - Execution time tracking
 - Progress indicators
 - Summary statistics of generated data
@@ -291,6 +299,7 @@ uv run pytest tests/test_generate_fixtures.py -v
 ```
 
 This verifies:
+
 - Data generation functions
 - Realistic content in all fields
 - Proper structure and relationships

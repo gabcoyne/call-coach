@@ -9,11 +9,7 @@ interface OverallScoreBadgeProps {
   className?: string;
 }
 
-export function OverallScoreBadge({
-  score,
-  previousScore,
-  className,
-}: OverallScoreBadgeProps) {
+export function OverallScoreBadge({ score, previousScore, className }: OverallScoreBadgeProps) {
   // Calculate trend
   let trend: "up" | "down" | "same" | null = null;
   let trendValue: number | null = null;
@@ -35,9 +31,7 @@ export function OverallScoreBadge({
     <Card className={cn("", className)}>
       <CardContent className="p-6">
         <div className="flex flex-col items-center justify-center space-y-2">
-          <p className="text-sm font-medium text-muted-foreground">
-            Overall Score
-          </p>
+          <p className="text-sm font-medium text-muted-foreground">Overall Score</p>
           <div className="flex items-center gap-2">
             <span className="text-5xl font-bold">{Math.round(score)}</span>
             <span className="text-2xl text-muted-foreground">/100</span>

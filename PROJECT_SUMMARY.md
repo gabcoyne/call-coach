@@ -1,8 +1,8 @@
 # Gong Call Coaching Agent - Project Summary
 
-**Status:** Phase 1 Complete ✅  
-**Date:** 2026-02-04  
-**Lines of Code:** ~2,929 Python LOC  
+**Status:** Phase 1 Complete ✅
+**Date:** 2026-02-04
+**Lines of Code:** ~2,929 Python LOC
 **Files Created:** 31
 
 ---
@@ -24,7 +24,7 @@ A production-ready foundation for an AI-powered sales coaching system that:
 call-coach/
 ├── README.md                    # Overview and features
 ├── QUICKSTART.md                # 5-minute setup
-├── SETUP.md                     # Detailed setup instructions  
+├── SETUP.md                     # Detailed setup instructions
 ├── STATUS.md                    # Implementation progress tracker
 ├── requirements.txt             # Python dependencies
 ├── config.py                    # Pydantic settings
@@ -83,6 +83,7 @@ call-coach/
 ## Key Features Implemented
 
 ### 1. Database Schema (14 Tables)
+
 - ✅ Partitioned `coaching_sessions` (quarterly)
 - ✅ Indexes on all critical queries
 - ✅ Full-text search on transcripts
@@ -91,12 +92,14 @@ call-coach/
 - ✅ Analysis run observability
 
 ### 2. Gong Integration
+
 - ✅ API client with retries
 - ✅ HMAC-SHA256 webhook verification
 - ✅ Idempotency handling
 - ✅ FastAPI server (<500ms response)
 
 ### 3. Intelligent Caching (Cost Optimization)
+
 - ✅ SHA256 transcript hashing
 - ✅ Cache key: `dimension + transcript_hash + rubric_version`
 - ✅ TTL-based expiration
@@ -104,12 +107,14 @@ call-coach/
 - ✅ **Impact:** 60-80% cost reduction
 
 ### 4. Transcript Chunking (Long Calls)
+
 - ✅ Sliding window with 20% overlap
 - ✅ Token counting with tiktoken
 - ✅ Handles 60+ minute calls (>80K tokens)
 - ✅ Chunk reconstruction
 
 ### 5. Prefect Flow (Async Processing)
+
 - ✅ `process_new_call_flow`
 - ✅ Concurrent task execution
 - ✅ Retry logic
@@ -117,6 +122,7 @@ call-coach/
 - ✅ Webhook status updates
 
 ### 6. Type Safety
+
 - ✅ Pydantic models everywhere
 - ✅ Enum-based constants
 - ✅ Validated settings
@@ -127,28 +133,34 @@ call-coach/
 ## What's Next
 
 ### Phase 2: Knowledge Base (1-2 days)
+
 Need from sales team:
+
 - Coaching rubrics (discovery, product knowledge, objections, engagement)
 - Product documentation (Prefect, Horizon features)
 - Competitive positioning
 
 ### Phase 3: Analysis Engine (3-4 days)
+
 - Implement Claude API integration
 - Create prompt templates
 - Add prompt caching
 - Parallel dimension analysis
 
 ### Phase 4: FastMCP Server (4-5 days)
+
 - Build 9 MCP tools
 - On-demand coaching via Claude Desktop
 - Authentication
 
 ### Phase 5: Weekly Reviews (2-3 days)
+
 - Automated batch processing
 - Report generation
 - Notifications
 
 ### Phase 6: Production Hardening (5-7 days)
+
 - Monitoring dashboards
 - Cost tracking
 - Security audit
@@ -161,10 +173,12 @@ Need from sales team:
 ## Cost Analysis
 
 ### Without Optimization
+
 - 100 calls/week × 30K tokens × 4 dimensions = 480M tokens/month
 - **Cost:** ~$1,787/month
 
 ### With Caching (Implemented)
+
 - 60-80% cache hit rate
 - Prompt caching on rubrics/knowledge base
 - **Cost:** ~$317/month (82% reduction)
@@ -175,6 +189,7 @@ Need from sales team:
 ## How to Use
 
 ### Local Development
+
 ```bash
 make install          # Install dependencies
 make docker-up        # Start services
@@ -183,6 +198,7 @@ make webhook-server   # Start webhook server
 ```
 
 ### Verify Setup
+
 ```bash
 # Health check
 curl http://localhost:8000/webhooks/health
@@ -195,6 +211,7 @@ pytest tests/ -v
 ```
 
 ### Process a Call
+
 ```python
 from flows.process_new_call import process_new_call_flow
 
@@ -206,24 +223,28 @@ result = process_new_call_flow(gong_call_id="your-call-id")
 ## Technical Highlights
 
 ### Performance
+
 - Webhook response: <500ms (target achieved)
 - Chunking overhead: Minimal (uses token-based slicing)
 - Database queries: All indexed
 - Connection pooling: 5-20 connections
 
 ### Reliability
+
 - Idempotency via `gong_webhook_id`
 - Retry logic on all external calls
 - Transaction safety
 - Error tracking in database
 
 ### Scalability
+
 - Partitioned tables for growth
 - Stateless webhook server (horizontal scaling)
 - Connection pooling
 - Async processing via Prefect
 
 ### Cost Optimization
+
 - Intelligent caching (60-80% savings)
 - Prompt caching (50% input token reduction)
 - Token counting before API calls
@@ -233,13 +254,14 @@ result = process_new_call_flow(gong_call_id="your-call-id")
 
 ## Dependencies
 
-**Python:** 3.11+  
-**Database:** PostgreSQL 15+ (Neon in production)  
-**Orchestration:** Prefect 3.0+  
-**AI:** Claude API (Sonnet 4.5)  
-**API Integration:** Gong  
+**Python:** 3.11+
+**Database:** PostgreSQL 15+ (Neon in production)
+**Orchestration:** Prefect 3.0+
+**AI:** Claude API (Sonnet 4.5)
+**API Integration:** Gong
 
 Key libraries:
+
 - `fastmcp` - MCP server framework
 - `prefect` - Workflow orchestration
 - `anthropic` - Claude API client
@@ -253,6 +275,7 @@ Key libraries:
 ## Verification Checklist
 
 Phase 1 Complete:
+
 - ✅ Database schema created with all tables
 - ✅ Indexes on all critical queries
 - ✅ Connection pooling configured
@@ -281,6 +304,7 @@ Phase 1 Complete:
 ## Contact
 
 For questions about:
+
 - **Architecture:** See implementation plan
 - **Setup:** Check SETUP.md
 - **Progress:** Review STATUS.md

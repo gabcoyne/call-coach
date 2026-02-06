@@ -8,10 +8,11 @@ Measures:
 - Memory usage
 - Cache effectiveness
 """
+
 import time
-import random
+from typing import Any
+
 import pytest
-from typing import List, Dict, Any
 
 
 @pytest.mark.performance
@@ -22,15 +23,16 @@ class TestCoachingAnalysisScenario:
     def analysis_client(self):
         """Create HTTP client for analysis."""
         import httpx
+
         return httpx.Client(base_url="http://localhost:8000", timeout=60.0)
 
     @pytest.fixture
-    def call_ids(self) -> List[str]:
+    def call_ids(self) -> list[str]:
         """Generate test call IDs."""
         return [f"call_{i:06d}" for i in range(1, 101)]
 
     @pytest.fixture
-    def analysis_configs(self) -> List[Dict[str, Any]]:
+    def analysis_configs(self) -> list[dict[str, Any]]:
         """Different analysis configurations to test."""
         return [
             {
@@ -41,7 +43,12 @@ class TestCoachingAnalysisScenario:
             },
             {
                 "name": "full_analysis",
-                "dimensions": ["engagement", "discovery", "objection_handling", "product_knowledge"],
+                "dimensions": [
+                    "engagement",
+                    "discovery",
+                    "objection_handling",
+                    "product_knowledge",
+                ],
                 "include_transcript": True,
                 "use_cache": True,
             },
@@ -56,10 +63,11 @@ class TestCoachingAnalysisScenario:
     def test_analyze_100_calls_sequential(
         self,
         analysis_client,
-        call_ids: List[str],
+        call_ids: list[str],
         benchmark,
     ):
         """Benchmark sequential analysis of 100 calls."""
+
         def analyze_all():
             total_time = 0
             successful = 0
@@ -84,7 +92,7 @@ class TestCoachingAnalysisScenario:
                         successful += 1
                     else:
                         failed += 1
-                except Exception as e:
+                except Exception:
                     failed += 1
 
             return {
@@ -98,7 +106,7 @@ class TestCoachingAnalysisScenario:
 
         result = benchmark(analyze_all)
         assert result["successful"] > 0, "At least some calls should be analyzed successfully"
-        print(f"\nCoaching Analysis Results:")
+        print("\nCoaching Analysis Results:")
         print(f"  Total Calls: {result['total_calls']}")
         print(f"  Successful: {result['successful']}")
         print(f"  Failed: {result['failed']}")
@@ -109,7 +117,7 @@ class TestCoachingAnalysisScenario:
     def test_analyze_with_different_dimensions(
         self,
         analysis_client,
-        call_ids: List[str],
+        call_ids: list[str],
         benchmark,
     ):
         """Benchmark analysis with different dimension configurations."""
@@ -148,7 +156,7 @@ class TestCoachingAnalysisScenario:
                 "avg_time": elapsed / 25,
             }
 
-        print(f"\nAnalysis by Dimension Configuration:")
+        print("\nAnalysis by Dimension Configuration:")
         for config_name, metrics in results.items():
             print(f"  {config_name}:")
             print(f"    Avg Time: {metrics['avg_time']:.3f}s")
@@ -157,7 +165,7 @@ class TestCoachingAnalysisScenario:
     def test_cache_effectiveness(
         self,
         analysis_client,
-        call_ids: List[str],
+        call_ids: list[str],
     ):
         """Measure cache hit effectiveness."""
         call_id = call_ids[0]
@@ -196,7 +204,7 @@ class TestCoachingAnalysisScenario:
         avg_hit_time = sum(hit_times) / len(hit_times) if hit_times else 0
         speedup = first_call_time / avg_hit_time if avg_hit_time > 0 else 0
 
-        print(f"\nCache Effectiveness:")
+        print("\nCache Effectiveness:")
         print(f"  First Call (Miss): {first_call_time:.3f}s")
         print(f"  Avg Hit Time: {avg_hit_time:.3f}s")
         print(f"  Speedup: {speedup:.2f}x")
@@ -204,10 +212,11 @@ class TestCoachingAnalysisScenario:
     def test_analysis_with_large_transcript(
         self,
         analysis_client,
-        call_ids: List[str],
+        call_ids: list[str],
         benchmark,
     ):
         """Benchmark analysis with transcript snippets."""
+
         def analyze_with_transcript():
             successful = 0
             total_time = 0
@@ -240,7 +249,7 @@ class TestCoachingAnalysisScenario:
             }
 
         result = benchmark(analyze_with_transcript)
-        print(f"\nAnalysis with Transcript Snippets:")
+        print("\nAnalysis with Transcript Snippets:")
         print(f"  Calls Analyzed: {result['calls_analyzed']}")
         print(f"  Total Time: {result['total_time']:.2f}s")
         print(f"  Avg Time/Call: {result['avg_time']:.3f}s")
@@ -248,7 +257,7 @@ class TestCoachingAnalysisScenario:
     def test_parallel_analysis_patterns(
         self,
         analysis_client,
-        call_ids: List[str],
+        call_ids: list[str],
     ):
         """Test what happens with rapid sequential analysis."""
         rapid_calls = 10

@@ -1,8 +1,20 @@
-'use client';
+"use client";
 
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { CHART_COLORS, SCORE_COLORS } from '@/lib/colors';
-import { useState } from 'react';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from "recharts";
+import { CHART_COLORS, SCORE_COLORS } from "@/lib/colors";
+import { useState } from "react";
 
 export interface ObjectionType {
   name: string;
@@ -33,9 +45,9 @@ export function ObjectionBreakdown({
   data,
   showDetails = false,
   height = 350,
-  className = '',
+  className = "",
 }: ObjectionBreakdownProps) {
-  const [viewMode, setViewMode] = useState<'pie' | 'details'>(showDetails ? 'details' : 'pie');
+  const [viewMode, setViewMode] = useState<"pie" | "details">(showDetails ? "details" : "pie");
 
   if (!data || data.length === 0) {
     return (
@@ -94,26 +106,26 @@ export function ObjectionBreakdown({
   };
 
   // Pie chart view
-  if (viewMode === 'pie') {
+  if (viewMode === "pie") {
     return (
       <div className={className}>
         <div className="flex justify-end mb-4 gap-2">
           <button
-            onClick={() => setViewMode('pie')}
+            onClick={() => setViewMode("pie")}
             className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-              viewMode === 'pie'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              viewMode === "pie"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             Distribution
           </button>
           <button
-            onClick={() => setViewMode('details')}
+            onClick={() => setViewMode("details")}
             className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-              viewMode === 'details'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              viewMode === "details"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             Details
@@ -136,10 +148,7 @@ export function ObjectionBreakdown({
               dataKey="count"
             >
               {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={CHART_COLORS[index % CHART_COLORS.length]}
-                />
+                <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
               ))}
             </Pie>
             <Tooltip content={<CustomPieTooltip />} />
@@ -150,28 +159,28 @@ export function ObjectionBreakdown({
   }
 
   // Details bar chart view (success rate per objection)
-  const detailsData = data.filter(d => d.successRate !== undefined);
+  const detailsData = data.filter((d) => d.successRate !== undefined);
 
   if (detailsData.length === 0) {
     return (
       <div className={className}>
         <div className="flex justify-end mb-4 gap-2">
           <button
-            onClick={() => setViewMode('pie')}
+            onClick={() => setViewMode("pie")}
             className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-              viewMode === 'pie'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              viewMode === "pie"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             Distribution
           </button>
           <button
-            onClick={() => setViewMode('details')}
+            onClick={() => setViewMode("details")}
             className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-              viewMode === 'details'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              viewMode === "details"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             Details
@@ -182,7 +191,9 @@ export function ObjectionBreakdown({
           className="flex items-center justify-center border rounded-lg bg-gray-50"
           style={{ height }}
         >
-          <p className="text-gray-500 text-sm">No success rate data available. Switch to Distribution view.</p>
+          <p className="text-gray-500 text-sm">
+            No success rate data available. Switch to Distribution view.
+          </p>
         </div>
       </div>
     );
@@ -192,21 +203,21 @@ export function ObjectionBreakdown({
     <div className={className}>
       <div className="flex justify-end mb-4 gap-2">
         <button
-          onClick={() => setViewMode('pie')}
+          onClick={() => setViewMode("pie")}
           className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-            viewMode === 'pie'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            viewMode === "pie"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
           Distribution
         </button>
         <button
-          onClick={() => setViewMode('details')}
+          onClick={() => setViewMode("details")}
           className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-            viewMode === 'details'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            viewMode === "details"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
           Details
@@ -214,10 +225,7 @@ export function ObjectionBreakdown({
       </div>
 
       <ResponsiveContainer width="100%" height={height}>
-        <BarChart
-          data={detailsData}
-          margin={{ top: 5, right: 30, left: 0, bottom: 80 }}
-        >
+        <BarChart data={detailsData} margin={{ top: 5, right: 30, left: 0, bottom: 80 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="name"
@@ -229,10 +237,10 @@ export function ObjectionBreakdown({
           />
           <YAxis
             yAxisId="left"
-            domain={[0, 'auto']}
+            domain={[0, "auto"]}
             tick={{ fontSize: 12 }}
             stroke="#6b7280"
-            label={{ value: 'Count', angle: -90, position: 'insideLeft' }}
+            label={{ value: "Count", angle: -90, position: "insideLeft" }}
           />
           <YAxis
             yAxisId="right"
@@ -240,10 +248,10 @@ export function ObjectionBreakdown({
             domain={[0, 100]}
             tick={{ fontSize: 12 }}
             stroke="#6b7280"
-            label={{ value: 'Success Rate %', angle: 90, position: 'insideRight' }}
+            label={{ value: "Success Rate %", angle: 90, position: "insideRight" }}
           />
           <Tooltip content={<CustomBarTooltip />} />
-          <Legend wrapperStyle={{ fontSize: '12px' }} />
+          <Legend wrapperStyle={{ fontSize: "12px" }} />
 
           {/* Count bars */}
           <Bar

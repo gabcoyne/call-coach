@@ -14,18 +14,13 @@ const DIMENSION_LABELS: Record<string, string> = {
 };
 
 const DIMENSION_DESCRIPTIONS: Record<string, string> = {
-  product_knowledge:
-    "Understanding of Prefect features, benefits, and technical details",
+  product_knowledge: "Understanding of Prefect features, benefits, and technical details",
   discovery: "Ability to uncover customer needs, pain points, and requirements",
-  objection_handling:
-    "Effectiveness in addressing concerns and overcoming obstacles",
+  objection_handling: "Effectiveness in addressing concerns and overcoming obstacles",
   engagement: "Rapport building, active listening, and conversational flow",
 };
 
-export function DimensionScoreCards({
-  scores,
-  className,
-}: DimensionScoreCardsProps) {
+export function DimensionScoreCards({ scores, className }: DimensionScoreCardsProps) {
   const dimensions = [
     "product_knowledge",
     "discovery",

@@ -47,15 +47,18 @@ Before deploying, ensure you have:
 ### Step 1: Create Vercel Project
 
 1. **Sign in to Vercel**
+
    - Go to [vercel.com](https://vercel.com)
    - Sign in with GitHub
 
 2. **Import Repository**
+
    - Click "Add New Project"
    - Select your GitHub repository
    - Authorize Vercel to access the repo
 
 3. **Configure Build Settings**
+
    - **Framework Preset**: Next.js (auto-detected)
    - **Root Directory**: `frontend/` (for monorepo)
    - **Build Command**: `npm run build` (default)
@@ -63,7 +66,9 @@ Before deploying, ensure you have:
    - **Install Command**: `npm install` (default)
 
 4. **Set Node.js Version**
+
    - In `package.json`, add:
+
    ```json
    {
      "engines": {
@@ -83,6 +88,7 @@ See the [Environment Variables](#environment-configuration) section below for de
 ### Step 3: Redeploy
 
 After adding environment variables:
+
 1. Go to **Deployments** tab
 2. Click "..." on the latest deployment
 3. Select "Redeploy"
@@ -206,6 +212,7 @@ vercel --prod --branch main
 4. Every push to PR updates preview
 
 **Preview URL Format**:
+
 ```
 https://gong-coaching-<pr-branch>-<team-name>.vercel.app
 ```
@@ -311,6 +318,7 @@ When rolling back:
 Vercel provides DNS records to configure:
 
 **Option A: CNAME Record** (recommended for subdomains)
+
 ```
 Type:  CNAME
 Name:  coaching
@@ -319,6 +327,7 @@ TTL:   3600
 ```
 
 **Option B: A Record** (for apex domains)
+
 ```
 Type:  A
 Name:  @
@@ -336,6 +345,7 @@ TTL:   3600
 ### SSL/HTTPS Configuration
 
 Vercel automatically:
+
 - Provisions Let's Encrypt SSL certificate
 - Enables HTTPS
 - Redirects HTTP to HTTPS
@@ -361,6 +371,7 @@ To redirect `www.coaching.prefect.io` to `coaching.prefect.io`:
 3. Free tier: 1M events/month
 
 **Metrics Tracked**:
+
 - Page views
 - Unique visitors
 - Core Web Vitals (LCP, FID, CLS)
@@ -368,6 +379,7 @@ To redirect `www.coaching.prefect.io` to `coaching.prefect.io`:
 - Geographic distribution
 
 **Viewing Analytics**:
+
 - Dashboard → Analytics tab
 - Filter by time range (24h, 7d, 30d)
 - View real-time data
@@ -379,11 +391,13 @@ Tracks Core Web Vitals in production:
 **Enable Speed Insights**:
 
 1. Install package:
+
 ```bash
 npm install @vercel/speed-insights
 ```
 
 2. Add to root layout:
+
 ```typescript
 // app/layout.tsx
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -436,6 +450,7 @@ vercel logs <deployment-url>
    - Deployment error
 
 **Email Notifications**:
+
 - Automatic for deployment failures
 - Configure in **Settings → Notifications**
 
@@ -451,31 +466,31 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: "/:path*",
         headers: [
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: "X-Frame-Options",
+            value: "DENY",
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
           },
           {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains',
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
           },
           {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
           },
           {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
           },
         ],
       },
@@ -508,6 +523,7 @@ Add CSP header for XSS protection:
 ### Environment Variable Encryption
 
 Vercel automatically encrypts all environment variables:
+
 - Encrypted at rest
 - Only decrypted at build/runtime
 - Never exposed in logs or client code (unless `NEXT_PUBLIC_*`)
@@ -522,6 +538,7 @@ Vercel automatically encrypts all environment variables:
 4. Users must enter password to access preview URLs
 
 **Vercel Authentication** (Enterprise):
+
 - Requires users to sign in with Vercel account
 - Available on Enterprise plans only
 
@@ -536,6 +553,7 @@ Type error: Property 'x' does not exist on type 'Y'
 ```
 
 **Solution**:
+
 1. Fix TypeScript errors locally
 2. Run `npm run build` to verify
 3. Run `npx tsc --noEmit` to check types
@@ -548,6 +566,7 @@ Cannot find module '@/lib/utils'
 ```
 
 **Solution**:
+
 1. Verify all imports use correct paths
 2. Check `tsconfig.json` path aliases match
 3. Ensure all dependencies in `package.json`
@@ -562,6 +581,7 @@ MCP_BACKEND_URL is undefined
 ```
 
 **Solution**:
+
 1. Verify variables are set in Vercel dashboard
 2. Check variable names match exactly (including `NEXT_PUBLIC_` prefix)
 3. Redeploy after adding variables
@@ -570,6 +590,7 @@ MCP_BACKEND_URL is undefined
 **Issue: API routes returning 500 errors**
 
 **Solution**:
+
 1. Check function logs in Vercel dashboard
 2. Verify MCP backend URL is correct and reachable
 3. Check Clerk API keys are valid
@@ -580,6 +601,7 @@ MCP_BACKEND_URL is undefined
 **Issue: Slow page loads**
 
 **Solution**:
+
 1. Check Vercel Analytics → Speed Insights
 2. Optimize images (use Next.js Image component)
 3. Enable ISR for static pages
@@ -589,6 +611,7 @@ MCP_BACKEND_URL is undefined
 **Issue: High bandwidth usage**
 
 **Solution**:
+
 1. Optimize images (WebP format, responsive sizes)
 2. Enable caching headers
 3. Use Vercel Image Optimization
@@ -599,6 +622,7 @@ MCP_BACKEND_URL is undefined
 **Issue: Deployment queued indefinitely**
 
 **Solution**:
+
 1. Check Vercel Status page: [vercel-status.com](https://www.vercel-status.com/)
 2. Cancel stuck deployment and retry
 3. Contact Vercel support if persists
@@ -608,6 +632,7 @@ MCP_BACKEND_URL is undefined
 **Issue: Domain not resolving**
 
 **Solution**:
+
 1. Verify DNS records are correct
 2. Wait 5-10 minutes for DNS propagation
 3. Use DNS checker tool: `dig coaching.prefect.io`
@@ -616,6 +641,7 @@ MCP_BACKEND_URL is undefined
 **Issue: SSL certificate not provisioning**
 
 **Solution**:
+
 1. Ensure DNS is correctly configured
 2. Remove and re-add domain
 3. Wait 30 minutes for certificate provisioning
@@ -639,11 +665,13 @@ Before deploying to production:
 ### Deployment Schedule
 
 **Recommended Schedule**:
+
 - **Monday-Thursday**: Safe to deploy
 - **Friday**: Avoid unless critical
 - **Weekends**: Emergency fixes only
 
 **Deploy During**:
+
 - Off-peak hours (if downtime expected)
 - When team is available to monitor
 - When you can quickly rollback if needed
@@ -653,12 +681,14 @@ Before deploying to production:
 After deploying to production:
 
 1. **Immediate (0-5 minutes)**:
+
    - [ ] Visit production URL and verify it loads
    - [ ] Test authentication (sign in)
    - [ ] Test critical user flows (view call, search)
    - [ ] Check browser console for errors
 
 2. **Short-term (5-30 minutes)**:
+
    - [ ] Monitor Vercel function logs for errors
    - [ ] Check Vercel Analytics for traffic
    - [ ] Review user reports (if any)
@@ -680,6 +710,7 @@ After deploying to production:
 ---
 
 **Need Help?**
+
 - Vercel Support: [vercel.com/support](https://vercel.com/support)
 - Internal: Contact DevOps team
 - Emergency: Follow [RUNBOOK.md](./RUNBOOK.md) incident procedures

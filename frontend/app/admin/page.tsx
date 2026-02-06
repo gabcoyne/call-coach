@@ -20,14 +20,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import {
-  Activity,
-  Users,
-  TrendingUp,
-  AlertCircle,
-  RefreshCw,
-  ArrowRight,
-} from "lucide-react";
+import { Activity, Users, TrendingUp, AlertCircle, RefreshCw, ArrowRight } from "lucide-react";
 
 interface SystemMetrics {
   apiResponseTime: number;
@@ -147,12 +140,7 @@ export default function AdminDashboardPage() {
             System health, usage metrics, and cost tracking
           </p>
         </div>
-        <Button
-          onClick={fetchDashboardData}
-          variant="outline"
-          size="sm"
-          className="gap-2"
-        >
+        <Button onClick={fetchDashboardData} variant="outline" size="sm" className="gap-2">
           <RefreshCw className="h-4 w-4" />
           Refresh
         </Button>
@@ -182,9 +170,7 @@ export default function AdminDashboardPage() {
             <div className="text-2xl font-bold">
               {metrics?.apiResponseTime?.toFixed(0) ?? "N/A"}ms
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Average response time
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Average response time</p>
           </CardContent>
         </Card>
 
@@ -195,12 +181,8 @@ export default function AdminDashboardPage() {
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.errorRate?.toFixed(2) ?? "N/A"}%
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Last 24 hours
-            </p>
+            <div className="text-2xl font-bold">{metrics?.errorRate?.toFixed(2) ?? "N/A"}%</div>
+            <p className="text-xs text-muted-foreground mt-1">Last 24 hours</p>
           </CardContent>
         </Card>
 
@@ -211,12 +193,8 @@ export default function AdminDashboardPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.uptime?.toFixed(2) ?? "N/A"}%
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              This month
-            </p>
+            <div className="text-2xl font-bold">{metrics?.uptime?.toFixed(2) ?? "N/A"}%</div>
+            <p className="text-xs text-muted-foreground mt-1">This month</p>
           </CardContent>
         </Card>
 
@@ -227,12 +205,8 @@ export default function AdminDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {usage?.activeUsers ?? "N/A"}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              This month
-            </p>
+            <div className="text-2xl font-bold">{usage?.activeUsers ?? "N/A"}</div>
+            <p className="text-xs text-muted-foreground mt-1">This month</p>
           </CardContent>
         </Card>
       </div>
@@ -243,14 +217,10 @@ export default function AdminDashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Calls Analyzed</CardTitle>
-            <CardDescription>
-              Total calls processed this month
-            </CardDescription>
+            <CardDescription>Total calls processed this month</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">
-              {usage?.callsAnalyzed ?? 0}
-            </div>
+            <div className="text-3xl font-bold">{usage?.callsAnalyzed ?? 0}</div>
             <p className="text-xs text-muted-foreground mt-2">
               API calls today: {usage?.apiCallsToday ?? 0}
             </p>
@@ -261,9 +231,7 @@ export default function AdminDashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Claude API Cost</CardTitle>
-            <CardDescription>
-              Estimated token usage and costs
-            </CardDescription>
+            <CardDescription>Estimated token usage and costs</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -295,9 +263,7 @@ export default function AdminDashboardPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Latest system events from the past 24 hours
-            </CardDescription>
+            <CardDescription>Latest system events from the past 24 hours</CardDescription>
           </div>
           <Button asChild variant="ghost" size="sm" className="gap-2">
             <a href="/admin/analytics">
@@ -328,9 +294,7 @@ export default function AdminDashboardPage() {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">
-                      {item.description}
-                    </p>
+                    <p className="text-sm font-medium text-foreground">{item.description}</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {new Date(item.timestamp).toLocaleString()}
                     </p>
@@ -338,9 +302,7 @@ export default function AdminDashboardPage() {
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                No recent activity
-              </p>
+              <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
             )}
           </div>
         </CardContent>
@@ -352,9 +314,7 @@ export default function AdminDashboardPage() {
           <a href="/admin/users">
             <Users className="h-5 w-5 mb-2" />
             <span className="font-semibold">User Management</span>
-            <span className="text-xs text-muted-foreground mt-1">
-              Manage roles and permissions
-            </span>
+            <span className="text-xs text-muted-foreground mt-1">Manage roles and permissions</span>
           </a>
         </Button>
 
@@ -372,9 +332,7 @@ export default function AdminDashboardPage() {
           <a href="/admin/system">
             <Activity className="h-5 w-5 mb-2" />
             <span className="font-semibold">System Health</span>
-            <span className="text-xs text-muted-foreground mt-1">
-              Database & cache status
-            </span>
+            <span className="text-xs text-muted-foreground mt-1">Database & cache status</span>
           </a>
         </Button>
       </div>

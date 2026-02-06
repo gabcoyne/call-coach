@@ -14,15 +14,18 @@ The FastMCP backend server cannot run locally for development because the Pydant
 ## Capabilities
 
 ### New Capabilities
+
 - `local-backend-runner`: Scripts, configuration, and tooling for running the FastMCP server locally using `uv`, including environment setup and hot-reload support
 - `backend-development-docs`: Comprehensive CLAUDE.md with backend architecture, development workflow, testing procedures, and troubleshooting guide
 
 ### Modified Capabilities
+
 <!-- No existing capabilities are being modified at the spec level -->
 
 ## Impact
 
 **Affected Files:**
+
 - `coaching_mcp/shared/config.py` - Fix env file path resolution
 - `coaching_mcp/server.py` - Add dev mode flag and relaxed validation
 - Root directory - New run scripts and CLAUDE.md
@@ -30,16 +33,19 @@ The FastMCP backend server cannot run locally for development because the Pydant
 - `README.md` - Add local development section
 
 **Affected Systems:**
+
 - Local development environment (Python 3.11+, uv, PostgreSQL)
 - FastMCP server startup and configuration loading
 - Frontend-backend integration (localhost:3000 ↔ localhost:8000)
 
 **Dependencies:**
+
 - Requires working Neon database connection (already configured)
 - Requires valid API keys in `.env` (already present)
 - Frontend expects MCP backend at `http://localhost:8000` (needs update to env var)
 
 **Benefits:**
+
 - Enables rapid local iteration without Horizon deployment
 - Reduces development cycle time from ~5 minutes to <30 seconds
 - Allows debugging with IDE breakpoints and local logs

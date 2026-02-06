@@ -1,6 +1,7 @@
 """
 Test different Gong API authentication methods to find which one works.
 """
+
 import httpx
 
 # Credentials provided
@@ -19,7 +20,7 @@ def test_auth_method(name: str, **kwargs):
     """Test an authentication method."""
     print(f"\n{'=' * 60}")
     print(f"Testing: {name}")
-    print('=' * 60)
+    print("=" * 60)
 
     try:
         response = httpx.get(TEST_ENDPOINT, params=TEST_PARAMS, timeout=10.0, **kwargs)

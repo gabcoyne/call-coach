@@ -12,19 +12,18 @@ Run this:
 - After rubric updates
 - Daily via cron for cache maintenance
 """
+
 import logging
 from datetime import datetime, timedelta
 from typing import Any
 
-from analysis.cache import generate_transcript_hash, get_active_rubric_version
 from analysis.rubric_loader import load_rubric
 from cache.redis_client import get_redis_cache
-from db import fetch_all, fetch_one
+from db import fetch_all
 from db.models import CoachingDimension
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -174,7 +173,7 @@ class CacheWarmer:
                 ORDER BY cs.created_at DESC
                 LIMIT 100
                 """,
-                (datetime.now() - timedelta(days=days_back),)
+                (datetime.now() - timedelta(days=days_back),),
             )
 
             # Store each session in Redis
@@ -190,7 +189,9 @@ class CacheWarmer:
                         "action_items": session["action_items"],
                         "full_analysis": session["full_analysis"],
                         "metadata": session["metadata"],
-                        "created_at": session["created_at"].isoformat() if session["created_at"] else None,
+                        "created_at": (
+                            session["created_at"].isoformat() if session["created_at"] else None
+                        ),
                     }
 
                     success = self.redis_cache.set(
@@ -252,7 +253,7 @@ class CacheWarmer:
                 ORDER BY s.email
                 LIMIT 50
                 """,
-                (datetime.now() - timedelta(days=days_back),)
+                (datetime.now() - timedelta(days=days_back),),
             )
 
             # Note: Rep performance summaries are typically computed on-demand
@@ -315,7 +316,7 @@ class CacheWarmer:
                 ORDER BY cs.created_at DESC
                 LIMIT 50
                 """,
-                (dimension.value, datetime.now() - timedelta(days=days_back))
+                (dimension.value, datetime.now() - timedelta(days=days_back)),
             )
 
             for session in sessions:
@@ -328,7 +329,9 @@ class CacheWarmer:
                         "action_items": session["action_items"],
                         "full_analysis": session["full_analysis"],
                         "metadata": session["metadata"],
-                        "created_at": session["created_at"].isoformat() if session["created_at"] else None,
+                        "created_at": (
+                            session["created_at"].isoformat() if session["created_at"] else None
+                        ),
                     }
 
                     success = self.redis_cache.set(
@@ -381,16 +384,13 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Warm Redis cache with frequent data")
     parser.add_argument(
-        "--days",
-        type=int,
-        default=30,
-        help="Number of days to look back (default: 30)"
+        "--days", type=int, default=30, help="Number of days to look back (default: 30)"
     )
     parser.add_argument(
         "--dimension",
         type=str,
         choices=["product_knowledge", "discovery", "objection_handling", "engagement"],
-        help="Warm specific dimension only"
+        help="Warm specific dimension only",
     )
 
     args = parser.parse_args()
@@ -404,7 +404,7 @@ if __name__ == "__main__":
     else:
         # Warm all
         stats = warm_cache(days_back=args.days)
-        print(f"\nCache warming complete!")
+        print("\nCache warming complete!")
         print(f"Total items warmed: {stats['total_warmed']}")
         print(f"Duration: {stats['duration_seconds']}s")
         print(f"Errors: {stats['total_errors']}")

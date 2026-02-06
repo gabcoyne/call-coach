@@ -1,4 +1,4 @@
-import { getScoreColor } from '@/lib/colors';
+import { getScoreColor } from "@/lib/colors";
 
 export interface ScoreCardProps {
   /** Numeric score value (0-100) */
@@ -19,7 +19,7 @@ export interface ScoreCardProps {
  * - Yellow (60-79): Good performance
  * - Red (<60): Needs improvement
  */
-export function ScoreCard({ score, title, subtitle, className = '' }: ScoreCardProps) {
+export function ScoreCard({ score, title, subtitle, className = "" }: ScoreCardProps) {
   const { bg, text, label } = getScoreColor(score);
 
   return (
@@ -28,43 +28,28 @@ export function ScoreCard({ score, title, subtitle, className = '' }: ScoreCardP
       style={{ backgroundColor: bg, borderColor: text }}
     >
       {/* Title */}
-      <h3
-        className="text-sm font-medium mb-2"
-        style={{ color: text }}
-      >
+      <h3 className="text-sm font-medium mb-2" style={{ color: text }}>
         {title}
       </h3>
 
       {/* Score Display */}
       <div className="flex items-baseline gap-2">
-        <span
-          className="text-3xl font-bold"
-          style={{ color: text }}
-        >
+        <span className="text-3xl font-bold" style={{ color: text }}>
           {score}
         </span>
-        <span
-          className="text-lg font-medium"
-          style={{ color: text }}
-        >
+        <span className="text-lg font-medium" style={{ color: text }}>
           / 100
         </span>
       </div>
 
       {/* Performance Label */}
-      <p
-        className="text-xs font-semibold mt-1"
-        style={{ color: text }}
-      >
+      <p className="text-xs font-semibold mt-1" style={{ color: text }}>
         {label}
       </p>
 
       {/* Optional Subtitle */}
       {subtitle && (
-        <p
-          className="text-sm mt-2"
-          style={{ color: text }}
-        >
+        <p className="text-sm mt-2" style={{ color: text }}>
           {subtitle}
         </p>
       )}

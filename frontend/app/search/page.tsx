@@ -287,18 +287,9 @@ export default function CallSearchPage() {
         {/* Advanced Filter Sections */}
         {showAdvancedFilters && (
           <div className="space-y-4">
-            <ScoreThresholdFilters
-              filters={filters}
-              onFiltersChange={handleFiltersChange}
-            />
-            <TopicKeywordFilter
-              filters={filters}
-              onFiltersChange={handleFiltersChange}
-            />
-            <ObjectionTypeFilter
-              filters={filters}
-              onFiltersChange={handleFiltersChange}
-            />
+            <ScoreThresholdFilters filters={filters} onFiltersChange={handleFiltersChange} />
+            <TopicKeywordFilter filters={filters} onFiltersChange={handleFiltersChange} />
+            <ObjectionTypeFilter filters={filters} onFiltersChange={handleFiltersChange} />
           </div>
         )}
 
@@ -335,10 +326,7 @@ export default function CallSearchPage() {
                 >
                   {useBulkActionsView ? "Normal View" : "Bulk Actions"}
                 </Button>
-                <SaveSearchButton
-                  filters={filters}
-                  onSave={handleSaveSearch}
-                />
+                <SaveSearchButton filters={filters} onSave={handleSaveSearch} />
                 <ExportResults results={paginatedResults} />
               </div>
             </div>
@@ -372,9 +360,7 @@ export default function CallSearchPage() {
             {error && !isLoading && (
               <div className="text-center py-12">
                 <AlertCircle className="h-12 w-12 mx-auto text-destructive mb-4" />
-                <p className="text-lg font-medium text-destructive mb-2">
-                  Error loading results
-                </p>
+                <p className="text-lg font-medium text-destructive mb-2">Error loading results</p>
                 <p className="text-sm text-muted-foreground mb-4">
                   {error.message || "Something went wrong"}
                 </p>

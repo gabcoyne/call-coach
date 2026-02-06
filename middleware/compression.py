@@ -6,10 +6,11 @@ Automatically compresses responses based on:
 - Response size threshold
 - Client Accept-Encoding header
 """
+
 import gzip
 import logging
+from collections.abc import Callable
 from io import BytesIO
-from typing import Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware

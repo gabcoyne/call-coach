@@ -66,9 +66,7 @@ export function EnhancedCallPlayer({
                 </span>
               )}
             </TabsTrigger>
-            {selectedAnnotation && (
-              <TabsTrigger value="share">Share Clip</TabsTrigger>
-            )}
+            {selectedAnnotation && <TabsTrigger value="share">Share Clip</TabsTrigger>}
           </TabsList>
 
           {/* Transcript Tab */}
@@ -102,20 +100,13 @@ export function EnhancedCallPlayer({
                   >
                     <div className="space-y-2">
                       <div className="flex items-start justify-between">
-                        <h4 className="text-sm font-semibold text-gray-900">
-                          {annotation.title}
-                        </h4>
+                        <h4 className="text-sm font-semibold text-gray-900">{annotation.title}</h4>
                         <span className="text-xs font-mono text-gray-600">
                           {Math.floor(annotation.timestamp / 60)}:
-                          {String(Math.floor(annotation.timestamp % 60)).padStart(
-                            2,
-                            "0"
-                          )}
+                          {String(Math.floor(annotation.timestamp % 60)).padStart(2, "0")}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-700">
-                        {annotation.insight}
-                      </p>
+                      <p className="text-sm text-gray-700">{annotation.insight}</p>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -131,9 +122,7 @@ export function EnhancedCallPlayer({
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <p className="text-sm">
-                  No coaching insights available for this call
-                </p>
+                <p className="text-sm">No coaching insights available for this call</p>
               </div>
             )}
           </TabsContent>
@@ -141,10 +130,7 @@ export function EnhancedCallPlayer({
           {/* Share Clip Tab */}
           {selectedAnnotation && (
             <TabsContent value="share" className="space-y-4">
-              <ClipGenerator
-                annotation={selectedAnnotation}
-                duration={duration}
-              />
+              <ClipGenerator annotation={selectedAnnotation} duration={duration} />
             </TabsContent>
           )}
         </Tabs>

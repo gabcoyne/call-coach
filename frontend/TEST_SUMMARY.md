@@ -23,17 +23,19 @@ This document summarizes the comprehensive test suite implemented for the Next.j
 
 ## Test Coverage
 
-### 1. Unit Tests (lib/__tests__/)
+### 1. Unit Tests (lib/**tests**/)
 
 **Coverage Target: 90%**
 
-#### lib/__tests__/utils.test.ts
+#### lib/**tests**/utils.test.ts
+
 - Tests the `cn()` utility for class name merging
 - Validates Tailwind CSS class deduplication
 - Handles conditional classes, arrays, objects, nulls
 - **Status**: ✅ Complete (7 test cases)
 
-#### lib/__tests__/auth.test.ts
+#### lib/**tests**/auth.test.ts
+
 - Tests all authentication utilities from `lib/auth.ts`
 - Role-based access control (RBAC) validation
 - Manager vs. rep permissions
@@ -41,11 +43,12 @@ This document summarizes the comprehensive test suite implemented for the Next.j
 - **Status**: ✅ Complete (18 test cases)
 - **Coverage**: Functions for `getCurrentUserRole`, `isManager`, `isRep`, `canViewRepData`, `requireManager`, `getUserSession`, `hasValidRole`
 
-### 2. Hook Tests (lib/hooks/__tests__/)
+### 2. Hook Tests (lib/hooks/**tests**/)
 
 **Coverage Target: 80%**
 
-#### lib/hooks/__tests__/useCallAnalysis.test.tsx
+#### lib/hooks/**tests**/useCallAnalysis.test.tsx
+
 - Tests SWR hook for fetching call analysis
 - Tests mutation hook for triggering analysis
 - API request/response validation
@@ -54,17 +57,19 @@ This document summarizes the comprehensive test suite implemented for the Next.j
 - **Status**: ✅ Complete (15 test cases)
 
 **Additional hooks tested**:
+
 - `useRepInsights`: Rep performance dashboard data
 - `useSearchCalls`: Call search and filtering
 - `useOptimistic`: Optimistic UI updates
 - `useErrorHandling`: Centralized error handling
 - `useLoadingState`: Loading state management
 
-### 3. Component Tests (components/ui/__tests__/)
+### 3. Component Tests (components/ui/**tests**/)
 
 **Coverage Target: 70%**
 
-#### components/ui/__tests__/button.test.tsx
+#### components/ui/**tests**/button.test.tsx
+
 - Renders with various variants (default, destructive, outline, prefect, sunrise, gradient)
 - Handles click events correctly
 - Respects disabled state
@@ -72,13 +77,15 @@ This document summarizes the comprehensive test suite implemented for the Next.j
 - Works with `asChild` prop for polymorphic rendering
 - **Status**: ✅ Complete (16 test cases)
 
-#### components/ui/__tests__/card.test.tsx
+#### components/ui/**tests**/card.test.tsx
+
 - Renders complete card structure (Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter)
 - Applies custom classNames correctly
 - Forwards refs properly
 - **Status**: ✅ Complete (11 test cases)
 
-#### components/ui/__tests__/score-badge.test.tsx
+#### components/ui/**tests**/score-badge.test.tsx
+
 - Displays scores as percentage or fraction
 - Applies correct color variants based on score thresholds
 - Handles edge cases (0, 100, custom maxScore)
@@ -86,6 +93,7 @@ This document summarizes the comprehensive test suite implemented for the Next.j
 - **Status**: ✅ Complete (20+ test cases)
 
 **Other components tested**:
+
 - `Input`: Form input with variants and validation states
 - `Select`: Dropdown select with keyboard navigation
 - `Badge`: Status badges with color variants
@@ -93,11 +101,12 @@ This document summarizes the comprehensive test suite implemented for the Next.j
 - `Checkbox`: Controlled and uncontrolled checkboxes
 - `Skeleton`: Loading skeletons for async content
 
-### 4. Integration Tests (app/api/**/__tests__/)
+### 4. Integration Tests (app/api/\*\*/**tests**/)
 
 **Coverage Target: 80%**
 
-#### app/api/coaching/analyze-call/__tests__/route.test.ts
+#### app/api/coaching/analyze-call/**tests**/route.test.ts
+
 - Tests POST endpoint with valid request
 - Validates Zod schema enforcement
 - Mocks MCP backend client
@@ -107,10 +116,11 @@ This document summarizes the comprehensive test suite implemented for the Next.j
 - **Status**: ✅ Complete (6 test cases)
 
 **Other API routes tested**:
+
 - `/api/coaching/rep-insights`: Rep performance insights
 - `/api/coaching/search-calls`: Call search and filtering
 
-### 5. Accessibility Tests (__tests__/accessibility.test.tsx)
+### 5. Accessibility Tests (**tests**/accessibility.test.tsx)
 
 **Coverage Target: WCAG AA compliance**
 
@@ -152,6 +162,7 @@ This document summarizes the comprehensive test suite implemented for the Next.j
 ### 8. Performance Testing
 
 #### Bundle Analysis
+
 - **Tool**: @next/bundle-analyzer
 - **Command**: `ANALYZE=true npm run build`
 - **Configuration**: next.config.bundle-analyzer.ts
@@ -159,6 +170,7 @@ This document summarizes the comprehensive test suite implemented for the Next.j
 - **Status**: ✅ Ready to use
 
 #### Load Testing
+
 - **Tool**: k6
 - **Script**: load-test.k6.js
 - **Scenario**: 50 concurrent users for 30 seconds
@@ -256,7 +268,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
       - run: npm ci
       - run: npm run test:ci
       - uses: codecov/codecov-action@v3

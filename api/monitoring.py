@@ -8,11 +8,12 @@ Provides real-time metrics for:
 - Database performance
 - API usage patterns
 """
+
 import logging
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from threading import Lock
 from typing import Any
 
@@ -27,6 +28,7 @@ router = APIRouter(prefix="/monitoring", tags=["monitoring"])
 # METRICS COLLECTION
 # ============================================================================
 
+
 @dataclass
 class MetricsCollector:
     """
@@ -34,13 +36,12 @@ class MetricsCollector:
 
     Tracks request counts, response times, errors, and rate limiting.
     """
+
     # Request counts by endpoint
     request_counts: dict[str, int] = field(default_factory=lambda: defaultdict(int))
 
     # Response times (store last N for percentiles)
-    response_times: dict[str, list[float]] = field(
-        default_factory=lambda: defaultdict(list)
-    )
+    response_times: dict[str, list[float]] = field(default_factory=lambda: defaultdict(list))
     max_response_time_samples: int = 1000
 
     # Error counts by status code
@@ -48,9 +49,7 @@ class MetricsCollector:
 
     # Rate limit hits
     rate_limit_hits: int = 0
-    rate_limit_hits_by_endpoint: dict[str, int] = field(
-        default_factory=lambda: defaultdict(int)
-    )
+    rate_limit_hits_by_endpoint: dict[str, int] = field(default_factory=lambda: defaultdict(int))
 
     # Start time for uptime calculation
     start_time: float = field(default_factory=time.time)
@@ -162,6 +161,7 @@ metrics = MetricsCollector()
 # MONITORING ENDPOINTS
 # ============================================================================
 
+
 @router.get("/health")
 async def health_check() -> dict[str, Any]:
     """
@@ -227,7 +227,8 @@ async def get_database_metrics() -> dict[str, Any]:
 
     try:
         # Get connection pool stats
-        pool_stats = fetch_one("""
+        pool_stats = fetch_one(
+            """
             SELECT
                 count(*) as total_connections,
                 sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) as active,
@@ -235,15 +236,18 @@ async def get_database_metrics() -> dict[str, Any]:
                 sum(CASE WHEN state = 'idle in transaction' THEN 1 ELSE 0 END) as idle_in_transaction
             FROM pg_stat_activity
             WHERE datname = current_database()
-        """)
+        """
+        )
 
         # Get slow query count (queries > 1 second)
-        slow_queries = fetch_one("""
+        slow_queries = fetch_one(
+            """
             SELECT count(*) as slow_query_count
             FROM pg_stat_activity
             WHERE state != 'idle'
             AND now() - query_start > interval '1 second'
-        """)
+        """
+        )
 
         return {
             "connection_pool": pool_stats,
@@ -290,6 +294,7 @@ async def reset_metrics() -> dict[str, str]:
 # ============================================================================
 # MIDDLEWARE INTEGRATION
 # ============================================================================
+
 
 async def record_request_metrics(request: Request, response_time: float, status_code: int):
     """

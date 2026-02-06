@@ -8,7 +8,10 @@ import { ScoreCard } from "@/components/coaching/ScoreCard";
 import { TrendChart, TrendDataPoint } from "@/components/coaching/TrendChart";
 import { SkillGapChart, SkillGapData } from "@/components/coaching/SkillGapChart";
 import { TeamComparisonChart, ComparisonData } from "@/components/coaching/TeamComparisonChart";
-import { DimensionBreakdownChart, DimensionData } from "@/components/coaching/DimensionBreakdownChart";
+import {
+  DimensionBreakdownChart,
+  DimensionData,
+} from "@/components/coaching/DimensionBreakdownChart";
 import { RecentActivityFeed, ActivityItem } from "@/components/coaching/RecentActivityFeed";
 import { FeedbackStats } from "@/components/coaching/FeedbackStats";
 import {
@@ -20,19 +23,25 @@ import {
 } from "@/components/charts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ArrowLeft, TrendingUp, TrendingDown, Calendar, Phone } from "lucide-react";
 import { getScoreColor } from "@/lib/colors";
 import Link from "next/link";
 
 // Time range options
-type TimeRange = 'last_7_days' | 'last_30_days' | 'last_90_days' | 'all_time';
+type TimeRange = "last_7_days" | "last_30_days" | "last_90_days" | "all_time";
 
 const TIME_RANGE_OPTIONS = [
-  { value: 'last_7_days' as TimeRange, label: 'Last 7 Days' },
-  { value: 'last_30_days' as TimeRange, label: 'Last 30 Days' },
-  { value: 'last_90_days' as TimeRange, label: 'Last 90 Days' },
-  { value: 'all_time' as TimeRange, label: 'All Time' },
+  { value: "last_7_days" as TimeRange, label: "Last 7 Days" },
+  { value: "last_30_days" as TimeRange, label: "Last 30 Days" },
+  { value: "last_90_days" as TimeRange, label: "Last 90 Days" },
+  { value: "all_time" as TimeRange, label: "All Time" },
 ] as const;
 
 interface DashboardPageProps {
@@ -43,34 +52,35 @@ interface DashboardPageProps {
 
 // Mock data for team average comparison - in production this would come from the backend
 const MOCK_TEAM_AVERAGES: Record<string, number> = {
-  'Qualification Skills': 72,
-  'Discovery & Diagnosis': 68,
-  'Value Communication': 75,
-  'Objection Handling': 70,
-  'Deal Advancement': 73,
-  'Relationship Building': 76,
+  "Qualification Skills": 72,
+  "Discovery & Diagnosis": 68,
+  "Value Communication": 75,
+  "Objection Handling": 70,
+  "Deal Advancement": 73,
+  "Relationship Building": 76,
 };
 
 export default function RepDashboardPage({ params }: DashboardPageProps) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
-  const [timeRange, setTimeRange] = useState<TimeRange>('last_30_days');
+  const [timeRange, setTimeRange] = useState<TimeRange>("last_30_days");
 
   // Decode the email from URL
   const repEmail = decodeURIComponent(params.repEmail);
 
   // Check if current user is a manager
-  const isManager = user?.publicMetadata?.role === 'manager';
+  const isManager = user?.publicMetadata?.role === "manager";
   const currentUserEmail = user?.emailAddresses[0]?.emailAddress;
 
   // Check authorization: managers can view anyone, reps can only view themselves
   const canViewData = isManager || currentUserEmail === repEmail;
 
   // Fetch insights using the hook
-  const { data: insights, isLoading, error } = useRepInsights(
-    canViewData ? repEmail : null,
-    { time_period: timeRange }
-  );
+  const {
+    data: insights,
+    isLoading,
+    error,
+  } = useRepInsights(canViewData ? repEmail : null, { time_period: timeRange });
 
   useEffect(() => {
     if (isLoaded && !canViewData) {
@@ -78,7 +88,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
       if (currentUserEmail && currentUserEmail !== repEmail) {
         router.push(`/dashboard/${encodeURIComponent(currentUserEmail)}`);
       } else {
-        router.push('/sign-in');
+        router.push("/sign-in");
       }
     }
   }, [isLoaded, canViewData, currentUserEmail, repEmail, router]);
@@ -88,17 +98,16 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
     if (!insights?.score_trends) return [];
 
     return Object.entries(insights.score_trends)
-      .filter(([key]) => key !== 'overall')
+      .filter(([key]) => key !== "overall")
       .map(([dimension, data]) => {
         const scores = data.scores.filter((s): s is number => s !== null);
-        const avgScore = scores.length > 0
-          ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-          : 0;
+        const avgScore =
+          scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
 
         return {
           dimension,
           avgScore,
-          displayName: dimension.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+          displayName: dimension.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
         };
       })
       .sort((a, b) => b.avgScore - a.avgScore);
@@ -113,10 +122,10 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
   };
 
   // Prepare trend data for chart
-  const prepareTrendData = (): { data: TrendDataPoint[], dimensions: string[] } => {
+  const prepareTrendData = (): { data: TrendDataPoint[]; dimensions: string[] } => {
     if (!insights?.score_trends) return { data: [], dimensions: [] };
 
-    const dimensions = Object.keys(insights.score_trends).filter(k => k !== 'overall');
+    const dimensions = Object.keys(insights.score_trends).filter((k) => k !== "overall");
     const dates = insights.score_trends.overall?.dates || [];
 
     const data: TrendDataPoint[] = dates.map((date, index) => {
@@ -141,7 +150,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
       .map((date, index) => ({
         call_id: `call-${index}`,
         date,
-        call_type: 'Sales Call',
+        call_type: "Sales Call",
         overall_score: insights.score_trends.overall?.scores[index] ?? null,
       }))
       .reverse()
@@ -155,7 +164,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
     if (!insights?.skill_gaps) return [];
 
     return insights.skill_gaps.map((gap) => ({
-      area: gap.area.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+      area: gap.area.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
       current: gap.current_score,
       target: gap.target_score,
     }));
@@ -199,7 +208,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
 
       // Add top dimension scores
       Object.keys(insights.score_trends)
-        .filter(k => k !== 'overall')
+        .filter((k) => k !== "overall")
         .slice(0, 3)
         .forEach((dimension) => {
           const score = insights.score_trends[dimension]?.scores[index];
@@ -217,10 +226,12 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
     if (!insights?.skill_gaps) return [];
 
     return insights.skill_gaps.map((gap) => ({
-      skill: gap.area.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+      skill: gap.area.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
       actual: gap.current_score,
       target: gap.target_score,
-      teamAverage: MOCK_TEAM_AVERAGES[gap.area.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())] || gap.target_score,
+      teamAverage:
+        MOCK_TEAM_AVERAGES[gap.area.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())] ||
+        gap.target_score,
     }));
   };
 
@@ -250,11 +261,11 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
   // Prepare objection breakdown data (mock for now - would need backend support)
   const prepareObjectionBreakdownData = () => {
     return [
-      { name: 'Budget Concerns', count: 12, successRate: 65, avgScore: 72 },
-      { name: 'Timeline Issues', count: 8, successRate: 78, avgScore: 81 },
-      { name: 'Product Fit', count: 6, successRate: 55, avgScore: 68 },
-      { name: 'Competitor Comparison', count: 5, successRate: 72, avgScore: 75 },
-      { name: 'Implementation Risk', count: 3, successRate: 85, avgScore: 88 },
+      { name: "Budget Concerns", count: 12, successRate: 65, avgScore: 72 },
+      { name: "Timeline Issues", count: 8, successRate: 78, avgScore: 81 },
+      { name: "Product Fit", count: 6, successRate: 55, avgScore: 68 },
+      { name: "Competitor Comparison", count: 5, successRate: 72, avgScore: 75 },
+      { name: "Implementation Risk", count: 3, successRate: 85, avgScore: 88 },
     ];
   };
 
@@ -313,11 +324,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
     return (
       <div className="container mx-auto p-6 space-y-6">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="gap-2"
-          >
+          <Button variant="ghost" onClick={() => router.back()} className="gap-2">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
@@ -331,15 +338,11 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
           <CardHeader>
             <CardTitle className="text-red-800">Error Loading Dashboard</CardTitle>
             <CardDescription className="text-red-600">
-              {error.message || 'Failed to load rep insights'}
+              {error.message || "Failed to load rep insights"}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button
-              variant="outline"
-              onClick={() => window.location.reload()}
-              className="gap-2"
-            >
+            <Button variant="outline" onClick={() => window.location.reload()} className="gap-2">
               Retry
             </Button>
           </CardContent>
@@ -352,11 +355,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
     return (
       <div className="container mx-auto p-6 space-y-6">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="gap-2"
-          >
+          <Button variant="ghost" onClick={() => router.back()} className="gap-2">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
@@ -393,18 +392,12 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
       {/* Header with Back Button and Time Range Filter */}
       <div className="flex items-center justify-between border-b pb-6">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="gap-2"
-          >
+          <Button variant="ghost" onClick={() => router.back()} className="gap-2">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              {insights.rep_info.name}
-            </h1>
+            <h1 className="text-3xl font-bold text-foreground">{insights.rep_info.name}</h1>
             <p className="text-muted-foreground mt-1">{repEmail}</p>
           </div>
         </div>
@@ -432,7 +425,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
             <ScoreCard
               score={overallScore}
               title="Overall Average Score"
-              subtitle={`Based on ${totalCalls} call${totalCalls !== 1 ? 's' : ''}`}
+              subtitle={`Based on ${totalCalls} call${totalCalls !== 1 ? "s" : ""}`}
             />
           ) : (
             <Card>
@@ -451,9 +444,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
                 </div>
                 <Phone className="w-8 h-8 text-gray-400" />
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                {insights.rep_info.date_range.period}
-              </p>
+              <p className="text-xs text-gray-500 mt-2">{insights.rep_info.date_range.period}</p>
             </CardContent>
           </Card>
 
@@ -485,15 +476,12 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
             <CardHeader>
               <CardTitle>Performance Trajectory</CardTitle>
               <CardDescription>
-                Track your progress across different coaching dimensions over the selected time period
+                Track your progress across different coaching dimensions over the selected time
+                period
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <TrendChart
-                data={trendData}
-                dimensions={dimensions}
-                height={350}
-              />
+              <TrendChart data={trendData} dimensions={dimensions} height={350} />
             </CardContent>
           </Card>
         </section>
@@ -515,14 +503,12 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
             <CardHeader>
               <CardTitle>Current vs Target Performance</CardTitle>
               <CardDescription>
-                Radar chart showing your current scores compared to target goals across key skill areas
+                Radar chart showing your current scores compared to target goals across key skill
+                areas
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SkillGapChart
-                data={skillGapData}
-                height={350}
-              />
+              <SkillGapChart data={skillGapData} height={350} />
             </CardContent>
           </Card>
         </section>
@@ -540,10 +526,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <TeamComparisonChart
-                data={teamComparisonData}
-                height={320}
-              />
+              <TeamComparisonChart data={teamComparisonData} height={320} />
             </CardContent>
           </Card>
         </section>
@@ -563,10 +546,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <DimensionBreakdownChart
-                  data={dimensionBreakdownData}
-                  height={300}
-                />
+                <DimensionBreakdownChart data={dimensionBreakdownData} height={300} />
               </CardContent>
             </Card>
 
@@ -575,11 +555,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
               <h3 className="text-lg font-semibold mb-3">Dimension Details</h3>
               <div className="grid gap-3 grid-cols-1">
                 {dimensionScores.map((dim) => (
-                  <ScoreCard
-                    key={dim.dimension}
-                    score={dim.avgScore}
-                    title={dim.displayName}
-                  />
+                  <ScoreCard key={dim.dimension} score={dim.avgScore} title={dim.displayName} />
                 ))}
               </div>
             </div>
@@ -595,14 +571,15 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
             <CardHeader>
               <CardTitle>Score Progress Over Time</CardTitle>
               <CardDescription>
-                Track your overall performance and top dimension scores across the selected time period
+                Track your overall performance and top dimension scores across the selected time
+                period
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ScoreTrendChart
                 data={prepareAdvancedTrendData()}
                 dimensions={Object.keys(insights.score_trends)
-                  .filter(k => k !== 'overall')
+                  .filter((k) => k !== "overall")
                   .slice(0, 3)}
                 height={350}
                 showArea={false}
@@ -620,15 +597,12 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
             <CardHeader>
               <CardTitle>Your Skills vs Team Average</CardTitle>
               <CardDescription>
-                Compare your actual performance against team averages and target goals across all dimensions
+                Compare your actual performance against team averages and target goals across all
+                dimensions
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SkillGapRadar
-                data={prepareSkillGapRadarData()}
-                compareType="team"
-                height={350}
-              />
+              <SkillGapRadar data={prepareSkillGapRadarData()} compareType="team" height={350} />
             </CardContent>
           </Card>
         </section>
@@ -668,10 +642,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-2">
-              <ActivityTimeline
-                data={prepareActivityTimelineData()}
-                metric="calls"
-              />
+              <ActivityTimeline data={prepareActivityTimelineData()} metric="calls" />
             </CardContent>
           </Card>
         </section>
@@ -685,7 +656,8 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
             <CardHeader>
               <CardTitle>Objection Types & Success Rates</CardTitle>
               <CardDescription>
-                Analyze the most common objections you encounter and how successfully you handle each type
+                Analyze the most common objections you encounter and how successfully you handle
+                each type
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -702,10 +674,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
       {/* Recent Activity Feed */}
       <section>
         <h2 className="text-2xl font-bold mb-4">Recent Activity</h2>
-        <RecentActivityFeed
-          activities={recentCalls}
-          limit={10}
-        />
+        <RecentActivityFeed activities={recentCalls} limit={10} />
       </section>
 
       {/* Coaching Quality Metrics */}

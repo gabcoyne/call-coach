@@ -11,6 +11,7 @@ Call Coach has two primary user roles with different capabilities:
 **Who**: Individual sales representatives (AE, SE, CSM)
 
 **What They Can Do**:
+
 - View their own call analyses
 - See their personal performance dashboard
 - Create their own coaching plans
@@ -19,6 +20,7 @@ Call Coach has two primary user roles with different capabilities:
 - Compare their scores to team averages (anonymized)
 
 **What They Cannot Do**:
+
 - View other reps' call data
 - View other reps' performance dashboards
 - Download team reports
@@ -26,6 +28,7 @@ Call Coach has two primary user roles with different capabilities:
 - Manage system settings
 
 **Access Pattern**:
+
 ```
 Rep Sarah logs in
 ├─ Can see Sarah's calls
@@ -35,6 +38,7 @@ Rep Sarah logs in
 ```
 
 **Primary Use Cases**:
+
 - Review my recent calls
 - Understand my strengths and gaps
 - Track my improvement over time
@@ -47,6 +51,7 @@ Rep Sarah logs in
 **Who**: Sales managers, directors, team leads
 
 **What They Can Do**:
+
 - View all team members' call analyses
 - Compare rep performance
 - View aggregate team insights
@@ -57,12 +62,14 @@ Rep Sarah logs in
 - Monitor team progress
 
 **What They Cannot Do**:
+
 - Edit call analyses
 - Delete historical data
 - Change system-level settings
 - Access data outside their scope
 
 **Access Pattern**:
+
 ```
 Manager John logs in
 ├─ Can see all team members' calls
@@ -73,6 +80,7 @@ Manager John logs in
 ```
 
 **Primary Use Cases**:
+
 - Monitor team performance
 - Identify coaching opportunities
 - Track team trends
@@ -89,7 +97,7 @@ Roles are managed through Clerk's role/permission system.
 
 **Step 1: Create Roles in Clerk**
 
-1. Go to Clerk Dashboard: https://dashboard.clerk.com
+1. Go to Clerk Dashboard: <https://dashboard.clerk.com>
 2. Navigate to: Users & Authentication → Roles
 3. Create two roles:
    - **Rep** (with permissions: view_own_data, analyze_own_calls)
@@ -109,9 +117,9 @@ The frontend automatically checks role on login:
 ```typescript
 // In Next.js component
 const { sessionClaims } = useAuth();
-const userRole = sessionClaims?.role;  // 'rep' or 'manager'
+const userRole = sessionClaims?.role; // 'rep' or 'manager'
 
-if (userRole === 'manager') {
+if (userRole === "manager") {
   // Show manager features
 } else {
   // Show rep features
@@ -125,6 +133,7 @@ if (userRole === 'manager') {
 ### Rep Dashboard
 
 **Shows**:
+
 - Personal performance metrics
 - Trend graphs (Discovery, Product, Objections, Engagement)
 - Recent analyzed calls (5 most recent)
@@ -132,11 +141,13 @@ if (userRole === 'manager') {
 - Weekly report (self only)
 
 **UI Elements**:
+
 - "My Dashboard" in navigation
 - Can only view own data
 - Restricted search (only own calls)
 
 **Example**:
+
 ```
 Sarah's Dashboard
 ├─ This Month: 82 average score
@@ -154,6 +165,7 @@ Sarah's Dashboard
 ### Manager Dashboard
 
 **Shows**:
+
 - Team member performance metrics
 - Peer comparison matrix
 - Team trend analysis
@@ -161,12 +173,14 @@ Sarah's Dashboard
 - Team reports
 
 **UI Elements**:
+
 - "Team Dashboard" in navigation
 - Can select individual team members
 - Advanced filtering and sorting
 - Export to CSV/PDF
 
 **Example**:
+
 ```
 Manager Dashboard
 ├─ Team Performance:
@@ -186,6 +200,7 @@ Manager Dashboard
 ### What Reps See
 
 **Can See**:
+
 - Their own call list
 - Their own analysis details
 - Their own scores and trends
@@ -194,6 +209,7 @@ Manager Dashboard
 - Top performers (anonymized, top 3)
 
 **Cannot See**:
+
 - Other reps' call details
 - Specific peer performance
 - Other reps' names in comparisons
@@ -202,6 +218,7 @@ Manager Dashboard
 ### What Managers See
 
 **Can See**:
+
 - All team members' calls
 - All analysis details
 - Individual and team scores
@@ -211,6 +228,7 @@ Manager Dashboard
 - Performance comparisons
 
 **Rules**:
+
 - Manager sees only their team (from Clerk org structure)
 - Cannot see calls from other departments
 - Cannot see leadership dashboard (if applicable)
@@ -335,6 +353,7 @@ Clerk Admin in Clerk Dashboard
 Teams in Call Coach are based on Clerk's organization structure:
 
 **Option 1: Clerk Organizations**
+
 ```
 Organization: Sales Team
 ├─ John (Manager)
@@ -351,6 +370,7 @@ John (manager) sees Sarah, Tom, and Lisa's data.
 
 **Option 2: Custom Team Assignment**
 If not using Clerk orgs:
+
 1. Store team assignments in database
 2. Add team_id to user claims
 3. Check team_id when viewing data
@@ -364,6 +384,7 @@ If not using Clerk orgs:
 **Cause**: Role not set to "manager" or not in same team
 
 **Solution**:
+
 ```bash
 1. Go to Clerk Dashboard
 2. Select your user account
@@ -380,6 +401,7 @@ If not using Clerk orgs:
 **Cause**: Role set incorrectly
 
 **Solution**:
+
 ```bash
 1. Go to Clerk Dashboard
 2. Find your user
@@ -396,6 +418,7 @@ If not using Clerk orgs:
 **Cause**: Clerk cache or not logged out
 
 **Solution**:
+
 ```bash
 1. Log out completely
 2. Clear browser cookies (for Clerk)
@@ -410,21 +433,25 @@ If not using Clerk orgs:
 ## Best Practices
 
 1. **Regular Access Audits**
+
    - Monthly: Check role assignments
    - Quarterly: Audit data access logs
    - Remove roles for departed team members
 
 2. **Principle of Least Privilege**
+
    - Assign minimal required role
    - Rep: Default role for new hires
    - Manager: Only for managers, directors
 
 3. **Clear Role Definitions**
+
    - Communicate role capabilities
    - Document access policies
    - Train managers on features
 
 4. **Secure Transitions**
+
    - When rep becomes manager: Upgrade role
    - When manager leaves: Downgrade to rep
    - Immediate revocation: Remove all access

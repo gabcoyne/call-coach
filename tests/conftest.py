@@ -1,8 +1,9 @@
 """Pytest configuration and fixtures."""
-import json
+
 import sys
-import pytest
 from pathlib import Path
+
+import pytest
 
 # Add project root to sys.path so imports resolve to our local modules first
 # This ensures tests import from local mcp/ module instead of installed fastmcp package

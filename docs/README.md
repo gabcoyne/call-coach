@@ -13,29 +13,34 @@ New to call-coach? Start here:
 ## Documentation Structure
 
 ### User Guides
+
 - [Getting Started](./user-guide/README.md) - Introduction to call-coach
 - [Using Coaching Insights](./user-guide/coaching.md) - How to interpret and apply coaching recommendations
 - [Role Management](./user-guide/role-management.md) - Understanding roles and permissions
 - [Weekly Reports](./user-guide/weekly-reports.md) - Interpreting automated weekly summaries
 
 ### API Documentation
+
 - [API Overview](./api/README.md) - Architecture and authentication
 - [REST Endpoints](./api/endpoints.md) - Complete endpoint reference with examples
 - [OpenAPI Specification](./api/openapi.yaml) - Machine-readable API spec
 
 ### Developer Guides
+
 - [Local Development](./developers/setup.md) - Environment setup and local testing
 - [System Architecture](./developers/architecture.md) - Technical design and components
 - [Adding Features](./developers/adding-features.md) - Development workflow and patterns
 - [Testing Guide](./developers/testing.md) - How to run and write tests
 
 ### Troubleshooting
+
 - [Common Issues](./troubleshooting/README.md) - Quick answers to frequent problems
 - [API Error Codes](./troubleshooting/api-errors.md) - Error code reference and solutions
 - [Deployment Issues](./troubleshooting/deployment.md) - Troubleshooting production problems
 - [Performance Tuning](./troubleshooting/performance.md) - Optimization and monitoring
 
 ### Deployment
+
 - [Vercel Deployment](./deployment/vercel.md) - Frontend deployment guide
 - [Environment Variables](./deployment/environment.md) - Configuration reference
 - [Database Setup](./deployment/database.md) - Neon PostgreSQL configuration
@@ -57,16 +62,16 @@ New to call-coach? Start here:
 
 ## Technology Stack
 
-| Component | Technology | Version |
-|-----------|-----------|---------|
-| Backend | Python | 3.11+ |
-| API Server | FastAPI | 0.115+ |
-| MCP Server | FastMCP | 2.0+ |
-| Orchestration | Prefect | 3.0+ |
-| AI Analysis | Claude API | Sonnet 4.5 |
-| Database | PostgreSQL (Neon) | 15+ |
-| Frontend | Next.js | 15+ |
-| UI Framework | React with Shadcn/ui | Latest |
+| Component     | Technology           | Version    |
+| ------------- | -------------------- | ---------- |
+| Backend       | Python               | 3.11+      |
+| API Server    | FastAPI              | 0.115+     |
+| MCP Server    | FastMCP              | 2.0+       |
+| Orchestration | Prefect              | 3.0+       |
+| AI Analysis   | Claude API           | Sonnet 4.5 |
+| Database      | PostgreSQL (Neon)    | 15+        |
+| Frontend      | Next.js              | 15+        |
+| UI Framework  | React with Shadcn/ui | Latest     |
 
 ## Project Structure Overview
 
@@ -87,12 +92,14 @@ call-coach/
 ## Common Tasks
 
 ### For Users
+
 - [Analyze a sales call](./user-guide/coaching.md#analyzing-calls)
 - [View performance insights](./user-guide/README.md#dashboard)
 - [Search for specific calls](./user-guide/README.md#call-search)
 - [Understand weekly reports](./user-guide/weekly-reports.md)
 
 ### For Developers
+
 - [Set up local environment](./developers/setup.md)
 - [Run tests locally](./developers/testing.md)
 - [Add a new coaching dimension](./developers/adding-features.md#adding-dimensions)
@@ -100,6 +107,7 @@ call-coach/
 - [Deploy to production](./deployment/vercel.md)
 
 ### For Operators
+
 - [Monitor production system](./deployment/monitoring.md)
 - [Manage environment variables](./deployment/environment.md)
 - [Scale the database](./deployment/database.md)

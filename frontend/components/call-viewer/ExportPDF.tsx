@@ -35,12 +35,7 @@ export function ExportPDF({ callId, callTitle, className }: ExportPDFProps) {
   };
 
   return (
-    <Button
-      onClick={handleExport}
-      variant="outline"
-      disabled={isExporting}
-      className={className}
-    >
+    <Button onClick={handleExport} variant="outline" disabled={isExporting} className={className}>
       <FileDown className="h-4 w-4 mr-2" />
       {isExporting ? "Exporting..." : "Export PDF"}
     </Button>

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
-import { CHART_COLORS } from '@/lib/colors';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
+import { CHART_COLORS } from "@/lib/colors";
 
 export interface DimensionData {
   name: string;
@@ -29,7 +29,7 @@ export interface DimensionBreakdownChartProps {
 export function DimensionBreakdownChart({
   data,
   height = 300,
-  className = '',
+  className = "",
   title,
 }: DimensionBreakdownChartProps) {
   if (!data || data.length === 0) {
@@ -45,7 +45,7 @@ export function DimensionBreakdownChart({
 
   // Custom label renderer to show percentage
   const renderLabel = (entry: { value: number; percent?: number }) => {
-    const percent = entry.percent ? (entry.percent * 100).toFixed(0) : '0';
+    const percent = entry.percent ? (entry.percent * 100).toFixed(0) : "0";
     return `${percent}%`;
   };
 
@@ -65,18 +65,15 @@ export function DimensionBreakdownChart({
             dataKey="value"
           >
             {data.map((_, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={CHART_COLORS[index % CHART_COLORS.length]}
-              />
+              <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
             ))}
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: '#ffffff',
-              border: '1px solid #e5e7eb',
-              borderRadius: '6px',
-              fontSize: '12px',
+              backgroundColor: "#ffffff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "6px",
+              fontSize: "12px",
             }}
             formatter={(value: number, name: string, props: any) => {
               const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -84,11 +81,7 @@ export function DimensionBreakdownChart({
               return [`${percentage}%`, props.payload.name];
             }}
           />
-          <Legend
-            verticalAlign="bottom"
-            height={36}
-            wrapperStyle={{ fontSize: '12px' }}
-          />
+          <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: "12px" }} />
         </PieChart>
       </ResponsiveContainer>
     </div>

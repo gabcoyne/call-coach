@@ -8,12 +8,13 @@ Provides:
 - Prometheus metrics export
 - Dashboard-ready JSON API
 """
+
 import logging
 from datetime import datetime, timedelta
 from typing import Any
 
 from cache.redis_client import get_redis_cache
-from db import fetch_one, fetch_all
+from db import fetch_all, fetch_one
 
 logger = logging.getLogger(__name__)
 
@@ -34,10 +35,7 @@ class CacheStatsCollector:
         """Initialize cache stats collector."""
         self.redis_cache = get_redis_cache()
 
-    def get_comprehensive_stats(
-        self,
-        days_back: int = 7
-    ) -> dict[str, Any]:
+    def get_comprehensive_stats(self, days_back: int = 7) -> dict[str, Any]:
         """
         Get comprehensive cache statistics.
 
@@ -72,10 +70,7 @@ class CacheStatsCollector:
     def _get_redis_stats(self) -> dict[str, Any]:
         """Get Redis-specific statistics."""
         if not self.redis_cache.available:
-            return {
-                "available": False,
-                "reason": "Redis not configured or not reachable"
-            }
+            return {"available": False, "reason": "Redis not configured or not reachable"}
 
         return self.redis_cache.get_stats()
 
@@ -103,14 +98,14 @@ class CacheStatsCollector:
                 FROM coaching_sessions
                 WHERE created_at > %s
                 """,
-                (cutoff,)
+                (cutoff,),
             )
 
             if not stats or stats["total_analyses"] == 0:
                 return {
                     "total_analyses": 0,
                     "cache_hit_rate": 0.0,
-                    "message": "No analyses in time period"
+                    "message": "No analyses in time period",
                 }
 
             total = stats["total_analyses"]
@@ -171,7 +166,9 @@ class CacheStatsCollector:
             "cost_savings_usd": round(cost_saved, 2),
             "analysis_cost_with_cache": round(cost_with_cache, 2),
             "analysis_cost_without_cache": round(cost_without_cache, 2),
-            "savings_percentage": round((cost_saved / cost_without_cache * 100) if cost_without_cache > 0 else 0, 1),
+            "savings_percentage": round(
+                (cost_saved / cost_without_cache * 100) if cost_without_cache > 0 else 0, 1
+            ),
         }
 
     def _get_performance_metrics(self, days_back: int) -> dict[str, Any]:
@@ -196,7 +193,7 @@ class CacheStatsCollector:
                 FROM analysis_runs
                 WHERE started_at > %s
                 """,
-                (cutoff,)
+                (cutoff,),
             )
 
             if not perf_stats:
@@ -212,9 +209,19 @@ class CacheStatsCollector:
                 "cache_hit_rate": round(hit_rate, 2),
                 "completed_runs": perf_stats.get("completed", 0),
                 "failed_runs": perf_stats.get("failed", 0),
-                "success_rate": round((perf_stats.get("completed", 0) / total * 100) if total > 0 else 0, 2),
-                "avg_duration_seconds": float(perf_stats["avg_duration_seconds"]) if perf_stats.get("avg_duration_seconds") else 0,
-                "avg_tokens_per_run": int(perf_stats["avg_tokens_per_run"]) if perf_stats.get("avg_tokens_per_run") else 0,
+                "success_rate": round(
+                    (perf_stats.get("completed", 0) / total * 100) if total > 0 else 0, 2
+                ),
+                "avg_duration_seconds": (
+                    float(perf_stats["avg_duration_seconds"])
+                    if perf_stats.get("avg_duration_seconds")
+                    else 0
+                ),
+                "avg_tokens_per_run": (
+                    int(perf_stats["avg_tokens_per_run"])
+                    if perf_stats.get("avg_tokens_per_run")
+                    else 0
+                ),
             }
 
         except Exception as e:
@@ -222,9 +229,7 @@ class CacheStatsCollector:
             return {"error": str(e)}
 
     def _assess_cache_health(
-        self,
-        redis_stats: dict[str, Any],
-        db_stats: dict[str, Any]
+        self, redis_stats: dict[str, Any], db_stats: dict[str, Any]
     ) -> dict[str, Any]:
         """
         Assess overall cache health.
@@ -241,9 +246,7 @@ class CacheStatsCollector:
         if not redis_stats.get("available"):
             health["status"] = "degraded"
             health["issues"].append("Redis cache not available")
-            health["recommendations"].append(
-                "Check Redis connection and ensure service is running"
-            )
+            health["recommendations"].append("Check Redis connection and ensure service is running")
 
         # Check cache hit rate
         hit_rate = db_stats.get("cache_hit_rate", 0)
@@ -300,7 +303,7 @@ class CacheStatsCollector:
                 GROUP BY coaching_dimension
                 ORDER BY total_analyses DESC
                 """,
-                (cutoff,)
+                (cutoff,),
             )
 
             breakdown = {}
@@ -340,39 +343,43 @@ class CacheStatsCollector:
             f"cache_hit_rate{{source=\"database\"}} {stats['database'].get('cache_hit_rate', 0)}",
         ]
 
-        if stats['redis'].get('available'):
-            lines.extend([
-                "# HELP redis_cache_hit_rate Redis cache hit rate percentage",
-                "# TYPE redis_cache_hit_rate gauge",
-                f"redis_cache_hit_rate {stats['redis'].get('hit_rate', 0)}",
-                "",
-                "# HELP redis_memory_used_mb Redis memory usage in MB",
-                "# TYPE redis_memory_used_mb gauge",
-                f"redis_memory_used_mb {stats['redis'].get('memory_used_mb', 0)}",
-                "",
-                "# HELP redis_total_keys Total keys in Redis",
-                "# TYPE redis_total_keys gauge",
-                f"redis_total_keys {stats['redis'].get('total_keys', 0)}",
-            ])
+        if stats["redis"].get("available"):
+            lines.extend(
+                [
+                    "# HELP redis_cache_hit_rate Redis cache hit rate percentage",
+                    "# TYPE redis_cache_hit_rate gauge",
+                    f"redis_cache_hit_rate {stats['redis'].get('hit_rate', 0)}",
+                    "",
+                    "# HELP redis_memory_used_mb Redis memory usage in MB",
+                    "# TYPE redis_memory_used_mb gauge",
+                    f"redis_memory_used_mb {stats['redis'].get('memory_used_mb', 0)}",
+                    "",
+                    "# HELP redis_total_keys Total keys in Redis",
+                    "# TYPE redis_total_keys gauge",
+                    f"redis_total_keys {stats['redis'].get('total_keys', 0)}",
+                ]
+            )
 
-        lines.extend([
-            "",
-            "# HELP cache_cost_savings_usd Cost savings from caching in USD",
-            "# TYPE cache_cost_savings_usd counter",
-            f"cache_cost_savings_usd {stats['cost_savings'].get('cost_savings_usd', 0)}",
-            "",
-            "# HELP cache_tokens_saved Total tokens saved by caching",
-            "# TYPE cache_tokens_saved counter",
-            f"cache_tokens_saved {stats['cost_savings'].get('tokens_saved', 0)}",
-            "",
-            "# HELP analysis_runs_total Total analysis runs",
-            "# TYPE analysis_runs_total counter",
-            f"analysis_runs_total {stats['performance'].get('total_runs', 0)}",
-            "",
-            "# HELP analysis_success_rate Analysis success rate percentage",
-            "# TYPE analysis_success_rate gauge",
-            f"analysis_success_rate {stats['performance'].get('success_rate', 0)}",
-        ])
+        lines.extend(
+            [
+                "",
+                "# HELP cache_cost_savings_usd Cost savings from caching in USD",
+                "# TYPE cache_cost_savings_usd counter",
+                f"cache_cost_savings_usd {stats['cost_savings'].get('cost_savings_usd', 0)}",
+                "",
+                "# HELP cache_tokens_saved Total tokens saved by caching",
+                "# TYPE cache_tokens_saved counter",
+                f"cache_tokens_saved {stats['cost_savings'].get('tokens_saved', 0)}",
+                "",
+                "# HELP analysis_runs_total Total analysis runs",
+                "# TYPE analysis_runs_total counter",
+                f"analysis_runs_total {stats['performance'].get('total_runs', 0)}",
+                "",
+                "# HELP analysis_success_rate Analysis success rate percentage",
+                "# TYPE analysis_success_rate gauge",
+                f"analysis_success_rate {stats['performance'].get('success_rate', 0)}",
+            ]
+        )
 
         return "\n".join(lines)
 
@@ -398,21 +405,16 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Get cache statistics")
     parser.add_argument(
-        "--days",
-        type=int,
-        default=7,
-        help="Number of days to analyze (default: 7)"
+        "--days", type=int, default=7, help="Number of days to analyze (default: 7)"
     )
     parser.add_argument(
         "--format",
         choices=["json", "prometheus"],
         default="json",
-        help="Output format (default: json)"
+        help="Output format (default: json)",
     )
     parser.add_argument(
-        "--dimension-breakdown",
-        action="store_true",
-        help="Show per-dimension breakdown"
+        "--dimension-breakdown", action="store_true", help="Show per-dimension breakdown"
     )
 
     args = parser.parse_args()

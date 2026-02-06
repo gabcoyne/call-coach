@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export type TimePeriod = 'last_7_days' | 'last_30_days' | 'last_quarter' | 'last_year' | 'all_time';
+export type TimePeriod = "last_7_days" | "last_30_days" | "last_quarter" | "last_year" | "all_time";
 
 interface TimePeriodSelectorProps {
   value: TimePeriod;
@@ -16,11 +16,11 @@ interface TimePeriodSelectorProps {
 }
 
 const TIME_PERIODS: { value: TimePeriod; label: string }[] = [
-  { value: 'last_7_days', label: 'Last 7 Days' },
-  { value: 'last_30_days', label: 'Last 30 Days' },
-  { value: 'last_quarter', label: 'Last Quarter' },
-  { value: 'last_year', label: 'Last Year' },
-  { value: 'all_time', label: 'All Time' },
+  { value: "last_7_days", label: "Last 7 Days" },
+  { value: "last_30_days", label: "Last 30 Days" },
+  { value: "last_quarter", label: "Last Quarter" },
+  { value: "last_year", label: "Last Year" },
+  { value: "all_time", label: "All Time" },
 ];
 
 export function TimePeriodSelector({ value, onChange }: TimePeriodSelectorProps) {

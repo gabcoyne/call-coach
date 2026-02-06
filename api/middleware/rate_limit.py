@@ -14,11 +14,12 @@ Headers added to responses:
 - X-RateLimit-Remaining: Requests remaining in window
 - X-RateLimit-Reset: Unix timestamp when limit resets
 """
+
 import logging
 import time
-from typing import Callable
+from collections.abc import Callable
 
-from fastapi import Request, Response, HTTPException
+from fastapi import HTTPException, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 
@@ -125,7 +126,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     "X-RateLimit-Remaining": "0",
                     "X-RateLimit-Reset": str(int(reset_time)),
                     "Retry-After": str(retry_after),
-                }
+                },
             )
 
         # Process request
@@ -223,14 +224,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         if self.redis_client and self.redis_client.available:
             # Use Redis for distributed rate limiting
-            return self._check_rate_limit_redis(
-                key, limit, window_seconds, current_time
-            )
+            return self._check_rate_limit_redis(key, limit, window_seconds, current_time)
         else:
             # Fall back to local cache (single instance only)
-            return self._check_rate_limit_local(
-                key, limit, window_seconds, current_time
-            )
+            return self._check_rate_limit_local(key, limit, window_seconds, current_time)
 
     def _check_rate_limit_redis(
         self,
@@ -280,9 +277,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             logger.error(f"Redis rate limit error: {e}")
             # Fall back to local cache
-            return self._check_rate_limit_local(
-                key, limit, window_seconds, current_time
-            )
+            return self._check_rate_limit_local(key, limit, window_seconds, current_time)
 
     def _check_rate_limit_local(
         self,
@@ -341,8 +336,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             current_time: Current timestamp
         """
         expired_keys = [
-            key for key, entry in self._local_cache.items()
-            if current_time >= entry["reset_time"]
+            key for key, entry in self._local_cache.items() if current_time >= entry["reset_time"]
         ]
 
         for key in expired_keys:

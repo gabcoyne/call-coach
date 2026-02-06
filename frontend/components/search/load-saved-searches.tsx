@@ -86,19 +86,11 @@ export function LoadSavedSearches({ onLoad }: LoadSavedSearchesProps) {
           </SelectContent>
         </Select>
       </div>
-      <Button
-        onClick={handleLoad}
-        disabled={!selectedId}
-        variant="outline"
-      >
+      <Button onClick={handleLoad} disabled={!selectedId} variant="outline">
         Load
       </Button>
       {selectedId && (
-        <Button
-          onClick={(e) => handleDelete(selectedId, e)}
-          variant="destructive"
-          size="icon"
-        >
+        <Button onClick={(e) => handleDelete(selectedId, e)} variant="destructive" size="icon">
           <Trash2 className="h-4 w-4" />
         </Button>
       )}

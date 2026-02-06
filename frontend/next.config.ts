@@ -31,9 +31,12 @@ const nextConfig: NextConfig = {
   // Compiler optimizations
   compiler: {
     // Remove console logs in production
-    removeConsole: process.env.NODE_ENV === "production" ? {
-      exclude: ["error", "warn"],
-    } : false,
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? {
+            exclude: ["error", "warn"],
+          }
+        : false,
   },
 
   // Experimental features for better performance
@@ -56,9 +59,7 @@ const nextConfig: NextConfig = {
       config.plugins.push(
         new BundleAnalyzerPlugin({
           analyzerMode: "static",
-          reportFilename: isServer
-            ? "../analyze/server.html"
-            : "./analyze/client.html",
+          reportFilename: isServer ? "../analyze/server.html" : "./analyze/client.html",
           openAnalyzer: true,
         })
       );

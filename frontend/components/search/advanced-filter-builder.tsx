@@ -42,34 +42,30 @@ const FIELD_OPTIONS: Array<{ value: FilterField; label: string }> = [
   { value: "rep_email", label: "Rep Email" },
 ];
 
-const CONDITION_OPTIONS: Record<FilterField, Array<{ value: FilterCondition; label: string }>> =
-  {
-    score: [
-      { value: "equals", label: "Equals" },
-      { value: "greater_than", label: "Greater than" },
-      { value: "less_than", label: "Less than" },
-      { value: "between", label: "Between" },
-    ],
-    date: [
-      { value: "equals", label: "On" },
-      { value: "greater_than", label: "After" },
-      { value: "less_than", label: "Before" },
-      { value: "between", label: "Between" },
-    ],
-    duration: [
-      { value: "equals", label: "Equals" },
-      { value: "greater_than", label: "Longer than" },
-      { value: "less_than", label: "Shorter than" },
-    ],
-    call_type: [{ value: "equals", label: "Is" }],
-    product: [{ value: "equals", label: "Is" }],
-    rep_email: [{ value: "contains", label: "Contains" }],
-  };
+const CONDITION_OPTIONS: Record<FilterField, Array<{ value: FilterCondition; label: string }>> = {
+  score: [
+    { value: "equals", label: "Equals" },
+    { value: "greater_than", label: "Greater than" },
+    { value: "less_than", label: "Less than" },
+    { value: "between", label: "Between" },
+  ],
+  date: [
+    { value: "equals", label: "On" },
+    { value: "greater_than", label: "After" },
+    { value: "less_than", label: "Before" },
+    { value: "between", label: "Between" },
+  ],
+  duration: [
+    { value: "equals", label: "Equals" },
+    { value: "greater_than", label: "Longer than" },
+    { value: "less_than", label: "Shorter than" },
+  ],
+  call_type: [{ value: "equals", label: "Is" }],
+  product: [{ value: "equals", label: "Is" }],
+  rep_email: [{ value: "contains", label: "Contains" }],
+};
 
-export function AdvancedFilterBuilder({
-  onApplyFilters,
-  onClose,
-}: AdvancedFilterBuilderProps) {
+export function AdvancedFilterBuilder({ onApplyFilters, onClose }: AdvancedFilterBuilderProps) {
   const [rules, setRules] = useState<FilterRule[]>([
     { id: "1", field: "score", condition: "greater_than", value: 0 },
   ]);
@@ -91,17 +87,8 @@ export function AdvancedFilterBuilder({
     }
   };
 
-  const updateRule = (
-    id: string,
-    field: Partial<FilterRule>
-  ) => {
-    setRules(
-      rules.map((r) =>
-        r.id === id
-          ? { ...r, ...field }
-          : r
-      )
-    );
+  const updateRule = (id: string, field: Partial<FilterRule>) => {
+    setRules(rules.map((r) => (r.id === id ? { ...r, ...field } : r)));
   };
 
   const convertRulesToFilters = (): Partial<SearchCallsRequest> => {
@@ -131,7 +118,11 @@ export function AdvancedFilterBuilder({
 
         case "call_type":
           if (typeof rule.value === "string") {
-            filters.call_type = rule.value as "discovery" | "demo" | "technical_deep_dive" | "negotiation";
+            filters.call_type = rule.value as
+              | "discovery"
+              | "demo"
+              | "technical_deep_dive"
+              | "negotiation";
           }
           break;
 
@@ -210,8 +201,7 @@ export function AdvancedFilterBuilder({
                     onValueChange={(value) =>
                       updateRule(rule.id, {
                         field: value as FilterField,
-                        condition: CONDITION_OPTIONS[value as FilterField][0]
-                          .value,
+                        condition: CONDITION_OPTIONS[value as FilterField][0].value,
                       })
                     }
                   >
@@ -268,9 +258,7 @@ export function AdvancedFilterBuilder({
                       <SelectContent>
                         <SelectItem value="discovery">Discovery</SelectItem>
                         <SelectItem value="demo">Demo</SelectItem>
-                        <SelectItem value="technical_deep_dive">
-                          Technical Deep Dive
-                        </SelectItem>
+                        <SelectItem value="technical_deep_dive">Technical Deep Dive</SelectItem>
                         <SelectItem value="negotiation">Negotiation</SelectItem>
                       </SelectContent>
                     </Select>
@@ -337,11 +325,7 @@ export function AdvancedFilterBuilder({
         </div>
 
         {/* Add Rule Button */}
-        <Button
-          variant="outline"
-          onClick={addRule}
-          className="w-full gap-2"
-        >
+        <Button variant="outline" onClick={addRule} className="w-full gap-2">
           <Plus className="h-4 w-4" />
           Add Another Condition
         </Button>
@@ -351,9 +335,7 @@ export function AdvancedFilterBuilder({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleApply}>
-            Apply Filters
-          </Button>
+          <Button onClick={handleApply}>Apply Filters</Button>
         </div>
       </CardContent>
     </Card>

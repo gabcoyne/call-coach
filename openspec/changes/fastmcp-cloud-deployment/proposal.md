@@ -14,28 +14,33 @@ The Gong Call Coaching Agent's MCP server is currently only runnable locally, li
 ## Capabilities
 
 ### New Capabilities
+
 - `fastmcp-cloud-config`: FastMCP Cloud deployment configuration including runtime, dependencies, and environment variable specifications
 - `horizon-integration`: Prefect Horizon MCP server integration with proper authentication and working directory setup
 - `cloud-env-management`: Secure environment variable configuration for cloud deployments with validation
 - `deployment-validation`: Pre-deployment health checks for database, Gong API, and Claude API connectivity
 
 ### Modified Capabilities
+
 <!-- No existing specs are being modified - this is net new cloud deployment capability -->
 
 ## Impact
 
 **New Files**:
+
 - `fastmcp.toml` - FastMCP project configuration
 - `.fastmcp/config.json` - Cloud deployment metadata
 - `.fastmcp/deploy.sh` - Deployment automation script
 - `openspec/changes/fastmcp-cloud-deployment/` - OpenSpec artifacts
 
 **Modified Files**:
+
 - `README.md` - Add cloud deployment section with Horizon integration
 - `mcp/server.py` - Add startup validation logging for cloud environment
 - `pyproject.toml` - Ensure all FastMCP Cloud dependencies are pinned
 
 **External Systems**:
+
 - **Prefect Horizon**: New MCP server at `https://horizon.prefect.io/prefect-george/servers`
 - **FastMCP Cloud**: Server authentication via `fmcp_F6rhqd9oFr1HOzNu6hOa5VBfwh2iXsKYWofXqPGTzqc`
 - **Neon Database**: Cloud server needs production database access (already configured)

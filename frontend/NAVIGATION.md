@@ -11,6 +11,7 @@ The Gong Call Coaching frontend uses a responsive navigation system with a deskt
 Desktop navigation sidebar that appears on screens larger than 1024px (lg breakpoint).
 
 **Features:**
+
 - Logo and branding at the top
 - Navigation links for main routes (Dashboard, Search, Feed, Calls, Profile)
 - Active state highlighting using Prefect pink
@@ -18,6 +19,7 @@ Desktop navigation sidebar that appears on screens larger than 1024px (lg breakp
 - Fixed width of 256px (w-64)
 
 **Navigation Links:**
+
 - Dashboard (`/dashboard`) - LayoutDashboard icon
 - Search (`/search`) - Search icon
 - Feed (`/feed`) - Rss icon
@@ -29,6 +31,7 @@ Desktop navigation sidebar that appears on screens larger than 1024px (lg breakp
 Mobile-first navigation that appears on screens smaller than 1024px.
 
 **Features:**
+
 - Fixed header with logo and hamburger menu
 - Full-screen overlay menu when opened
 - User avatar (Clerk UserButton) in header
@@ -40,6 +43,7 @@ Mobile-first navigation that appears on screens smaller than 1024px.
 User profile component that displays at the bottom of the desktop sidebar.
 
 **Features:**
+
 - Clerk UserButton for authentication
 - User name and email display
 - Loading skeleton while user data loads
@@ -51,6 +55,7 @@ User profile component that displays at the bottom of the desktop sidebar.
 Dynamic breadcrumb navigation for deep pages.
 
 **Features:**
+
 - Automatically generates breadcrumbs from URL path
 - Home icon for root
 - ChevronRight separators
@@ -58,6 +63,7 @@ Dynamic breadcrumb navigation for deep pages.
 - Hides on home page and single-level routes
 
 **Special handling:**
+
 - Formats path segments (capitalizes, removes hyphens)
 - Known routes get proper labels (dashboard, search, feed, etc.)
 
@@ -68,6 +74,7 @@ Dynamic breadcrumb navigation for deep pages.
 The main layout file that wraps all pages.
 
 **Structure:**
+
 ```
 <ClerkProvider>
   <html>
@@ -90,6 +97,7 @@ The main layout file that wraps all pages.
 ```
 
 **Key Features:**
+
 - Clerk authentication wrapper
 - Full-height layout with flex
 - Responsive sidebar visibility
@@ -103,6 +111,7 @@ The main layout file that wraps all pages.
 Global loading UI using React Suspense and Next.js loading.tsx convention.
 
 **Features:**
+
 - Skeleton components for header and content
 - Grid layout matching typical page structure
 - Automatically shown during route transitions
@@ -112,6 +121,7 @@ Global loading UI using React Suspense and Next.js loading.tsx convention.
 Client-side error boundary for handling runtime errors.
 
 **Features:**
+
 - Error message display
 - Error digest for tracking
 - "Try again" button to reset error
@@ -124,6 +134,7 @@ Client-side error boundary for handling runtime errors.
 Custom 404 page for missing routes.
 
 **Features:**
+
 - Large 404 display
 - Helpful messaging
 - Navigation buttons to home and dashboard

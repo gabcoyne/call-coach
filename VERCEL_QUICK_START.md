@@ -77,6 +77,7 @@ vercel --prod
 ### 1. Check Build Status
 
 Visit Vercel Dashboard > Deployments and verify:
+
 - [x] Build succeeded
 - [x] No errors in logs
 - [x] Function deployed successfully
@@ -155,6 +156,7 @@ npm run build
 ### Database Connection Error
 
 Check:
+
 - [x] Using Neon **pooler endpoint** (not direct)
 - [x] `DATABASE_URL` includes `?sslmode=require`
 - [x] Pool sizes set correctly (MIN=2, MAX=10)
@@ -162,13 +164,14 @@ Check:
 ### Cron Job Not Running
 
 Check:
+
 - [x] `CRON_SECRET` is set in Vercel env vars
 - [x] Function logs in Vercel dashboard
 - [x] Python dependencies installed (automatic via pyproject.toml)
 
 ### 401 Unauthorized (Clerk)
 
-- [x] Using **live keys** (pk_live_*, sk_live_*) not test keys
+- [x] Using **live keys** (pk*live\*\*, sk*live\*\*) not test keys
 - [x] Clerk domain matches production URL
 - [x] Sign-in URL configured correctly
 
@@ -197,6 +200,7 @@ After successful deployment:
 **Full Documentation**: See `DEPLOYMENT.md` for comprehensive guide.
 
 **Quick Checks**:
+
 ```bash
 # Verify config files
 bash scripts/verify-deployment-config.sh

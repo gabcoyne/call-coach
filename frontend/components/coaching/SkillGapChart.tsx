@@ -1,7 +1,16 @@
-'use client';
+"use client";
 
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, Tooltip, ResponsiveContainer } from 'recharts';
-import { CHART_COLORS } from '@/lib/colors';
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  Legend,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { CHART_COLORS } from "@/lib/colors";
 
 export interface SkillGapData {
   area: string;
@@ -24,11 +33,7 @@ export interface SkillGapChartProps {
  * Displays a radar chart comparing current vs target scores across different skill areas.
  * Provides visual representation of gaps and areas for improvement.
  */
-export function SkillGapChart({
-  data,
-  height = 350,
-  className = '',
-}: SkillGapChartProps) {
+export function SkillGapChart({ data, height = 350, className = "" }: SkillGapChartProps) {
   if (!data || data.length === 0) {
     return (
       <div
@@ -45,17 +50,8 @@ export function SkillGapChart({
       <ResponsiveContainer width="100%" height={height}>
         <RadarChart data={data} margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
           <PolarGrid stroke="#e5e7eb" />
-          <PolarAngleAxis
-            dataKey="area"
-            tick={{ fontSize: 12 }}
-            stroke="#6b7280"
-          />
-          <PolarRadiusAxis
-            angle={90}
-            domain={[0, 100]}
-            tick={{ fontSize: 12 }}
-            stroke="#6b7280"
-          />
+          <PolarAngleAxis dataKey="area" tick={{ fontSize: 12 }} stroke="#6b7280" />
+          <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 12 }} stroke="#6b7280" />
           <Radar
             name="Current Score"
             dataKey="current"
@@ -73,15 +69,13 @@ export function SkillGapChart({
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#ffffff',
-              border: '1px solid #e5e7eb',
-              borderRadius: '6px',
-              fontSize: '12px',
+              backgroundColor: "#ffffff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "6px",
+              fontSize: "12px",
             }}
           />
-          <Legend
-            wrapperStyle={{ fontSize: '12px' }}
-          />
+          <Legend wrapperStyle={{ fontSize: "12px" }} />
         </RadarChart>
       </ResponsiveContainer>
     </div>

@@ -17,13 +17,13 @@ from uuid import UUID
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from db import fetch_all, fetch_one
 from flows.process_new_call import (
     fetch_call_from_gong,
     fetch_transcript_from_gong,
     store_speakers,
     store_transcript,
 )
-from db import execute_query, fetch_all, fetch_one
 
 # Configure logging
 logging.basicConfig(
@@ -46,14 +46,16 @@ def get_calls_needing_transcripts() -> list[dict[str, Any]]:
     """
     logger.info("Querying calls without transcripts...")
 
-    calls = fetch_all("""
+    calls = fetch_all(
+        """
         SELECT c.id, c.gong_call_id, c.title, c.scheduled_at
         FROM calls c
         LEFT JOIN transcripts t ON c.id = t.call_id
         WHERE t.id IS NULL
         GROUP BY c.id, c.gong_call_id, c.title, c.scheduled_at
         ORDER BY c.scheduled_at DESC
-    """)
+    """
+    )
 
     logger.info(f"Found {len(calls)} calls needing transcripts")
     return calls
@@ -89,21 +91,22 @@ def load_transcript_for_call(call: dict[str, Any]) -> dict[str, Any]:
 
     try:
         # Fetch call metadata from Gong
-        logger.info(f"  Fetching call metadata from Gong...")
+        logger.info("  Fetching call metadata from Gong...")
         gong_call_data = fetch_call_from_gong(gong_call_id)
 
         # Fetch transcript from Gong
-        logger.info(f"  Fetching transcript from Gong...")
+        logger.info("  Fetching transcript from Gong...")
         transcript_data = fetch_transcript_from_gong(gong_call_id, gong_call_data)
 
         # Store speakers
-        logger.info(f"  Storing speakers...")
+        logger.info("  Storing speakers...")
         participants = gong_call_data.get("participants", [])
 
         # If no participants from Gong API, create a default rep speaker for analysis
         if not participants:
-            logger.warning(f"  No participants from Gong API - creating default rep speaker")
+            logger.warning("  No participants from Gong API - creating default rep speaker")
             from uuid import uuid4
+
             from db import execute_query
 
             default_speaker_id = uuid4()
@@ -132,7 +135,7 @@ def load_transcript_for_call(call: dict[str, Any]) -> dict[str, Any]:
             result["speakers"] = len(speaker_mapping)
 
         # Store transcript
-        logger.info(f"  Storing transcript...")
+        logger.info("  Storing transcript...")
         transcript_hash = store_transcript(call_id, transcript_data, speaker_mapping)
 
         # Count transcript sentences stored
@@ -175,9 +178,9 @@ def batch_load_transcripts(max_workers: int = 3) -> dict[str, Any]:
     Returns:
         Summary statistics of the batch load
     """
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("Starting batch transcript loading from Gong")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Ensure logs directory exists
     logs_dir = project_root / "logs"
@@ -206,10 +209,7 @@ def batch_load_transcripts(max_workers: int = 3) -> dict[str, Any]:
     # Use ThreadPoolExecutor for concurrent loading
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
-        future_to_call = {
-            executor.submit(load_transcript_for_call, call): call
-            for call in calls
-        }
+        future_to_call = {executor.submit(load_transcript_for_call, call): call for call in calls}
 
         # Process completed tasks
         completed = 0
@@ -238,16 +238,18 @@ def batch_load_transcripts(max_workers: int = 3) -> dict[str, Any]:
                     f"[{completed}/{len(calls)}] ✗ Exception for call {call['gong_call_id']}: {e}",
                     exc_info=True,
                 )
-                results.append({
-                    "call_id": str(call["id"]),
-                    "gong_call_id": call["gong_call_id"],
-                    "title": call["title"],
-                    "success": False,
-                    "transcript_sentences": 0,
-                    "speakers": 0,
-                    "error": str(e),
-                    "duration_seconds": 0,
-                })
+                results.append(
+                    {
+                        "call_id": str(call["id"]),
+                        "gong_call_id": call["gong_call_id"],
+                        "title": call["title"],
+                        "success": False,
+                        "transcript_sentences": 0,
+                        "speakers": 0,
+                        "error": str(e),
+                        "duration_seconds": 0,
+                    }
+                )
 
     # Calculate summary statistics
     total_duration = time.time() - start_time
@@ -257,9 +259,9 @@ def batch_load_transcripts(max_workers: int = 3) -> dict[str, Any]:
     total_speakers = sum(r["speakers"] for r in results)
 
     logger.info("")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("Batch transcript loading complete!")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info(f"Total calls processed: {len(results)}")
     logger.info(f"Successful: {successful}")
     logger.info(f"Failed: {failed}")
@@ -272,9 +274,11 @@ def batch_load_transcripts(max_workers: int = 3) -> dict[str, Any]:
     transcript_count = fetch_one("SELECT COUNT(*) as count FROM transcripts")
     logger.info(f"\nTranscript sentences in database: {transcript_count['count']:,}")
 
-    calls_with_transcripts = fetch_one("""
+    calls_with_transcripts = fetch_one(
+        """
         SELECT COUNT(DISTINCT call_id) as count FROM transcripts
-    """)
+    """
+    )
     logger.info(f"Calls with transcripts: {calls_with_transcripts['count']}")
 
     return {

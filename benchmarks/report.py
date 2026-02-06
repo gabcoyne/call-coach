@@ -8,11 +8,12 @@ Generates HTML reports with:
 - Cache hit rates
 - Comparison to baseline
 """
+
 import json
-from datetime import datetime
-from typing import Dict, List, Any
-from pathlib import Path
 import statistics
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 
 class PerformanceReport:
@@ -23,15 +24,15 @@ class PerformanceReport:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.timestamp = datetime.now()
 
-    def load_benchmark_results(self, results_file: str) -> Dict[str, Any]:
+    def load_benchmark_results(self, results_file: str) -> dict[str, Any]:
         """Load benchmark results from JSON file."""
         try:
-            with open(results_file, "r") as f:
+            with open(results_file) as f:
                 return json.load(f)
         except FileNotFoundError:
             return {}
 
-    def calculate_percentiles(self, response_times: List[float]) -> Dict[str, float]:
+    def calculate_percentiles(self, response_times: list[float]) -> dict[str, float]:
         """Calculate response time percentiles."""
         if not response_times:
             return {"p50": 0, "p95": 0, "p99": 0}
@@ -50,7 +51,7 @@ class PerformanceReport:
     def generate_html_report(
         self,
         title: str,
-        sections: Dict[str, Dict[str, Any]],
+        sections: dict[str, dict[str, Any]],
     ) -> str:
         """Generate HTML report with performance data."""
         html = f"""<!DOCTYPE html>
@@ -253,7 +254,7 @@ class PerformanceReport:
 """
         return html
 
-    def _generate_section(self, title: str, data: Dict[str, Any]) -> str:
+    def _generate_section(self, title: str, data: dict[str, Any]) -> str:
         """Generate a report section."""
         html = f"<h2>{title}</h2>\n"
 
@@ -271,7 +272,7 @@ class PerformanceReport:
 
         return html
 
-    def _generate_metrics_grid(self, metrics: Dict[str, Any]) -> str:
+    def _generate_metrics_grid(self, metrics: dict[str, Any]) -> str:
         """Generate metrics grid."""
         html = '<div class="metrics-grid">\n'
 
@@ -299,7 +300,7 @@ class PerformanceReport:
         html += "</div>\n"
         return html
 
-    def _generate_endpoints_table(self, endpoints: List[Dict[str, Any]]) -> str:
+    def _generate_endpoints_table(self, endpoints: list[dict[str, Any]]) -> str:
         """Generate endpoints performance table."""
         html = """
 <table>
@@ -337,7 +338,7 @@ class PerformanceReport:
 """
         return html
 
-    def _generate_queries_table(self, queries: List[Dict[str, Any]]) -> str:
+    def _generate_queries_table(self, queries: list[dict[str, Any]]) -> str:
         """Generate database queries performance table."""
         html = """
 <table>
@@ -379,7 +380,7 @@ class PerformanceReport:
         print(f"Report saved: {filepath}")
         return filepath
 
-    def generate_summary_report(self, results: Dict[str, Any]) -> str:
+    def generate_summary_report(self, results: dict[str, Any]) -> str:
         """Generate summary performance report."""
         sections = {
             "API Performance": {

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { getPriorityColor } from '@/lib/colors';
+import { getPriorityColor } from "@/lib/colors";
 
 export interface ActionItemProps {
   /** Action item text/description */
   text: string;
   /** Priority level (high, medium, low) */
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
   /** Optional completion status */
   completed?: boolean;
   /** Optional callback when checkbox is toggled */
@@ -28,10 +28,10 @@ export function ActionItem({
   priority,
   completed = false,
   onComplete,
-  className = '',
+  className = "",
 }: ActionItemProps) {
   const priorityColors = getPriorityColor(priority);
-  const showCheckbox = typeof onComplete === 'function';
+  const showCheckbox = typeof onComplete === "function";
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (onComplete) {
@@ -40,7 +40,11 @@ export function ActionItem({
   };
 
   return (
-    <div className={`flex items-start gap-3 p-3 border rounded-lg ${completed ? 'bg-gray-50' : 'bg-white'} ${className}`}>
+    <div
+      className={`flex items-start gap-3 p-3 border rounded-lg ${
+        completed ? "bg-gray-50" : "bg-white"
+      } ${className}`}
+    >
       {/* Optional Checkbox */}
       {showCheckbox && (
         <input
@@ -48,7 +52,7 @@ export function ActionItem({
           checked={completed}
           onChange={handleCheckboxChange}
           className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
-          aria-label={`Mark "${text}" as ${completed ? 'incomplete' : 'complete'}`}
+          aria-label={`Mark "${text}" as ${completed ? "incomplete" : "complete"}`}
         />
       )}
 
@@ -62,7 +66,7 @@ export function ActionItem({
               backgroundColor: priorityColors.bg,
               color: priorityColors.text,
               borderColor: priorityColors.border,
-              borderWidth: '1px',
+              borderWidth: "1px",
             }}
           >
             {priority.charAt(0).toUpperCase() + priority.slice(1)}
@@ -70,7 +74,7 @@ export function ActionItem({
         </div>
 
         {/* Action Text */}
-        <p className={`text-sm ${completed ? 'line-through text-gray-500' : 'text-gray-700'}`}>
+        <p className={`text-sm ${completed ? "line-through text-gray-500" : "text-gray-700"}`}>
           {text}
         </p>
       </div>

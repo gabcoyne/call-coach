@@ -2,30 +2,20 @@
 Prefect flow for processing new calls from Gong webhooks.
 Handles transcript fetching, chunking, and basic analysis.
 """
+
 import json
 import logging
-from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
 from prefect import flow, task
 from prefect.task_runners import ConcurrentTaskRunner
 
-from analysis.chunking import chunk_transcript, count_tokens
 from analysis.cache import generate_transcript_hash
+from analysis.chunking import count_tokens
 from coaching_mcp.shared import settings
 from db import execute_query, fetch_one
-from db.models import (
-    Call,
-    Speaker,
-    Transcript,
-    AnalysisRun,
-    AnalysisRunStatus,
-    WebhookEventStatus,
-    Role,
-    CallType,
-    Product,
-)
+from db.models import AnalysisRunStatus, CallType, Product, Role, WebhookEventStatus
 from gong.client import GongClient
 from gong.webhook import WebhookHandler
 
@@ -52,7 +42,9 @@ def fetch_call_from_gong(call_id: str) -> dict[str, Any]:
 
 
 @task(name="fetch_transcript_from_gong", retries=3, retry_delay_seconds=5)
-def fetch_transcript_from_gong(call_id: str, call_metadata: dict[str, Any] | None = None) -> dict[str, Any]:
+def fetch_transcript_from_gong(
+    call_id: str, call_metadata: dict[str, Any] | None = None
+) -> dict[str, Any]:
     """
     Fetch transcript from Gong API.
 
@@ -68,6 +60,7 @@ def fetch_transcript_from_gong(call_id: str, call_metadata: dict[str, Any] | Non
     with GongClient() as client:
         # Convert call_metadata dict back to GongCall if provided
         from gong.types import GongCall
+
         call_obj = GongCall(**call_metadata) if call_metadata else None
 
         transcript = client.get_transcript(call_id, call_metadata=call_obj)
@@ -230,13 +223,15 @@ def store_transcript(
         topic = monologue.get("topic")
 
         for sentence in monologue["sentences"]:
-            all_sentences.append({
-                "speaker_id": speaker_id,
-                "topic": topic,
-                "start_ms": sentence["start"],  # milliseconds from call start
-                "end_ms": sentence["end"],
-                "text": sentence["text"],
-            })
+            all_sentences.append(
+                {
+                    "speaker_id": speaker_id,
+                    "topic": topic,
+                    "start_ms": sentence["start"],  # milliseconds from call start
+                    "end_ms": sentence["end"],
+                    "text": sentence["text"],
+                }
+            )
 
     # Build full transcript for hashing
     full_text = " ".join([s["text"] for s in all_sentences])
@@ -249,7 +244,7 @@ def store_transcript(
     # Chunk if needed
     needs_chunking = total_tokens > settings.max_chunk_size_tokens
     if needs_chunking:
-        logger.info(f"Transcript exceeds max size, will chunk during analysis")
+        logger.info("Transcript exceeds max size, will chunk during analysis")
 
     # Store individual sentences
     # Note: timestamp_seconds field stores the START time in milliseconds (schema needs updating)
@@ -258,11 +253,13 @@ def store_transcript(
 
         # Store topic in topics array field (JSONB or VARCHAR[])
         # Store both start and end times in metadata until schema updated
-        chunk_metadata_json = json.dumps({
-            "start_ms": sentence["start_ms"],
-            "end_ms": sentence["end_ms"],
-            "duration_ms": sentence["end_ms"] - sentence["start_ms"],
-        })
+        chunk_metadata_json = json.dumps(
+            {
+                "start_ms": sentence["start_ms"],
+                "end_ms": sentence["end_ms"],
+                "duration_ms": sentence["end_ms"] - sentence["start_ms"],
+            }
+        )
 
         execute_query(
             """
@@ -282,7 +279,9 @@ def store_transcript(
             ),
         )
 
-    logger.info(f"Stored {len(all_sentences)} transcript sentences from {len(monologues)} monologues")
+    logger.info(
+        f"Stored {len(all_sentences)} transcript sentences from {len(monologues)} monologues"
+    )
     return transcript_hash
 
 

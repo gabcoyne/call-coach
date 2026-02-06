@@ -4,6 +4,7 @@ Rubric loading and validation module for role-based coaching.
 Loads role-specific coaching rubrics (AE, SE, CSM) from JSON files,
 validates their structure, and provides cached access for analysis.
 """
+
 import json
 import logging
 from pathlib import Path
@@ -20,6 +21,7 @@ RUBRICS_DIR = Path(__file__).parent / "rubrics"
 
 class RubricValidationError(Exception):
     """Raised when rubric validation fails."""
+
     pass
 
 
@@ -37,9 +39,7 @@ def validate_rubric(rubric_dict: dict[str, Any]) -> None:
     required_fields = ["role", "role_name", "dimensions"]
     missing_fields = [f for f in required_fields if f not in rubric_dict]
     if missing_fields:
-        raise RubricValidationError(
-            f"Missing required fields: {', '.join(missing_fields)}"
-        )
+        raise RubricValidationError(f"Missing required fields: {', '.join(missing_fields)}")
 
     # Validate dimensions array
     dimensions = rubric_dict["dimensions"]
@@ -70,15 +70,11 @@ def validate_rubric(rubric_dict: dict[str, Any]) -> None:
 
         # Validate criteria is array
         if not isinstance(dim["criteria"], list) or len(dim["criteria"]) == 0:
-            raise RubricValidationError(
-                f"Dimension {dim['id']}: criteria must be non-empty array"
-            )
+            raise RubricValidationError(f"Dimension {dim['id']}: criteria must be non-empty array")
 
         # Validate scoring bands
         if not isinstance(dim["scoring"], dict):
-            raise RubricValidationError(
-                f"Dimension {dim['id']}: scoring must be an object"
-            )
+            raise RubricValidationError(f"Dimension {dim['id']}: scoring must be an object")
 
         missing_bands = [b for b in scoring_bands if b not in dim["scoring"]]
         if missing_bands:
@@ -124,19 +120,16 @@ def load_rubric(role: str) -> dict[str, Any]:
 
     if not rubric_file.exists():
         raise FileNotFoundError(
-            f"Rubric file not found: {rubric_file}. "
-            f"Valid roles: ae, se, csm"
+            f"Rubric file not found: {rubric_file}. " f"Valid roles: ae, se, csm"
         )
 
     logger.info(f"Loading rubric for role '{role}' from {rubric_file}")
 
     try:
-        with open(rubric_file, "r") as f:
+        with open(rubric_file) as f:
             rubric_dict = json.load(f)
     except json.JSONDecodeError as e:
-        raise RubricValidationError(
-            f"Failed to parse rubric JSON for role '{role}': {e}"
-        )
+        raise RubricValidationError(f"Failed to parse rubric JSON for role '{role}': {e}")
 
     # Validate structure
     try:
@@ -204,11 +197,7 @@ def get_rubric_info(role: str) -> dict[str, Any]:
         "description": rubric.get("description", ""),
         "dimension_count": len(rubric["dimensions"]),
         "dimensions": [
-            {
-                "id": dim["id"],
-                "name": dim["name"],
-                "weight": dim["weight"]
-            }
+            {"id": dim["id"], "name": dim["name"], "weight": dim["weight"]}
             for dim in rubric["dimensions"]
-        ]
+        ],
     }

@@ -41,12 +41,14 @@ The opportunity-coaching-view feature enables managers to coach reps across enti
 **File:** `db/migrations/003_opportunity_schema.sql`
 
 Created tables:
+
 - `opportunities`: Core opportunity data from Gong (name, account, owner, stage, health_score)
 - `emails`: Email touchpoints with body snippets (500 chars)
 - `call_opportunities`: M:N junction linking calls to opportunities
 - `sync_status`: Tracks last sync timestamps for incremental updates
 
 Indexes for performance:
+
 - `idx_opportunities_owner`: Filter by owner + sort by updated_at
 - `idx_opportunities_stage`: Filter by stage + close date
 - `idx_emails_opportunity`: Timeline queries
@@ -61,11 +63,13 @@ Indexes for performance:
 **File:** `gong/client.py`
 
 New methods:
+
 - `list_opportunities(modified_after, cursor)`: Fetch opportunities with pagination
 - `get_opportunity_calls(opportunity_id)`: Get call IDs for opportunity
 - `get_opportunity_emails(opportunity_id)`: Get emails for opportunity
 
 Features:
+
 - Cursor-based pagination for large result sets
 - Rate limiting with exponential backoff (HTTP 429 handling)
 - `modified_after` parameter for incremental syncs
@@ -79,6 +83,7 @@ Features:
 **File:** `db/queries.py`
 
 New functions:
+
 ```python
 upsert_opportunity(opp_data)          # Idempotent opportunity storage
 upsert_email(email_data)              # Idempotent email storage
@@ -98,22 +103,26 @@ get/update_sync_status(entity_type)   # Track incremental syncs
 **File:** `flows/daily_gong_sync.py`
 
 Workflow:
+
 1. `sync_opportunities()`: Fetch modified opportunities, upsert to database
 2. `sync_opportunity_calls()`: Link calls to opportunities via junction table
 3. `sync_opportunity_emails()`: Store emails with body truncation
 4. Update sync_status table with timestamps
 
 Features:
+
 - Incremental sync using `modifiedAfter` parameter
 - Error handling: continues on failures, logs errors
 - Structured logging: counts, errors, timing
 - Idempotent: safe to run multiple times
 
 **Execution:**
+
 - Local: `uv run python -m flows.daily_gong_sync`
 - Vercel: Cron job at 6am daily
 
 **Pending:**
+
 - Local testing (task 4.8)
 - Idempotency verification (task 4.9)
 
@@ -122,20 +131,25 @@ Features:
 ### 5. Vercel Cron Integration (3/5 tasks ✓)
 
 **Files:**
+
 - `api/cron/daily-sync.py`: Serverless function wrapper
 - `vercel.json`: Cron configuration
 
 Configuration:
+
 ```json
 {
-  "crons": [{
-    "path": "/api/cron/daily-sync",
-    "schedule": "0 6 * * *"  // 6am daily
-  }]
+  "crons": [
+    {
+      "path": "/api/cron/daily-sync",
+      "schedule": "0 6 * * *" // 6am daily
+    }
+  ]
 }
 ```
 
 **Pending:**
+
 - Local testing with `vercel dev` (task 5.4)
 - Documentation update (task 5.5)
 
@@ -144,6 +158,7 @@ Configuration:
 ### 6-8. Backend APIs (17/21 tasks ✓)
 
 **Files:**
+
 - `frontend/app/api/opportunities/route.ts`: List opportunities
 - `frontend/app/api/opportunities/[id]/route.ts`: Opportunity detail
 - `frontend/app/api/opportunities/[id]/timeline/route.ts`: Timeline
@@ -151,20 +166,24 @@ Configuration:
 - `frontend/lib/db/connection.ts`: PostgreSQL connection pool
 
 **Opportunities List API:**
+
 - Query params: owner, stage, health_score_min/max, search, sort, page, limit
 - Returns: opportunities array + pagination metadata
 - Supports multi-select filters (stage can be comma-separated)
 
 **Opportunity Detail API:**
+
 - Returns opportunity with call_count and email_count
 - 404 if not found
 
 **Timeline API:**
+
 - Paginated calls + emails sorted chronologically
 - Type-tagged items (call vs email)
 - Summary data only (no transcript/email body)
 
 **Pending:**
+
 - Endpoint testing with curl/Postman (tasks 6.7, 7.5, 8.7)
 
 ---
@@ -174,6 +193,7 @@ Configuration:
 **Not implemented yet**
 
 Required components:
+
 - `app/opportunities/page.tsx`: List page with filters
 - `components/OpportunitiesList.tsx`: Interactive table
 - `app/opportunities/[id]/page.tsx`: Detail page
@@ -183,6 +203,7 @@ Required components:
 - `components/EmailTimelineCard.tsx`: Expandable email cards
 
 Features needed:
+
 - Search with debounce (300ms)
 - Filter dropdowns (owner, stage, health score)
 - Sort controls with direction toggle
@@ -199,6 +220,7 @@ Features needed:
 **File:** `analysis/opportunity_coaching.py`
 
 Functions:
+
 ```python
 analyze_opportunity_patterns(opportunity_id)
 # Aggregates coaching scores across all calls
@@ -222,6 +244,7 @@ generate_coaching_recommendations(opportunity_id)
 ```
 
 **Coaching Philosophy Implemented:**
+
 - BE DIRECT: No sugarcoating, point out exact problems
 - Use timestamps and quotes from calls
 - Compare to exemplars from closed-won deals
@@ -229,6 +252,7 @@ generate_coaching_recommendations(opportunity_id)
 - Provide actionable behavioral changes only
 
 **Pending:**
+
 - Caching layer (task 11.7)
 - Testing with sample opportunities (task 11.8)
 
@@ -239,6 +263,7 @@ generate_coaching_recommendations(opportunity_id)
 **File:** `analysis/learning_insights.py`
 
 Functions:
+
 ```python
 find_similar_won_opportunities(rep_email, product)
 # Finds closed-won deals by top performers
@@ -258,6 +283,7 @@ get_learning_insights(rep_email, focus_area)
 ```
 
 **Focus Areas:**
+
 - discovery: Question quality, active listening
 - objections: Identification and response
 - product_knowledge: Technical accuracy
@@ -265,12 +291,14 @@ get_learning_insights(rep_email, focus_area)
 - next_steps: Clarity on commitments
 
 **Coaching Approach:**
+
 - Shows exactly what top performers do differently
 - Uses specific call examples with timestamps
 - Compares behavioral patterns, not just scores
 - Provides actionable differences to learn from
 
 **Pending:**
+
 - Testing with real closed-won opportunities (task 12.7)
 
 ---
@@ -278,28 +306,33 @@ get_learning_insights(rep_email, focus_area)
 ### 13. FastMCP Tools (6/7 tasks ✓)
 
 **Files:**
+
 - `coaching_mcp/tools/analyze_opportunity.py`
 - `coaching_mcp/tools/get_learning_insights.py`
 - `coaching_mcp/server.py` (updated)
 
 **Tool 1: analyze_opportunity**
+
 ```python
 analyze_opportunity(opportunity_id: str) -> dict
 # Returns: patterns, themes, objections, relationship, recommendations
 ```
 
 **Tool 2: get_learning_insights**
+
 ```python
 get_learning_insights(rep_email: str, focus_area: str) -> dict
 # Returns: rep_performance, top_performer_benchmark, behavioral_differences, exemplar_moments
 ```
 
 **Registration:**
+
 - Both tools registered in FastMCP server
 - Server now has 5 tools total (up from 3)
 - Input validation and error handling included
 
 **Pending:**
+
 - Testing via Claude Desktop (task 13.7)
 
 ---
@@ -309,6 +342,7 @@ get_learning_insights(rep_email: str, focus_area: str) -> dict
 **Not implemented yet**
 
 Required:
+
 - `components/OpportunityInsights.tsx`: Display insights on detail page
 - `app/api/opportunities/[id]/insights/route.ts`: Backend endpoint
 - Expand/collapse functionality
@@ -322,6 +356,7 @@ Required:
 **Not implemented yet**
 
 Test scenarios needed:
+
 - Full flow: sync → database → UI
 - Search with all filter combinations
 - Timeline pagination (50+ items)
@@ -342,11 +377,13 @@ Test scenarios needed:
 ### Immediate Priorities
 
 1. **Test Core Infrastructure**
+
    - Run daily sync locally: `uv run python -m flows.daily_gong_sync`
    - Verify data in database
    - Test MCP tools via Claude Desktop
 
 2. **Build Frontend UI** (51 tasks remaining)
+
    - Start with opportunities list page (tasks 9.1-9.13)
    - Then detail page + timeline (tasks 10.1-10.13)
    - Add insights component (tasks 14.1-14.10)
@@ -359,6 +396,7 @@ Test scenarios needed:
 ### Deployment Readiness
 
 **Production-Ready Now:**
+
 - Database schema
 - Daily sync flow
 - Backend APIs
@@ -366,6 +404,7 @@ Test scenarios needed:
 - FastMCP tools
 
 **Not Production-Ready:**
+
 - Frontend UI (not built)
 - Integration tests (not run)
 - Documentation (not updated)
@@ -375,18 +414,23 @@ Test scenarios needed:
 ## Key Design Decisions
 
 ### Incremental Sync
+
 Using `modifiedAfter` parameter to only fetch changed opportunities since last sync. Reduces API calls by 80%+.
 
 ### Normalized Schema
+
 Proper tables with foreign keys instead of JSONB blobs. Enables efficient querying and filtering.
 
 ### DIRECT Coaching Philosophy
+
 Analysis modules focus on specific problems with timestamps. No encouragement language - just gaps and fixes.
 
 ### Learning from Winners
+
 Compare reps to top performers on similar closed-won deals. Provide concrete behavioral examples.
 
 ### Opportunity-Centric Workflow
+
 Sync fetches opportunities → enriches with calls/emails. Matches manager workflow (coach deals, not just calls).
 
 ---
@@ -394,6 +438,7 @@ Sync fetches opportunities → enriches with calls/emails. Matches manager workf
 ## Files Changed
 
 **Created (14 files):**
+
 - `db/migrations/003_opportunity_schema.sql`
 - `flows/daily_gong_sync.py`
 - `api/cron/daily-sync.py`
@@ -410,6 +455,7 @@ Sync fetches opportunities → enriches with calls/emails. Matches manager workf
 - `AGENTS.md`
 
 **Modified (4 files):**
+
 - `gong/client.py`: Added opportunity methods + rate limiting
 - `db/queries.py`: Added opportunity queries
 - `coaching_mcp/server.py`: Registered new tools
@@ -422,6 +468,7 @@ Sync fetches opportunities → enriches with calls/emails. Matches manager workf
 The analysis modules implement the CRITICAL coaching philosophy:
 
 **From `analysis/opportunity_coaching.py`:**
+
 ```python
 prompt = f"""...
 BE DIRECT. State exactly what was discussed and how it changed over time.
@@ -430,6 +477,7 @@ No encouragement or positive spin.
 ```
 
 **From `analysis/learning_insights.py`:**
+
 ```python
 prompt = f"""...
 BE DIRECT. Point out exactly what the rep is missing.
@@ -439,6 +487,7 @@ No encouragement - just show the gap and what good looks like.
 ```
 
 This ensures coaching feedback:
+
 - Points out SPECIFIC problems with timestamps
 - Compares to top performers on closed-won deals
 - NO encouragement language
@@ -490,21 +539,25 @@ curl http://localhost:3000/api/opportunities/{id}/timeline
 ## Performance Considerations
 
 ### Database Query Optimization
+
 - Indexes on frequently filtered columns (owner_email, stage, updated_at)
 - Pagination to limit result set size
 - GROUP BY aggregations for call/email counts
 
 ### API Rate Limiting
+
 - Exponential backoff on HTTP 429
 - Daily sync cadence (not hourly) to stay under limits
 - Cursor-based pagination for large result sets
 
 ### Caching Strategy
+
 - Opportunity-level analysis results (cache_key = all call IDs)
 - Learning insights by (rep_email, focus_area)
 - Backend API responses (SWR in frontend)
 
 ### Scalability
+
 - Neon free tier: 512MB storage (current schema ~5MB per 5000 opps)
 - Gong API: 1000 calls/day (daily sync ~100-200 calls)
 - Vercel: Free tier supports daily cron
@@ -514,16 +567,19 @@ curl http://localhost:3000/api/opportunities/{id}/timeline
 ## Risk Mitigation
 
 **Stale Data (up to 24 hours):**
+
 - Daily sync at 6am, managers review previous day
 - Acceptable for coaching use case
 - Webhook ingestion can be added post-deployment
 
 **Gong API Schema Changes:**
+
 - Store full API responses in metadata JSONB
 - Only parse fields we need
 - Easy to adapt to changes
 
 **Storage Growth:**
+
 - Monitor Neon usage
 - Add retention policy (90 days) if needed
 - Compress old email bodies
@@ -533,12 +589,14 @@ curl http://localhost:3000/api/opportunities/{id}/timeline
 ## Success Metrics
 
 **Technical:**
+
 - ✓ Database migration successful
 - ✓ Sync flow idempotent
 - ✓ API endpoints <500ms response time
 - ✓ MCP tools functional
 
 **Business:**
+
 - (Pending) Managers can view all touchpoints for an opportunity
 - (Pending) Coaching insights identify specific behavioral gaps
 - (Pending) Learning insights show concrete examples from top performers

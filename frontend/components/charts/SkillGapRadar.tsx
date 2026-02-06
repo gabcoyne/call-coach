@@ -1,7 +1,16 @@
-'use client';
+"use client";
 
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, Tooltip, ResponsiveContainer } from 'recharts';
-import { CHART_COLORS } from '@/lib/colors';
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  Legend,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { CHART_COLORS } from "@/lib/colors";
 
 export interface SkillGapRadarData {
   skill: string;
@@ -14,7 +23,7 @@ export interface SkillGapRadarProps {
   /** Array of skill gap data with actual, target, and optional team average scores */
   data: SkillGapRadarData[];
   /** Compare against team average or top performers */
-  compareType?: 'team' | 'topPerformers' | 'target';
+  compareType?: "team" | "topPerformers" | "target";
   /** Optional height in pixels (default: 350) */
   height?: number;
   /** Optional className for additional styling */
@@ -30,9 +39,9 @@ export interface SkillGapRadarProps {
  */
 export function SkillGapRadar({
   data,
-  compareType = 'target',
+  compareType = "target",
   height = 350,
-  className = '',
+  className = "",
 }: SkillGapRadarProps) {
   if (!data || data.length === 0) {
     return (
@@ -64,25 +73,16 @@ export function SkillGapRadar({
   };
 
   // Determine which comparison series to show
-  const shouldShowTeam = compareType === 'team' && data.some(d => d.teamAverage !== undefined);
-  const shouldShowTarget = compareType !== 'team';
+  const shouldShowTeam = compareType === "team" && data.some((d) => d.teamAverage !== undefined);
+  const shouldShowTarget = compareType !== "team";
 
   return (
     <div className={className}>
       <ResponsiveContainer width="100%" height={height}>
         <RadarChart data={data} margin={{ top: 30, right: 120, bottom: 30, left: 120 }}>
           <PolarGrid stroke="#e5e7eb" strokeDasharray="3 3" />
-          <PolarAngleAxis
-            dataKey="skill"
-            tick={{ fontSize: 11 }}
-            stroke="#6b7280"
-          />
-          <PolarRadiusAxis
-            angle={90}
-            domain={[0, 100]}
-            tick={{ fontSize: 11 }}
-            stroke="#6b7280"
-          />
+          <PolarAngleAxis dataKey="skill" tick={{ fontSize: 11 }} stroke="#6b7280" />
+          <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 11 }} stroke="#6b7280" />
 
           {/* Actual performance */}
           <Radar
@@ -120,11 +120,7 @@ export function SkillGapRadar({
           )}
 
           <Tooltip content={<CustomTooltip />} />
-          <Legend
-            wrapperStyle={{ fontSize: '12px' }}
-            verticalAlign="bottom"
-            height={36}
-          />
+          <Legend wrapperStyle={{ fontSize: "12px" }} verticalAlign="bottom" height={36} />
         </RadarChart>
       </ResponsiveContainer>
     </div>

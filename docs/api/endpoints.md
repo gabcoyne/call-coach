@@ -4,18 +4,20 @@ Complete reference for all REST API endpoints with request/response examples.
 
 ## Base URL
 
-| Environment | Base URL |
-|-------------|----------|
-| Local Development | `http://localhost:8000` |
-| Vercel Frontend | `https://call-coach.vercel.app` |
-| Custom Deployment | `https://your-domain.com` |
+| Environment       | Base URL                        |
+| ----------------- | ------------------------------- |
+| Local Development | `http://localhost:8000`         |
+| Vercel Frontend   | `https://call-coach.vercel.app` |
+| Custom Deployment | `https://your-domain.com`       |
 
 ## Authentication
 
 ### Local Development
+
 No authentication required.
 
 ### Production (Horizon)
+
 Requests may require Bearer token authentication:
 
 ```bash
@@ -32,12 +34,14 @@ Analyze a single Gong call for coaching insights across all dimensions.
 **URL**: `POST /coaching/analyze-call`
 
 **Headers**:
+
 ```
 Content-Type: application/json
 Authorization: Bearer <api_key> (optional in development)
 ```
 
 **Request Body**:
+
 ```json
 {
   "gong_call_id": "1464927526043145564",
@@ -52,6 +56,7 @@ Authorization: Bearer <api_key> (optional in development)
 | `focus_area` | string | No | One of: "discovery", "product", "objections", "engagement" |
 
 **Response** (200 OK):
+
 ```json
 {
   "call_id": "1464927526043145564",
@@ -155,7 +160,8 @@ Authorization: Bearer <api_key> (optional in development)
 
 **Error Responses**:
 
-*400 Bad Request*:
+_400 Bad Request_:
+
 ```json
 {
   "error": "Invalid parameter",
@@ -163,7 +169,8 @@ Authorization: Bearer <api_key> (optional in development)
 }
 ```
 
-*404 Not Found*:
+_404 Not Found_:
+
 ```json
 {
   "error": "Call not found",
@@ -171,7 +178,8 @@ Authorization: Bearer <api_key> (optional in development)
 }
 ```
 
-*500 Internal Server Error*:
+_500 Internal Server Error_:
+
 ```json
 {
   "error": "Analysis failed",
@@ -189,6 +197,7 @@ Get performance metrics and coaching insights for a specific rep over a time per
 **URL**: `POST /coaching/rep-insights`
 
 **Request Body**:
+
 ```json
 {
   "rep_email": "sarah.jones@prefect.io",
@@ -203,6 +212,7 @@ Get performance metrics and coaching insights for a specific rep over a time per
 | `time_period` | string | No | One of: "week", "month", "quarter". Default: "month" |
 
 **Response** (200 OK):
+
 ```json
 {
   "rep_email": "sarah.jones@prefect.io",
@@ -324,7 +334,8 @@ Get performance metrics and coaching insights for a specific rep over a time per
 
 **Error Responses**:
 
-*400 Bad Request*:
+_400 Bad Request_:
+
 ```json
 {
   "error": "Invalid parameter",
@@ -332,7 +343,8 @@ Get performance metrics and coaching insights for a specific rep over a time per
 }
 ```
 
-*404 Not Found*:
+_404 Not Found_:
+
 ```json
 {
   "error": "Rep not found",
@@ -349,6 +361,7 @@ Search for calls matching specific criteria.
 **URL**: `POST /coaching/search`
 
 **Request Body**:
+
 ```json
 {
   "query": "discovery pricing",
@@ -378,6 +391,7 @@ Search for calls matching specific criteria.
 | `limit` | integer | No | Max results (1-100, default: 20) |
 
 **Response** (200 OK):
+
 ```json
 {
   "query": "discovery pricing",
@@ -466,7 +480,8 @@ Search for calls matching specific criteria.
 
 **Error Responses**:
 
-*400 Bad Request*:
+_400 Bad Request_:
+
 ```json
 {
   "error": "Invalid filter",
@@ -474,7 +489,8 @@ Search for calls matching specific criteria.
 }
 ```
 
-*422 Unprocessable Entity*:
+_422 Unprocessable Entity_:
+
 ```json
 {
   "error": "Invalid date format",
@@ -486,15 +502,15 @@ Search for calls matching specific criteria.
 
 ## Status Codes
 
-| Code | Meaning | Action |
-|------|---------|--------|
-| 200 | Success | Request completed successfully |
-| 400 | Bad Request | Check request parameters and format |
-| 401 | Unauthorized | Check API key or authentication |
-| 404 | Not Found | Resource does not exist |
-| 429 | Too Many Requests | Wait before retrying (rate limited) |
-| 500 | Internal Error | Retry after 30 seconds, contact support if persistent |
-| 503 | Service Unavailable | Service is temporarily down, retry later |
+| Code | Meaning             | Action                                                |
+| ---- | ------------------- | ----------------------------------------------------- |
+| 200  | Success             | Request completed successfully                        |
+| 400  | Bad Request         | Check request parameters and format                   |
+| 401  | Unauthorized        | Check API key or authentication                       |
+| 404  | Not Found           | Resource does not exist                               |
+| 429  | Too Many Requests   | Wait before retrying (rate limited)                   |
+| 500  | Internal Error      | Retry after 30 seconds, contact support if persistent |
+| 503  | Service Unavailable | Service is temporarily down, retry later              |
 
 ## Pagination
 
@@ -535,10 +551,12 @@ Then repeat with next date range:
 **Local Development**: Unlimited
 
 **Production**:
+
 - 100 requests/minute per API key
 - Returns `X-RateLimit-Remaining` header
 
 Example rate limit header:
+
 ```
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 42
@@ -546,6 +564,7 @@ X-RateLimit-Reset: 1670000000
 ```
 
 If rate limited (429 response):
+
 ```json
 {
   "error": "Rate limit exceeded",
@@ -564,6 +583,7 @@ All endpoints support intelligent caching:
 - **Hit rate**: Typically 60-80%
 
 Example cached response:
+
 ```json
 {
   "call_id": "1464927526043145564",
@@ -624,12 +644,13 @@ Response lists top discovery calls with scores 90+ for Horizon.
 
 Interactive API docs available when running locally:
 
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+- **Swagger UI**: <http://localhost:8000/docs>
+- **ReDoc**: <http://localhost:8000/redoc>
 
 Download OpenAPI spec:
-- **JSON**: http://localhost:8000/openapi.json
-- **YAML**: http://localhost:8000/openapi.yaml
+
+- **JSON**: <http://localhost:8000/openapi.json>
+- **YAML**: <http://localhost:8000/openapi.yaml>
 
 ## Next Steps
 

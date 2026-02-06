@@ -58,7 +58,11 @@ export default function PreferencesPage() {
           const data = await response.json();
           setPreferences({
             theme: data.theme ?? "system",
-            defaultCoachingDimensions: data.defaultCoachingDimensions ?? ["opening", "discovery", "pitch"],
+            defaultCoachingDimensions: data.defaultCoachingDimensions ?? [
+              "opening",
+              "discovery",
+              "pitch",
+            ],
             dashboardLayout: data.dashboardLayout ?? "grid",
             compactMode: data.compactMode ?? false,
             autoRefreshEnabled: data.autoRefreshEnabled ?? true,
@@ -159,14 +163,18 @@ export default function PreferencesPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Preferences</h1>
-        <p className="text-muted-foreground mt-1">
-          Customize your experience with Call Coach
-        </p>
+        <p className="text-muted-foreground mt-1">Customize your experience with Call Coach</p>
       </div>
 
       {/* Status Message */}
       {message && (
-        <div className={`p-4 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+        <div
+          className={`p-4 rounded-lg ${
+            message.type === "success"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
           {message.text}
         </div>
       )}
@@ -283,9 +291,7 @@ export default function PreferencesPage() {
       <Card>
         <CardHeader>
           <CardTitle>Default Coaching Dimensions</CardTitle>
-          <CardDescription>
-            Select which coaching dimensions to focus on by default
-          </CardDescription>
+          <CardDescription>Select which coaching dimensions to focus on by default</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">

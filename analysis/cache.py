@@ -2,14 +2,15 @@
 Intelligent caching for coaching analyses.
 Critical for cost optimization (60-80% reduction).
 """
+
 import hashlib
 import logging
 from datetime import datetime, timedelta
 from typing import Any
 
-from db import fetch_one, execute_query
-from db.models import CoachingDimension, CoachingSession
 from coaching_mcp.shared import settings
+from db import execute_query, fetch_one
+from db.models import CoachingDimension
 
 logger = logging.getLogger(__name__)
 
@@ -127,8 +128,7 @@ def invalidate_cache_for_rubric(dimension: CoachingDimension, old_version: str) 
         Number of cache entries invalidated
     """
     logger.info(
-        f"Invalidating cache for dimension={dimension.value}, "
-        f"rubric_version={old_version}"
+        f"Invalidating cache for dimension={dimension.value}, " f"rubric_version={old_version}"
     )
 
     # We don't delete cache entries, just mark the rubric as deprecated

@@ -7,10 +7,12 @@ Simulates realistic user load on the Call Coaching API:
 - Search queries with various filters
 - Measures response times, throughput, and error rates
 """
+
 import random
 import time
-from locust import HttpUser, between, task, TaskSet, events
 from datetime import datetime, timedelta
+
+from locust import HttpUser, TaskSet, between, events, task
 
 
 # Statistics tracking
@@ -54,9 +56,9 @@ class LoadTestStats:
             "response_time_p50": self.get_percentile(50),
             "response_time_p95": self.get_percentile(95),
             "response_time_p99": self.get_percentile(99),
-            "response_time_avg": sum(self.response_times) / len(self.response_times)
-            if self.response_times
-            else 0,
+            "response_time_avg": (
+                sum(self.response_times) / len(self.response_times) if self.response_times else 0
+            ),
             "response_time_max": max(self.response_times) if self.response_times else 0,
         }
 
@@ -118,9 +120,7 @@ class CoachingAPITasks(TaskSet):
                 "/tools/get_rep_insights",
                 json={
                     "rep_email": rep_email,
-                    "time_period": random.choice(
-                        ["last_7_days", "last_30_days", "last_90_days"]
-                    ),
+                    "time_period": random.choice(["last_7_days", "last_30_days", "last_90_days"]),
                     "product_filter": random.choice(self.products + [None]),
                 },
                 timeout=30,
@@ -215,7 +215,7 @@ class CoachingAPITasks(TaskSet):
             elapsed = time.time() - start
             success = response.status_code == 200
             load_test_stats.add_response(elapsed, success)
-        except Exception as e:
+        except Exception:
             elapsed = time.time() - start
             load_test_stats.add_response(elapsed, False)
 

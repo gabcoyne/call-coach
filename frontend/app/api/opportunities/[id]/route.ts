@@ -6,10 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOpportunity } from "@/lib/db/opportunities";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
 
@@ -17,18 +14,12 @@ export async function GET(
     const opportunity = await getOpportunity(id);
 
     if (!opportunity) {
-      return NextResponse.json(
-        { error: "Opportunity not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
     }
 
     return NextResponse.json({ opportunity });
   } catch (error) {
     console.error(`Error fetching opportunity ${params.id}:`, error);
-    return NextResponse.json(
-      { error: "Failed to fetch opportunity" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch opportunity" }, { status: 500 });
   }
 }

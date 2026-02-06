@@ -15,11 +15,11 @@ interface CoachingHighlightCardProps {
 export function CoachingHighlightCard({ highlight }: CoachingHighlightCardProps) {
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
     });
   };
 
@@ -32,14 +32,18 @@ export function CoachingHighlightCard({ highlight }: CoachingHighlightCardProps)
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline" className="text-xs bg-orange-50 text-prefect-sunrise1 border-prefect-sunrise1">
+              <Badge
+                variant="outline"
+                className="text-xs bg-orange-50 text-prefect-sunrise1 border-prefect-sunrise1"
+              >
                 Exemplary Moment
               </Badge>
               <ScoreBadge score={highlight.score} size="sm" />
             </div>
             <CardTitle className="text-base">
-              {highlight.dimension.replace('_', ' ').charAt(0).toUpperCase() +
-               highlight.dimension.replace('_', ' ').slice(1)} Excellence
+              {highlight.dimension.replace("_", " ").charAt(0).toUpperCase() +
+                highlight.dimension.replace("_", " ").slice(1)}{" "}
+              Excellence
             </CardTitle>
           </div>
         </div>
@@ -52,16 +56,12 @@ export function CoachingHighlightCard({ highlight }: CoachingHighlightCardProps)
             <p className="font-medium text-foreground">{highlight.rep_name}</p>
             <p className="text-xs text-muted-foreground">{highlight.call_title}</p>
           </div>
-          <p className="text-xs text-muted-foreground">
-            {formatTimestamp(highlight.timestamp)}
-          </p>
+          <p className="text-xs text-muted-foreground">{formatTimestamp(highlight.timestamp)}</p>
         </div>
 
         {/* Highlight Snippet */}
         <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-4 border border-prefect-sunrise1/20">
-          <p className="text-sm italic text-foreground leading-relaxed">
-            "{highlight.snippet}"
-          </p>
+          <p className="text-sm italic text-foreground leading-relaxed">"{highlight.snippet}"</p>
         </div>
 
         {/* Context */}

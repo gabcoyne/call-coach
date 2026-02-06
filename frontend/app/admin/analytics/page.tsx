@@ -121,12 +121,7 @@ export default function AdminAnalyticsPage() {
             Team performance insights and skill gap analysis
           </p>
         </div>
-        <Button
-          onClick={fetchAnalytics}
-          variant="outline"
-          size="sm"
-          className="gap-2"
-        >
+        <Button onClick={fetchAnalytics} variant="outline" size="sm" className="gap-2">
           <RefreshCw className="h-4 w-4" />
           Refresh
         </Button>
@@ -148,9 +143,7 @@ export default function AdminAnalyticsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Coaching Dimensions</CardTitle>
-          <CardDescription>
-            Score distribution across all coaching dimensions
-          </CardDescription>
+          <CardDescription>Score distribution across all coaching dimensions</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -186,25 +179,17 @@ export default function AdminAnalyticsPage() {
                   className="flex items-center gap-4 p-3 rounded-lg border hover:bg-gray-50"
                 >
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-prefect-pink to-prefect-sunrise1 flex items-center justify-center">
-                    <span className="text-sm font-bold text-white">
-                      {performer.rank}
-                    </span>
+                    <span className="text-sm font-bold text-white">{performer.rank}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">
-                      {performer.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {performer.email}
-                    </p>
+                    <p className="text-sm font-medium text-foreground">{performer.name}</p>
+                    <p className="text-xs text-muted-foreground">{performer.email}</p>
                   </div>
                   <div className="flex-shrink-0 text-right">
                     <div className="text-lg font-bold text-foreground">
                       {performer.avgScore.toFixed(1)}
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      {performer.callsAnalyzed} calls
-                    </p>
+                    <p className="text-xs text-muted-foreground">{performer.callsAnalyzed} calls</p>
                   </div>
                 </div>
               ))
@@ -221,9 +206,7 @@ export default function AdminAnalyticsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Skill Gap Analysis</CardTitle>
-          <CardDescription>
-            Areas where team performance lags behind targets
-          </CardDescription>
+          <CardDescription>Areas where team performance lags behind targets</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -232,9 +215,7 @@ export default function AdminAnalyticsPage() {
                 <div key={skill.skill} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-foreground">
-                        {skill.skill}
-                      </p>
+                      <p className="text-sm font-medium text-foreground">{skill.skill}</p>
                       <p className="text-xs text-muted-foreground">
                         {skill.teamMembers} team members
                       </p>
@@ -244,7 +225,8 @@ export default function AdminAnalyticsPage() {
                         Gap: {skill.gap.toFixed(1)}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Avg: {skill.averageScore.toFixed(1)} / Target: {skill.targetScore.toFixed(1)}
+                        Avg: {skill.averageScore.toFixed(1)} / Target:{" "}
+                        {skill.targetScore.toFixed(1)}
                       </p>
                     </div>
                   </div>
@@ -252,10 +234,7 @@ export default function AdminAnalyticsPage() {
                     <div
                       className="h-full bg-red-500 rounded-full transition-all"
                       style={{
-                        width: `${Math.min(
-                          (skill.averageScore / skill.targetScore) * 100,
-                          100
-                        )}%`,
+                        width: `${Math.min((skill.averageScore / skill.targetScore) * 100, 100)}%`,
                       }}
                     />
                   </div>
@@ -275,9 +254,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Dimension Score Distribution</CardTitle>
-            <CardDescription>
-              Percentage breakdown of dimensions
-            </CardDescription>
+            <CardDescription>Percentage breakdown of dimensions</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>

@@ -6,16 +6,7 @@ import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  LayoutDashboard,
-  Search,
-  Rss,
-  User,
-  Phone,
-  Menu,
-  X,
-  Target,
-} from "lucide-react";
+import { LayoutDashboard, Search, Rss, User, Phone, Menu, X, Target } from "lucide-react";
 
 const navigation = [
   {
@@ -81,11 +72,7 @@ export function MobileNav() {
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            {isOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
         </div>
       </div>

@@ -2,6 +2,7 @@
 Objection handling analysis prompt template.
 Evaluates identification, acknowledgment, response quality, and resolution.
 """
+
 from typing import Any
 
 
@@ -164,16 +165,12 @@ Please analyze this call for objection handling quality. Identify all objections
         {
             "role": "user",
             "content": [
-                {
-                    "type": "text",
-                    "text": system_prompt,
-                    "cache_control": {"type": "ephemeral"}
-                },
+                {"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}},
                 {
                     "type": "text",
                     "text": user_prompt,
-                }
-            ]
+                },
+            ],
         }
     ]
 
@@ -198,22 +195,22 @@ def _format_criteria(criteria: dict[str, Any]) -> str:
     """Format evaluation criteria."""
     lines = []
     for criterion, details in criteria.items():
-        weight = details.get('weight', 0)
-        description = details.get('description', '')
+        weight = details.get("weight", 0)
+        description = details.get("description", "")
         lines.append(f"### {criterion.replace('_', ' ').title()} ({weight}%)")
         lines.append(f"{description}\n")
 
-        if 'indicators' in details:
-            indicators = details['indicators']
-            if 'excellent' in indicators:
+        if "indicators" in details:
+            indicators = details["indicators"]
+            if "excellent" in indicators:
                 lines.append("**Excellent indicators:**")
-                for indicator in indicators['excellent']:
+                for indicator in indicators["excellent"]:
                     lines.append(f"- {indicator}")
                 lines.append("")
 
-            if 'poor' in indicators:
+            if "poor" in indicators:
                 lines.append("**Poor indicators:**")
-                for indicator in indicators['poor']:
+                for indicator in indicators["poor"]:
                     lines.append(f"- {indicator}")
                 lines.append("")
 
@@ -229,14 +226,14 @@ def _format_common_objections(common_objections: dict[str, Any]) -> str:
     for objection_type, details in common_objections.items():
         lines.append(f"### {objection_type.replace('_', ' ').title()}")
 
-        if 'examples' in details:
+        if "examples" in details:
             lines.append("\n**Common examples:**")
-            for example in details['examples']:
+            for example in details["examples"]:
                 lines.append(f"- {example}")
 
-        if 'strong_responses' in details:
+        if "strong_responses" in details:
             lines.append("\n**Strong response patterns:**")
-            for response in details['strong_responses']:
+            for response in details["strong_responses"]:
                 lines.append(f"- {response}")
 
         lines.append("")

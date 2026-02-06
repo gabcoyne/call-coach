@@ -12,14 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CallSearchResult } from "@/types/coaching";
-import {
-  CheckSquare2,
-  Download,
-  BarChart3,
-  Trash2,
-  FileText,
-  AlertCircle,
-} from "lucide-react";
+import { CheckSquare2, Download, BarChart3, Trash2, FileText, AlertCircle } from "lucide-react";
 
 interface BulkActionsProps {
   results: CallSearchResult[];
@@ -91,10 +84,7 @@ export function BulkActions({
       `"${result.prefect_reps.join(", ")}"`,
     ]);
 
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.join(",")),
-    ].join("\n");
+    const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -204,9 +194,8 @@ export function BulkActions({
                     <div className="font-medium truncate">{result.title}</div>
                     <div className="text-xs text-muted-foreground space-y-1">
                       <div>
-                        {result.date &&
-                          new Date(result.date).toLocaleDateString()}{" "}
-                        • {result.call_type}
+                        {result.date && new Date(result.date).toLocaleDateString()} •{" "}
+                        {result.call_type}
                       </div>
                       <div>
                         {result.prefect_reps.join(", ")} •{" "}
@@ -218,9 +207,7 @@ export function BulkActions({
                   </div>
                   {result.overall_score !== null && (
                     <div className="text-right">
-                      <div className="font-semibold text-lg">
-                        {result.overall_score}
-                      </div>
+                      <div className="font-semibold text-lg">{result.overall_score}</div>
                       <div className="text-xs text-muted-foreground">Score</div>
                     </div>
                   )}

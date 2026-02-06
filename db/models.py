@@ -2,17 +2,18 @@
 Pydantic models for database entities.
 Provides type safety and validation for data flowing through the system.
 """
+
 from datetime import datetime
 from enum import Enum
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
-
+from pydantic import BaseModel, field_validator
 
 # ============================================================================
 # ENUMS
 # ============================================================================
+
 
 class WebhookEventStatus(str, Enum):
     RECEIVED = "received"
@@ -77,8 +78,10 @@ class FeedbackType(str, Enum):
 # WEBHOOK EVENTS
 # ============================================================================
 
+
 class WebhookEvent(BaseModel):
     """Webhook event from Gong."""
+
     id: UUID | None = None
     gong_webhook_id: str
     event_type: str
@@ -94,8 +97,10 @@ class WebhookEvent(BaseModel):
 # CALLS & TRANSCRIPTS
 # ============================================================================
 
+
 class Call(BaseModel):
     """Call metadata from Gong."""
+
     id: UUID | None = None
     gong_call_id: str
     title: str | None = None
@@ -110,6 +115,7 @@ class Call(BaseModel):
 
 class Speaker(BaseModel):
     """Call participant."""
+
     id: UUID | None = None
     call_id: UUID
     name: str
@@ -128,6 +134,7 @@ class Speaker(BaseModel):
 
 class ChunkMetadata(BaseModel):
     """Metadata for transcript chunking."""
+
     chunk_id: int
     start_token: int
     end_token: int
@@ -136,6 +143,7 @@ class ChunkMetadata(BaseModel):
 
 class Transcript(BaseModel):
     """Transcript segment from a call."""
+
     id: UUID | None = None
     call_id: UUID
     speaker_id: UUID | None = None
@@ -151,8 +159,10 @@ class Transcript(BaseModel):
 # ANALYSIS RUNS
 # ============================================================================
 
+
 class AnalysisRun(BaseModel):
     """Analysis run tracking for observability."""
+
     id: UUID | None = None
     call_id: UUID | None = None
     webhook_event_id: UUID | None = None
@@ -171,8 +181,10 @@ class AnalysisRun(BaseModel):
 # COACHING SESSIONS
 # ============================================================================
 
+
 class SpecificExample(BaseModel):
     """Specific example from coaching analysis."""
+
     quote: str
     timestamp: int | None = None
     analysis: str
@@ -180,6 +192,7 @@ class SpecificExample(BaseModel):
 
 class CoachingSession(BaseModel):
     """Coaching session result."""
+
     id: UUID | None = None
     call_id: UUID
     rep_id: UUID
@@ -211,6 +224,7 @@ class CoachingSession(BaseModel):
 
 class CoachingMetric(BaseModel):
     """Granular metric for trending analysis."""
+
     id: UUID | None = None
     coaching_session_id: UUID
     metric_name: str
@@ -223,6 +237,7 @@ class CoachingMetric(BaseModel):
 # KNOWLEDGE BASE
 # ============================================================================
 
+
 class KnowledgeBaseCategory(str, Enum):
     FEATURE = "feature"
     DIFFERENTIATION = "differentiation"
@@ -233,6 +248,7 @@ class KnowledgeBaseCategory(str, Enum):
 
 class KnowledgeBaseEntry(BaseModel):
     """Product knowledge base entry."""
+
     id: UUID | None = None
     product: Product
     category: KnowledgeBaseCategory
@@ -245,8 +261,10 @@ class KnowledgeBaseEntry(BaseModel):
 # COACHING RUBRICS
 # ============================================================================
 
+
 class CoachingRubric(BaseModel):
     """Coaching rubric with versioning."""
+
     id: UUID | None = None
     name: str
     version: str  # Semantic version (e.g., "1.0.0")
@@ -263,8 +281,10 @@ class CoachingRubric(BaseModel):
 # COACHING FEEDBACK
 # ============================================================================
 
+
 class CoachingFeedback(BaseModel):
     """Feedback on coaching sessions."""
+
     id: UUID | None = None
     coaching_session_id: UUID
     rep_id: UUID
@@ -277,8 +297,10 @@ class CoachingFeedback(BaseModel):
 # HELPER MODELS FOR QUERIES
 # ============================================================================
 
+
 class RepPerformanceSummary(BaseModel):
     """Summary of rep performance from view."""
+
     rep_id: UUID
     rep_name: str
     rep_email: str | None
@@ -291,6 +313,7 @@ class RepPerformanceSummary(BaseModel):
 
 class CallAnalysisStatus(BaseModel):
     """Call analysis status from view."""
+
     call_id: UUID
     gong_call_id: str
     title: str | None

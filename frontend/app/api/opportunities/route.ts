@@ -60,10 +60,7 @@ export async function GET(request: NextRequest) {
 
     // Validate pagination
     if (page < 1 || limit < 1 || limit > 200) {
-      return NextResponse.json(
-        { error: "Invalid pagination parameters" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid pagination parameters" }, { status: 400 });
     }
 
     const offset = (page - 1) * limit;
@@ -90,9 +87,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching opportunities:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch opportunities" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch opportunities" }, { status: 500 });
   }
 }

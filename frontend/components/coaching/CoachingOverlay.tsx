@@ -53,9 +53,7 @@ export function CoachingOverlay({
   onClose,
   position = "bottom-right",
 }: CoachingOverlayProps) {
-  const [displayAnnotation, setDisplayAnnotation] = useState<Annotation | null>(
-    annotation
-  );
+  const [displayAnnotation, setDisplayAnnotation] = useState<Annotation | null>(annotation);
 
   useEffect(() => {
     if (annotation) {
@@ -85,9 +83,9 @@ export function CoachingOverlay({
 
   return (
     <div
-      className={`fixed z-40 w-80 rounded-lg border-2 shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${positionClasses[position]} ${
-        severityStyles[displayAnnotation.severity || "neutral"]
-      }`}
+      className={`fixed z-40 w-80 rounded-lg border-2 shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${
+        positionClasses[position]
+      } ${severityStyles[displayAnnotation.severity || "neutral"]}`}
     >
       {/* Header with icon */}
       <div className="flex items-start gap-3 p-4 border-b">
@@ -104,12 +102,7 @@ export function CoachingOverlay({
                 : "Coaching Insight"}
           </p>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClose}
-          className="h-6 w-6 p-0 flex-shrink-0"
-        >
+        <Button variant="ghost" size="sm" onClick={onClose} className="h-6 w-6 p-0 flex-shrink-0">
           <X className="h-4 w-4" />
         </Button>
       </div>
@@ -118,39 +111,31 @@ export function CoachingOverlay({
       <div className="p-4 space-y-3">
         {/* Title */}
         <div>
-          <h4 className="text-sm font-semibold text-gray-900">
-            {displayAnnotation.title}
-          </h4>
+          <h4 className="text-sm font-semibold text-gray-900">{displayAnnotation.title}</h4>
         </div>
 
         {/* Main insight */}
         <div>
-          <p className="text-sm text-gray-700 leading-relaxed">
-            {displayAnnotation.insight}
-          </p>
+          <p className="text-sm text-gray-700 leading-relaxed">{displayAnnotation.insight}</p>
         </div>
 
         {/* Coaching suggestion */}
         {displayAnnotation.severity === "improvement" && (
           <div className={`${config.bgLight} p-3 rounded-lg border-l-4 ${config.borderColor}`}>
-            <p className="text-xs font-semibold text-gray-900 mb-1">
-              Coaching Suggestion:
-            </p>
+            <p className="text-xs font-semibold text-gray-900 mb-1">Coaching Suggestion:</p>
             <p className="text-xs text-gray-700">
-              Focus on deepening your approach in this area. Consider practicing
-              this technique in upcoming calls.
+              Focus on deepening your approach in this area. Consider practicing this technique in
+              upcoming calls.
             </p>
           </div>
         )}
 
         {displayAnnotation.severity === "positive" && (
           <div className={`${config.bgLight} p-3 rounded-lg border-l-4 ${config.borderColor}`}>
-            <p className="text-xs font-semibold text-gray-900 mb-1">
-              Keep it up:
-            </p>
+            <p className="text-xs font-semibold text-gray-900 mb-1">Keep it up:</p>
             <p className="text-xs text-gray-700">
-              This is an excellent demonstration. Continue applying this approach
-              in similar situations.
+              This is an excellent demonstration. Continue applying this approach in similar
+              situations.
             </p>
           </div>
         )}

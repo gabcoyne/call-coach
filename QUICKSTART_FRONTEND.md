@@ -51,21 +51,25 @@ CLERK_SECRET_KEY=sk_test_...
 ### 3. Start the Backend API
 
 Option 1 - Using Make:
+
 ```bash
 make rest-api
 ```
 
 Option 2 - Using Script:
+
 ```bash
 ./scripts/start-rest-api.sh
 ```
 
 Option 3 - Manually:
+
 ```bash
 uv run uvicorn api.rest_server:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 You should see:
+
 ```
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 INFO:     Started reloader process
@@ -93,6 +97,7 @@ npm run dev
 ```
 
 You should see:
+
 ```
 ▲ Next.js 14.x.x
 - Local:        http://localhost:3000
@@ -101,7 +106,7 @@ You should see:
 
 ### 6. Open the App
 
-Navigate to: http://localhost:3000
+Navigate to: <http://localhost:3000>
 
 You should see the Call Coach dashboard.
 
@@ -109,7 +114,7 @@ You should see the Call Coach dashboard.
 
 ### View a Call Analysis
 
-1. Navigate to: http://localhost:3000/calls/1464927526043145564
+1. Navigate to: <http://localhost:3000/calls/1464927526043145564>
 2. You should see:
    - Call metadata (date, duration, participants)
    - Performance scores (overall, dimensions)
@@ -119,7 +124,7 @@ You should see the Call Coach dashboard.
 
 ### View Rep Dashboard
 
-1. Navigate to: http://localhost:3000/dashboard/sarah.jones@prefect.io
+1. Navigate to: <http://localhost:3000/dashboard/sarah.jones@prefect.io>
 2. You should see:
    - Performance overview
    - Score trends over time
@@ -128,7 +133,7 @@ You should see the Call Coach dashboard.
 
 ### Search Calls
 
-1. Navigate to: http://localhost:3000/search
+1. Navigate to: <http://localhost:3000/search>
 2. Try filtering by:
    - Date range
    - Minimum score (use slider)
@@ -141,6 +146,7 @@ You should see the Call Coach dashboard.
 **Error**: `ModuleNotFoundError: No module named 'api'`
 
 **Fix**: Make sure you're in the project root directory:
+
 ```bash
 cd /Users/gcoyne/src/prefect/call-coach
 uv run uvicorn api.rest_server:app --reload
@@ -151,6 +157,7 @@ uv run uvicorn api.rest_server:app --reload
 **Error**: Browser console shows `Failed to fetch`
 
 **Fix**: Ensure backend is running on port 8000:
+
 ```bash
 # Check if backend is running
 curl http://localhost:8000/health
@@ -170,6 +177,7 @@ make rest-api
 **Error**: Backend logs show `psycopg2.OperationalError`
 
 **Fix**: Verify DATABASE_URL in `.env`:
+
 ```bash
 # Must include sslmode=require
 DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
@@ -180,6 +188,7 @@ DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
 **Error**: Empty data in UI
 
 **Fix**: Load sample data:
+
 ```bash
 # Run Gong sync to populate database
 uv run python flows/daily_gong_sync.py
@@ -196,11 +205,13 @@ uv run python flows/daily_gong_sync.py
 ### Viewing Logs
 
 Backend logs appear in terminal where you ran `make rest-api`:
+
 ```bash
 INFO:     127.0.0.1:54321 - "POST /tools/analyze_call HTTP/1.1" 200 OK
 ```
 
 Frontend logs appear in terminal where you ran `npm run dev`:
+
 ```bash
 ○ Compiling /calls/[callId]/page ...
 ✓ Compiled in 1.2s

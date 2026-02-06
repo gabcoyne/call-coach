@@ -11,11 +11,7 @@ interface ClipGeneratorProps {
   onGenerate?: (startTime: number, endTime: number) => void;
 }
 
-export function ClipGenerator({
-  annotation,
-  duration,
-  onGenerate,
-}: ClipGeneratorProps) {
+export function ClipGenerator({ annotation, duration, onGenerate }: ClipGeneratorProps) {
   const [copied, setCopied] = useState(false);
   const [clipDuration] = useState(30); // 30 second clips by default
 
@@ -24,8 +20,7 @@ export function ClipGenerator({
   const clipEnd = Math.min(duration, annotation.timestamp + 15);
 
   const generateShareLink = () => {
-    const baseUrl =
-      typeof window !== "undefined" ? window.location.href.split("#")[0] : "";
+    const baseUrl = typeof window !== "undefined" ? window.location.href.split("#")[0] : "";
     return `${baseUrl}#t=${Math.floor(clipStart)}-${Math.floor(clipEnd)}`;
   };
 
@@ -41,9 +36,7 @@ export function ClipGenerator({
     // For now, we'll show a placeholder
     const link = generateShareLink();
     console.log("Download clip:", link);
-    alert(
-      "Clip download initiated. In production, this would generate an audio file."
-    );
+    alert("Clip download initiated. In production, this would generate an audio file.");
   };
 
   const formatTime = (seconds: number) => {
@@ -66,9 +59,7 @@ export function ClipGenerator({
       <div className="bg-white border border-gray-200 rounded-lg p-3 space-y-2">
         <div className="flex items-center justify-between text-xs">
           <span className="text-gray-600">Start:</span>
-          <span className="font-mono font-semibold text-gray-900">
-            {formatTime(clipStart)}
-          </span>
+          <span className="font-mono font-semibold text-gray-900">{formatTime(clipStart)}</span>
         </div>
         <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
           <div
@@ -81,29 +72,17 @@ export function ClipGenerator({
         </div>
         <div className="flex items-center justify-between text-xs">
           <span className="text-gray-600">End:</span>
-          <span className="font-mono font-semibold text-gray-900">
-            {formatTime(clipEnd)}
-          </span>
+          <span className="font-mono font-semibold text-gray-900">{formatTime(clipEnd)}</span>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="grid grid-cols-2 gap-2">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={copyShareLink}
-          className="text-xs h-8 gap-1.5"
-        >
+        <Button size="sm" variant="outline" onClick={copyShareLink} className="text-xs h-8 gap-1.5">
           <Copy className="h-3 w-3" />
           {copied ? "Copied!" : "Copy Link"}
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={downloadClip}
-          className="text-xs h-8 gap-1.5"
-        >
+        <Button size="sm" variant="outline" onClick={downloadClip} className="text-xs h-8 gap-1.5">
           <Download className="h-3 w-3" />
           Download
         </Button>
@@ -113,8 +92,7 @@ export function ClipGenerator({
       <div className="text-xs text-gray-600 flex items-start gap-2 pt-2 border-t">
         <Clock className="h-3 w-3 flex-shrink-0 mt-0.5" />
         <p>
-          Share this link with colleagues. The recipient will hear the coaching
-          insight in context.
+          Share this link with colleagues. The recipient will hear the coaching insight in context.
         </p>
       </div>
     </div>

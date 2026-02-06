@@ -1,12 +1,13 @@
 """
 Analyze Call Tool - Deep-dive coaching analysis for a specific call.
 """
+
 import logging
 from typing import Any
 from uuid import UUID
 
 from analysis.engine import analyze_call as run_analysis
-from db import fetch_one, fetch_all
+from db import fetch_all, fetch_one
 from db.models import CoachingDimension
 
 logger = logging.getLogger(__name__)
@@ -62,8 +63,7 @@ def analyze_call_tool(
         invalid = [d for d in dimensions if d not in valid_dimensions]
         if invalid:
             raise ValueError(
-                f"Invalid dimensions: {invalid}. "
-                f"Valid options: {sorted(valid_dimensions)}"
+                f"Invalid dimensions: {invalid}. " f"Valid options: {sorted(valid_dimensions)}"
             )
 
     logger.info(f"Analyzing {len(dimensions)} dimensions: {dimensions}")
@@ -94,7 +94,9 @@ def analyze_call_tool(
     )
 
     # Identify the rep (internal speaker)
-    rep = next((s for s in speakers if s["company_side"] and s["role"] in ["ae", "se", "csm"]), None)
+    rep = next(
+        (s for s in speakers if s["company_side"] and s["role"] in ["ae", "se", "csm"]), None
+    )
     if not rep:
         logger.warning("No Prefect rep found on call - using first internal speaker")
         rep = next((s for s in speakers if s["company_side"]), speakers[0] if speakers else None)
@@ -197,12 +199,16 @@ def analyze_call_tool(
                 for s in speakers
             ],
         },
-        "rep_analyzed": {
-            "name": rep["name"] if rep else "Unknown",
-            "email": rep["email"] if rep else None,
-            "role": rep["role"] if rep else None,
-            "evaluated_as_role": detected_role,  # Role used for rubric evaluation
-        } if rep else None,
+        "rep_analyzed": (
+            {
+                "name": rep["name"] if rep else "Unknown",
+                "email": rep["email"] if rep else None,
+                "role": rep["role"] if rep else None,
+                "evaluated_as_role": detected_role,  # Role used for rubric evaluation
+            }
+            if rep
+            else None
+        ),
         "scores": scores,
         "strengths": all_strengths[:10],  # Top 10
         "areas_for_improvement": all_improvements[:10],  # Top 10
@@ -217,7 +223,9 @@ def analyze_call_tool(
     return response
 
 
-def calculate_comparison_to_average(scores: dict[str, int | None], product: str | None) -> list[dict]:
+def calculate_comparison_to_average(
+    scores: dict[str, int | None], product: str | None
+) -> list[dict]:
     """
     Compare rep scores to team averages.
 
@@ -254,14 +262,16 @@ def calculate_comparison_to_average(scores: dict[str, int | None], product: str 
         rep_score = scores.get(dim)
 
         if rep_score is not None:
-            comparisons.append({
-                "metric": dim,
-                "rep_score": rep_score,
-                "team_average": round(float(avg["avg_score"]), 1),
-                "difference": round(rep_score - float(avg["avg_score"]), 1),
-                "percentile": calculate_percentile(rep_score, dim),
-                "sample_size": avg["sample_size"],
-            })
+            comparisons.append(
+                {
+                    "metric": dim,
+                    "rep_score": rep_score,
+                    "team_average": round(float(avg["avg_score"]), 1),
+                    "difference": round(rep_score - float(avg["avg_score"]), 1),
+                    "percentile": calculate_percentile(rep_score, dim),
+                    "sample_size": avg["sample_size"],
+                }
+            )
 
     return comparisons
 

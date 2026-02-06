@@ -1,7 +1,18 @@
-'use client';
+"use client";
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from 'recharts';
-import { CHART_COLORS } from '@/lib/colors';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Area,
+  AreaChart,
+} from "recharts";
+import { CHART_COLORS } from "@/lib/colors";
 
 export interface ScoreTrendDataPoint {
   /** Date label for x-axis (e.g., "2026-01-15") */
@@ -42,7 +53,7 @@ export function ScoreTrendChart({
   showArea = false,
   showWeekOverWeek = false,
   height = 350,
-  className = '',
+  className = "",
 }: ScoreTrendChartProps) {
   // If no data, show placeholder
   if (!data || data.length === 0) {
@@ -57,8 +68,8 @@ export function ScoreTrendChart({
   }
 
   // Filter out any undefined dimensions and add overall if not present
-  const displayDimensions = dimensions.filter(d => d !== 'date');
-  const hasOverall = data.some(d => d.overall !== undefined);
+  const displayDimensions = dimensions.filter((d) => d !== "date");
+  const hasOverall = data.some((d) => d.overall !== undefined);
 
   // Custom tooltip to show detailed information
   const CustomTooltip = ({ active, payload }: any) => {
@@ -83,10 +94,7 @@ export function ScoreTrendChart({
     return (
       <div className={className}>
         <ResponsiveContainer width="100%" height={height}>
-          <AreaChart
-            data={data}
-            margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-          >
+          <AreaChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
             <defs>
               <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={CHART_COLORS[0]} stopOpacity={0.8} />
@@ -94,25 +102,24 @@ export function ScoreTrendChart({
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis
-              dataKey="date"
-              tick={{ fontSize: 12 }}
-              stroke="#6b7280"
-            />
+            <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#6b7280" />
             <YAxis
               domain={[0, 100]}
               tick={{ fontSize: 12 }}
               stroke="#6b7280"
-              label={{ value: 'Score', angle: -90, position: 'insideLeft' }}
+              label={{ value: "Score", angle: -90, position: "insideLeft" }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Area
               type="monotone"
-              dataKey={displayDimensions[0] || 'overall'}
+              dataKey={displayDimensions[0] || "overall"}
               stroke={CHART_COLORS[0]}
               fillOpacity={1}
               fill="url(#colorScore)"
-              name={displayDimensions[0]?.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || 'Score'}
+              name={
+                displayDimensions[0]?.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ||
+                "Score"
+              }
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -123,27 +130,17 @@ export function ScoreTrendChart({
   return (
     <div className={className}>
       <ResponsiveContainer width="100%" height={height}>
-        <LineChart
-          data={data}
-          margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-        >
+        <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis
-            dataKey="date"
-            tick={{ fontSize: 12 }}
-            stroke="#6b7280"
-          />
+          <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#6b7280" />
           <YAxis
             domain={[0, 100]}
             tick={{ fontSize: 12 }}
             stroke="#6b7280"
-            label={{ value: 'Score', angle: -90, position: 'insideLeft' }}
+            label={{ value: "Score", angle: -90, position: "insideLeft" }}
           />
           <Tooltip content={<CustomTooltip />} />
-          <Legend
-            wrapperStyle={{ fontSize: '12px' }}
-            iconType="line"
-          />
+          <Legend wrapperStyle={{ fontSize: "12px" }} iconType="line" />
 
           {/* Overall score line if available */}
           {hasOverall && (
@@ -168,7 +165,7 @@ export function ScoreTrendChart({
               strokeWidth={2}
               dot={{ r: 4 }}
               activeDot={{ r: 6 }}
-              name={dimension.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+              name={dimension.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
             />
           ))}
         </LineChart>

@@ -59,21 +59,25 @@ Tracks application performance metrics including API response times, token usage
 #### Key Metrics
 
 - **API Metrics**
+
   - `api_requests_total` - Total requests by method, endpoint, and status
   - `api_request_duration_seconds` - Request latency with percentiles
 
 - **Claude API Metrics**
+
   - `claude_api_calls_total` - Total API calls by model and status
   - `claude_input_tokens_total` - Input tokens sent
   - `claude_output_tokens_total` - Output tokens received
   - `claude_api_duration_seconds` - API call latency
 
 - **Cache Metrics**
+
   - `cache_hits_total` - Cache hits by cache type
   - `cache_misses_total` - Cache misses by cache type
   - `cache_size_bytes` - Current cache size
 
 - **Database Metrics**
+
   - `db_queries_total` - Total queries by operation and table
   - `db_query_duration_seconds` - Query latency
   - `db_connections_active` - Active database connections
@@ -168,17 +172,20 @@ logger.log_database_query(
 Alert definitions for Prometheus Alertmanager covering:
 
 - **Error Alerts**
+
   - High error rate (>5%)
   - Sentry error spike
   - Gong API errors
   - Claude API errors
 
 - **Performance Alerts**
+
   - Slow API responses (p95 > 2s)
   - High Claude API latency (p95 > 30s)
   - Slow database queries (p95 > 1s)
 
 - **Resource Alerts**
+
   - High memory usage (>85%)
   - High CPU usage (>80%)
   - High disk usage (<15% available)

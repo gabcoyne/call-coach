@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import {
-  Share2,
-  Copy,
-  Check,
-  Mail,
-  Twitter,
-  Linkedin,
-} from "lucide-react";
+import { Share2, Copy, Check, Mail, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -52,13 +45,13 @@ export function ShareLink({ callId, callTitle }: ShareLinkProps) {
 
   const createShareUrl = (platform: "email" | "twitter" | "linkedin"): string => {
     const encodedUrl = encodeURIComponent(shareUrl);
-    const encodedTitle = encodeURIComponent(
-      `Check out this call analysis: "${callTitle}"`
-    );
+    const encodedTitle = encodeURIComponent(`Check out this call analysis: "${callTitle}"`);
 
     switch (platform) {
       case "email":
-        return `mailto:?subject=Call Analysis: ${encodeURIComponent(callTitle)}&body=Check out this call analysis: ${encodedUrl}`;
+        return `mailto:?subject=Call Analysis: ${encodeURIComponent(
+          callTitle
+        )}&body=Check out this call analysis: ${encodedUrl}`;
       case "twitter":
         return `https://twitter.com/intent/tweet?text=Check out this call analysis: "${callTitle}"&url=${encodedUrl}`;
       case "linkedin":
@@ -83,9 +76,7 @@ export function ShareLink({ callId, callTitle }: ShareLinkProps) {
         <div className="space-y-4">
           {/* Copy Link Section */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-900">
-              Call Analysis Link
-            </label>
+            <label className="text-sm font-medium text-gray-900">Call Analysis Link</label>
             <div className="flex gap-2">
               <Input
                 ref={inputRef}
@@ -117,9 +108,7 @@ export function ShareLink({ callId, callTitle }: ShareLinkProps) {
 
           {/* Share Options */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-900">
-              Share Via
-            </label>
+            <label className="text-sm font-medium text-gray-900">Share Via</label>
             <div className="grid grid-cols-2 gap-2">
               <a href={createShareUrl("email")} target="_blank" rel="noopener noreferrer">
                 <Button
@@ -131,11 +120,7 @@ export function ShareLink({ callId, callTitle }: ShareLinkProps) {
                   Email
                 </Button>
               </a>
-              <a
-                href={createShareUrl("twitter")}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={createShareUrl("twitter")} target="_blank" rel="noopener noreferrer">
                 <Button
                   variant="outline"
                   size="sm"
@@ -145,11 +130,7 @@ export function ShareLink({ callId, callTitle }: ShareLinkProps) {
                   Twitter
                 </Button>
               </a>
-              <a
-                href={createShareUrl("linkedin")}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={createShareUrl("linkedin")} target="_blank" rel="noopener noreferrer">
                 <Button
                   variant="outline"
                   size="sm"
@@ -165,8 +146,8 @@ export function ShareLink({ callId, callTitle }: ShareLinkProps) {
           {/* Info */}
           <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
             <p className="text-xs text-blue-800">
-              Anyone with this link can view the call analysis. Make sure this
-              is appropriate to share in your organization.
+              Anyone with this link can view the call analysis. Make sure this is appropriate to
+              share in your organization.
             </p>
           </div>
         </div>

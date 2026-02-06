@@ -12,9 +12,9 @@ const config: Config = {
         // Prefect Brand Colors
         prefect: {
           // Primary brand colors
-          pink: "#FF4BBD",        // Highlight Pink
-          sunrise1: "#FE9655",    // Sunrise 1 (Orange)
-          sunrise2: "#FEB255",    // Sunrise 2 (Yellow)
+          pink: "#FF4BBD", // Highlight Pink
+          sunrise1: "#FE9655", // Sunrise 1 (Orange)
+          sunrise2: "#FEB255", // Sunrise 2 (Yellow)
 
           // Extended palette
           blue: {

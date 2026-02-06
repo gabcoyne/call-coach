@@ -17,6 +17,7 @@ February 5, 2026
 ### Search Components (`/components/search/`)
 
 1. **MultiCriteriaFilterForm** - Advanced filtering interface
+
    - Rep email filter
    - Product filter (Prefect/Horizon/Both)
    - Call type filter (Discovery/Demo/Technical/Negotiation)
@@ -24,21 +25,25 @@ February 5, 2026
    - Results per page selector
 
 2. **ScoreThresholdFilters** - Score-based filtering
+
    - Minimum overall score (0-100)
    - Maximum overall score (0-100)
    - Visual feedback for active filters
 
 3. **ObjectionTypeFilter** - Objection handling filter
+
    - Filter by objection types: Pricing, Timing, Technical, Competitor
    - Single-select dropdown
 
 4. **TopicKeywordFilter** - Topic/keyword multi-select
+
    - Add multiple topics/keywords
    - Visual badge display
    - Remove individual topics
    - Search transcript content
 
 5. **SearchResults** - Results display with view modes
+
    - Card view: Rich visual cards with metadata
    - Table view: Compact tabular display
    - Toggle between views
@@ -46,29 +51,34 @@ February 5, 2026
    - Links to call analysis pages
 
 6. **SortingOptions** - Result sorting
+
    - Sort by: Date, Score, Duration
    - Sort direction: Ascending/Descending
    - Maintains sort state across searches
 
 7. **PaginationControls** - Results pagination
+
    - Configurable page size (10/20/50/100)
    - First/Previous/Next/Last navigation
    - Current page indicator
    - Results count display
 
 8. **SaveSearchButton** - Persist search configurations
+
    - Save filters to localStorage
    - Name saved searches
    - View active filter summary
    - Success feedback
 
 9. **LoadSavedSearches** - Saved search management
+
    - Dropdown of saved searches
    - Load saved configurations
    - Delete saved searches
    - Shows creation dates
 
 10. **ExportResults** - Data export
+
     - Export to CSV format
     - Export to Excel (CSV with .xlsx extension)
     - Includes all result metadata
@@ -115,6 +125,7 @@ Created additional Shadcn/ui components:
 ## Features Implemented
 
 ### Core Search Functionality
+
 - ✅ Multi-criteria filtering (rep, date, product, call type)
 - ✅ Score threshold filtering (min/max)
 - ✅ Objection type filtering
@@ -122,24 +133,28 @@ Created additional Shadcn/ui components:
 - ✅ Real-time filter updates
 
 ### Display & Navigation
+
 - ✅ Card view (visual, metadata-rich)
 - ✅ Table view (compact, scannable)
 - ✅ View mode toggle
 - ✅ Responsive design (mobile/tablet/desktop)
 
 ### Sorting
+
 - ✅ Sort by date
 - ✅ Sort by score
 - ✅ Sort by duration
 - ✅ Ascending/descending direction
 
 ### Pagination
+
 - ✅ Configurable page size
 - ✅ Page navigation controls
 - ✅ Results count display
 - ✅ First/Last page shortcuts
 
 ### Saved Searches
+
 - ✅ Save search configurations
 - ✅ Name saved searches
 - ✅ Load saved searches
@@ -147,12 +162,14 @@ Created additional Shadcn/ui components:
 - ✅ localStorage persistence
 
 ### Export
+
 - ✅ Export to CSV
 - ✅ Export to Excel
 - ✅ Proper data formatting
 - ✅ Quote escaping
 
 ### Quick Filters
+
 - ✅ 6 preset filters
 - ✅ Role-based visibility
 - ✅ Auto-search on preset selection
@@ -161,23 +178,27 @@ Created additional Shadcn/ui components:
 ## Integration Points
 
 ### Authentication
+
 - Uses `@clerk/nextjs` for user context
 - Role-based preset filtering (manager vs rep)
 - User email for "My Calls" filters
 
 ### API Integration
+
 - Connects to `/api/coaching/search-calls` endpoint
 - POST requests with filter payload
 - Proper error handling
 - Rate limiting support
 
 ### Type Safety
+
 - Full TypeScript implementation
 - Zod schema validation on backend
 - Type-safe filter objects
 - Proper error types
 
 ### State Management
+
 - Local component state for filters
 - SWR for server state
 - localStorage for saved searches
@@ -228,6 +249,7 @@ npm install @radix-ui/react-dropdown-menu
 These packages are referenced in the UI components but were not installed during implementation. They need to be added to `package.json`.
 
 ### Already Installed
+
 - `swr` - Data fetching and caching
 - `@clerk/nextjs` - Authentication
 - `lucide-react` - Icons
@@ -236,6 +258,7 @@ These packages are referenced in the UI components but were not installed during
 ## User Experience
 
 ### Search Flow
+
 1. User visits `/search` page
 2. Sees quick filter presets at top
 3. Can select a preset for instant results
@@ -247,12 +270,14 @@ These packages are referenced in the UI components but were not installed during
 ### Role-Based Experience
 
 **Sales Rep:**
+
 - Sees "My Calls This Week" preset
 - Sees "My High Performers" preset
 - Can search all calls (limited by RBAC on backend)
 - Default filter: their own email
 
 **Manager:**
+
 - Sees all rep presets plus:
   - "Recent All Calls" (30 days)
   - "Team Top Performers" (85+)
@@ -262,16 +287,19 @@ These packages are referenced in the UI components but were not installed during
 ## Performance Optimizations
 
 1. **Client-Side Operations**
+
    - Fetches 100 results, paginates client-side
    - Avoids repeated API calls for pagination
    - Immediate sort response
 
 2. **SWR Caching**
+
    - Results cached by filter signature
    - Revalidation on focus
    - Stale-while-revalidate pattern
 
 3. **Lazy Loading**
+
    - All components are client-side only
    - No SSR overhead
    - Fast initial page load
@@ -284,6 +312,7 @@ These packages are referenced in the UI components but were not installed during
 ## Testing Recommendations
 
 ### Manual Testing
+
 - [ ] Search with various filter combinations
 - [ ] Test pagination with different page sizes
 - [ ] Verify sorting in both directions
@@ -296,6 +325,7 @@ These packages are referenced in the UI components but were not installed during
 - [ ] Test empty search results
 
 ### Integration Testing
+
 - [ ] Verify API integration with real backend
 - [ ] Test RBAC enforcement (rep vs manager)
 - [ ] Verify rate limiting behavior
@@ -305,14 +335,17 @@ These packages are referenced in the UI components but were not installed during
 ## Known Limitations
 
 1. **Client-Side Pagination**
+
    - Limited to 100 results per search
    - For datasets >100, need server-side pagination
 
 2. **Export Format**
+
    - Excel export is actually CSV format
    - Full Excel support requires `xlsx` library
 
 3. **Toast Notifications**
+
    - Placeholder implementation
    - Need to integrate proper toast library (sonner, react-hot-toast)
 
@@ -324,12 +357,14 @@ These packages are referenced in the UI components but were not installed during
 ## Future Enhancements
 
 1. **Advanced Features**
+
    - Dimension-specific score filters (not just overall)
    - Multi-select for call types
    - Regex support in topic search
    - Saved search sharing
 
 2. **UX Improvements**
+
    - URL state persistence
    - Real toast notifications
    - Advanced export formats (JSON, PDF)
@@ -351,11 +386,13 @@ These packages are referenced in the UI components but were not installed during
 ## Next Steps
 
 1. Install missing Radix UI dependencies:
+
    ```bash
    npm install @radix-ui/react-checkbox @radix-ui/react-slider @radix-ui/react-dialog @radix-ui/react-dropdown-menu
    ```
 
 2. Test the search page:
+
    ```bash
    npm run dev
    # Visit http://localhost:3000/search

@@ -7,14 +7,15 @@ Provides:
 - Retry logic for transient errors
 - Detailed logging with context
 """
+
 import logging
 import traceback
 from typing import Any
 
 from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
+from psycopg2 import InterfaceError, OperationalError
 from pydantic import ValidationError
-from psycopg2 import OperationalError, InterfaceError
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # ERROR RESPONSE SCHEMA
 # ============================================================================
+
 
 class ErrorResponse:
     """Standardized error response format."""
@@ -63,24 +65,29 @@ class ErrorResponse:
 # ERROR CATEGORIES
 # ============================================================================
 
+
 class TransientError(Exception):
     """Error that may succeed on retry (network, timeout, etc.)."""
+
     pass
 
 
 class ValidationErrorException(Exception):
     """Error in request validation."""
+
     pass
 
 
 class DatabaseError(Exception):
     """Database operation error."""
+
     pass
 
 
 # ============================================================================
 # ERROR HANDLERS
 # ============================================================================
+
 
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     """
@@ -101,7 +108,7 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
             "request_id": request_id,
             "path": request.url.path,
             "method": request.method,
-        }
+        },
     )
 
     return JSONResponse(
@@ -110,14 +117,11 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
             error=f"http_{exc.status_code}",
             message=exc.detail,
             request_id=request_id,
-        )
+        ),
     )
 
 
-async def validation_exception_handler(
-    request: Request,
-    exc: ValidationError
-) -> JSONResponse:
+async def validation_exception_handler(request: Request, exc: ValidationError) -> JSONResponse:
     """
     Handle Pydantic validation errors.
 
@@ -133,11 +137,13 @@ async def validation_exception_handler(
     # Extract validation errors
     errors = []
     for error in exc.errors():
-        errors.append({
-            "field": ".".join(str(loc) for loc in error["loc"]),
-            "message": error["msg"],
-            "type": error["type"],
-        })
+        errors.append(
+            {
+                "field": ".".join(str(loc) for loc in error["loc"]),
+                "message": error["msg"],
+                "type": error["type"],
+            }
+        )
 
     logger.warning(
         f"Validation error: {len(errors)} fields",
@@ -145,7 +151,7 @@ async def validation_exception_handler(
             "request_id": request_id,
             "path": request.url.path,
             "errors": errors,
-        }
+        },
     )
 
     return JSONResponse(
@@ -155,14 +161,11 @@ async def validation_exception_handler(
             message="Request validation failed",
             details={"validation_errors": errors},
             request_id=request_id,
-        )
+        ),
     )
 
 
-async def database_exception_handler(
-    request: Request,
-    exc: Exception
-) -> JSONResponse:
+async def database_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """
     Handle database-related errors.
 
@@ -185,7 +188,7 @@ async def database_exception_handler(
                 "request_id": request_id,
                 "path": request.url.path,
                 "error_type": type(exc).__name__,
-            }
+            },
         )
 
         return JSONResponse(
@@ -196,7 +199,7 @@ async def database_exception_handler(
                 details={"retry_after": 5},
                 request_id=request_id,
             ),
-            headers={"Retry-After": "5"}
+            headers={"Retry-After": "5"},
         )
 
     # Non-transient database error
@@ -216,7 +219,7 @@ async def database_exception_handler(
             error="database_error",
             message="Database operation failed",
             request_id=request_id,
-        )
+        ),
     )
 
 
@@ -254,7 +257,7 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
             error="internal_error",
             message="An unexpected error occurred",
             request_id=request_id,
-        )
+        ),
     )
 
 
@@ -262,12 +265,9 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
 # RETRY LOGIC
 # ============================================================================
 
+
 async def retry_on_transient_error(
-    func,
-    max_retries: int = 3,
-    backoff_factor: float = 1.0,
-    *args,
-    **kwargs
+    func, max_retries: int = 3, backoff_factor: float = 1.0, *args, **kwargs
 ) -> Any:
     """
     Retry function on transient errors with exponential backoff.
@@ -295,7 +295,7 @@ async def retry_on_transient_error(
             last_exception = e
 
             if attempt < max_retries - 1:
-                delay = backoff_factor * (2 ** attempt)
+                delay = backoff_factor * (2**attempt)
                 logger.warning(
                     f"Transient error on attempt {attempt + 1}/{max_retries}. "
                     f"Retrying in {delay}s: {e}"
@@ -314,6 +314,7 @@ async def retry_on_transient_error(
 # ============================================================================
 # ERROR TRACKING INTEGRATION
 # ============================================================================
+
 
 def send_to_error_tracking(exc: Exception, request: Request) -> None:
     """
@@ -351,10 +352,7 @@ def setup_error_handlers(app) -> None:
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(ValidationError, validation_exception_handler)
-    app.add_exception_handler(
-        (OperationalError, InterfaceError),
-        database_exception_handler
-    )
+    app.add_exception_handler((OperationalError, InterfaceError), database_exception_handler)
     app.add_exception_handler(Exception, general_exception_handler)
 
     logger.info("Error handlers registered")

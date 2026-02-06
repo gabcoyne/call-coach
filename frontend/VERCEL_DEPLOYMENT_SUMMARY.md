@@ -13,7 +13,9 @@ Section 11 of the Next.js coaching frontend project has been completed. All Verc
 ### 1. Configuration Files
 
 #### `/vercel.json` (Repository Root)
+
 Production-ready Vercel configuration file with:
+
 - **Monorepo support**: Root directory set to `frontend/`
 - **Build configuration**: Custom build and install commands
 - **Security headers**: Comprehensive headers for all routes
@@ -30,7 +32,9 @@ Production-ready Vercel configuration file with:
 **Security Score Target**: A or A+ on securityheaders.com
 
 #### `/.vercelignore` (Repository Root)
+
 Excludes unnecessary files from Vercel deployments:
+
 - Documentation files (except README.md)
 - Development and test files
 - Python backend files (not part of frontend deployment)
@@ -40,7 +44,9 @@ Excludes unnecessary files from Vercel deployments:
 ### 2. Documentation Files
 
 #### `/VERCEL_DEPLOYMENT.md` (20KB)
+
 Comprehensive step-by-step deployment guide covering:
+
 1. **Initial Vercel Setup**: Account creation, repository linking
 2. **Monorepo Configuration**: Framework preset, root directory settings
 3. **Environment Variables**: Production and preview/staging configurations
@@ -54,7 +60,9 @@ Comprehensive step-by-step deployment guide covering:
 11. **Troubleshooting**: Common issues and solutions
 
 #### `/DEPLOYMENT_CHECKLIST.md` (10KB)
+
 Task-oriented checklist for deployment operations:
+
 - Pre-deployment checklist (code readiness, environment configuration)
 - Vercel initial setup (one-time tasks)
 - First deployment verification (functionality, performance, security)
@@ -65,7 +73,9 @@ Task-oriented checklist for deployment operations:
 - Emergency contacts and resources
 
 #### `/PRODUCTION_READINESS.md` (14KB)
+
 Comprehensive production readiness report including:
+
 - Executive summary and feature implementation status
 - Security posture analysis
 - Performance expectations (Core Web Vitals targets)
@@ -78,7 +88,9 @@ Comprehensive production readiness report including:
 - Support and escalation procedures
 
 #### `/frontend/.env.example` (Updated)
+
 Enhanced environment variable documentation:
+
 - Section headers for organization
 - Production vs. staging vs. development values
 - Detailed comments for each variable group
@@ -112,6 +124,7 @@ Since tasks 11.1-11.11 require manual work in the Vercel dashboard (account crea
 4. **Best Practices**: Enterprise-grade security headers and deployment workflows
 
 This approach ensures:
+
 - **Reproducibility**: Anyone can follow the documentation to deploy correctly
 - **Maintainability**: Configuration is version-controlled and documented
 - **Security**: All security measures are clearly defined and verifiable
@@ -121,19 +134,20 @@ This approach ensures:
 
 ### Security Headers Configured
 
-| Header | Value | Protection |
-|--------|-------|------------|
-| Strict-Transport-Security | max-age=63072000; includeSubDomains; preload | Force HTTPS, prevent SSL stripping |
-| X-Frame-Options | SAMEORIGIN | Prevent clickjacking attacks |
-| X-Content-Type-Options | nosniff | Prevent MIME type sniffing |
-| X-XSS-Protection | 1; mode=block | Legacy XSS protection |
-| Referrer-Policy | strict-origin-when-cross-origin | Control referrer information |
-| Permissions-Policy | camera=(), microphone=(), geolocation=() | Disable sensitive APIs |
-| Content-Security-Policy | (Comprehensive policy) | Prevent XSS, restrict resource loading |
+| Header                    | Value                                        | Protection                             |
+| ------------------------- | -------------------------------------------- | -------------------------------------- |
+| Strict-Transport-Security | max-age=63072000; includeSubDomains; preload | Force HTTPS, prevent SSL stripping     |
+| X-Frame-Options           | SAMEORIGIN                                   | Prevent clickjacking attacks           |
+| X-Content-Type-Options    | nosniff                                      | Prevent MIME type sniffing             |
+| X-XSS-Protection          | 1; mode=block                                | Legacy XSS protection                  |
+| Referrer-Policy           | strict-origin-when-cross-origin              | Control referrer information           |
+| Permissions-Policy        | camera=(), microphone=(), geolocation=()     | Disable sensitive APIs                 |
+| Content-Security-Policy   | (Comprehensive policy)                       | Prevent XSS, restrict resource loading |
 
 ### Content Security Policy Details
 
 The CSP policy allows:
+
 - **Scripts**: Self, Clerk authentication, Cloudflare challenges
 - **Styles**: Self, inline styles (required for Tailwind)
 - **Images**: Self, data URLs, HTTPS, blob URLs
@@ -147,11 +161,11 @@ All other resources are blocked by default (`default-src 'self'`).
 
 ### Environment Strategy
 
-| Environment | Branch | MCP Backend | Clerk Keys | Purpose |
-|-------------|--------|-------------|------------|---------|
-| Production | `main` | https://mcp.prefect.io | `pk_live_*` | Live user traffic |
-| Preview | Feature branches | https://mcp-staging.prefect.io | `pk_test_*` | PR testing |
-| Development | Local | http://localhost:8000 | `pk_test_*` | Local development |
+| Environment | Branch           | MCP Backend                      | Clerk Keys  | Purpose           |
+| ----------- | ---------------- | -------------------------------- | ----------- | ----------------- |
+| Production  | `main`           | <https://mcp.prefect.io>         | `pk_live_*` | Live user traffic |
+| Preview     | Feature branches | <https://mcp-staging.prefect.io> | `pk_test_*` | PR testing        |
+| Development | Local            | <http://localhost:8000>          | `pk_test_*` | Local development |
 
 ### Deployment Flow
 
@@ -164,6 +178,7 @@ All other resources are blocked by default (`default-src 'self'`).
 ### Rollback Strategy
 
 If production deployment fails:
+
 1. Identify last successful deployment in Vercel dashboard
 2. Click "Promote to Production" (instant rollback, no rebuild)
 3. Investigate issue in preview environment
@@ -175,12 +190,12 @@ If production deployment fails:
 
 ### Core Web Vitals Targets
 
-| Metric | Target | Expected |
-|--------|--------|----------|
-| LCP (Largest Contentful Paint) | < 2.5s | 1.2-1.8s |
-| FID (First Input Delay) | < 100ms | 20-50ms |
-| CLS (Cumulative Layout Shift) | < 0.1 | 0.02-0.05 |
-| TTFB (Time to First Byte) | < 600ms | 200-400ms |
+| Metric                         | Target  | Expected  |
+| ------------------------------ | ------- | --------- |
+| LCP (Largest Contentful Paint) | < 2.5s  | 1.2-1.8s  |
+| FID (First Input Delay)        | < 100ms | 20-50ms   |
+| CLS (Cumulative Layout Shift)  | < 0.1   | 0.02-0.05 |
+| TTFB (Time to First Byte)      | < 600ms | 200-400ms |
 
 ### Bundle Size Estimates
 
@@ -192,17 +207,20 @@ If production deployment fails:
 ## Monitoring and Observability
 
 ### Vercel Analytics (Configured)
+
 - Core Web Vitals tracking
 - Real user monitoring (RUM)
 - Page load performance
 - Geographic distribution
 
 ### Vercel Functions Logs (Automatic)
+
 - API route logs
 - Error tracking
 - Build logs
 
 ### Slack Notifications (Configured)
+
 - Deployment started/completed/failed
 - Optional: Comments on deployments
 
@@ -211,6 +229,7 @@ If production deployment fails:
 ### Vercel Hobby Tier (Free)
 
 **Included:**
+
 - Unlimited deployments
 - 100 GB bandwidth/month
 - 100 GB-hours serverless function execution
@@ -218,6 +237,7 @@ If production deployment fails:
 - Analytics (2,500 data points/month)
 
 **Estimated Usage (500 users):**
+
 - ~5 GB bandwidth/month
 - ~10 GB-hours function execution/month
 - Well within Hobby tier limits
@@ -227,6 +247,7 @@ If production deployment fails:
 ## Next Steps
 
 ### Immediate (Before Launch)
+
 1. **Create Vercel account** (if not exists)
 2. **Link GitHub repository** to Vercel
 3. **Configure environment variables** (production and preview)
@@ -236,6 +257,7 @@ If production deployment fails:
 7. **Verify deployment** using DEPLOYMENT_CHECKLIST.md
 
 ### Post-Launch (First Week)
+
 1. **Monitor Core Web Vitals** in Vercel Analytics
 2. **Review Vercel Functions logs** for errors
 3. **Test rollback procedure** (promote previous deployment)
@@ -243,6 +265,7 @@ If production deployment fails:
 5. **Schedule weekly analytics review**
 
 ### Long-Term (V2 Planning)
+
 1. **Implement automated testing suite** (Section 12)
 2. **Advanced error tracking** (Sentry, Datadog)
 3. **Custom analytics** (Google Analytics, Mixpanel)
@@ -252,6 +275,7 @@ If production deployment fails:
 ## Files Created/Modified
 
 ### Created
+
 - `/vercel.json` - Vercel configuration with security headers
 - `/.vercelignore` - Deployment exclusion rules
 - `/VERCEL_DEPLOYMENT.md` - Comprehensive deployment guide
@@ -260,18 +284,21 @@ If production deployment fails:
 - `/frontend/VERCEL_DEPLOYMENT_SUMMARY.md` - This document
 
 ### Modified
+
 - `/frontend/.env.example` - Enhanced with production variables and documentation
 - `/openspec/changes/nextjs-coaching-frontend/tasks.md` - Marked Section 11 tasks complete
 
 ## Validation
 
 ### Pre-Commit Checks
+
 - ✅ All JSON files valid (vercel.json)
 - ✅ Markdown files formatted correctly
 - ✅ .env.example contains no secrets
 - ✅ Documentation is comprehensive and accurate
 
 ### Manual Verification Required
+
 - ⏳ Vercel configuration tested in actual Vercel dashboard
 - ⏳ Security headers verified via securityheaders.com
 - ⏳ DNS configuration tested
@@ -283,6 +310,7 @@ If production deployment fails:
 Section 11 (Vercel Deployment Configuration) is complete. All configuration files and comprehensive documentation have been created to enable production deployment of the Call Coach Next.js frontend to Vercel.
 
 **Key Accomplishments:**
+
 - ✅ Production-ready `vercel.json` with enterprise security headers
 - ✅ 20KB+ comprehensive deployment guide
 - ✅ Task-oriented deployment checklist

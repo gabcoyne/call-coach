@@ -11,12 +11,14 @@ The CallRecordingPlayer and related components have been significantly enhanced 
 **Component**: `AnnotationMarker.tsx`
 
 Visual markers appear on the timeline showing where coaching insights occur. Each marker:
+
 - Color-coded by dimension (product_knowledge=blue, discovery=green, objection_handling=orange, engagement=purple)
 - Displays insight on hover
 - Clickable to jump to that moment in the recording
 - Animated feedback for better UX
 
 **Usage**:
+
 ```tsx
 <AnnotationMarker
   annotation={annotation}
@@ -28,6 +30,7 @@ Visual markers appear on the timeline showing where coaching insights occur. Eac
 ```
 
 **Data Structure**:
+
 ```typescript
 interface Annotation {
   id: string;
@@ -44,6 +47,7 @@ interface Annotation {
 **Component**: `AnnotationPopover.tsx`
 
 Floating panel that displays detailed coaching insights with:
+
 - Dimension icon and label
 - Full insight text
 - Expandable dimension description
@@ -57,6 +61,7 @@ Useful for detailed review of specific coaching moments.
 **Component**: `CoachingOverlay.tsx`
 
 Floating panel that automatically appears when playing through a section with a coaching insight. Features:
+
 - Smooth slide-in animation
 - Contextual coaching suggestions
 - Auto-dismiss or manual close
@@ -69,6 +74,7 @@ The overlay intelligently detects when the playback time is near an annotation a
 **Component**: `CallRecordingPlayer.tsx`
 
 Major upgrades:
+
 - **Playback speed control**: 0.5x, 1x, 1.5x, 2x speeds
 - **Annotation timeline**: Visual timeline with coaching insight markers
 - **Timestamp sharing**: Copy a shareable link to specific moments
@@ -76,6 +82,7 @@ Major upgrades:
 - **Performance**: Smooth animation and state management
 
 **New Props**:
+
 ```typescript
 interface CallRecordingPlayerProps {
   gongUrl?: string | null;
@@ -91,6 +98,7 @@ interface CallRecordingPlayerProps {
 **Component**: `TranscriptSearch.tsx`
 
 Improvements:
+
 - **Auto-scroll**: Automatically scrolls to current playback segment
 - **Highlight current speaker**: Shows "Playing" indicator for active segment
 - **Playback synchronization**: Receives `currentPlaybackTime` prop
@@ -98,6 +106,7 @@ Improvements:
 - **Better visual feedback**: Highlights with blue background when playing
 
 **New Props**:
+
 ```typescript
 interface TranscriptSearchProps {
   transcript: TranscriptSegment[];
@@ -111,6 +120,7 @@ interface TranscriptSearchProps {
 **Component**: `ClipGenerator.tsx`
 
 Enables sharing of specific coaching moments with:
+
 - Automatic 30-second clip generation (15 seconds before/after insight)
 - Copy shareable link with timestamp range
 - Download functionality (backend integration ready)
@@ -118,12 +128,9 @@ Enables sharing of specific coaching moments with:
 - One-click sharing
 
 **Usage**:
+
 ```tsx
-<ClipGenerator
-  annotation={annotation}
-  duration={duration}
-  onGenerate={handleGenerate}
-/>
+<ClipGenerator annotation={annotation} duration={duration} onGenerate={handleGenerate} />
 ```
 
 ### 7. Enhanced Call Player Integration
@@ -131,6 +138,7 @@ Enables sharing of specific coaching moments with:
 **Component**: `EnhancedCallPlayer.tsx`
 
 Comprehensive player combining all features:
+
 - Tabbed interface: Transcript, Coaching Insights, Share Clip
 - Synchronized playback across all components
 - Coaching insight selection and display
@@ -139,12 +147,14 @@ Comprehensive player combining all features:
 ## Integration with CallAnalysisViewer
 
 The `CallAnalysisViewer` has been updated to:
+
 1. Generate annotations from dimension_details
 2. Use `EnhancedCallPlayer` instead of basic player
 3. Pass transcript and annotations to the player
 4. Handle timestamp clicks to sync audio playback
 
 Example annotation generation:
+
 ```typescript
 const generateAnnotations = (): Annotation[] => {
   // Creates annotations from strengths/improvements
@@ -157,12 +167,12 @@ const generateAnnotations = (): Annotation[] => {
 
 Dimensions are color-coded for quick visual identification:
 
-| Dimension | Color | Icon |
-|-----------|-------|------|
-| Product Knowledge | Blue (#3B82F6) | AlertCircle |
-| Discovery | Green (#22C55E) | Search |
+| Dimension          | Color            | Icon          |
+| ------------------ | ---------------- | ------------- |
+| Product Knowledge  | Blue (#3B82F6)   | AlertCircle   |
+| Discovery          | Green (#22C55E)  | Search        |
 | Objection Handling | Orange (#F97316) | MessageSquare |
-| Engagement | Purple (#A855F7) | TrendingUp |
+| Engagement         | Purple (#A855F7) | TrendingUp    |
 
 ## Performance Considerations
 
@@ -174,6 +184,7 @@ Dimensions are color-coded for quick visual identification:
 ## Usage Example
 
 ### Basic Usage
+
 ```tsx
 <CallRecordingPlayer
   gongUrl="https://gong.io/..."
@@ -184,6 +195,7 @@ Dimensions are color-coded for quick visual identification:
 ```
 
 ### With Transcript Sync
+
 ```tsx
 <EnhancedCallPlayer
   recordingUrl="https://example.com/call.mp3"
@@ -195,9 +207,10 @@ Dimensions are color-coded for quick visual identification:
 ```
 
 ### Full Integration
+
 ```tsx
-import { EnhancedCallPlayer } from '@/components/coaching/EnhancedCallPlayer';
-import type { Annotation } from '@/components/coaching/AnnotationMarker';
+import { EnhancedCallPlayer } from "@/components/coaching/EnhancedCallPlayer";
+import type { Annotation } from "@/components/coaching/AnnotationMarker";
 
 export function CallPage() {
   const annotations: Annotation[] = [
@@ -226,6 +239,7 @@ export function CallPage() {
 ## Accessibility
 
 All components include:
+
 - Semantic HTML
 - ARIA labels where appropriate
 - Keyboard-accessible controls
@@ -283,6 +297,7 @@ frontend/components/coaching/
 ## Styling
 
 Components use Tailwind CSS with:
+
 - Blue accent color for primary actions
 - Green for positive/strength indicators
 - Orange for improvement opportunities

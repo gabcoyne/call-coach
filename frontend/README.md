@@ -195,6 +195,7 @@ See [CLERK_SETUP.md](./CLERK_SETUP.md#testing-authentication-flow) for authentic
 ### Automated Testing (Future)
 
 Automated testing will be added in Phase 12:
+
 - Unit tests with Jest and React Testing Library
 - Integration tests for API routes
 - E2E tests with Playwright

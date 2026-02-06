@@ -7,13 +7,14 @@ Allows users to control:
 - Frequency and timing
 - Opt-out options
 """
+
 import logging
 from enum import Enum
-from typing import Any, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-from db import fetch_one, fetch_all, execute_query
+
+from db import execute_query, fetch_all, fetch_one
 
 logger = logging.getLogger(__name__)
 
@@ -171,11 +172,11 @@ class NotificationPreferencesManager:
     def update_notification_type_preference(
         user_id: UUID,
         notification_type: str,
-        enabled: Optional[bool] = None,
-        email: Optional[bool] = None,
-        slack: Optional[bool] = None,
-        in_app: Optional[bool] = None,
-        frequency: Optional[str] = None,
+        enabled: bool | None = None,
+        email: bool | None = None,
+        slack: bool | None = None,
+        in_app: bool | None = None,
+        frequency: str | None = None,
     ) -> bool:
         """
         Update preference for a specific notification type.
@@ -231,7 +232,9 @@ class NotificationPreferencesManager:
                 ON CONFLICT (user_id, notification_type) DO UPDATE SET
                 {', '.join(updates)}
                 """,
-                [user_id, notification_type] + params[:4] + (params[4:5] or [False])
+                [user_id, notification_type]
+                + params[:4]
+                + (params[4:5] or [False])
                 + (params[5:6] or [True])
                 + (params[6:7] or ["immediate"])
                 + params[7:],
@@ -317,9 +320,7 @@ class NotificationPreferencesManager:
             return pref.get(channel_key, False)
 
         except Exception as e:
-            logger.error(
-                f"Failed to check notification preference for user {user_id}: {e}"
-            )
+            logger.error(f"Failed to check notification preference for user {user_id}: {e}")
             return False
 
     @staticmethod

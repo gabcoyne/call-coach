@@ -23,9 +23,7 @@ export default function DesignSystemPage() {
     <div className="container mx-auto p-8 space-y-12">
       <div>
         <h1 className="text-4xl font-bold mb-2">Prefect Design System</h1>
-        <p className="text-muted-foreground">
-          Component showcase for Gong Call Coaching frontend
-        </p>
+        <p className="text-muted-foreground">Component showcase for Gong Call Coaching frontend</p>
       </div>
 
       {/* Colors */}
@@ -100,14 +98,11 @@ export default function DesignSystemPage() {
           <Card>
             <CardHeader>
               <CardTitle>Call Analysis</CardTitle>
-              <CardDescription>
-                Review your sales call performance
-              </CardDescription>
+              <CardDescription>Review your sales call performance</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                This is a sample card showing how content looks within the
-                Prefect design system.
+                This is a sample card showing how content looks within the Prefect design system.
               </p>
             </CardContent>
             <CardFooter>
@@ -188,9 +183,7 @@ export default function DesignSystemPage() {
             <h6 className="text-base font-medium">Heading 6</h6>
           </div>
           <div>
-            <p className="text-base">
-              This is body text using the default font size and weight.
-            </p>
+            <p className="text-base">This is body text using the default font size and weight.</p>
             <p className="text-sm text-muted-foreground">
               This is small text, often used for secondary information.
             </p>

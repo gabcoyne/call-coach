@@ -13,6 +13,7 @@ npm install
 ```
 
 This will install:
+
 - Tailwind CSS v3.4+
 - Shadcn/ui components
 - Radix UI primitives
@@ -65,9 +66,9 @@ The design system uses Shadcn/ui's semantic color system with CSS variables:
 Add font imports to your layout:
 
 ```tsx
-import { Inter } from 'next/font/google';
+import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 ```
 
 ### Type Scale
@@ -110,9 +111,7 @@ Use standard Tailwind spacing utilities: `p-4`, `m-8`, `gap-6`, etc.
 Example usage:
 
 ```tsx
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-  {/* Responsive grid */}
-</div>
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">{/* Responsive grid */}</div>
 ```
 
 ## Components
@@ -157,13 +156,11 @@ import {
     <CardTitle>Title</CardTitle>
     <CardDescription>Description</CardDescription>
   </CardHeader>
-  <CardContent>
-    Content goes here
-  </CardContent>
+  <CardContent>Content goes here</CardContent>
   <CardFooter>
     <Button>Action</Button>
   </CardFooter>
-</Card>
+</Card>;
 ```
 
 ### Input
@@ -177,7 +174,7 @@ import { Label } from "@/components/ui/label";
 <div className="space-y-2">
   <Label htmlFor="email">Email</Label>
   <Input id="email" type="email" placeholder="you@example.com" />
-</div>
+</div>;
 ```
 
 ### Select
@@ -201,7 +198,7 @@ import {
     <SelectItem value="1">Option 1</SelectItem>
     <SelectItem value="2">Option 2</SelectItem>
   </SelectContent>
-</Select>
+</Select>;
 ```
 
 ### Badge
@@ -223,11 +220,13 @@ import { Badge } from "@/components/ui/badge";
 The design system includes Prefect-specific variants:
 
 ### Button Variants
+
 - `prefect` - Solid pink background
 - `sunrise` - Solid orange background
 - `gradient` - Pink to orange gradient
 
 ### Badge Variants
+
 - `prefect` - Pink badge
 - `sunrise` - Orange badge
 - `success` - Green badge
@@ -243,7 +242,7 @@ Merge Tailwind classes with proper precedence:
 ```tsx
 import { cn } from "@/lib/utils";
 
-<div className={cn("base-class", conditionalClass && "conditional-class")} />
+<div className={cn("base-class", conditionalClass && "conditional-class")} />;
 ```
 
 ## Dark Mode
@@ -265,20 +264,14 @@ Official Prefect logos should be placed in `/public/logos/`:
 - `prefect-wordmark.svg` - Wordmark only
 - `prefect-icon.svg` - Icon only
 
-Download from: https://prefect.io/newsroom/logos
+Download from: <https://prefect.io/newsroom/logos>
 
 ### Usage
 
 ```tsx
 import Image from "next/image";
 
-<Image
-  src="/logos/prefect-logo.svg"
-  alt="Prefect"
-  width={120}
-  height={32}
-  priority
-/>
+<Image src="/logos/prefect-logo.svg" alt="Prefect" width={120} height={32} priority />;
 ```
 
 ## Best Practices
@@ -298,6 +291,7 @@ npx shadcn-ui@latest add [component-name]
 ```
 
 This will automatically:
+
 - Install required dependencies
 - Add the component to `components/ui/`
 - Configure with your theme

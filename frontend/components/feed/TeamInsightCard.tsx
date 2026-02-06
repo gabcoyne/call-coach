@@ -12,34 +12,34 @@ interface TeamInsightCardProps {
 export function TeamInsightCard({ insight }: TeamInsightCardProps) {
   const getTrendIcon = () => {
     switch (insight.trend) {
-      case 'up':
+      case "up":
         return <TrendingUp className="h-5 w-5 text-green-600" />;
-      case 'down':
+      case "down":
         return <TrendingDown className="h-5 w-5 text-red-600" />;
-      case 'stable':
+      case "stable":
         return <Minus className="h-5 w-5 text-gray-600" />;
     }
   };
 
   const getTrendColor = () => {
     switch (insight.trend) {
-      case 'up':
-        return 'text-green-600 bg-green-50';
-      case 'down':
-        return 'text-red-600 bg-red-50';
-      case 'stable':
-        return 'text-gray-600 bg-gray-50';
+      case "up":
+        return "text-green-600 bg-green-50";
+      case "down":
+        return "text-red-600 bg-red-50";
+      case "stable":
+        return "text-gray-600 bg-gray-50";
     }
   };
 
   const getTypeLabel = () => {
     switch (insight.type) {
-      case 'trend':
-        return 'Team Trend';
-      case 'comparison':
-        return 'Team Comparison';
-      case 'achievement':
-        return 'Team Achievement';
+      case "trend":
+        return "Team Trend";
+      case "comparison":
+        return "Team Comparison";
+      case "achievement":
+        return "Team Achievement";
     }
   };
 
@@ -59,9 +59,7 @@ export function TeamInsightCard({ insight }: TeamInsightCardProps) {
             </div>
             <CardTitle className="text-base">{insight.title}</CardTitle>
           </div>
-          <div className={`p-2 rounded-lg ${getTrendColor()}`}>
-            {getTrendIcon()}
-          </div>
+          <div className={`p-2 rounded-lg ${getTrendColor()}`}>{getTrendIcon()}</div>
         </div>
       </CardHeader>
 
@@ -74,24 +72,22 @@ export function TeamInsightCard({ insight }: TeamInsightCardProps) {
             <p className="text-2xl font-bold text-foreground">{insight.value}</p>
           </div>
           {insight.change !== 0 && (
-            <div className={`flex items-center gap-1 ${
-              insight.change > 0 ? 'text-green-600' : 'text-red-600'
-            }`}>
+            <div
+              className={`flex items-center gap-1 ${
+                insight.change > 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
               {insight.change > 0 ? (
                 <TrendingUp className="h-4 w-4" />
               ) : (
                 <TrendingDown className="h-4 w-4" />
               )}
-              <span className="text-sm font-semibold">
-                {Math.abs(insight.change)}%
-              </span>
+              <span className="text-sm font-semibold">{Math.abs(insight.change)}%</span>
             </div>
           )}
         </div>
 
-        <div className="text-xs text-muted-foreground">
-          Period: {insight.period}
-        </div>
+        <div className="text-xs text-muted-foreground">Period: {insight.period}</div>
       </CardContent>
     </Card>
   );

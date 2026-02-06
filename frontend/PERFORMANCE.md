@@ -15,31 +15,35 @@ This document outlines all performance optimizations implemented in the Gong Cal
 
 We aim to meet the following performance targets:
 
-| Metric | Target | Good | Needs Improvement | Poor |
-|--------|--------|------|-------------------|------|
-| LCP (Largest Contentful Paint) | < 2.5s | < 2.5s | 2.5s - 4.0s | > 4.0s |
-| FID (First Input Delay) | < 100ms | < 100ms | 100ms - 300ms | > 300ms |
-| CLS (Cumulative Layout Shift) | < 0.1 | < 0.1 | 0.1 - 0.25 | > 0.25 |
-| FCP (First Contentful Paint) | < 1.8s | < 1.8s | 1.8s - 3.0s | > 3.0s |
-| TTFB (Time to First Byte) | < 800ms | < 800ms | 800ms - 1800ms | > 1800ms |
+| Metric                         | Target  | Good    | Needs Improvement | Poor     |
+| ------------------------------ | ------- | ------- | ----------------- | -------- |
+| LCP (Largest Contentful Paint) | < 2.5s  | < 2.5s  | 2.5s - 4.0s       | > 4.0s   |
+| FID (First Input Delay)        | < 100ms | < 100ms | 100ms - 300ms     | > 300ms  |
+| CLS (Cumulative Layout Shift)  | < 0.1   | < 0.1   | 0.1 - 0.25        | > 0.25   |
+| FCP (First Contentful Paint)   | < 1.8s  | < 1.8s  | 1.8s - 3.0s       | > 3.0s   |
+| TTFB (Time to First Byte)      | < 800ms | < 800ms | 800ms - 1800ms    | > 1800ms |
 
 ## Implemented Optimizations
 
 ### 1. Code Splitting (Task 13.1)
 
 **What was done:**
+
 - Implemented dynamic imports for heavy components (Recharts charts)
 - Charts are loaded on-demand only when needed
 - Loading states provide feedback during component load
 
 **Files changed:**
+
 - `/app/dashboard/[repEmail]/page.tsx` - Dynamic imports for `ScoreTrendsChart` and `DimensionRadarChart`
 
 **Impact:**
+
 - Initial bundle size reduced by ~150KB
 - Dashboard page loads faster for users who don't scroll to charts
 
 **Example:**
+
 ```typescript
 const ScoreTrendsChart = dynamic(
   () => import("@/components/dashboard/ScoreTrendsChart").then((mod) => ({
@@ -55,19 +59,23 @@ const ScoreTrendsChart = dynamic(
 ### 2. Image Optimization (Task 13.2)
 
 **What was done:**
+
 - Configured Next.js Image component with modern formats (AVIF, WebP)
 - Set up responsive image sizes for different device widths
 - Configured allowed domains for remote images (Clerk avatars)
 
 **Configuration:**
+
 - `next.config.ts` - Image optimization settings
 
 **Impact:**
+
 - Images are automatically optimized and served in modern formats
 - Lazy loading prevents loading off-screen images
 - Responsive images reduce bandwidth on mobile devices
 
 **Best practices:**
+
 ```typescript
 import Image from "next/image";
 
@@ -93,18 +101,22 @@ import Image from "next/image";
 ### 3. Data Prefetching (Task 13.3)
 
 **What was done:**
+
 - Created prefetch utilities for critical data (call analysis, rep insights)
 - Implemented hover-based prefetching for navigation links
 - Used React cache for server-side data fetching
 
 **Files added:**
+
 - `/lib/prefetch.ts` - Prefetching utilities
 
 **Impact:**
+
 - Perceived performance improvement: data is ready before user navigates
 - Reduced time-to-interactive on navigation
 
 **Usage:**
+
 ```typescript
 import { usePrefetchOnHover } from "@/lib/prefetch";
 
@@ -122,10 +134,12 @@ const { prefetchCall, prefetchDashboard } = usePrefetchOnHover();
 ### 4. Incremental Static Regeneration (Task 13.4)
 
 **What was done:**
+
 - Configured revalidation periods for prefetch functions
 - Set up caching strategies for API responses
 
 **Implementation:**
+
 ```typescript
 // In prefetch.ts
 const response = await fetch(url, {
@@ -136,6 +150,7 @@ const response = await fetch(url, {
 ```
 
 **Impact:**
+
 - Reduced server load for frequently accessed data
 - Faster page loads for cached content
 
@@ -144,15 +159,18 @@ const response = await fetch(url, {
 ### 5. Bundle Analysis and Optimization (Task 13.5)
 
 **What was done:**
+
 - Installed and configured `webpack-bundle-analyzer`
 - Added `ANALYZE=true` flag to generate bundle reports
 - Configured package optimization in Next.js
 
 **Configuration:**
+
 - `next.config.ts` - Webpack bundle analyzer plugin
 - `package.json` - Added analyzer script
 
 **Usage:**
+
 ```bash
 # Analyze bundle size
 ANALYZE=true npm run build
@@ -163,6 +181,7 @@ ANALYZE=true npm run build
 ```
 
 **Impact:**
+
 - Visibility into bundle composition
 - Ability to identify and optimize large dependencies
 
@@ -171,17 +190,19 @@ ANALYZE=true npm run build
 **Status:** Optional - Not implemented
 
 **Reasoning:**
+
 - This is an authenticated SPA with dynamic data
 - Service workers add complexity for caching auth-protected content
 - Modern browsers already cache static assets efficiently
 - Can be added in future if offline support is required
 
 **If needed in future:**
+
 ```typescript
 // Add to next.config.ts
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
+const withPWA = require("next-pwa")({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
 });
 
 module.exports = withPWA(nextConfig);
@@ -190,19 +211,23 @@ module.exports = withPWA(nextConfig);
 ### 7. Recharts Bundle Optimization (Task 13.7)
 
 **What was done:**
+
 - Replaced barrel imports with direct component imports
 - Import only the specific components needed (not the entire library)
 
 **Files changed:**
+
 - `/components/dashboard/ScoreTrendsChart.tsx`
 - `/components/dashboard/DimensionRadarChart.tsx`
 
 **Before:**
+
 ```typescript
 import { LineChart, Line, XAxis, YAxis } from "recharts";
 ```
 
 **After:**
+
 ```typescript
 import { LineChart } from "recharts/lib/chart/LineChart";
 import { Line } from "recharts/lib/cartesian/Line";
@@ -211,24 +236,29 @@ import { YAxis } from "recharts/lib/cartesian/YAxis";
 ```
 
 **Impact:**
+
 - Reduced Recharts bundle size by ~40%
 - Faster parse and compile times for chart components
 
 ### 8. Core Web Vitals Monitoring (Task 13.8)
 
 **What was done:**
+
 - Created WebVitals component to monitor performance metrics
 - Added to root layout for automatic monitoring
 - Implemented custom metric tracking hook
 - Added long task detection for performance debugging
 
 **Files added:**
+
 - `/components/analytics/WebVitals.tsx`
 
 **Files changed:**
+
 - `/app/layout.tsx` - Added WebVitals component
 
 **Features:**
+
 - Automatic tracking of LCP, FID, CLS, FCP, TTFB
 - Console logging in development
 - Production-ready analytics integration points
@@ -236,6 +266,7 @@ import { YAxis } from "recharts/lib/cartesian/YAxis";
 - Custom metric measurement hook
 
 **Usage:**
+
 ```typescript
 // Custom metrics
 import { usePerformanceMetric } from "@/components/analytics/WebVitals";
@@ -272,10 +303,12 @@ ANALYZE=true npm run build
 ### What to Look For
 
 1. **Large Dependencies**
+
    - Any single package > 100KB should be investigated
    - Consider code splitting or alternative libraries
 
 2. **Duplicate Dependencies**
+
    - Multiple versions of the same package
    - Can be resolved with package resolution rules
 
@@ -286,6 +319,7 @@ ANALYZE=true npm run build
 ### Current Bundle Sizes (Estimated)
 
 After optimizations:
+
 - First Load JS: ~250KB (gzipped)
 - Recharts chunk: ~80KB (lazy loaded)
 - Dashboard page: ~350KB (including charts)
@@ -295,11 +329,13 @@ After optimizations:
 ### Development Monitoring
 
 1. **Browser DevTools**
+
    - Open Chrome DevTools → Performance tab
    - Record page load
    - Check for long tasks, layout shifts, large bundle sizes
 
 2. **Console Logs**
+
    - Web Vitals are automatically logged in development
    - Look for `[Web Vitals]` prefix in console
 
@@ -310,13 +346,16 @@ After optimizations:
 ### Production Monitoring
 
 1. **Vercel Analytics** (if deployed to Vercel)
+
    - Automatically tracks Core Web Vitals
    - Real user monitoring (RUM)
    - Geographic performance data
 
 2. **Custom Analytics**
+
    - WebVitals component logs metrics in production
    - Integrate with your analytics service:
+
      ```typescript
      // In WebVitals.tsx
      if (process.env.NODE_ENV === "production") {
@@ -454,22 +493,27 @@ Regular performance maintenance:
 Potential areas for further optimization:
 
 1. **Route Prefetching**
+
    - Implement automatic prefetching for common navigation paths
    - Based on user behavior analytics
 
 2. **Font Optimization**
+
    - Use `next/font` for optimal font loading
    - Implement FOIT/FOUT strategies
 
 3. **API Response Caching**
+
    - Implement more aggressive caching with stale-while-revalidate
    - Add cache headers on API routes
 
 4. **Component Virtualization**
+
    - For large lists (call history, search results)
    - Use react-virtual or react-window
 
 5. **Edge Rendering**
+
    - Move some computation to edge functions
    - Reduce client-side JavaScript
 

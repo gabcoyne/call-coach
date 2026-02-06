@@ -23,10 +23,7 @@ interface ObjectionTypeFilterProps {
   onFiltersChange: (filters: Partial<SearchCallsRequest>) => void;
 }
 
-export function ObjectionTypeFilter({
-  filters,
-  onFiltersChange,
-}: ObjectionTypeFilterProps) {
+export function ObjectionTypeFilter({ filters, onFiltersChange }: ObjectionTypeFilterProps) {
   return (
     <Card>
       <CardHeader>

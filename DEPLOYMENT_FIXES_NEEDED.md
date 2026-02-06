@@ -1,6 +1,7 @@
 # FastMCP Server Deployment Fixes Required
 
 ## Current Status
+
 Deployment to Horizon is **FAILING** with module import errors and the code has **critical security vulnerabilities** that must be fixed before production use.
 
 ---
@@ -8,9 +9,11 @@ Deployment to Horizon is **FAILING** with module import errors and the code has 
 ## CRITICAL FIXES (Must Do Before Production)
 
 ### 1. SQL Injection Vulnerability in search_calls.py
+
 **Location**: `coaching_mcp/tools/search_calls.py` line 100
 
 **Issue**: The objection type filter uses string interpolation in SQL LIKE pattern:
+
 ```python
 where_clauses.append("transcripts.topics @> ARRAY[%s]::text[]")
 args.append(f"%{has_objection_type}%")
@@ -19,15 +22,18 @@ args.append(f"%{has_objection_type}%")
 **Risk**: If `has_objection_type` contains SQL metacharacters, could inject malicious SQL.
 
 **Fix**: Use proper ILIKE with parameterized query:
+
 ```python
 where_clauses.append("EXISTS (SELECT 1 FROM unnest(transcripts.topics) AS topic WHERE topic ILIKE %s)")
 args.append(f"%{has_objection_type}%")
 ```
 
 ### 2. Unsafe Array Type Parameter Handling
+
 **Location**: `coaching_mcp/tools/search_calls.py` line 108
 
 **Issue**: Array overlap operator `&&` with topic list may not be properly handled by psycopg2:
+
 ```python
 where_clauses.append("transcripts.topics && %s")
 args.append(topics)
@@ -36,6 +42,7 @@ args.append(topics)
 **Risk**: psycopg2 may not properly adapt Python list to PostgreSQL array type, causing query failures.
 
 **Fix**: Use psycopg2's Array adapter explicitly:
+
 ```python
 from psycopg2.extensions import adapt
 where_clauses.append("transcripts.topics && %s::text[]")
@@ -43,17 +50,20 @@ args.append(adapt(topics))
 ```
 
 ### 3. Missing Package Dependencies in fastmcp.toml
+
 **Location**: `fastmcp.toml` line 18-19
 
 **Issue**: Only Python version specified, no package dependencies listed.
 
 **Current**:
+
 ```toml
 [dependencies]
 python = ">=3.11"
 ```
 
 **Fix**: Add required packages:
+
 ```toml
 [dependencies]
 python = ">=3.11"
@@ -71,6 +81,7 @@ python-dotenv = ">=1.0.0"
 ## HIGH PRIORITY FIXES (Before Production Use)
 
 ### 4. Blocking API Calls in Startup Validation
+
 **Location**: `coaching_mcp/server.py` lines 90-101 in `_validate_gong_api()`
 
 **Issue**: Makes live Gong API call with 7-day date range during server startup. If network is slow or API is down, server startup will hang/timeout.
@@ -78,6 +89,7 @@ python-dotenv = ">=1.0.0"
 **Impact**: Horizon deployment may timeout during health checks.
 
 **Fix**: Add timeout and make it optional:
+
 ```python
 def _validate_gong_api() -> None:
     """Test Gong API authentication with minimal request."""
@@ -114,6 +126,7 @@ def _validate_gong_api() -> None:
 ```
 
 ### 5. Database Schema Not Validated
+
 **Location**: `coaching_mcp/server.py` lines 49-76 in `_validate_database_connection()`
 
 **Issue**: Only checks if database is reachable with `SELECT 1`, doesn't verify required tables exist.
@@ -121,6 +134,7 @@ def _validate_gong_api() -> None:
 **Impact**: Server could start successfully but fail when tools try to query non-existent tables.
 
 **Fix**: Add table existence check:
+
 ```python
 def _validate_database_connection() -> None:
     """Test database connectivity and schema."""
@@ -156,15 +170,18 @@ def _validate_database_connection() -> None:
 ```
 
 ### 6. Credential Exposure in Logs
+
 **Location**: Multiple files
 
 **Issue**: HTTP errors and connection failures may log full request/response including auth headers.
 
 **Locations**:
+
 - `gong/client.py` line 104 - logs full HTTP error response
 - `db/connection.py` line 90 - connection string with password in error messages
 
 **Fix**: Add log sanitization:
+
 ```python
 # In gong/client.py
 except HTTPStatusError as e:
@@ -186,9 +203,11 @@ except Exception as e:
 ## MEDIUM PRIORITY FIXES
 
 ### 7. Broad Exception Catching in Tools
+
 **Location**: `coaching_mcp/tools/analyze_call.py` lines 96-97
 
 **Issue**: Catches all exceptions and hides them in results:
+
 ```python
 except Exception as e:
     return {"error": f"Failed to analyze call: {str(e)}"}
@@ -197,6 +216,7 @@ except Exception as e:
 **Impact**: Hard to debug production failures - errors are silently swallowed.
 
 **Fix**: Catch specific exceptions and re-raise unexpected ones:
+
 ```python
 except (DatabaseError, GongAPIError) as e:
     return {"error": f"Failed to analyze call: {str(e)}"}
@@ -206,11 +226,13 @@ except Exception as e:
 ```
 
 ### 8. API Key Format Validation Too Strict
+
 **Location**: `coaching_mcp/server.py` line 128-131
 
 **Issue**: Hardcoded check for `sk-ant-` prefix will break if Anthropic changes format.
 
 **Fix**: Make it more lenient:
+
 ```python
 def _validate_anthropic_api() -> None:
     """Validate Anthropic API key format."""
@@ -229,11 +251,13 @@ def _validate_anthropic_api() -> None:
 ```
 
 ### 9. Missing Timeout on Database Queries
+
 **Location**: All tool implementations
 
 **Issue**: No query timeouts - could hang indefinitely on slow queries.
 
 **Fix**: Add statement timeout in connection pool:
+
 ```python
 # In db/connection.py
 pool = psycopg2.pool.ThreadedConnectionPool(
@@ -249,6 +273,7 @@ pool = psycopg2.pool.ThreadedConnectionPool(
 ## LOW PRIORITY IMPROVEMENTS
 
 ### 10. Remove Unused Dependency
+
 **Location**: `pyproject.toml`
 
 **Issue**: `asyncpg` is listed but never imported (code uses sync `psycopg2`).
@@ -256,6 +281,7 @@ pool = psycopg2.pool.ThreadedConnectionPool(
 **Fix**: Remove from dependencies or document why it's needed.
 
 ### 11. Mixed Dependency Pinning Strategy
+
 **Location**: `pyproject.toml`
 
 **Issue**: Some packages pinned (`fastmcp==0.3.0`), others use `>=` (`prefect>=3.0.0`).

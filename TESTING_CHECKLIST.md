@@ -19,6 +19,7 @@ Use this checklist to verify the frontend-backend integration is working correct
 ```
 
 **Expected Output**:
+
 ```
 Starting Call Coaching REST API...
 Endpoints will be available at http://localhost:8000
@@ -39,8 +40,9 @@ curl http://localhost:8000/health
 ```
 
 **Expected Output**:
+
 ```json
-{"status":"ok","service":"call-coaching-api","tools":5}
+{ "status": "ok", "service": "call-coaching-api", "tools": 5 }
 ```
 
 - [ ] Returns 200 status
@@ -48,7 +50,7 @@ curl http://localhost:8000/health
 
 ### 3. OpenAPI Documentation
 
-Open in browser: http://localhost:8000/docs
+Open in browser: <http://localhost:8000/docs>
 
 - [ ] Swagger UI loads
 - [ ] Shows all 5 tool endpoints:
@@ -74,6 +76,7 @@ curl -X POST http://localhost:8000/tools/analyze_call \
 Replace `YOUR_CALL_ID` with an actual call ID from your database.
 
 **Expected Output**: JSON with:
+
 - [ ] `call_metadata` object
 - [ ] `scores` object with dimension scores
 - [ ] `strengths` array
@@ -94,6 +97,7 @@ curl -X POST http://localhost:8000/tools/get_rep_insights \
 Replace `YOUR_REP_EMAIL` with an actual rep email from your database.
 
 **Expected Output**: JSON with:
+
 - [ ] `rep_info` object
 - [ ] `score_trends` object
 - [ ] `skill_gaps` array
@@ -112,6 +116,7 @@ curl -X POST http://localhost:8000/tools/search_calls \
 ```
 
 **Expected Output**: JSON array with:
+
 - [ ] Array of call objects
 - [ ] Each call has `call_id`, `title`, `date`, `overall_score`
 - [ ] Results limited to 10 items
@@ -126,6 +131,7 @@ npm run dev
 ```
 
 **Expected Output**:
+
 ```
 ▲ Next.js 14.x.x
 - Local:        http://localhost:3000
@@ -137,7 +143,7 @@ npm run dev
 
 ### 2. Homepage
 
-Navigate to: http://localhost:3000
+Navigate to: <http://localhost:3000>
 
 - [ ] Page loads without errors
 - [ ] No console errors in browser
@@ -145,11 +151,12 @@ Navigate to: http://localhost:3000
 
 ### 3. Call Analysis Page
 
-Navigate to: http://localhost:3000/calls/{CALL_ID}
+Navigate to: <http://localhost:3000/calls/{CALL_ID}>
 
 Replace `{CALL_ID}` with an actual call ID.
 
 **Page Elements**:
+
 - [ ] Loading skeleton appears first
 - [ ] Call metadata displays:
   - [ ] Title
@@ -171,17 +178,19 @@ Replace `{CALL_ID}` with an actual call ID.
   - [ ] Check icons
 
 **Interactions**:
+
 - [ ] Back button navigates to dashboard
 - [ ] Refresh button reloads data
 - [ ] No console errors
 
 ### 4. Rep Dashboard Page
 
-Navigate to: http://localhost:3000/dashboard/{REP_EMAIL}
+Navigate to: <http://localhost:3000/dashboard/{REP_EMAIL}>
 
 Replace `{REP_EMAIL}` with an actual rep email.
 
 **Page Elements**:
+
 - [ ] Loading skeleton appears first
 - [ ] Header displays:
   - [ ] Rep name
@@ -205,6 +214,7 @@ Replace `{REP_EMAIL}` with an actual rep email.
   - [ ] "View Details" link
 
 **Interactions**:
+
 - [ ] Time range selector changes data
 - [ ] Back button navigates
 - [ ] "View Details" links work
@@ -212,9 +222,10 @@ Replace `{REP_EMAIL}` with an actual rep email.
 
 ### 5. Search Page
 
-Navigate to: http://localhost:3000/search
+Navigate to: <http://localhost:3000/search>
 
 **Filter Controls**:
+
 - [ ] Start date input
 - [ ] End date input
 - [ ] Rep email input (if manager role)
@@ -224,12 +235,14 @@ Navigate to: http://localhost:3000/search
 - [ ] Clear filters button
 
 **Interactions**:
+
 - [ ] Filters update results automatically
 - [ ] Date validation works (end > start)
 - [ ] Keyword search is debounced (300ms)
 - [ ] Clear filters resets all inputs
 
 **Results**:
+
 - [ ] Loading skeleton appears during fetch
 - [ ] Results table displays:
   - [ ] Date column
@@ -249,11 +262,13 @@ Navigate to: http://localhost:3000/search
 **Test error scenarios**:
 
 1. **Backend Down**: Stop REST API server, try to load a page
+
    - [ ] Error message displays
    - [ ] Retry button appears
    - [ ] Retry button reloads data
 
 2. **Invalid Call ID**: Navigate to `/calls/invalid-id`
+
    - [ ] Error message displays
    - [ ] No console errors crash the app
 
@@ -266,10 +281,12 @@ Navigate to: http://localhost:3000/search
 **Test loading indicators**:
 
 1. **Initial Load**:
+
    - [ ] Skeleton screens display
    - [ ] Smooth transition to actual content
 
 2. **Background Refresh**:
+
    - [ ] Previous data stays visible
    - [ ] Updates seamlessly when new data arrives
 
@@ -282,12 +299,14 @@ Navigate to: http://localhost:3000/search
 Open browser DevTools console (F12).
 
 **Check for**:
+
 - [ ] No error messages (red)
 - [ ] No warning messages (yellow)
 - [ ] Network requests complete successfully
 - [ ] No CORS errors
 
 **Network Tab**:
+
 - [ ] POST requests to `http://localhost:8000/tools/*` succeed (200 status)
 - [ ] Response times are reasonable (<5s for analysis)
 - [ ] No failed requests (4xx, 5xx)
@@ -305,6 +324,7 @@ time curl -X POST http://localhost:8000/tools/analyze_call \
 ```
 
 **Expected Times** (with caching enabled):
+
 - [ ] Analyze call: <2s (cached), <10s (uncached)
 - [ ] Rep insights: <3s
 - [ ] Search calls: <1s
@@ -318,6 +338,7 @@ Use Chrome DevTools Lighthouse:
 3. Run audit
 
 **Expected Scores**:
+
 - [ ] Performance: >80
 - [ ] Accessibility: >90
 - [ ] Best Practices: >80
@@ -400,18 +421,19 @@ Common fixes:
 
 Once all tests pass:
 
-- [ ] Backend tests: ___/6 passed
-- [ ] Frontend tests: ___/8 passed
-- [ ] Performance tests: ___/3 passed
-- [ ] Integration tests: ___/3 passed
+- [ ] Backend tests: \_\_\_/6 passed
+- [ ] Frontend tests: \_\_\_/8 passed
+- [ ] Performance tests: \_\_\_/3 passed
+- [ ] Integration tests: \_\_\_/3 passed
 
-**Total**: ___/20 passed
+**Total**: \_\_\_/20 passed
 
-**Tested by**: ________________
+**Tested by**: **\*\***\_\_\_\_**\*\***
 
-**Date**: ________________
+**Date**: **\*\***\_\_\_\_**\*\***
 
 **Notes**:
+
 ```
 [Add any issues or observations here]
 ```

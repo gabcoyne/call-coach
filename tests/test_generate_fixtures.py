@@ -1,8 +1,7 @@
 """Tests for the fixtures generator script."""
+
 import sys
 from pathlib import Path
-
-import pytest
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -61,7 +60,13 @@ class TestFixturesGenerator:
             assert "title" in call
             assert "call_type" in call
             assert "product" in call
-            assert call["call_type"] in ["discovery", "demo", "technical_deep_dive", "negotiation", "follow_up"]
+            assert call["call_type"] in [
+                "discovery",
+                "demo",
+                "technical_deep_dive",
+                "negotiation",
+                "follow_up",
+            ]
             assert call["product"] in ["prefect", "horizon", "both"]
 
     def test_call_speakers_generation(self):
@@ -110,8 +115,12 @@ class TestFixturesGenerator:
 
         # Test various call types
         for call_type in ["discovery", "demo", "technical_deep_dive"]:
-            company_line = generator._generate_transcript_line(call_type, is_company=True, prospect=None)
-            prospect_line = generator._generate_transcript_line(call_type, is_company=False, prospect=None)
+            company_line = generator._generate_transcript_line(
+                call_type, is_company=True, prospect=None
+            )
+            prospect_line = generator._generate_transcript_line(
+                call_type, is_company=False, prospect=None
+            )
 
             assert len(company_line) > 0
             assert len(prospect_line) > 0

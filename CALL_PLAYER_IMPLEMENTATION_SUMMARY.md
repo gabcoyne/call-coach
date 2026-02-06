@@ -7,6 +7,7 @@ All 5 major tasks have been successfully completed:
 ### Task 1: ✅ Enhanced CallRecordingPlayer.tsx
 
 **Changes Made**:
+
 - Added playback speed control (0.5x, 1x, 1.5x, 2x)
 - Added annotation markers on timeline showing where coaching insights occur
 - Click timestamp functionality to jump to specific moments
@@ -15,6 +16,7 @@ All 5 major tasks have been successfully completed:
 - Better time formatting and visual hierarchy
 
 **New Features**:
+
 - `annotations` prop accepts array of Annotation objects
 - Timeline visualization with color-coded markers
 - Auto-detecting active annotation based on playback time
@@ -25,18 +27,21 @@ All 5 major tasks have been successfully completed:
 **New Components Created**:
 
 1. **AnnotationMarker.tsx**
+
    - Visual marker on timeline
    - Color-coded by dimension (product_knowledge=blue, discovery=green, objection_handling=orange, engagement=purple)
    - Hover popover showing insight details
    - Click-to-jump functionality
 
 2. **AnnotationPopover.tsx**
+
    - Detailed popover view of annotation
    - Shows dimension, title, insight text
    - Expandable dimension description
    - Jump-to-moment action button
 
 3. **Supporting Types** (in AnnotationMarker.tsx):
+
    ```typescript
    interface Annotation {
      id: string;
@@ -51,6 +56,7 @@ All 5 major tasks have been successfully completed:
 ### Task 3: ✅ Added Coaching Overlay
 
 **Component: CoachingOverlay.tsx**
+
 - Floating panel that auto-displays when playing near annotation
 - Shows coaching suggestions and strengths
 - Contextual feedback based on annotation severity
@@ -61,6 +67,7 @@ All 5 major tasks have been successfully completed:
 ### Task 4: ✅ Transcript Synchronization
 
 **Enhanced: TranscriptSearch.tsx**
+
 - Added `currentPlaybackTime` prop to track playback position
 - Auto-scroll to current playback segment
 - "Playing" indicator badge on active segment
@@ -69,6 +76,7 @@ All 5 major tasks have been successfully completed:
 - Smooth scroll behavior
 
 **Integration**:
+
 - CallAnalysisViewer passes playback time to transcript component
 - Transcript updates as audio plays
 - Click on transcript word jumps to that timestamp
@@ -76,6 +84,7 @@ All 5 major tasks have been successfully completed:
 ### Task 5: ✅ Sharing Features
 
 **Component: ClipGenerator.tsx**
+
 - Generate shareable clips with timestamps
 - 30-second clip window (15s before/after insight)
 - Copy shareable link to clipboard
@@ -83,21 +92,22 @@ All 5 major tasks have been successfully completed:
 - Visual timeline showing clip boundaries
 
 **Features**:
+
 - `#t=start-end` URL format for timestamp ranges
 - One-click link copying with feedback
 - Integration with annotation selection
 
 ## New Components Created (7 Total)
 
-| Component | Purpose | Status |
-|-----------|---------|--------|
-| `AnnotationMarker.tsx` | Timeline annotation visual marker | ✅ Created |
-| `AnnotationPopover.tsx` | Detailed annotation popover | ✅ Created |
-| `CoachingOverlay.tsx` | Auto-displaying coaching insights | ✅ Created |
-| `ClipGenerator.tsx` | Shareable clip generation | ✅ Created |
-| `EnhancedCallPlayer.tsx` | Unified player with all features | ✅ Created |
-| `CallRecordingPlayer.tsx` | Enhanced with new features | ✅ Updated |
-| `TranscriptSearch.tsx` | Enhanced with playback sync | ✅ Updated |
+| Component                 | Purpose                           | Status     |
+| ------------------------- | --------------------------------- | ---------- |
+| `AnnotationMarker.tsx`    | Timeline annotation visual marker | ✅ Created |
+| `AnnotationPopover.tsx`   | Detailed annotation popover       | ✅ Created |
+| `CoachingOverlay.tsx`     | Auto-displaying coaching insights | ✅ Created |
+| `ClipGenerator.tsx`       | Shareable clip generation         | ✅ Created |
+| `EnhancedCallPlayer.tsx`  | Unified player with all features  | ✅ Created |
+| `CallRecordingPlayer.tsx` | Enhanced with new features        | ✅ Updated |
+| `TranscriptSearch.tsx`    | Enhanced with playback sync       | ✅ Updated |
 
 ## File Structure
 
@@ -125,12 +135,14 @@ root/
 ## Key Features Implemented
 
 ### Timeline Annotations
+
 - Visual markers on timeline with timestamps
 - Color-coded by coaching dimension
 - Hover popover with insight preview
 - Click to jump to annotation moment
 
 ### Playback Controls
+
 - Play/Pause toggle
 - Volume control
 - Playback speed: 0.5x, 1x, 1.5x, 2x
@@ -138,6 +150,7 @@ root/
 - Timestamp sharing link
 
 ### Transcript Sync
+
 - Auto-scroll to current speaker
 - "Playing" badge on active segment
 - Highlight current segment
@@ -145,12 +158,14 @@ root/
 - Jump-to-timestamp from transcript
 
 ### Coaching Insights
+
 - Auto-displaying overlay during playback
 - Contextual suggestions based on annotation type
 - Closeable with dismiss button
 - Positioned floating panel
 
 ### Sharing
+
 - Generate 30-second clips around insights
 - Copy shareable links with timestamp ranges
 - One-click copy to clipboard with feedback
@@ -161,17 +176,20 @@ root/
 The main call analysis viewer has been updated to:
 
 1. **Generate Annotations**:
+
    - Creates annotations from dimension_details (strengths and improvements)
    - Assigns random timestamps to spread across call
    - Maps severity (positive/improvement)
 
 2. **Use EnhancedCallPlayer**:
+
    - Replaces basic CallRecordingPlayer
    - Passes annotations to player
    - Passes transcript segments
    - Handles timestamp click events
 
 3. **Example Generated Annotation**:
+
    ```typescript
    {
      id: "strength-discovery",
@@ -185,12 +203,12 @@ The main call analysis viewer has been updated to:
 
 ## Color Scheme
 
-| Dimension | Color | RGB | Icon |
-|-----------|-------|-----|------|
-| Product Knowledge | Blue | #3B82F6 | AlertCircle |
-| Discovery | Green | #22C55E | Search |
+| Dimension          | Color  | RGB     | Icon          |
+| ------------------ | ------ | ------- | ------------- |
+| Product Knowledge  | Blue   | #3B82F6 | AlertCircle   |
+| Discovery          | Green  | #22C55E | Search        |
 | Objection Handling | Orange | #F97316 | MessageSquare |
-| Engagement | Purple | #A855F7 | TrendingUp |
+| Engagement         | Purple | #A855F7 | TrendingUp    |
 
 ## Performance Optimizations
 
@@ -219,8 +237,9 @@ The main call analysis viewer has been updated to:
 ## Usage Example
 
 ### Basic Enhanced Player
+
 ```tsx
-import { EnhancedCallPlayer } from '@/components/coaching';
+import { EnhancedCallPlayer } from "@/components/coaching";
 
 export function CallPage() {
   return (
@@ -236,6 +255,7 @@ export function CallPage() {
 ```
 
 ### From CallAnalysisViewer
+
 ```tsx
 <EnhancedCallPlayer
   gongUrl={metadata.gong_url}
@@ -269,6 +289,7 @@ export function CallPage() {
 ## Documentation
 
 Comprehensive documentation available in:
+
 - `/Users/gcoyne/src/prefect/call-coach/frontend/CALL_PLAYER_ENHANCEMENTS.md` - Feature details
 - Component docstrings in each file
 
@@ -278,11 +299,7 @@ The enhanced player is backward compatible. Existing code using `CallRecordingPl
 
 ```tsx
 // Still works - annotations and timestamp handler are optional
-<CallRecordingPlayer
-  gongUrl={gongUrl}
-  recordingUrl={recordingUrl}
-  duration={duration}
-/>
+<CallRecordingPlayer gongUrl={gongUrl} recordingUrl={recordingUrl} duration={duration} />
 ```
 
 ## Deployment Checklist

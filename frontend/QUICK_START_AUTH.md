@@ -11,7 +11,7 @@ npm install
 
 ## 2. Get Clerk Keys
 
-1. Go to https://dashboard.clerk.com/sign-up
+1. Go to <https://dashboard.clerk.com/sign-up>
 2. Create account and new application
 3. Copy your API keys
 
@@ -23,6 +23,7 @@ cp .env.example .env.local
 ```
 
 Edit `.env.local` and add your keys:
+
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_YOUR_KEY
 CLERK_SECRET_KEY=sk_test_YOUR_KEY
@@ -34,28 +35,31 @@ CLERK_SECRET_KEY=sk_test_YOUR_KEY
 npm run dev
 ```
 
-Visit http://localhost:3000
+Visit <http://localhost:3000>
 
 ## 5. Create Test Users
 
-1. Sign up at http://localhost:3000/sign-up
+1. Sign up at <http://localhost:3000/sign-up>
 2. Go to Clerk Dashboard → Users
 3. Click on user → Metadata tab
 4. Add to Public metadata:
 
 **For Manager:**
+
 ```json
-{"role": "manager"}
+{ "role": "manager" }
 ```
 
 **For Rep:**
+
 ```json
-{"role": "rep"}
+{ "role": "rep" }
 ```
 
-## Done!
+## Done
 
 You now have:
+
 - ✅ Working sign-in/sign-up
 - ✅ Protected routes
 - ✅ Role-based access control

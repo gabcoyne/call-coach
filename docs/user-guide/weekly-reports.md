@@ -13,6 +13,7 @@ Every Monday at 6 AM PT, Call Coach generates a personalized weekly report based
 Shows your performance for the week at a glance.
 
 **Example**:
+
 ```
 Week of January 29 - February 4
 
@@ -23,6 +24,7 @@ Trend: Improving ↑
 ```
 
 **Interpretation**:
+
 - **Calls Analyzed**: Number of calls processed this week
 - **Average Score**: Mean of all dimension scores
 - **Best Call**: Highest-scoring call with title
@@ -35,6 +37,7 @@ Trend: Improving ↑
 Detailed score for each coaching dimension this week.
 
 **Example**:
+
 ```
 DISCOVERY: 81/100 (↓ Down 2 from last week)
 ├─ Trend over 4 weeks: 78 → 80 → 82 → 81
@@ -76,6 +79,7 @@ ENGAGEMENT: 86/100 (↑ Up 4 from last week)
 ```
 
 **How to Interpret**:
+
 - **Score**: Your performance (0-100, higher is better)
 - **Trend Arrow**: Week-over-week change
 - **Trend Line**: Last 4 weeks progression
@@ -91,6 +95,7 @@ ENGAGEMENT: 86/100 (↑ Up 4 from last week)
 AI-generated observations about your performance this week.
 
 **Example**:
+
 ```
 Key Insights:
 
@@ -128,6 +133,7 @@ Key Insights:
 Personalized action items based on your data.
 
 **Example**:
+
 ```
 Coaching Priorities for Next Week:
 
@@ -160,6 +166,7 @@ OPTIONAL:
 Highlights of your best and most interesting calls.
 
 **Example**:
+
 ```
 TOP CALLS TO LEARN FROM:
 
@@ -233,6 +240,7 @@ Average = (Discovery + Product + Objections + Engagement) / 4
 ```
 
 **Example**:
+
 ```
 Discovery:        81
 Product Knowledge: 89
@@ -244,27 +252,30 @@ Average:          83
 
 ### What Scores Mean
 
-| Score | Level | Interpretation |
-|-------|-------|-----------------|
-| 90-100 | Excellent | Exceptional performance, minimal improvement needed |
-| 80-89 | Good | Strong performance, some development opportunities |
-| 70-79 | Average | Acceptable performance, meaningful improvement possible |
-| 60-69 | Below Average | Performance needs attention, coaching recommended |
-| <60 | Poor | Significant performance issues, immediate intervention needed |
+| Score  | Level         | Interpretation                                                |
+| ------ | ------------- | ------------------------------------------------------------- |
+| 90-100 | Excellent     | Exceptional performance, minimal improvement needed           |
+| 80-89  | Good          | Strong performance, some development opportunities            |
+| 70-79  | Average       | Acceptable performance, meaningful improvement possible       |
+| 60-69  | Below Average | Performance needs attention, coaching recommended             |
+| <60    | Poor          | Significant performance issues, immediate intervention needed |
 
 ### Trends
 
 **Improving (↑)**
+
 - Score went up from last week
 - Shows skill development in progress
 - Continue current practices
 
 **Stable (→)**
+
 - Score about same as last week
 - Consistent performance level
 - No major change positive or negative
 
 **Declining (↓)**
+
 - Score went down from last week
 - May indicate focus shift or skill regression
 - Needs attention
@@ -276,17 +287,20 @@ Average:          83
 ### Weekly Workflow
 
 **Monday Morning**: Receive report
+
 - Read insights
 - Note coaching priorities
 - Identify high-scoring calls to learn from
 
 **Tuesday-Thursday**: Take action
+
 - Complete coaching activities
 - Review high-scoring calls
 - Practice new techniques
 - Get manager feedback
 
 **Friday**: Prepare for next week
+
 - Note what you'll focus on
 - Schedule coaching if needed
 - Review practice areas
@@ -314,12 +328,14 @@ Average:          83
 ### Coaching Priorities
 
 **If High Priority Available**:
+
 1. Schedule immediately
 2. Prepare any materials
 3. Complete the workshop
 4. Apply learnings in next call
 
 **If Only Medium/Optional**:
+
 1. Schedule this week if possible
 2. Or complete next week
 3. Track completion for development
@@ -333,6 +349,7 @@ Your report includes how you compare to your team:
 ### What You See
 
 **Your Score vs Team Average**:
+
 ```
 Your Score: 83
 Team Average: 79
@@ -350,12 +367,14 @@ You're below team average in:
 ### Benchmarking
 
 **If You're Above Average**:
+
 - Celebrate! You're exceeding expectations
 - Share your approach with team
 - Help others improve
 - Consider next development goals
 
 **If You're Below Average**:
+
 - This is opportunity area
 - See what top performers do differently
 - Seek coaching
@@ -400,6 +419,7 @@ Team Averages:
 ```
 
 **What to Do**:
+
 1. Objection handling is significantly below average
 2. Request objection handling coaching
 3. Review all calls with objections
@@ -425,6 +445,7 @@ Status: Great progress! Momentum building.
 ```
 
 **What to Do**:
+
 1. Recognize improvement
 2. Maintain coaching focus
 3. Goal: Objection handling to 82+ (team avg)
@@ -453,12 +474,7 @@ A: Yes - click the PDF icon to download your report.
 A: Scores are Claude's assessment based on the transcript. Review the evidence, discuss with your manager, and use for learning.
 
 **Q: How do I improve my score?**
-A: 1) Identify lowest dimension
-2) Study high-scoring calls
-3) Practice that skill
-4) Get coaching
-5) Apply in real calls
-6) Measure improvement next week
+A: 1) Identify lowest dimension 2) Study high-scoring calls 3) Practice that skill 4) Get coaching 5) Apply in real calls 6) Measure improvement next week
 
 ---
 

@@ -3,6 +3,7 @@ FastAPI webhook server for receiving Gong webhooks.
 Lightweight server that returns 200 OK quickly (<500ms).
 Heavy processing happens asynchronously via Prefect flows.
 """
+
 import logging
 
 from fastapi import FastAPI
@@ -53,7 +54,9 @@ async def root():
 async def startup_event():
     """Run on startup."""
     logger.info("Starting webhook server")
-    logger.info(f"Webhook endpoint: http://{settings.webhook_host}:{settings.webhook_port}/webhooks/gong")
+    logger.info(
+        f"Webhook endpoint: http://{settings.webhook_host}:{settings.webhook_port}/webhooks/gong"
+    )
 
 
 @app.on_event("shutdown")

@@ -12,13 +12,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Phone,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-  AlertCircle,
-} from "lucide-react";
+import { Phone, ChevronDown, ChevronUp, Clock, AlertCircle } from "lucide-react";
 
 interface CallDetail {
   id: string;
@@ -107,17 +101,8 @@ export function CallTimelineCard({
               </div>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleExpanded}
-            className="ml-2"
-          >
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
+          <Button variant="ghost" size="sm" onClick={toggleExpanded} className="ml-2">
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </div>
       </CardHeader>
@@ -159,9 +144,7 @@ export function CallTimelineCard({
                   <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">
                     Summary
                   </div>
-                  <p className="text-sm text-foreground">
-                    {data.call.summary}
-                  </p>
+                  <p className="text-sm text-foreground">{data.call.summary}</p>
                 </div>
               )}
 
@@ -181,9 +164,7 @@ export function CallTimelineCard({
                     variant="link"
                     size="sm"
                     className="mt-2"
-                    onClick={() =>
-                      window.open(`/calls/${callId}`, "_blank")
-                    }
+                    onClick={() => window.open(`/calls/${callId}`, "_blank")}
                   >
                     View Full Call Analysis
                   </Button>

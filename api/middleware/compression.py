@@ -10,9 +10,10 @@ Features:
 - Respects Accept-Encoding header
 - Skips already-compressed content types
 """
+
 import gzip
 import logging
-from typing import Callable
+from collections.abc import Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -106,10 +107,7 @@ class CompressionMiddleware(BaseHTTPMiddleware):
             )
 
         # Compress response
-        compressed_body = gzip.compress(
-            body,
-            compresslevel=self.compression_level
-        )
+        compressed_body = gzip.compress(body, compresslevel=self.compression_level)
 
         # Calculate compression ratio
         original_size = len(body)

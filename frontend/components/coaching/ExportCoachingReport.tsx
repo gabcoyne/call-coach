@@ -10,10 +10,7 @@ interface ExportCoachingReportProps {
   callTitle: string;
 }
 
-export function ExportCoachingReport({
-  analysis,
-  callTitle,
-}: ExportCoachingReportProps) {
+export function ExportCoachingReport({ analysis, callTitle }: ExportCoachingReportProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
@@ -104,61 +101,96 @@ export function ExportCoachingReport({
                 <div class="score-value">${scores.overall}</div>
                 <div class="score-label">Overall Score</div>
               </div>
-              ${scores.product_knowledge !== null && scores.product_knowledge !== undefined ? `
+              ${
+                scores.product_knowledge !== null && scores.product_knowledge !== undefined
+                  ? `
                 <div class="score-card">
                   <div class="score-value">${scores.product_knowledge}</div>
                   <div class="score-label">Product Knowledge</div>
                 </div>
-              ` : ""}
-              ${scores.discovery !== null && scores.discovery !== undefined ? `
+              `
+                  : ""
+              }
+              ${
+                scores.discovery !== null && scores.discovery !== undefined
+                  ? `
                 <div class="score-card">
                   <div class="score-value">${scores.discovery}</div>
                   <div class="score-label">Discovery</div>
                 </div>
-              ` : ""}
-              ${scores.objection_handling !== null && scores.objection_handling !== undefined ? `
+              `
+                  : ""
+              }
+              ${
+                scores.objection_handling !== null && scores.objection_handling !== undefined
+                  ? `
                 <div class="score-card">
                   <div class="score-value">${scores.objection_handling}</div>
                   <div class="score-label">Objection Handling</div>
                 </div>
-              ` : ""}
-              ${scores.engagement !== null && scores.engagement !== undefined ? `
+              `
+                  : ""
+              }
+              ${
+                scores.engagement !== null && scores.engagement !== undefined
+                  ? `
                 <div class="score-card">
                   <div class="score-value">${scores.engagement}</div>
                   <div class="score-label">Engagement</div>
                 </div>
-              ` : ""}
+              `
+                  : ""
+              }
             </div>
 
-            ${analysis.strengths && analysis.strengths.length > 0 ? `
+            ${
+              analysis.strengths && analysis.strengths.length > 0
+                ? `
               <div class="strengths">
                 <h2>Strengths</h2>
                 <ul>
                   ${analysis.strengths.map((s) => `<li>${s}</li>`).join("")}
                 </ul>
               </div>
-            ` : ""}
+            `
+                : ""
+            }
 
-            ${analysis.areas_for_improvement && analysis.areas_for_improvement.length > 0 ? `
+            ${
+              analysis.areas_for_improvement && analysis.areas_for_improvement.length > 0
+                ? `
               <div class="improvements">
                 <h2>Areas for Improvement</h2>
                 <ul>
                   ${analysis.areas_for_improvement.map((a) => `<li>${a}</li>`).join("")}
                 </ul>
               </div>
-            ` : ""}
+            `
+                : ""
+            }
 
-            ${analysis.action_items && analysis.action_items.length > 0 ? `
+            ${
+              analysis.action_items && analysis.action_items.length > 0
+                ? `
               <div class="action-items">
                 <h2>Action Items</h2>
                 <ul>
                   ${analysis.action_items.map((item) => `<li>${item}</li>`).join("")}
                 </ul>
               </div>
-            ` : ""}
+            `
+                : ""
+            }
 
             <div class="footer">
-              <p>Generated on ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} at ${new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</p>
+              <p>Generated on ${new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })} at ${new Date().toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}</p>
             </div>
           </body>
         </html>
@@ -202,9 +234,7 @@ export function ExportCoachingReport({
           </>
         )}
       </Button>
-      {exportError && (
-        <p className="text-xs text-red-600 mt-2">{exportError}</p>
-      )}
+      {exportError && <p className="text-xs text-red-600 mt-2">{exportError}</p>}
     </div>
   );
 }

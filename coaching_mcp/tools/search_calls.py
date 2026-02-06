@@ -1,9 +1,10 @@
 """
 Search Calls Tool - Find calls matching specific criteria.
 """
+
 import logging
-from typing import Any
 from datetime import datetime
+from typing import Any
 
 from db import fetch_all
 
@@ -40,7 +41,9 @@ def search_calls_tool(
     Returns:
         List of matching calls with metadata and scores, filtered by role if specified
     """
-    logger.info(f"Searching calls with filters: rep={rep_email}, product={product}, type={call_type}, role={role}")
+    logger.info(
+        f"Searching calls with filters: rep={rep_email}, product={product}, type={call_type}, role={role}"
+    )
 
     # Build dynamic query
     where_clauses = ["c.processed_at IS NOT NULL"]
@@ -48,14 +51,16 @@ def search_calls_tool(
 
     # Filter by rep email
     if rep_email:
-        where_clauses.append("""
+        where_clauses.append(
+            """
             EXISTS (
                 SELECT 1 FROM speakers s
                 WHERE s.call_id = c.id
                 AND s.email = %s
                 AND s.company_side = true
             )
-        """)
+        """
+        )
         params.append(rep_email)
 
     # Filter by product
@@ -91,36 +96,42 @@ def search_calls_tool(
 
     # Filter by objection type (search in coaching session analysis)
     if has_objection_type:
-        where_clauses.append("""
+        where_clauses.append(
+            """
             EXISTS (
                 SELECT 1 FROM coaching_sessions cs
                 WHERE cs.call_id = c.id
                 AND cs.coaching_dimension = 'objection_handling'
                 AND cs.full_analysis ILIKE %s
             )
-        """)
+        """
+        )
         params.append(f"%{has_objection_type}%")
 
     # Filter by topics (search in transcript topics array)
     if topics:
-        where_clauses.append("""
+        where_clauses.append(
+            """
             EXISTS (
                 SELECT 1 FROM transcripts t
                 WHERE t.call_id = c.id
                 AND t.topics && %s::text[]
             )
-        """)
+        """
+        )
         params.append(topics)
 
     # Filter by role (search in coaching_sessions metadata)
     if role:
-        where_clauses.append("""
+        where_clauses.append(
+            """
             EXISTS (
                 SELECT 1 FROM coaching_sessions cs
                 WHERE cs.call_id = c.id
                 AND cs.metadata->>'rubric_role' = %s
             )
-        """)
+        """
+        )
         params.append(role)
 
     # Limit
@@ -167,17 +178,21 @@ def search_calls_tool(
     # Format results
     formatted_results = []
     for row in results:
-        formatted_results.append({
-            "call_id": row["gong_call_id"],
-            "title": row["title"],
-            "date": str(row["scheduled_at"]) if row["scheduled_at"] else None,
-            "duration_seconds": row["duration_seconds"],
-            "call_type": row["call_type"],
-            "product": row["product"],
-            "overall_score": round(float(row["overall_score"]), 1) if row["overall_score"] else None,
-            "customer_names": row["customer_names"] or [],
-            "prefect_reps": row["prefect_reps"] or [],
-        })
+        formatted_results.append(
+            {
+                "call_id": row["gong_call_id"],
+                "title": row["title"],
+                "date": str(row["scheduled_at"]) if row["scheduled_at"] else None,
+                "duration_seconds": row["duration_seconds"],
+                "call_type": row["call_type"],
+                "product": row["product"],
+                "overall_score": (
+                    round(float(row["overall_score"]), 1) if row["overall_score"] else None
+                ),
+                "customer_names": row["customer_names"] or [],
+                "prefect_reps": row["prefect_reps"] or [],
+            }
+        )
 
     logger.info(f"Found {len(formatted_results)} matching calls")
     return formatted_results

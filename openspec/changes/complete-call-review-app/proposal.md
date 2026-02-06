@@ -15,6 +15,7 @@ The Gong Call Coaching Agent has a fully functional MCP backend (database, Gong 
 ## Capabilities
 
 ### New Capabilities
+
 - `clerk-authentication`: Clerk-based authentication with email/password/Google OAuth and manager/rep RBAC using publicMetadata
 - `call-analysis-viewer`: Full-featured call detail page displaying transcript, coaching insights, dimension scores, and actionable recommendations
 - `rep-dashboard`: Performance dashboard with trend visualization, recent calls, metrics aggregation, and role-based data access
@@ -24,12 +25,14 @@ The Gong Call Coaching Agent has a fully functional MCP backend (database, Gong 
 - `vercel-deployment`: Production deployment configuration with environment management and API routing
 
 ### Modified Capabilities
+
 <!-- No existing spec requirements are changing -->
 
 ## Impact
 
 **Affected Code:**
-- `frontend/.env.local`: Add valid Clerk keys (pk_test_*, sk_test_*)
+
+- `frontend/.env.local`: Add valid Clerk keys (pk*test\*\*, sk*test\*\*)
 - `frontend/app/layout.tsx`: Already has ClerkProvider, verify middleware config
 - `frontend/app/calls/[callId]/page.tsx`: Complete call analysis viewer implementation
 - `frontend/app/calls/[callId]/CallAnalysisViewer.tsx`: Build out full component with API integration
@@ -40,14 +43,17 @@ The Gong Call Coaching Agent has a fully functional MCP backend (database, Gong 
 - `frontend/components/coaching/`: New coaching-specific components (ScoreCard, TrendChart, InsightCard, ActionItem)
 
 **Dependencies:**
+
 - Clerk Dashboard: Create application, get API keys, configure metadata schema
 - MCP Backend: Must remain running on localhost:8000 (or deployed URL)
 - Neon Database: Contains call data, coaching results, rubrics
 
 **APIs:**
+
 - New API routes: `/api/calls/[callId]`, `/api/reps/[email]/insights`, `/api/calls/search`
 - MCP Backend Tools: `analyze_call`, `get_rep_insights`, `search_calls`
 
 **Systems:**
+
 - Vercel: Deployment target with environment variable configuration
 - Clerk: Third-party auth service

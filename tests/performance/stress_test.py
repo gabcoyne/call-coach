@@ -7,13 +7,14 @@ Tests system behavior under extreme load:
 - Tests recovery after failures
 - Monitors resource utilization during stress
 """
+
 import asyncio
-import time
 import random
-from dataclasses import dataclass, field
-from typing import List
+import time
+from dataclasses import dataclass
+from datetime import datetime
+
 import httpx
-from datetime import datetime, timedelta
 
 
 @dataclass
@@ -50,7 +51,7 @@ class StressTestRunner:
         self.max_users = max_users
         self.ramp_up_interval = ramp_up_interval
         self.requests_per_user = requests_per_user
-        self.metrics: List[StressTestMetrics] = []
+        self.metrics: list[StressTestMetrics] = []
         self.breaking_point = None
 
         # Test data
@@ -96,15 +97,15 @@ class StressTestRunner:
 
             elapsed = time.time() - start
             return (response.status_code == 200, elapsed)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return (False, 30.0)
-        except Exception as e:
+        except Exception:
             elapsed = time.time() - start
             return (False, elapsed)
 
     async def simulate_user(
         self, client: httpx.AsyncClient, user_id: int
-    ) -> tuple[int, int, List[float]]:
+    ) -> tuple[int, int, list[float]]:
         """Simulate a single user making requests."""
         successful = 0
         failed = 0
@@ -132,9 +133,7 @@ class StressTestRunner:
 
         return (successful, failed, response_times)
 
-    def calculate_metrics(
-        self, concurrent_users: int, results: List[tuple]
-    ) -> StressTestMetrics:
+    def calculate_metrics(self, concurrent_users: int, results: list[tuple]) -> StressTestMetrics:
         """Calculate metrics from test results."""
         all_response_times = []
         total_successful = 0
@@ -158,16 +157,16 @@ class StressTestRunner:
             total_requests=total_requests,
             successful_requests=total_successful,
             failed_requests=total_failed,
-            response_time_avg=sum(all_response_times) / len(all_response_times)
-            if all_response_times
-            else 0,
+            response_time_avg=(
+                sum(all_response_times) / len(all_response_times) if all_response_times else 0
+            ),
             response_time_p95=sorted_times[p95_idx] if p95_idx < len(sorted_times) else 0,
             response_time_p99=sorted_times[p99_idx] if p99_idx < len(sorted_times) else 0,
             error_rate=error_rate,
             throughput_rps=total_requests / (self.ramp_up_interval / 1000),
         )
 
-    async def run(self) -> List[StressTestMetrics]:
+    async def run(self) -> list[StressTestMetrics]:
         """Run the complete stress test."""
         print(f"\n{'=' * 80}")
         print("STRESS TEST: STARTING")
@@ -179,9 +178,7 @@ class StressTestRunner:
         print(f"Requests/User:      {self.requests_per_user}")
         print(f"{'=' * 80}\n")
 
-        connector = httpx.AsyncHTTPConnection(
-            pool_connections=1000, pool_maxsize=1000
-        )
+        connector = httpx.AsyncHTTPConnection(pool_connections=1000, pool_maxsize=1000)
         async with httpx.AsyncClient(
             connector=connector, timeout=60.0, limits=httpx.Limits(max_connections=1000)
         ) as client:
@@ -192,10 +189,7 @@ class StressTestRunner:
                 start_time = time.time()
 
                 # Create tasks for all users
-                tasks = [
-                    self.simulate_user(client, user_id)
-                    for user_id in range(current_users)
-                ]
+                tasks = [self.simulate_user(client, user_id) for user_id in range(current_users)]
 
                 # Run all users concurrently
                 results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -255,8 +249,10 @@ class StressTestRunner:
         print()
 
         # Print phase-by-phase metrics
-        print(f"{'Users':>8} {'Requests':>10} {'Success':>10} {'Failed':>8} "
-              f"{'Error %':>8} {'Avg (ms)':>10} {'P95 (ms)':>10} {'P99 (ms)':>10} {'RPS':>8}")
+        print(
+            f"{'Users':>8} {'Requests':>10} {'Success':>10} {'Failed':>8} "
+            f"{'Error %':>8} {'Avg (ms)':>10} {'P95 (ms)':>10} {'P99 (ms)':>10} {'RPS':>8}"
+        )
         print("-" * 94)
 
         for metric in self.metrics:

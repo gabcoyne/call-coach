@@ -4,47 +4,60 @@ Prometheus metrics for monitoring application performance and usage.
 Tracks: API response times, Claude API token usage, cache hit rates,
 database query times, and other key performance indicators.
 """
+
 import logging
 import time
-from typing import Optional, Callable, Any
+from collections.abc import Callable
 from contextlib import contextmanager
 from functools import wraps
+from typing import Any
 
 try:
-    from prometheus_client import Counter, Histogram, Gauge, CollectorRegistry
+    from prometheus_client import CollectorRegistry, Counter, Gauge, Histogram
 except ImportError:
     # Fallback for environments without prometheus_client
     class Counter:
         def __init__(self, *args, **kwargs):
             pass
+
         def inc(self, *args, **kwargs):
             pass
+
         def labels(self, *args, **kwargs):
             return self
 
     class Histogram:
         def __init__(self, *args, **kwargs):
             pass
+
         def observe(self, *args, **kwargs):
             pass
+
         def time(self, *args, **kwargs):
             from contextlib import contextmanager
+
             @contextmanager
             def noop():
                 yield
+
             return noop()
+
         def labels(self, *args, **kwargs):
             return self
 
     class Gauge:
         def __init__(self, *args, **kwargs):
             pass
+
         def set(self, *args, **kwargs):
             pass
+
         def inc(self, *args, **kwargs):
             pass
+
         def dec(self, *args, **kwargs):
             pass
+
         def labels(self, *args, **kwargs):
             return self
 
@@ -56,7 +69,7 @@ logger = logging.getLogger(__name__)
 class MetricsCollector:
     """Prometheus metrics collector for the Call Coach application."""
 
-    def __init__(self, registry: Optional[CollectorRegistry] = None):
+    def __init__(self, registry: CollectorRegistry | None = None):
         """
         Initialize metrics collector.
 
@@ -250,8 +263,16 @@ class MetricsCollector:
 
     def get_cache_hit_rate(self, cache_type: str) -> float:
         """Calculate cache hit rate for a given cache type."""
-        hits = self.cache_hits.labels(cache_type=cache_type)._value.get() if hasattr(self.cache_hits.labels(cache_type=cache_type), '_value') else 0
-        misses = self.cache_misses.labels(cache_type=cache_type)._value.get() if hasattr(self.cache_misses.labels(cache_type=cache_type), '_value') else 0
+        hits = (
+            self.cache_hits.labels(cache_type=cache_type)._value.get()
+            if hasattr(self.cache_hits.labels(cache_type=cache_type), "_value")
+            else 0
+        )
+        misses = (
+            self.cache_misses.labels(cache_type=cache_type)._value.get()
+            if hasattr(self.cache_misses.labels(cache_type=cache_type), "_value")
+            else 0
+        )
         total = hits + misses
         return (hits / total * 100) if total > 0 else 0
 
@@ -315,7 +336,7 @@ class MetricsCollector:
 
 
 # Global metrics instance
-_metrics: Optional[MetricsCollector] = None
+_metrics: MetricsCollector | None = None
 
 
 def get_metrics() -> MetricsCollector:
@@ -336,6 +357,7 @@ def initialize_metrics() -> MetricsCollector:
 
 def track_api_call(method: str, endpoint: str):
     """Decorator to track API calls."""
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args, **kwargs) -> Any:
@@ -345,11 +367,13 @@ def track_api_call(method: str, endpoint: str):
             try:
                 result = await func(*args, **kwargs)
                 return result
-            except Exception as e:
+            except Exception:
                 status = 500
                 raise
             finally:
                 duration = time.time() - start_time
                 metrics.record_api_request(method, endpoint, status, duration)
+
         return wrapper
+
     return decorator

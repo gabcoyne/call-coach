@@ -1,7 +1,17 @@
-'use client';
+"use client";
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
-import { SCORE_COLORS } from '@/lib/colors';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
+import { SCORE_COLORS } from "@/lib/colors";
 
 export interface ComparisonData {
   dimension: string;
@@ -27,7 +37,7 @@ export interface TeamComparisonChartProps {
 export function TeamComparisonChart({
   data,
   height = 300,
-  className = '',
+  className = "",
 }: TeamComparisonChartProps) {
   if (!data || data.length === 0) {
     return (
@@ -51,10 +61,7 @@ export function TeamComparisonChart({
   return (
     <div className={className}>
       <ResponsiveContainer width="100%" height={height}>
-        <BarChart
-          data={data}
-          margin={{ top: 5, right: 30, left: 20, bottom: 60 }}
-        >
+        <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="dimension"
@@ -68,19 +75,17 @@ export function TeamComparisonChart({
             domain={[0, 100]}
             tick={{ fontSize: 12 }}
             stroke="#6b7280"
-            label={{ value: 'Score', angle: -90, position: 'insideLeft' }}
+            label={{ value: "Score", angle: -90, position: "insideLeft" }}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#ffffff',
-              border: '1px solid #e5e7eb',
-              borderRadius: '6px',
-              fontSize: '12px',
+              backgroundColor: "#ffffff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "6px",
+              fontSize: "12px",
             }}
           />
-          <Legend
-            wrapperStyle={{ fontSize: '12px' }}
-          />
+          <Legend wrapperStyle={{ fontSize: "12px" }} />
           <Bar
             dataKey="repScore"
             fill={SCORE_COLORS.HIGH}

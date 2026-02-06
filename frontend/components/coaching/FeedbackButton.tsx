@@ -13,22 +13,14 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
-type FeedbackType =
-  | "accurate"
-  | "inaccurate"
-  | "missing_context"
-  | "helpful"
-  | "not_helpful";
+type FeedbackType = "accurate" | "inaccurate" | "missing_context" | "helpful" | "not_helpful";
 
 interface FeedbackButtonProps {
   coachingSessionId: string;
   onFeedbackSubmitted?: () => void;
 }
 
-export function FeedbackButton({
-  coachingSessionId,
-  onFeedbackSubmitted,
-}: FeedbackButtonProps) {
+export function FeedbackButton({ coachingSessionId, onFeedbackSubmitted }: FeedbackButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<FeedbackType | null>(null);
   const [comment, setComment] = useState("");
@@ -40,19 +32,16 @@ export function FeedbackButton({
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(
-        `/api/coaching-sessions/${coachingSessionId}/feedback`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            feedback_type: selectedType,
-            feedback_text: comment || null,
-          }),
-        }
-      );
+      const response = await fetch(`/api/coaching-sessions/${coachingSessionId}/feedback`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          feedback_type: selectedType,
+          feedback_text: comment || null,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to submit feedback");
@@ -117,9 +106,7 @@ export function FeedbackButton({
           <div className="space-y-6">
             {/* Accuracy Feedback */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">
-                How accurate was this analysis?
-              </label>
+              <label className="text-sm font-medium">How accurate was this analysis?</label>
               <div className="flex gap-2">
                 <Button
                   variant={selectedType === "accurate" ? "default" : "outline"}
@@ -140,9 +127,7 @@ export function FeedbackButton({
                   Inaccurate
                 </Button>
                 <Button
-                  variant={
-                    selectedType === "missing_context" ? "default" : "outline"
-                  }
+                  variant={selectedType === "missing_context" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setSelectedType("missing_context")}
                   className="flex-1 gap-2"
@@ -155,9 +140,7 @@ export function FeedbackButton({
 
             {/* Helpfulness */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Was this feedback helpful?
-              </label>
+              <label className="text-sm font-medium">Was this feedback helpful?</label>
               <div className="flex gap-2">
                 <Button
                   variant={selectedType === "helpful" ? "default" : "outline"}
@@ -169,9 +152,7 @@ export function FeedbackButton({
                   Helpful
                 </Button>
                 <Button
-                  variant={
-                    selectedType === "not_helpful" ? "default" : "outline"
-                  }
+                  variant={selectedType === "not_helpful" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setSelectedType("not_helpful")}
                   className="flex-1 gap-2"
@@ -195,24 +176,15 @@ export function FeedbackButton({
                 className="resize-none"
                 rows={4}
               />
-              <p className="text-xs text-muted-foreground">
-                {comment.length}/1000
-              </p>
+              <p className="text-xs text-muted-foreground">{comment.length}/1000</p>
             </div>
 
             {/* Submit Button */}
             <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-                disabled={isSubmitting}
-              >
+              <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={!selectedType || isSubmitting}
-              >
+              <Button onClick={handleSubmit} disabled={!selectedType || isSubmitting}>
                 {isSubmitting ? "Submitting..." : "Submit Feedback"}
               </Button>
             </div>

@@ -4,10 +4,11 @@ Database Query Benchmarks
 Measures performance of critical database queries.
 Identifies slow queries and optimization opportunities.
 """
-import pytest
+
 import asyncio
-from typing import List
-import time
+
+import pytest
+
 from db import queries
 
 
@@ -65,6 +66,7 @@ class TestDatabaseBenchmarks:
 
     def test_search_calls_by_product(self, benchmark):
         """Benchmark searching calls by product."""
+
         def query():
             return queries.search_calls(product="product_a", limit=20)
 
@@ -135,6 +137,7 @@ class TestDatabaseBenchmarks:
 
     def test_get_recent_calls(self, benchmark):
         """Benchmark fetching recent calls."""
+
         def query():
             return queries.get_recent_calls(limit=100)
 
@@ -151,6 +154,7 @@ class TestDatabaseBenchmarks:
 
     def test_count_calls_by_product(self, benchmark):
         """Benchmark counting calls by product."""
+
         def query():
             return queries.count_calls_by_product()
 
@@ -158,6 +162,7 @@ class TestDatabaseBenchmarks:
 
     def test_count_calls_by_rep(self, benchmark):
         """Benchmark counting calls by rep."""
+
         def query():
             return queries.count_calls_by_rep()
 
@@ -165,6 +170,7 @@ class TestDatabaseBenchmarks:
 
     def test_get_dashboard_stats(self, benchmark):
         """Benchmark fetching dashboard statistics."""
+
         def query():
             return queries.get_dashboard_stats()
 
@@ -176,6 +182,7 @@ class TestDatabaseQueryPlan:
 
     def test_search_calls_index_usage(self, benchmark):
         """Benchmark search_calls to verify index usage."""
+
         # This would ideally check EXPLAIN PLAN
         def query():
             return queries.search_calls(
@@ -207,6 +214,7 @@ class TestDatabaseConnectionPool:
 
     def test_connection_acquisition_time(self, benchmark):
         """Measure time to acquire a connection from pool."""
+
         def get_connection():
             # This would measure actual connection pool performance
             conn = queries.get_connection()
@@ -216,6 +224,7 @@ class TestDatabaseConnectionPool:
 
     def test_query_with_multiple_connections(self, benchmark):
         """Benchmark query performance under connection pool stress."""
+
         def query():
             results = []
             for i in range(5):

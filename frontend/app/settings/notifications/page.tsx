@@ -119,14 +119,18 @@ export default function NotificationsPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Notification Settings</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage how and when you receive notifications
-        </p>
+        <p className="text-muted-foreground mt-1">Manage how and when you receive notifications</p>
       </div>
 
       {/* Status Message */}
       {message && (
-        <div className={`p-4 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+        <div
+          className={`p-4 rounded-lg ${
+            message.type === "success"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
           {message.text}
         </div>
       )}
@@ -143,10 +147,7 @@ export default function NotificationsPage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="frequency">Summary Frequency</Label>
-            <Select
-              value={preferences.notificationFrequency}
-              onValueChange={handleFrequencyChange}
-            >
+            <Select value={preferences.notificationFrequency} onValueChange={handleFrequencyChange}>
               <SelectTrigger id="frequency" className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -167,7 +168,9 @@ export default function NotificationsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Email Notifications</CardTitle>
-          <CardDescription>Choose which notifications you want to receive via email</CardDescription>
+          <CardDescription>
+            Choose which notifications you want to receive via email
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-start space-x-3 p-3 rounded-lg border border-border hover:bg-muted transition-colors">

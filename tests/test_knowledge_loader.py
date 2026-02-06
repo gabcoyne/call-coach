@@ -1,14 +1,8 @@
 """Tests for knowledge base loader."""
+
 import json
-from pathlib import Path
 
-import pytest
-
-from knowledge.loader import (
-    load_rubric_from_file,
-    RUBRICS_DIR,
-    PRODUCTS_DIR,
-)
+from knowledge.loader import PRODUCTS_DIR, RUBRICS_DIR, load_rubric_from_file
 
 
 def test_rubrics_directory_exists():

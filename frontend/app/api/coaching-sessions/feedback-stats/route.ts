@@ -175,10 +175,7 @@ export async function GET(request: NextRequest) {
     // Issue 3: High missing context
     const missingContextRate =
       overallStats.total_feedback > 0
-        ? Math.round(
-            (100 * overallStats.missing_context_count) /
-              overallStats.total_feedback
-          )
+        ? Math.round((100 * overallStats.missing_context_count) / overallStats.total_feedback)
         : 0;
 
     if (missingContextRate > 20) {
@@ -199,9 +196,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching feedback stats:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch feedback statistics" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch feedback statistics" }, { status: 500 });
   }
 }

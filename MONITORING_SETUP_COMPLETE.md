@@ -7,9 +7,11 @@ Comprehensive monitoring and observability infrastructure has been successfully 
 ## Implementation Summary
 
 ### 1. Sentry Error Tracking
+
 **File**: `/Users/gcoyne/src/prefect/call-coach/monitoring/sentry.py`
 
 Complete Sentry integration with:
+
 - Exception capture with rich context (user ID, email, call_id, rep_id, opportunity_id, correlation_id)
 - Message capturing for logging
 - Breadcrumb tracking for request chains
@@ -20,57 +22,69 @@ Complete Sentry integration with:
 - Performance profiling optional support
 
 **Key Classes**:
+
 - `SentryConfig` - Configuration and initialization
 - Global functions: `capture_exception()`, `capture_message()`, `add_breadcrumb()`, `set_user_context()`, `set_tags()`
 
 ### 2. Prometheus Metrics
+
 **File**: `/Users/gcoyne/src/prefect/call-coach/monitoring/metrics.py`
 
 Comprehensive metrics collection tracking:
 
 **API Metrics**:
+
 - `api_requests_total` - Total requests by method, endpoint, status
 - `api_request_duration_seconds` - Request latency with percentiles (p50, p95, p99)
 
 **Claude API Metrics**:
+
 - `claude_api_calls_total` - Total API calls by model and status
 - `claude_input_tokens_total` - Input tokens sent
 - `claude_output_tokens_total` - Output tokens received
 - `claude_api_duration_seconds` - API call latency
 
 **Cache Metrics**:
+
 - `cache_hits_total` - Cache hits by type
 - `cache_misses_total` - Cache misses by type
 - `cache_size_bytes` - Current cache size
 - Helper method: `get_cache_hit_rate()`
 
 **Database Metrics**:
+
 - `db_queries_total` - Total queries by operation and table
 - `db_query_duration_seconds` - Query latency with percentiles
 - `db_connections_active` - Active database connections
 
 **Business Metrics**:
+
 - `calls_analyzed_total` - Coaching analyses completed (by status)
 - `coaching_sessions_created_total` - Sessions created
 - `coaching_session_duration_seconds` - Session duration distribution
 
 **Error Metrics**:
+
 - `errors_total` - Total errors by type and source
 - `gong_api_errors_total` - Gong API errors by type
 
 **System Metrics**:
+
 - `background_tasks_running` - Active background tasks
 
 **Key Classes**:
+
 - `MetricsCollector` - Main metrics collector with context managers
 - Global functions: `get_metrics()`, `initialize_metrics()`, `track_api_call()` decorator
 
 ### 3. Structured Logging
+
 **File**: `/Users/gcoyne/src/prefect/call-coach/instrumentation/logger.py`
 
 JSON-formatted logging with full request tracing:
 
 **Features**:
+
 - Correlation ID generation and tracking via context variables
 - Call ID, rep ID, user ID tracking across requests
 - JSON output for log aggregation (ELK, DataDog, etc.)
@@ -79,6 +93,7 @@ JSON-formatted logging with full request tracing:
 - Specialized logging methods for coaching scenarios
 
 **Log Types**:
+
 - `log_api_request()` - API endpoint calls with duration and status
 - `log_call_analysis()` - Coaching analysis with dimensions and tokens
 - `log_coaching_session()` - Session creation with score and metadata
@@ -87,70 +102,81 @@ JSON-formatted logging with full request tracing:
 - `log_external_api_call()` - Third-party API calls (Gong, Claude, etc.)
 
 **Key Classes**:
+
 - `StructuredLogger` - Logger instance with context management
 - `JSONFormatter` - JSON log formatting
 - `CorrelationIdFilter` - Automatic field injection
 - Global functions: `setup_structured_logging()`, `get_logger()`, `get_correlation_id()`, `set_correlation_id()`
 
 ### 4. Alerting Rules
+
 **File**: `/Users/gcoyne/src/prefect/call-coach/monitoring/alerts.yml`
 
 Prometheus alerting rules organized by category:
 
 **Error Alerts**:
+
 - High error rate (>5%) - Critical, 5m threshold
 - Sentry error spike (>10 in 15m) - Warning, 5m threshold
 - Gong API errors occurring - Warning, 2m threshold
 - Claude API error rate (>5%) - Warning, 5m threshold
 
 **Performance Alerts**:
+
 - Slow API responses (p95 > 2s) - Warning, 5m threshold
 - High Claude API latency (p95 > 30s) - Warning, 5m threshold
 - Slow database queries (p95 > 1s) - Warning, 5m threshold
 - Long call analysis duration (p95 > 60s) - Info, 10m threshold
 
 **Resource Alerts**:
+
 - High memory usage (>85%) - Warning, 5m threshold
 - High CPU usage (>80%) - Warning, 5m threshold
 - Disk critically full (<15% available) - Critical, 5m threshold
 - Database connection pool near full (>80%) - Warning, 5m threshold
 
 **Business Alerts**:
+
 - Zero coaching sessions in 1 hour - Warning, 2h threshold
 - Zero calls analyzed in 1 hour - Warning, 2h threshold
 - Low cache hit rate (<30%) - Info, 10m threshold
 
 **Dependency Alerts**:
+
 - PostgreSQL database down - Critical, 1m threshold
 - Redis cache down - Critical, 1m threshold
 - Gong API experiencing issues - Critical, 5m threshold
 
 **Token Usage Alerts**:
+
 - High token usage (>1M tokens/hour) - Warning, 30m threshold
 - Daily token cost above threshold (>$100) - Info, 1h threshold
 
 ### 5. Health Check Endpoint
+
 **File**: `/Users/gcoyne/src/prefect/call-coach/frontend/app/api/health/route.ts`
 
 Comprehensive health check API endpoint (`GET /api/health`):
 
 **Checks Performed**:
+
 - Database connectivity and response time
 - Redis cache connectivity (with degradation if not configured)
 - Claude API availability (auth validation)
 - Backend API availability
 
 **Response Format**:
+
 ```json
 {
   "status": "healthy|degraded|unhealthy",
   "timestamp": "ISO8601",
   "uptime": "milliseconds",
   "checks": {
-    "database": {"status": "up|down|degraded", "latency_ms": 5},
-    "redis": {"status": "up|down|degraded", "latency_ms": 2},
-    "claude_api": {"status": "up|down|degraded", "latency_ms": 150},
-    "backend_api": {"status": "up|down|degraded", "latency_ms": 10}
+    "database": { "status": "up|down|degraded", "latency_ms": 5 },
+    "redis": { "status": "up|down|degraded", "latency_ms": 2 },
+    "claude_api": { "status": "up|down|degraded", "latency_ms": 150 },
+    "backend_api": { "status": "up|down|degraded", "latency_ms": 10 }
   },
   "version": "1.0.0",
   "environment": "production"
@@ -158,15 +184,18 @@ Comprehensive health check API endpoint (`GET /api/health`):
 ```
 
 **Status Codes**:
+
 - 200 - Healthy (all checks up)
 - 503 - Degraded or Unhealthy (one or more checks down)
 
 ### 6. Performance Profiling
+
 **File**: `/Users/gcoyne/src/prefect/call-coach/instrumentation/profiler.py`
 
 Multi-level performance profiling for bottleneck identification:
 
 **PerformanceProfiler**:
+
 - Block-level profiling with context manager
 - Function-level profiling with decorator
 - Memory tracking alongside timing
@@ -175,29 +204,34 @@ Multi-level performance profiling for bottleneck identification:
 - Slowest calls tracking
 
 **CPUProfiler**:
+
 - cProfile-based function-level CPU profiling
 - Statistical output generation
 - Profile data persistence for post-analysis
 - Top-20 functions report generation
 
 **SlowRequestDetector**:
+
 - Configurable threshold detection
 - Slow request logging with metadata
 - Request history tracking
 - Slow request reporting with sorting
 
 **Key Classes**:
+
 - `PerformanceProfiler` - Block and function profiling
 - `CPUProfiler` - CPU-level profiling
 - `SlowRequestDetector` - Request threshold monitoring
 - Global functions: `get_performance_profiler()`, `get_cpu_profiler()`, `get_slow_request_detector()`, `initialize_profiling()`, `profile_request()` decorator
 
 ### 7. Grafana Dashboard
+
 **File**: `/Users/gcoyne/src/prefect/call-coach/monitoring/dashboards/call_coach.json`
 
 Pre-built comprehensive dashboard with 8 panels:
 
 **Panels**:
+
 1. Application Status (gauge)
 2. API Request Rate (timeseries, by method/endpoint)
 3. API Response Time Percentiles (p50, p95, p99)
@@ -208,6 +242,7 @@ Pre-built comprehensive dashboard with 8 panels:
 8. Business Metrics (calls analyzed, sessions created)
 
 **Configuration**:
+
 - 10-second refresh rate
 - 6-hour time range
 - Dark theme with semantic colors
@@ -217,6 +252,7 @@ Pre-built comprehensive dashboard with 8 panels:
 ## Integration Points
 
 ### FastAPI REST Server Integration
+
 ```python
 from monitoring.sentry import initialize_sentry
 from monitoring.metrics import get_metrics
@@ -250,6 +286,7 @@ async def add_correlation(request, call_next):
 ```
 
 ### FastMCP Server Integration
+
 ```python
 from monitoring.sentry import initialize_sentry, capture_exception
 from instrumentation.logger import get_logger
@@ -280,6 +317,7 @@ def analyze_call(call_id: str):
 ## Files Created
 
 ### Monitoring Module
+
 - `/Users/gcoyne/src/prefect/call-coach/monitoring/__init__.py` - Module exports
 - `/Users/gcoyne/src/prefect/call-coach/monitoring/sentry.py` - Sentry integration
 - `/Users/gcoyne/src/prefect/call-coach/monitoring/metrics.py` - Prometheus metrics
@@ -288,14 +326,17 @@ def analyze_call(call_id: str):
 - `/Users/gcoyne/src/prefect/call-coach/monitoring/README.md` - Complete setup guide
 
 ### Instrumentation Module
+
 - `/Users/gcoyne/src/prefect/call-coach/instrumentation/__init__.py` - Module exports
 - `/Users/gcoyne/src/prefect/call-coach/instrumentation/logger.py` - Structured logging
 - `/Users/gcoyne/src/prefect/call-coach/instrumentation/profiler.py` - Performance profiling
 
 ### Frontend Health Check
+
 - `/Users/gcoyne/src/prefect/call-coach/frontend/app/api/health/route.ts` - Health check endpoint
 
 ### Configuration
+
 - Updated `/Users/gcoyne/src/prefect/call-coach/pyproject.toml` - Added monitoring dependencies
 
 ## Dependencies Added
@@ -307,6 +348,7 @@ def analyze_call(call_id: str):
 ```
 
 Optional for enhanced profiling:
+
 - `psutil>=5.9.0` - For memory usage tracking in profiler
 
 ## Environment Variables
@@ -459,6 +501,7 @@ Full documentation available in `/Users/gcoyne/src/prefect/call-coach/monitoring
 ## Support
 
 For questions or issues:
+
 1. Review the comprehensive README.md
 2. Check Grafana dashboard for current metrics
 3. Review Sentry for recent errors

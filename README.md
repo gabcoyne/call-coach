@@ -42,11 +42,13 @@ call-coach/
 ## Setup
 
 1. **Install uv** (Python package manager):
+
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
 2. **Configure environment**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your credentials:
@@ -56,16 +58,19 @@ call-coach/
    ```
 
 3. **Initialize database** (first time only):
+
    ```bash
    psql $DATABASE_URL -f db/migrations/001_initial_schema.sql
    ```
 
 4. **Load knowledge base** (first time only):
+
    ```bash
    uv run python -m knowledge.loader
    ```
 
 5. **Start the REST API server** (for frontend integration):
+
    ```bash
    # Start REST API at http://localhost:8000
    ./scripts/start-rest-api.sh
@@ -75,6 +80,7 @@ call-coach/
    ```
 
 6. **Start the Next.js frontend** (optional):
+
    ```bash
    cd frontend
    npm install
@@ -83,6 +89,7 @@ call-coach/
    ```
 
 7. **Run FastMCP server** (for Claude Desktop MCP integration):
+
    ```bash
    # Development mode (recommended for local dev)
    uv run mcp-server-dev
@@ -92,6 +99,7 @@ call-coach/
    ```
 
 8. **Deploy Prefect flows** (optional):
+
    ```bash
    prefect deploy flows/process_new_call.py
    prefect deploy flows/weekly_review.py
@@ -110,16 +118,20 @@ The MCP server can be deployed to **FastMCP Cloud** via **Prefect Horizon** for 
 ### Deployment Steps
 
 1. **Run pre-deployment validation**:
+
    ```bash
    ./.fastmcp/deploy.sh
    ```
+
    This verifies dependencies, configuration files, and local server initialization.
 
 2. **Navigate to Horizon MCP Servers**:
-   - Go to: https://horizon.prefect.io/prefect-george/servers
+
+   - Go to: <https://horizon.prefect.io/prefect-george/servers>
    - Click "Create New MCP Server"
 
 3. **Configure server settings**:
+
    - **Name**: `gong-call-coach`
    - **Runtime**: Python 3.11
    - **Command**: `uv`
@@ -127,6 +139,7 @@ The MCP server can be deployed to **FastMCP Cloud** via **Prefect Horizon** for 
    - **Working Directory**: `/app`
 
 4. **Set environment variables** (mark as secrets):
+
    ```
    GONG_API_KEY=your_gong_access_key_here
    GONG_API_SECRET=your_gong_secret_key_jwt_here
@@ -136,13 +149,16 @@ The MCP server can be deployed to **FastMCP Cloud** via **Prefect Horizon** for 
    ```
 
 5. **Upload project files**:
+
    - Option A: Connect GitHub repository
    - Option B: Upload project directory (zip entire `call-coach/` folder)
 
 6. **Deploy**:
+
    - Click "Deploy" button
    - Wait for status to show "Ready" (should complete within 30 seconds)
    - Check logs for validation success messages:
+
      ```
      ✓ All required environment variables present
      ✓ Database connection successful
@@ -153,15 +169,16 @@ The MCP server can be deployed to **FastMCP Cloud** via **Prefect Horizon** for 
 
 ### Required Environment Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `GONG_API_KEY` | Gong access key | `UQ4SK2LPUPBCFN7Q...` |
-| `GONG_API_SECRET` | Gong secret key (JWT) | `eyJhbGciOiJIUzI1NiJ9...` |
-| `GONG_API_BASE_URL` | Tenant-specific URL | `https://us-79647.api.gong.io/v2` |
-| `ANTHROPIC_API_KEY` | Claude API key | `sk-ant-api03-...` |
-| `DATABASE_URL` | Neon PostgreSQL URL | `postgresql://...?sslmode=require` |
+| Variable            | Description           | Example                            |
+| ------------------- | --------------------- | ---------------------------------- |
+| `GONG_API_KEY`      | Gong access key       | `UQ4SK2LPUPBCFN7Q...`              |
+| `GONG_API_SECRET`   | Gong secret key (JWT) | `eyJhbGciOiJIUzI1NiJ9...`          |
+| `GONG_API_BASE_URL` | Tenant-specific URL   | `https://us-79647.api.gong.io/v2`  |
+| `ANTHROPIC_API_KEY` | Claude API key        | `sk-ant-api03-...`                 |
+| `DATABASE_URL`      | Neon PostgreSQL URL   | `postgresql://...?sslmode=require` |
 
 **Optional Variables:**
+
 - `GONG_WEBHOOK_SECRET`: For webhook signature verification
 - `LOG_LEVEL`: Logging verbosity (default: `INFO`)
 
@@ -194,16 +211,18 @@ Test 3 - Search calls:
 **Symptom**: `✗ Gong API authentication failed`
 
 **Solutions**:
+
 1. Verify `GONG_API_KEY` and `GONG_API_SECRET` are correct
 2. Confirm `GONG_API_BASE_URL` uses your tenant-specific URL (not generic `api.gong.io`)
 3. Test credentials locally: `uv run python tests/test_gong_client_live.py`
-4. Regenerate keys at: https://gong.app.gong.io/settings/api/authentication
+4. Regenerate keys at: <https://gong.app.gong.io/settings/api/authentication>
 
 #### Database Connection Timeout
 
 **Symptom**: `✗ Database connection failed`
 
 **Solutions**:
+
 1. Verify `DATABASE_URL` includes `?sslmode=require` suffix
 2. Check Neon dashboard for connection pool limits (5-20 max)
 3. Confirm IP allowlist in Neon includes Horizon/FastMCP Cloud IPs
@@ -214,6 +233,7 @@ Test 3 - Search calls:
 **Symptom**: Server status shows "Failed" with timeout error
 
 **Solutions**:
+
 1. Check if large dependencies (tiktoken models) are causing slow imports
 2. Review Horizon logs for specific bottleneck during startup
 3. Consider pre-warming with Horizon warmup configuration
@@ -224,6 +244,7 @@ Test 3 - Search calls:
 **Symptom**: MCP tools not visible in Claude Desktop
 
 **Solutions**:
+
 1. Restart Claude Desktop completely
 2. Verify Horizon server status is "Ready" (not "Failed" or "Deploying")
 3. Check Horizon logs for tool registration success
@@ -234,10 +255,12 @@ Test 3 - Search calls:
 To rotate Gong or Anthropic API keys:
 
 1. Generate new keys:
-   - **Gong**: https://gong.app.gong.io/settings/api/authentication
-   - **Anthropic**: https://console.anthropic.com/settings/keys
+
+   - **Gong**: <https://gong.app.gong.io/settings/api/authentication>
+   - **Anthropic**: <https://console.anthropic.com/settings/keys>
 
 2. Update in Horizon UI:
+
    - Navigate to server settings
    - Edit environment variables
    - Update `GONG_API_KEY`, `GONG_API_SECRET`, or `ANTHROPIC_API_KEY`
@@ -252,16 +275,19 @@ To rotate Gong or Anthropic API keys:
 ### Monitoring
 
 **Horizon Logs**:
+
 - View real-time logs in Horizon UI
 - Look for validation success messages on startup
 - Monitor for repeated 401 errors (credential issues)
 
 **Neon Dashboard**:
+
 - Track connection pool usage (target: <50% utilization)
 - Monitor query latency (target: <100ms for simple queries)
 - Alert if connections exceed 15/20 limit
 
 **Anthropic Usage Dashboard**:
+
 - Track daily token usage and costs
 - Expected: $10-15/day with cache hit rate of 60-80%
 - Alert if daily cost exceeds $25 (possible cache invalidation issue)
@@ -281,6 +307,7 @@ Use with Claude Desktop (local or cloud-deployed):
 ### Weekly Reviews (Automated)
 
 Scheduled every Monday at 6am PT via Prefect Horizon:
+
 - Analyzes all calls from previous week
 - Generates rep-specific coaching reports
 - Sends team-wide insights to sales leadership
@@ -292,11 +319,13 @@ Scheduled every Monday at 6am PT via Prefect Horizon:
 Get the MCP backend server running locally in 3 steps:
 
 1. **Install uv** (Python package manager):
+
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
 2. **Setup environment**:
+
    ```bash
    # Ensure .env exists in project root with required credentials
    # Required: GONG_API_KEY, GONG_API_SECRET, ANTHROPIC_API_KEY, DATABASE_URL
@@ -305,6 +334,7 @@ Get the MCP backend server running locally in 3 steps:
    ```
 
 3. **Run the server**:
+
    ```bash
    # Development mode (fast startup, relaxed validation)
    uv run mcp-server-dev
@@ -319,6 +349,7 @@ For detailed backend development guide, see [CLAUDE.md](CLAUDE.md).
 ### Full Stack Development (Backend + Frontend)
 
 **Terminal 1 - MCP Backend Server**:
+
 ```bash
 # Ensure you're in the project root
 cd /Users/gcoyne/src/prefect/call-coach
@@ -338,6 +369,7 @@ uv run python coaching_mcp/server.py
 ```
 
 **Terminal 2 - Next.js Frontend**:
+
 ```bash
 # Navigate to frontend directory
 cd /Users/gcoyne/src/prefect/call-coach/frontend
@@ -355,6 +387,7 @@ npm run dev
 ```
 
 **Terminal 3 - Watch Tests (Optional)**:
+
 ```bash
 cd /Users/gcoyne/src/prefect/call-coach/frontend
 npm run test:watch
@@ -363,6 +396,7 @@ npm run test:watch
 ### Environment Setup
 
 **Backend** (`.env` in project root):
+
 ```bash
 # Required for MCP backend
 ANTHROPIC_API_KEY=sk-ant-...
@@ -373,6 +407,7 @@ GONG_API_BASE_URL=https://us-79647.api.gong.io/v2
 ```
 
 **Frontend** (`frontend/.env.local`):
+
 ```bash
 # Required for Next.js frontend
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
@@ -389,14 +424,17 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 ### Development Workflow
 
 1. **Backend changes**: Edit files in `coaching_mcp/`, `analysis/`, `gong/`, or `db/`
+
    - Server auto-reloads on file changes (if using uvicorn with --reload)
    - Test with: `pytest tests/`
 
 2. **Frontend changes**: Edit files in `frontend/app/`, `frontend/components/`, or `frontend/lib/`
+
    - Next.js hot-reloads automatically
    - Test with: `npm run test`
 
 3. **Database changes**:
+
    ```bash
    # Apply migration
    psql $DATABASE_URL -f db/migrations/00X_migration_name.sql
@@ -406,36 +444,41 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
    ```
 
 4. **Test full flow**:
-   - Open browser: http://localhost:3000
+   - Open browser: <http://localhost:3000>
    - Sign in with Clerk (create test user first)
    - Navigate to Dashboard, Search, or Feed
-   - Backend API calls go to http://localhost:8000
+   - Backend API calls go to <http://localhost:8000>
 
 ### Common Development Tasks
 
 **Run Python tests**:
+
 ```bash
 pytest tests/ -v
 ```
 
 **Run frontend tests**:
+
 ```bash
 cd frontend
 npm run test:coverage
 ```
 
 **Analyze bundle size**:
+
 ```bash
 cd frontend
 npm run analyze
 ```
 
 **Check Python dependencies**:
+
 ```bash
 uv tree
 ```
 
 **Update frontend dependencies**:
+
 ```bash
 cd frontend
 npm outdated
@@ -443,6 +486,7 @@ npm update
 ```
 
 **Format code**:
+
 ```bash
 # Python (if black/ruff configured)
 black coaching_mcp/ analysis/ gong/ db/
@@ -455,24 +499,28 @@ npm run lint
 ### Troubleshooting
 
 **Backend won't start**:
+
 - Check `.env` has all required variables
 - Verify database connection: `psql $DATABASE_URL -c "SELECT 1"`
 - Check Gong credentials: `python tests/test_gong_client_live.py`
 - Review logs for specific error
 
 **Frontend won't start**:
+
 - Check `frontend/.env.local` exists with Clerk keys
 - Run `npm install` to ensure dependencies are installed
 - Clear Next.js cache: `rm -rf frontend/.next`
 - Check port 3000 isn't already in use: `lsof -ti:3000`
 
 **API calls failing** (Frontend → Backend):
-- Verify backend is running on http://localhost:8000
+
+- Verify backend is running on <http://localhost:8000>
 - Check `NEXT_PUBLIC_MCP_BACKEND_URL` in `frontend/.env.local`
 - Open browser DevTools Network tab, check request/response
 - Review CORS settings if needed
 
 **Database connection issues**:
+
 - Confirm Neon database is running
 - Check DATABASE_URL includes `?sslmode=require`
 - Verify IP allowlist in Neon dashboard
@@ -485,6 +533,7 @@ npm run lint
 - **Per call**: $3.17 (vs. $17.87 baseline)
 
 Key optimizations:
+
 1. Intelligent caching (60-80% cache hit rate)
 2. Prompt caching (50% input token reduction)
 3. Parallel execution (4x faster, same cost)

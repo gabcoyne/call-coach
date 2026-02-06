@@ -21,19 +21,12 @@ export function NewItemsBanner({ count, onRefresh }: NewItemsBannerProps) {
           <RefreshCw className="h-5 w-5 animate-pulse" />
           <div>
             <p className="font-semibold">
-              {count} new {count === 1 ? 'item' : 'items'} available
+              {count} new {count === 1 ? "item" : "items"} available
             </p>
-            <p className="text-xs text-blue-100">
-              Click to refresh and see the latest updates
-            </p>
+            <p className="text-xs text-blue-100">Click to refresh and see the latest updates</p>
           </div>
         </div>
-        <Button
-          onClick={onRefresh}
-          variant="secondary"
-          size="sm"
-          className="gap-2"
-        >
+        <Button onClick={onRefresh} variant="secondary" size="sm" className="gap-2">
           <RefreshCw className="h-4 w-4" />
           Refresh Feed
         </Button>

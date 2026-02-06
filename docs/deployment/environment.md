@@ -17,11 +17,13 @@ These must be set for the application to start.
 **Format**: `sk-ant-v7-...` (usually 50+ characters)
 
 **Where to Get**:
-1. Go to https://console.anthropic.com/settings/keys
+
+1. Go to <https://console.anthropic.com/settings/keys>
 2. Click "Create new key"
 3. Copy the full key
 
 **Example**:
+
 ```
 ANTHROPIC_API_KEY=sk-ant-api03-v7-...
 ```
@@ -37,6 +39,7 @@ ANTHROPIC_API_KEY=sk-ant-api03-v7-...
 **Format**: `postgresql://[user]:[password]@[host]/[database]?sslmode=require`
 
 **Components**:
+
 - `user`: Database username
 - `password`: Database password
 - `host`: Database hostname (Neon)
@@ -44,13 +47,15 @@ ANTHROPIC_API_KEY=sk-ant-api03-v7-...
 - `sslmode=require`: Required for Neon
 
 **Where to Get**:
-1. Go to https://console.neon.tech
+
+1. Go to <https://console.neon.tech>
 2. Select your project
 3. Click "Connection" button
 4. Choose "Connection string"
 5. Copy the full string (must include `?sslmode=require`)
 
 **Example**:
+
 ```
 DATABASE_URL=postgresql://neondb_owner:abc123@ep-cool-cloud-a1b2c3d4.us-east-2.aws.neon.tech/callcoach?sslmode=require
 ```
@@ -68,11 +73,13 @@ DATABASE_URL=postgresql://neondb_owner:abc123@ep-cool-cloud-a1b2c3d4.us-east-2.a
 **Format**: alphanumeric (12-20 characters)
 
 **Where to Get**:
-1. Log in to Gong: https://gong.app.gong.io
+
+1. Log in to Gong: <https://gong.app.gong.io>
 2. Go to Settings → Integrations → API
 3. Copy "Access Key ID"
 
 **Example**:
+
 ```
 GONG_API_KEY=UQ4SK2LPUPBCFN7Q
 ```
@@ -88,10 +95,12 @@ GONG_API_KEY=UQ4SK2LPUPBCFN7Q
 **Format**: JWT-like string (starts with `eyJ...`)
 
 **Where to Get**:
+
 1. Same location as GONG_API_KEY
 2. Copy "Access Key Secret"
 
 **Example**:
+
 ```
 GONG_API_SECRET=eyJhbGciOiJIUzI1NiJ9...
 ```
@@ -111,11 +120,13 @@ GONG_API_SECRET=eyJhbGciOiJIUzI1NiJ9...
 **Important**: Must use your tenant-specific URL, not generic `api.gong.io`
 
 **Where to Get**:
+
 1. Log in to Gong
 2. Look at URL: `https://us-[NUMBER].gong.io`
 3. Use that number in API URL
 
 **Example**:
+
 ```
 GONG_API_BASE_URL=https://us-79647.api.gong.io/v2
 ```
@@ -135,11 +146,13 @@ These configure specific features or override defaults.
 **Format**: Any string you choose (recommended: 32+ random characters)
 
 **Usage**:
+
 1. Set in .env
 2. Copy same value to Gong dashboard → Webhooks
 3. Used to verify HMAC signatures
 
 **Example**:
+
 ```
 GONG_WEBHOOK_SECRET=your_super_secret_webhook_key_12345678
 ```
@@ -155,6 +168,7 @@ GONG_WEBHOOK_SECRET=your_super_secret_webhook_key_12345678
 **Description**: Logging verbosity level
 
 **Valid Values**:
+
 - `DEBUG` - Very verbose, shows all details
 - `INFO` - Normal level, shows important info
 - `WARNING` - Only warnings and errors
@@ -162,6 +176,7 @@ GONG_WEBHOOK_SECRET=your_super_secret_webhook_key_12345678
 - `CRITICAL` - Only critical errors
 
 **Example**:
+
 ```
 LOG_LEVEL=INFO
 ```
@@ -179,6 +194,7 @@ LOG_LEVEL=INFO
 **Valid Range**: 3600 (1 hour) to 2592000 (30 days)
 
 **Example**:
+
 ```
 CACHE_TTL_SECONDS=2592000  # 30 days
 ```
@@ -198,6 +214,7 @@ CACHE_TTL_SECONDS=2592000  # 30 days
 **Only Used For**: Cloud Prefect deployments
 
 **Example**:
+
 ```
 PREFECT_API_URL=https://api.prefect.cloud/api/accounts/abc123/workspaces/xyz789
 ```
@@ -215,6 +232,7 @@ PREFECT_API_URL=https://api.prefect.cloud/api/accounts/abc123/workspaces/xyz789
 **Only Used For**: Cloud Prefect deployments
 
 **Example**:
+
 ```
 PREFECT_API_KEY=pnu_abc123xyz789...
 ```
@@ -405,6 +423,7 @@ fi
 ```
 
 Run with:
+
 ```bash
 bash validate_env.sh
 ```
@@ -425,6 +444,7 @@ uv run mcp-server-dev
 ```
 
 If any validation fails, check:
+
 1. Variable name is spelled correctly
 2. Variable value is valid
 3. Variable is in correct environment scope
@@ -434,12 +454,14 @@ If any validation fails, check:
 ### Best Practices
 
 1. **Never commit `.env` to git**
+
    ```bash
    # Add to .gitignore
    echo ".env" >> .gitignore
    ```
 
 2. **Use `.env.example`** for template
+
    ```bash
    # Show which variables are needed
    cat .env.example
@@ -448,11 +470,13 @@ If any validation fails, check:
 3. **Rotate credentials regularly** (quarterly recommended)
 
 4. **Use different keys for different environments**
+
    - Dev: Personal API keys
    - Staging: Separate test keys
    - Production: Dedicated prod keys
 
 5. **Log rotation: Never log secrets**
+
    ```python
    # Bad:
    logger.info(f"Connecting with key: {api_key}")
@@ -464,6 +488,7 @@ If any validation fails, check:
 ### Rotating Credentials
 
 **When to Rotate**:
+
 - Quarterly or on schedule
 - If key is compromised
 - After team member leaves
@@ -472,10 +497,12 @@ If any validation fails, check:
 **How to Rotate**:
 
 1. **Generate new credentials** in source service:
-   - Anthropic: https://console.anthropic.com/settings/keys
-   - Gong: https://gong.app.gong.io/settings/api/authentication
+
+   - Anthropic: <https://console.anthropic.com/settings/keys>
+   - Gong: <https://gong.app.gong.io/settings/api/authentication>
 
 2. **Update all copies** of credential:
+
    - Development: Update `.env`
    - Staging: Update in deployment system
    - Production: Update in Vercel/Horizon
@@ -485,6 +512,7 @@ If any validation fails, check:
 4. **Verify new key works**: Test API calls
 
 5. **Revoke old key** in source service:
+
    - After confirming new key works
    - Prevents accidental use of old key
 
@@ -495,11 +523,13 @@ If any validation fails, check:
 ### "Environment variable not found"
 
 **Causes**:
+
 - Typo in variable name
 - Variable not in active environment
 - Shell not sourced `.env`
 
 **Solutions**:
+
 ```bash
 # 1. Check spelling
 echo $ANTHROPIC_API_KEY  # Match exactly, case-sensitive
@@ -519,10 +549,12 @@ echo $ANTHROPIC_API_KEY
 ### "Variable is empty"
 
 **Causes**:
+
 - Variable set but value is empty
 - Variable set to wrong file
 
 **Solutions**:
+
 ```bash
 # 1. Check .env file content
 grep ANTHROPIC_API_KEY .env
@@ -548,6 +580,7 @@ source .venv/bin/activate
 **Cause**: DATABASE_URL missing `?sslmode=require`
 
 **Solution**:
+
 ```bash
 # 1. Check DATABASE_URL
 echo $DATABASE_URL

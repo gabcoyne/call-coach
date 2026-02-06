@@ -2,6 +2,7 @@
 Gong API client for fetching call data and transcripts.
 Documentation: https://gong.app.gong.io/settings/api/documentation
 """
+
 import logging
 import time
 from typing import Any
@@ -10,13 +11,15 @@ import httpx
 from httpx import HTTPStatusError, RequestError
 
 from coaching_mcp.shared import settings
-from .types import GongCall, GongTranscript, GongMonologue, GongSentence, GongSpeaker
+
+from .types import GongCall, GongMonologue, GongSentence, GongSpeaker, GongTranscript
 
 logger = logging.getLogger(__name__)
 
 
 class GongAPIError(Exception):
     """Base exception for Gong API errors."""
+
     pass
 
 
@@ -220,6 +223,7 @@ class GongClient:
         if call_metadata and call_metadata.started and not from_datetime:
             # Use call start date +/- 1 day for more efficient query
             from datetime import timedelta
+
             call_start = call_metadata.started
             from_datetime = (call_start - timedelta(days=1)).isoformat()
             to_datetime = (call_start + timedelta(days=1)).isoformat()
@@ -315,7 +319,9 @@ class GongClient:
                     "2024-01-01T00:00:00Z", "2024-01-31T23:59:59Z", cursor=cursor
                 )
         """
-        logger.info(f"Listing calls: from={from_date}, to={to_date}, cursor={cursor[:20] if cursor else None}...")
+        logger.info(
+            f"Listing calls: from={from_date}, to={to_date}, cursor={cursor[:20] if cursor else None}..."
+        )
 
         params = {
             "fromDateTime": from_date,
@@ -409,7 +415,9 @@ class GongClient:
             if cursor:
                 more_opps, next_cursor = client.list_opportunities(modified_after=..., cursor=cursor)
         """
-        logger.info(f"Listing opportunities: modified_after={modified_after}, cursor={cursor[:20] if cursor else None}")
+        logger.info(
+            f"Listing opportunities: modified_after={modified_after}, cursor={cursor[:20] if cursor else None}"
+        )
 
         json_data: dict[str, Any] = {}
 
@@ -450,9 +458,7 @@ class GongClient:
         """
         logger.info(f"Fetching calls for opportunity {opportunity_id}")
 
-        json_data: dict[str, Any] = {
-            "filter": {"opportunityIds": [opportunity_id]}
-        }
+        json_data: dict[str, Any] = {"filter": {"opportunityIds": [opportunity_id]}}
 
         if cursor:
             json_data["cursor"] = cursor
@@ -490,9 +496,7 @@ class GongClient:
         """
         logger.info(f"Fetching emails for opportunity {opportunity_id}")
 
-        json_data: dict[str, Any] = {
-            "filter": {"opportunityIds": [opportunity_id]}
-        }
+        json_data: dict[str, Any] = {"filter": {"opportunityIds": [opportunity_id]}}
 
         if cursor:
             json_data["cursor"] = cursor

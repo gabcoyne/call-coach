@@ -6,10 +6,12 @@ Measures Redis cache performance including:
 - Operation latency
 - Memory usage patterns
 """
-import pytest
+
 import json
-from typing import Dict, Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+
+import pytest
+
 from cache.redis_client import RedisClient
 
 
@@ -63,7 +65,7 @@ class TestCacheBenchmarks:
     def test_cache_set_operation(self, benchmark, redis_client, sample_cached_objects):
         """Benchmark cache SET operation."""
         call_analysis = sample_cached_objects["call_analysis"]
-        cache_key = f"call_analysis:call_000001"
+        cache_key = "call_analysis:call_000001"
 
         def set_cache():
             redis_client.set(cache_key, json.dumps(call_analysis), ttl=3600)
@@ -73,7 +75,7 @@ class TestCacheBenchmarks:
     def test_cache_get_operation(self, benchmark, redis_client, sample_cached_objects):
         """Benchmark cache GET operation."""
         call_analysis = sample_cached_objects["call_analysis"]
-        cache_key = f"call_analysis:call_000001"
+        cache_key = "call_analysis:call_000001"
         redis_client.get.return_value = json.dumps(call_analysis)
 
         def get_cache():
@@ -199,6 +201,7 @@ class TestCacheEviction:
 
     def test_cache_invalidation(self, benchmark, redis_client):
         """Benchmark cache invalidation."""
+
         def invalidate():
             redis_client.delete("call_analysis:call_000001")
             redis_client.delete("call_analysis:call_000002")
@@ -274,6 +277,7 @@ class TestCacheWarming:
 
     def test_batch_cache_warming(self, benchmark, redis_client):
         """Benchmark batch cache warming."""
+
         def warm_cache_batch():
             cache_data = {f"key_{i}": f"value_{i}" for i in range(100)}
             redis_client.mset(cache_data)

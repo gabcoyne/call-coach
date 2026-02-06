@@ -5,6 +5,7 @@ Get up and running in 5 minutes.
 ## What This Does
 
 Analyzes sales calls from Gong using Claude AI to provide coaching insights on:
+
 - **Product Knowledge**: Technical accuracy and positioning
 - **Discovery**: Question quality and listening skills
 - **Objection Handling**: Response effectiveness

@@ -15,10 +15,10 @@ export function DashboardHeader({ repInfo, overallScore }: DashboardHeaderProps)
     const startDate = new Date(start);
     const endDate = new Date(end);
 
-    const formatter = new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
 
     return `${formatter.format(startDate)} - ${formatter.format(endDate)}`;
@@ -59,7 +59,11 @@ export function DashboardHeader({ repInfo, overallScore }: DashboardHeaderProps)
           <div>
             <p className="text-xs text-muted-foreground">Period</p>
             <p className="text-sm font-medium">
-              {formatDateRange(repInfo.date_range.start, repInfo.date_range.end, repInfo.date_range.period)}
+              {formatDateRange(
+                repInfo.date_range.start,
+                repInfo.date_range.end,
+                repInfo.date_range.period
+              )}
             </p>
           </div>
         </div>

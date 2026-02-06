@@ -1,22 +1,26 @@
 """
 Tests for MCP server startup validation.
 """
+
 import os
-import sys
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 
 class TestEnvironmentValidation:
     """Tests for _validate_environment function."""
 
-    @patch.dict(os.environ, {
-        "GONG_API_KEY": "test_key",
-        "GONG_API_SECRET": "test_secret",
-        "GONG_API_BASE_URL": "https://test.api.gong.io/v2",
-        "ANTHROPIC_API_KEY": "sk-ant-test",
-        "DATABASE_URL": "postgresql://test?sslmode=require"
-    })
+    @patch.dict(
+        os.environ,
+        {
+            "GONG_API_KEY": "test_key",
+            "GONG_API_SECRET": "test_secret",
+            "GONG_API_BASE_URL": "https://test.api.gong.io/v2",
+            "ANTHROPIC_API_KEY": "sk-ant-test",
+            "DATABASE_URL": "postgresql://test?sslmode=require",
+        },
+    )
     def test_validate_environment_all_present(self):
         """Test validation passes when all required vars present."""
         from coaching_mcp.server import _validate_environment
@@ -24,13 +28,17 @@ class TestEnvironmentValidation:
         # Should not raise
         _validate_environment()
 
-    @patch.dict(os.environ, {
-        "GONG_API_KEY": "test_key",
-        # Missing GONG_API_SECRET
-        "GONG_API_BASE_URL": "https://test.api.gong.io/v2",
-        "ANTHROPIC_API_KEY": "sk-ant-test",
-        "DATABASE_URL": "postgresql://test?sslmode=require"
-    }, clear=True)
+    @patch.dict(
+        os.environ,
+        {
+            "GONG_API_KEY": "test_key",
+            # Missing GONG_API_SECRET
+            "GONG_API_BASE_URL": "https://test.api.gong.io/v2",
+            "ANTHROPIC_API_KEY": "sk-ant-test",
+            "DATABASE_URL": "postgresql://test?sslmode=require",
+        },
+        clear=True,
+    )
     def test_validate_environment_missing_variable(self):
         """Test validation fails when required var missing."""
         from coaching_mcp.server import _validate_environment
@@ -54,8 +62,8 @@ class TestEnvironmentValidation:
 class TestDatabaseValidation:
     """Tests for _validate_database_connection function."""
 
-    @patch('db.fetch_one')
-    @patch('coaching_mcp.server.settings')
+    @patch("db.fetch_one")
+    @patch("coaching_mcp.server.settings")
     def test_validate_database_success(self, mock_settings, mock_fetch_one):
         """Test database validation passes with valid connection."""
         from coaching_mcp.server import _validate_database_connection
@@ -68,7 +76,7 @@ class TestDatabaseValidation:
 
         mock_fetch_one.assert_called_once_with("SELECT 1 as test")
 
-    @patch('coaching_mcp.server.settings')
+    @patch("coaching_mcp.server.settings")
     def test_validate_database_missing_sslmode(self, mock_settings):
         """Test database validation fails without sslmode."""
         from coaching_mcp.server import _validate_database_connection
@@ -80,8 +88,8 @@ class TestDatabaseValidation:
 
         assert exc_info.value.code == 1
 
-    @patch('db.fetch_one')
-    @patch('coaching_mcp.server.settings')
+    @patch("db.fetch_one")
+    @patch("coaching_mcp.server.settings")
     def test_validate_database_connection_failure(self, mock_settings, mock_fetch_one):
         """Test database validation fails on connection error."""
         from coaching_mcp.server import _validate_database_connection
@@ -94,8 +102,8 @@ class TestDatabaseValidation:
 
         assert exc_info.value.code == 1
 
-    @patch('db.fetch_one')
-    @patch('coaching_mcp.server.settings')
+    @patch("db.fetch_one")
+    @patch("coaching_mcp.server.settings")
     def test_validate_database_unexpected_result(self, mock_settings, mock_fetch_one):
         """Test database validation fails with unexpected query result."""
         from coaching_mcp.server import _validate_database_connection
@@ -112,7 +120,7 @@ class TestDatabaseValidation:
 class TestGongAPIValidation:
     """Tests for _validate_gong_api function."""
 
-    @patch('gong.client.GongClient')
+    @patch("gong.client.GongClient")
     def test_validate_gong_api_success(self, mock_gong_client):
         """Test Gong API validation passes with valid credentials."""
         from coaching_mcp.server import _validate_gong_api
@@ -129,7 +137,7 @@ class TestGongAPIValidation:
 
         assert mock_client_instance.list_calls.called
 
-    @patch('gong.client.GongClient')
+    @patch("gong.client.GongClient")
     def test_validate_gong_api_auth_failure(self, mock_gong_client):
         """Test Gong API validation fails with 401 error."""
         from coaching_mcp.server import _validate_gong_api
@@ -147,7 +155,7 @@ class TestGongAPIValidation:
 
         assert exc_info.value.code == 1
 
-    @patch('gong.client.GongClient')
+    @patch("gong.client.GongClient")
     def test_validate_gong_api_network_failure(self, mock_gong_client):
         """Test Gong API validation fails with network error."""
         from coaching_mcp.server import _validate_gong_api
@@ -168,7 +176,7 @@ class TestGongAPIValidation:
 class TestAnthropicAPIValidation:
     """Tests for _validate_anthropic_api function."""
 
-    @patch('coaching_mcp.server.settings')
+    @patch("coaching_mcp.server.settings")
     def test_validate_anthropic_api_valid_key(self, mock_settings):
         """Test Anthropic API validation passes with valid key format."""
         from coaching_mcp.server import _validate_anthropic_api
@@ -178,7 +186,7 @@ class TestAnthropicAPIValidation:
         # Should not raise
         _validate_anthropic_api()
 
-    @patch('coaching_mcp.server.settings')
+    @patch("coaching_mcp.server.settings")
     def test_validate_anthropic_api_invalid_prefix(self, mock_settings):
         """Test Anthropic API validation fails with wrong prefix."""
         from coaching_mcp.server import _validate_anthropic_api
@@ -190,7 +198,7 @@ class TestAnthropicAPIValidation:
 
         assert exc_info.value.code == 1
 
-    @patch('coaching_mcp.server.settings')
+    @patch("coaching_mcp.server.settings")
     def test_validate_anthropic_api_empty_key(self, mock_settings):
         """Test Anthropic API validation fails with empty key."""
         from coaching_mcp.server import _validate_anthropic_api
@@ -206,38 +214,28 @@ class TestAnthropicAPIValidation:
 class TestStartupValidationIntegration:
     """Integration tests for complete startup validation flow."""
 
-    @patch('coaching_mcp.server._validate_anthropic_api')
-    @patch('coaching_mcp.server._validate_gong_api')
-    @patch('coaching_mcp.server._validate_database_connection')
-    @patch('coaching_mcp.server._validate_environment')
-    def test_all_validations_pass(
-        self,
-        mock_env,
-        mock_db,
-        mock_gong,
-        mock_anthropic
-    ):
+    @patch("coaching_mcp.server._validate_anthropic_api")
+    @patch("coaching_mcp.server._validate_gong_api")
+    @patch("coaching_mcp.server._validate_database_connection")
+    @patch("coaching_mcp.server._validate_environment")
+    def test_all_validations_pass(self, mock_env, mock_db, mock_gong, mock_anthropic):
         """Test startup succeeds when all validations pass."""
         # All validations pass (no exceptions)
 
         # Import after patching to avoid module-level execution
         import importlib
+
         import mcp.server
+
         importlib.reload(mcp.server)
 
         # If we get here without SystemExit, validations passed
 
-    @patch('coaching_mcp.server._validate_anthropic_api')
-    @patch('coaching_mcp.server._validate_gong_api')
-    @patch('coaching_mcp.server._validate_database_connection')
-    @patch('coaching_mcp.server._validate_environment')
-    def test_validation_fails_early(
-        self,
-        mock_env,
-        mock_db,
-        mock_gong,
-        mock_anthropic
-    ):
+    @patch("coaching_mcp.server._validate_anthropic_api")
+    @patch("coaching_mcp.server._validate_gong_api")
+    @patch("coaching_mcp.server._validate_database_connection")
+    @patch("coaching_mcp.server._validate_environment")
+    def test_validation_fails_early(self, mock_env, mock_db, mock_gong, mock_anthropic):
         """Test startup fails fast on first validation error."""
         mock_env.side_effect = SystemExit(1)
 

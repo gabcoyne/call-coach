@@ -11,7 +11,6 @@ generating insights for all four coaching dimensions:
 
 Uses concurrent execution to speed up analysis while respecting API rate limits.
 """
-import asyncio
 import logging
 import sys
 import time
@@ -49,14 +48,16 @@ def get_calls_needing_analysis() -> list[dict[str, Any]]:
     """
     logger.info("Querying calls without coaching sessions...")
 
-    calls = fetch_all("""
+    calls = fetch_all(
+        """
         SELECT c.id, c.gong_call_id, c.title, c.scheduled_at,
                c.duration_seconds, c.call_type, c.product
         FROM calls c
         LEFT JOIN coaching_sessions cs ON c.id = cs.call_id
         WHERE cs.id IS NULL
         ORDER BY c.scheduled_at DESC
-    """)
+    """
+    )
 
     logger.info(f"Found {len(calls)} calls needing analysis")
     return calls
@@ -132,9 +133,9 @@ def batch_analyze_calls(max_workers: int = 5) -> dict[str, Any]:
     Returns:
         Summary statistics of the batch run
     """
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("Starting batch analysis of calls")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Ensure logs directory exists
     logs_dir = project_root / "logs"
@@ -162,10 +163,7 @@ def batch_analyze_calls(max_workers: int = 5) -> dict[str, Any]:
     # Use ThreadPoolExecutor for concurrent analysis
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
-        future_to_call = {
-            executor.submit(analyze_single_call, call): call
-            for call in calls
-        }
+        future_to_call = {executor.submit(analyze_single_call, call): call for call in calls}
 
         # Process completed tasks
         completed = 0
@@ -195,15 +193,17 @@ def batch_analyze_calls(max_workers: int = 5) -> dict[str, Any]:
                     f"[{completed}/{len(calls)}] ✗ Exception for call {call['gong_call_id']}: {e}",
                     exc_info=True,
                 )
-                results.append({
-                    "call_id": str(call["id"]),
-                    "gong_call_id": call["gong_call_id"],
-                    "title": call["title"],
-                    "success": False,
-                    "dimensions_completed": [],
-                    "errors": {"exception": str(e)},
-                    "duration_seconds": 0,
-                })
+                results.append(
+                    {
+                        "call_id": str(call["id"]),
+                        "gong_call_id": call["gong_call_id"],
+                        "title": call["title"],
+                        "success": False,
+                        "dimensions_completed": [],
+                        "errors": {"exception": str(e)},
+                        "duration_seconds": 0,
+                    }
+                )
 
     # Calculate summary statistics
     total_duration = time.time() - start_time
@@ -212,9 +212,9 @@ def batch_analyze_calls(max_workers: int = 5) -> dict[str, Any]:
     total_dimensions = sum(len(r["dimensions_completed"]) for r in results)
 
     logger.info("")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("Batch analysis complete!")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info(f"Total calls processed: {len(results)}")
     logger.info(f"Successful: {successful}")
     logger.info(f"Failed: {failed}")
@@ -226,9 +226,11 @@ def batch_analyze_calls(max_workers: int = 5) -> dict[str, Any]:
     total_sessions = fetch_one("SELECT COUNT(*) as count FROM coaching_sessions")
     logger.info(f"\nCoaching sessions in database: {total_sessions['count']}")
 
-    calls_with_sessions = fetch_one("""
+    calls_with_sessions = fetch_one(
+        """
         SELECT COUNT(DISTINCT call_id) as count FROM coaching_sessions
-    """)
+    """
+    )
     logger.info(f"Calls with coaching sessions: {calls_with_sessions['count']}")
 
     return {

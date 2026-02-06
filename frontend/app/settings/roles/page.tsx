@@ -32,8 +32,8 @@ export default async function RoleAssignmentPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Role Assignment</h1>
           <p className="mt-2 text-gray-600">
-            Assign coaching roles to staff members to customize evaluation criteria.
-            Each role has a specialized rubric focused on relevant skills.
+            Assign coaching roles to staff members to customize evaluation criteria. Each role has a
+            specialized rubric focused on relevant skills.
           </p>
         </div>
 
@@ -65,9 +65,7 @@ export default async function RoleAssignmentPage() {
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center space-y-2">
                 <div className="animate-spin h-8 w-8 border-4 border-prefect-blue-500 border-t-transparent rounded-full mx-auto" />
-                <p className="text-sm text-muted-foreground">
-                  Loading staff members...
-                </p>
+                <p className="text-sm text-muted-foreground">Loading staff members...</p>
               </div>
             </div>
           }

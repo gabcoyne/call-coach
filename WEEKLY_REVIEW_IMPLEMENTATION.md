@@ -15,6 +15,7 @@ February 5, 2026
 **Purpose**: Main Prefect flow orchestrating weekly report generation
 
 **Key Features**:
+
 - Queries all calls from past week per rep
 - Aggregates coaching scores by dimension (product knowledge, discovery, objection handling, engagement)
 - Identifies recurring objections and common themes from coaching sessions
@@ -23,6 +24,7 @@ February 5, 2026
 - Distributes via email and Slack
 
 **Tasks Implemented**:
+
 - `get_reps_with_calls()` - Find reps with calls in date range
 - `get_rep_calls_for_week()` - Get call list per rep
 - `aggregate_coaching_scores()` - Calculate scores by dimension
@@ -33,6 +35,7 @@ February 5, 2026
 - `post_to_slack()` - Team summary to webhook
 
 **Flow Configuration**:
+
 - Uses `ConcurrentTaskRunner` for parallel processing
 - Retries: 1 attempt with 30s delay
 - Default schedule: Every Monday at 6:00 AM UTC
@@ -42,18 +45,21 @@ February 5, 2026
 **Purpose**: Email delivery abstraction supporting multiple providers
 
 **Supported Providers**:
+
 - **SendGrid** (recommended for production)
 - **AWS SES** (for AWS-hosted infrastructure)
 - **Generic SMTP** (for any SMTP server)
 - **Console output** (for development/testing)
 
 **Auto-detection Logic**:
+
 - Checks for `SENDGRID_API_KEY` first
 - Falls back to `AWS_ACCESS_KEY_ID` for SES
 - Falls back to `SMTP_HOST` for generic SMTP
 - Defaults to console logging if none configured
 
 **Functions**:
+
 - `send_email_sendgrid()` - SendGrid integration
 - `send_email_ses()` - AWS SES integration
 - `send_email_smtp()` - Generic SMTP
@@ -66,6 +72,7 @@ February 5, 2026
 **Purpose**: Rich HTML email template for weekly reports
 
 **Sections**:
+
 - Summary box (calls, sessions, overall score with trend)
 - Score breakdown by dimension with visual indicators
 - Recurring objections with examples and quotes
@@ -74,6 +81,7 @@ February 5, 2026
 - Footer with timestamp
 
 **Styling**:
+
 - Responsive design
 - Color-coded score cards (green/yellow/red based on performance)
 - Trend indicators with emojis
@@ -84,11 +92,13 @@ February 5, 2026
 **Purpose**: Prefect deployment configuration for scheduling
 
 **Schedule**:
+
 - Cron: `0 6 * * 1` (Monday 6:00 AM UTC)
 - Timezone: UTC
 - Active: true
 
 **Parameters**:
+
 - `week_start`: Auto-calculated (7 days ago)
 - `week_end`: Auto-calculated (today)
 - `send_emails`: false (enable after email service setup)
@@ -99,6 +109,7 @@ February 5, 2026
 ### 5. Documentation: `flows/README_WEEKLY_REVIEW.md`
 
 **Comprehensive guide covering**:
+
 - Setup instructions for all email providers
 - Slack webhook configuration
 - Deployment to Prefect Cloud
@@ -117,12 +128,14 @@ February 5, 2026
 ## Data Pipeline
 
 ### Input Sources
+
 1. `calls` table - Call metadata and timing
 2. `speakers` table - Rep information (filtered by `company_side = true`)
 3. `coaching_sessions` table - Scores and analysis by dimension
 4. `transcripts` table - Indirectly for specific examples
 
 ### Processing Steps
+
 1. **Date Range Calculation**: Default to last 7 days or custom range
 2. **Rep Identification**: Find all reps with calls in range
 3. **Data Aggregation**:
@@ -145,6 +158,7 @@ February 5, 2026
    - Slack team summary (optional)
 
 ### Output Artifacts
+
 - Personalized HTML emails (one per rep)
 - Markdown reports (logged)
 - Slack team summary
@@ -155,6 +169,7 @@ February 5, 2026
 ### Environment Variables
 
 #### Email (Optional - choose one)
+
 ```bash
 # Option A: SendGrid
 SENDGRID_API_KEY=sg-xxx
@@ -173,11 +188,13 @@ SMTP_USE_TLS=true
 ```
 
 #### Slack (Optional)
+
 ```bash
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
 ```
 
 #### Existing (Required)
+
 ```bash
 DATABASE_URL=postgresql://...
 ANTHROPIC_API_KEY=sk-ant-...
@@ -188,6 +205,7 @@ GONG_API_SECRET=...
 ## Deployment Instructions
 
 ### 1. Install Dependencies
+
 ```bash
 # Already included in pyproject.toml
 # - jinja2>=3.1.0 (for templating)
@@ -196,12 +214,15 @@ GONG_API_SECRET=...
 ```
 
 ### 2. Configure Email Provider
+
 Choose and configure one email provider (see Environment Variables above).
 
 ### 3. Configure Slack (Optional)
+
 Set `SLACK_WEBHOOK_URL` environment variable.
 
 ### 4. Deploy to Prefect Cloud
+
 ```bash
 # Option A: Using YAML
 prefect deploy -f deployments/weekly_review.yaml
@@ -211,6 +232,7 @@ python -m flows.weekly_review --deploy
 ```
 
 ### 5. Verify Deployment
+
 ```bash
 # Check deployment exists
 prefect deployment ls | grep weekly-review
@@ -220,6 +242,7 @@ prefect deployment run weekly-review/weekly-review-monday-6am
 ```
 
 ### 6. Monitor Execution
+
 - View in Prefect Cloud dashboard
 - Check logs for each task
 - Verify email/Slack delivery
@@ -227,6 +250,7 @@ prefect deployment run weekly-review/weekly-review-monday-6am
 ## Testing
 
 ### Local Testing
+
 ```bash
 # Run flow locally (console mode)
 python -m flows.weekly_review
@@ -239,6 +263,7 @@ python
 ```
 
 ### Email Testing
+
 ```bash
 # Test with console output first
 python -m flows.weekly_review
@@ -250,6 +275,7 @@ python -m flows.weekly_review
 ```
 
 ### Integration Testing
+
 ```bash
 # Run for specific test week
 python -c "
@@ -271,17 +297,20 @@ print(result)
 ### Per-Rep Email Report
 
 **Summary Section**:
+
 - Total calls for week
 - Total coaching sessions analyzed
 - Overall average score with trend indicator
 
 **Score Breakdown**:
+
 - Product Knowledge (avg, min, max, trend)
 - Discovery (avg, min, max, trend)
 - Objection Handling (avg, min, max, trend)
 - Engagement (avg, min, max, trend)
 
 **Recurring Themes**:
+
 - Pricing objections (count + examples)
 - Timing objections (count + examples)
 - Technical concerns (count + examples)
@@ -289,9 +318,11 @@ print(result)
 - Other objections (count + examples)
 
 **Call List**:
+
 - All calls with titles, types, and dates
 
 **Action Items**:
+
 - Top 3 recommended focus areas based on:
   - Lowest scoring dimensions
   - Most recurring objections
@@ -300,6 +331,7 @@ print(result)
 ### Slack Team Summary
 
 **Format**:
+
 ```
 📊 Weekly Coaching Report - Week of January 06, 2025
 
@@ -318,20 +350,23 @@ Individual reports sent via email (if enabled)
 ## Performance Characteristics
 
 ### Execution Time
+
 - Small team (5-10 reps): ~30-60 seconds
 - Medium team (20-50 reps): ~2-5 minutes
 - Large team (100+ reps): ~10-20 minutes
 
 ### Database Queries
+
 - 1 query: Find all reps with calls
 - Per rep (concurrent):
   - 1 query: Get calls for week
   - 1 query: Aggregate scores by dimension
   - 1 query: Get objection handling sessions
   - 2 queries: Calculate trends (current + previous week)
-- Total: ~1 + (5 * num_reps) queries
+- Total: ~1 + (5 \* num_reps) queries
 
 ### Optimizations
+
 - Concurrent task execution for reps
 - Database indexes on:
   - `coaching_sessions(rep_id, created_at)`
@@ -342,6 +377,7 @@ Individual reports sent via email (if enabled)
 ## Success Metrics
 
 ### Flow Execution
+
 - ✅ Imports without errors
 - ✅ Runs locally with test data
 - ✅ Generates reports for all reps with calls
@@ -349,12 +385,14 @@ Individual reports sent via email (if enabled)
 - ✅ Identifies objection patterns
 
 ### Email Delivery
+
 - ✅ Template renders correctly
 - ✅ Auto-detects email provider
 - ✅ Supports multiple providers (SendGrid, SES, SMTP)
 - ✅ Falls back to console logging for dev
 
 ### Slack Integration
+
 - ✅ Posts formatted summary
 - ✅ Includes all reps and trends
 - ✅ Handles webhook failures gracefully
@@ -362,18 +400,21 @@ Individual reports sent via email (if enabled)
 ## Future Enhancements
 
 ### Short-term (Phase 2)
+
 1. PDF attachment generation (using ReportLab or WeasyPrint)
 2. Weekly reports table for audit trail
 3. Manager rollup reports (team-level aggregations)
 4. A/B test different report formats
 
 ### Medium-term (Phase 3)
+
 1. Interactive web dashboard links
 2. Multi-language support for international teams
 3. Customizable delivery schedules per rep
 4. SMS notifications for critical insights
 
 ### Long-term (Phase 4)
+
 1. ML-based performance prediction
 2. Automated coaching recommendations using AI
 3. Integration with calendar for scheduling follow-ups
@@ -382,6 +423,7 @@ Individual reports sent via email (if enabled)
 ## Related Files
 
 ### Created
+
 - `/flows/weekly_review.py` - Main flow implementation (594 lines)
 - `/reports/email_sender.py` - Email delivery system (297 lines)
 - `/reports/templates/weekly_report.html` - HTML email template (187 lines)
@@ -391,9 +433,11 @@ Individual reports sent via email (if enabled)
 - `/WEEKLY_REVIEW_IMPLEMENTATION.md` - This summary (current file)
 
 ### Modified
+
 - None (all new files)
 
 ### Dependencies
+
 - Existing: `prefect`, `jinja2`, `httpx`, `pydantic-settings`, `asyncpg`, `psycopg2-binary`
 - Optional: `sendgrid`, `boto3` (for email providers)
 

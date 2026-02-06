@@ -68,6 +68,7 @@ scripts/ci/setup-branch-protection.sh YOUR_GITHUB_TOKEN
 ```
 
 This configures:
+
 - Required status checks before merging
 - PR review requirements
 - Automatic enforcement of CI/CD rules
@@ -90,6 +91,7 @@ scripts/ci/run-tests-locally.sh security    # Security scans
 ### Test Suite (`.github/workflows/tests.yml`)
 
 Runs on: Every push to main/develop and PRs
+
 - Lint & format checking
 - Type checking
 - Unit and integration tests
@@ -98,12 +100,14 @@ Runs on: Every push to main/develop and PRs
 ### Build (`.github/workflows/build.yml`)
 
 Runs on: Code changes on main/develop
+
 - Builds Docker images for MCP and webhook servers
 - Pushes to GitHub Container Registry
 
 ### Deploy Staging (`.github/workflows/deploy-staging.yml`)
 
 Runs on: Push to develop branch
+
 - Runs database migrations
 - Deploys backend to staging
 - Deploys frontend to Vercel staging
@@ -112,6 +116,7 @@ Runs on: Push to develop branch
 ### Deploy Production (`.github/workflows/deploy-production.yml`)
 
 Runs on: Version tags (v1.0.0, v1.1.0, etc.)
+
 - Full test suite (80% coverage enforced)
 - Builds production Docker images
 - Runs migrations with backup
@@ -121,6 +126,7 @@ Runs on: Version tags (v1.0.0, v1.1.0, etc.)
 ### Database Migration (`.github/workflows/migrate.yml`)
 
 Trigger manually: `gh workflow run migrate.yml -f environment=staging`
+
 - Validates migrations
 - Creates database backup
 - Runs migrations with verification
@@ -129,6 +135,7 @@ Trigger manually: `gh workflow run migrate.yml -f environment=staging`
 ### Security (`.github/workflows/security.yml`)
 
 Runs on: Every push, PRs, and weekly schedule
+
 - Dependency vulnerability scanning
 - Python/JavaScript security analysis
 - Container image scanning
@@ -138,12 +145,14 @@ Runs on: Every push, PRs, and weekly schedule
 ### Release (`.github/workflows/release.yml`)
 
 Trigger manually via GitHub Actions UI:
+
 1. Go to "Actions" tab
 2. Select "Release" workflow
 3. Click "Run workflow"
 4. Choose version bump type: major/minor/patch
 
 This will:
+
 - Calculate next version
 - Generate changelog
 - Run full test suite
@@ -249,21 +258,25 @@ gh secret set SECRET_NAME --repo gabcoyne/call-coach
 ## Best Practices
 
 1. **Always test locally first**
+
    ```bash
    scripts/ci/run-tests-locally.sh all
    ```
 
 2. **Keep commits clean**
+
    - One feature per PR
    - Clear commit messages
    - Run linter before committing
 
 3. **Use semantic versioning**
+
    ```
    v1.2.3 = v[major].[minor].[patch]
    ```
 
 4. **Review before merging**
+
    - Check CI status (green ✅)
    - Get at least 1 approval
    - Resolve conflicts
@@ -316,7 +329,7 @@ For issues or questions:
 1. Check workflow logs in GitHub Actions
 2. Review `scripts/ci/README.md` for detailed info
 3. Check the workflow YAML files for configuration options
-4. Review GitHub Actions documentation at https://docs.github.com/actions
+4. Review GitHub Actions documentation at <https://docs.github.com/actions>
 
 ---
 

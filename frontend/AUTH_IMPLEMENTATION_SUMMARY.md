@@ -10,22 +10,26 @@
 All tasks from Section 3 (Authentication with Clerk) have been implemented:
 
 ### ✅ 3.1 Create Clerk account and application
+
 - **Status**: Manual step documented
 - **Documentation**: See [CLERK_SETUP.md](./CLERK_SETUP.md) for detailed setup instructions
 - **Action Required**: User must create Clerk account and get API keys
 
 ### ✅ 3.2 Install @clerk/nextjs package
+
 - **Status**: Complete
 - **Package Version**: `@clerk/nextjs@^6.14.0`
 - **Location**: Added to `package.json`
 - **Action Required**: Run `npm install` in frontend directory
 
 ### ✅ 3.3 Configure Clerk provider in app/layout.tsx
+
 - **Status**: Complete
 - **File**: `frontend/app/layout.tsx`
 - **Changes**: Wrapped app with `<ClerkProvider>` component
 
 ### ✅ 3.4 Set up Clerk environment variables
+
 - **Status**: Complete
 - **Files**:
   - `frontend/.env.example` (template with all required variables)
@@ -34,6 +38,7 @@ All tasks from Section 3 (Authentication with Clerk) have been implemented:
   2. Add Clerk API keys from dashboard
 
 ### ✅ 3.5 Create /sign-in and /sign-up routes
+
 - **Status**: Complete
 - **Files**:
   - `frontend/app/sign-in/[[...sign-in]]/page.tsx`
@@ -41,6 +46,7 @@ All tasks from Section 3 (Authentication with Clerk) have been implemented:
 - **Features**: Clean, centered authentication pages using Clerk components
 
 ### ✅ 3.6 Implement Next.js middleware for route protection
+
 - **Status**: Complete
 - **File**: `frontend/middleware.ts`
 - **Features**:
@@ -49,12 +55,14 @@ All tasks from Section 3 (Authentication with Clerk) have been implemented:
   - Supports API route protection
 
 ### ✅ 3.7 Configure user roles (manager vs. rep)
+
 - **Status**: Documented
 - **Documentation**: See [CLERK_SETUP.md](./CLERK_SETUP.md#role-configuration-in-clerk)
 - **Implementation**: Roles stored in Clerk `publicMetadata.role`
 - **Action Required**: Set roles in Clerk Dashboard for each user
 
 ### ✅ 3.8 Create role-based access control (RBAC) utilities
+
 - **Status**: Complete
 - **File**: `frontend/lib/auth.ts`
 - **Features**:
@@ -69,6 +77,7 @@ All tasks from Section 3 (Authentication with Clerk) have been implemented:
   - Type guards and helper functions
 
 ### ✅ 3.9 Test authentication flow
+
 - **Status**: Test steps documented
 - **Documentation**: See [CLERK_SETUP.md](./CLERK_SETUP.md#task-39-testing-authentication-flow)
 - **Manual Testing**:
@@ -82,19 +91,23 @@ All tasks from Section 3 (Authentication with Clerk) have been implemented:
 ## Files Created
 
 ### Core Authentication Files
+
 1. `frontend/middleware.ts` - Route protection middleware
 2. `frontend/lib/auth.ts` - RBAC utilities and role management
 3. `frontend/app/sign-in/[[...sign-in]]/page.tsx` - Sign-in page
 4. `frontend/app/sign-up/[[...sign-up]]/page.tsx` - Sign-up page
 
 ### Configuration Files
+
 5. `frontend/.env.example` - Environment variables template
 
 ### Documentation Files
+
 6. `frontend/CLERK_SETUP.md` - Clerk setup and testing guide
 7. `frontend/README.md` - Project overview and development guide
 
 ### Modified Files
+
 8. `frontend/app/layout.tsx` - Added ClerkProvider
 9. `frontend/package.json` - Added @clerk/nextjs dependency
 10. `openspec/changes/nextjs-coaching-frontend/tasks.md` - Marked tasks complete
@@ -109,46 +122,57 @@ All authentication work has been committed to the main branch.
 ## Next Steps for User
 
 ### 1. Install Dependencies
+
 ```bash
 cd frontend
 npm install
 ```
 
 ### 2. Set Up Clerk
+
 Follow instructions in [CLERK_SETUP.md](./CLERK_SETUP.md):
-1. Create Clerk account at https://dashboard.clerk.com
+
+1. Create Clerk account at <https://dashboard.clerk.com>
 2. Create new application
 3. Get API keys
 4. Copy `.env.example` to `.env.local`
 5. Add API keys to `.env.local`
 
 ### 3. Test Authentication
+
 ```bash
 cd frontend
 npm run dev
 ```
-Visit http://localhost:3000 and test:
+
+Visit <http://localhost:3000> and test:
+
 - Sign-up flow
 - Sign-in flow
 - Route protection
 - Logout
 
 ### 4. Configure User Roles
+
 In Clerk Dashboard:
+
 1. Go to Users
 2. For each user, set `publicMetadata.role` to `"manager"` or `"rep"`
 
 ## Integration Points for Other Agents
 
 ### For Agent-Design (Design System)
+
 - Authentication UI uses default Clerk styling
 - Can be customized with Clerk appearance API
 - Tailwind classes already applied to page containers
 - Consider adding brand-specific Clerk theming in future
 
 ### For Agent-Backend (API Routes)
+
 - Use RBAC utilities from `lib/auth.ts` in API routes
 - Example usage:
+
   ```typescript
   import { requireManager, canViewRepData } from "@/lib/auth";
 
@@ -158,7 +182,7 @@ In Clerk Dashboard:
 
     // Or check specific data access
     const repEmail = new URL(request.url).searchParams.get("rep");
-    if (!await canViewRepData(repEmail)) {
+    if (!(await canViewRepData(repEmail))) {
       return new Response("Forbidden", { status: 403 });
     }
 
@@ -167,9 +191,11 @@ In Clerk Dashboard:
   ```
 
 ### For Agent-Dashboard (Dashboard Implementation)
+
 - User role available via `getCurrentUserRole()`
 - Show/hide features based on role
 - Example:
+
   ```typescript
   import { isManager } from "@/lib/auth";
 
@@ -195,10 +221,12 @@ In Clerk Dashboard:
 ## Known Limitations
 
 1. **Manual role assignment**: Roles must be set manually in Clerk Dashboard
+
    - Future enhancement: Auto-assign roles based on email domain
    - Future enhancement: Use Clerk Organizations for team management
 
 2. **No automated tests yet**: Testing is manual
+
    - Automated tests planned for Phase 12
 
 3. **Basic UI styling**: Uses default Clerk components

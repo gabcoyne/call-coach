@@ -6,7 +6,7 @@
     {
       "id": "discovery",
       "name": "Discovery & Qualification",
-      "weight": 0.30,
+      "weight": 0.3,
       "criteria": [
         "Asks open-ended questions to uncover pain points and business challenges",
         "Identifies budget, authority, need, and timeline (BANT)",
@@ -42,7 +42,7 @@
     {
       "id": "product_positioning",
       "name": "Product Positioning",
-      "weight": 0.20,
+      "weight": 0.2,
       "criteria": [
         "Positions Prefect/Horizon as solution to specific customer pain points",
         "Tailors messaging to customer's industry, use case, or technical maturity",
@@ -78,7 +78,7 @@
     {
       "id": "call_control",
       "name": "Call Control & Next Steps",
-      "weight": 0.10,
+      "weight": 0.1,
       "criteria": [
         "Sets clear agenda and objectives at start of call",
         "Manages time effectively and keeps conversation on track",

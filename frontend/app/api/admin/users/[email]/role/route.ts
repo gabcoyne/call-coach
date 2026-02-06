@@ -14,18 +14,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import * as db from "@/lib/db";
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { email: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { email: string } }) {
   try {
     // Check authentication
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - please sign in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
     }
 
     // Check manager authorization
@@ -34,17 +28,11 @@ export async function PUT(
     const managerEmail = user?.primaryEmailAddress?.emailAddress;
 
     if (userRole !== "manager") {
-      return NextResponse.json(
-        { error: "Forbidden - manager access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
     }
 
     if (!managerEmail) {
-      return NextResponse.json(
-        { error: "Manager email not found" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Manager email not found" }, { status: 400 });
     }
 
     const { email } = params;
@@ -62,10 +50,7 @@ export async function PUT(
 
     // Validate email format
     if (!email.includes("@")) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
     }
 
     // Update or delete role

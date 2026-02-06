@@ -19,6 +19,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Sign-in page loads but authentication fails
 
 **Possible Causes**:
+
 1. Incorrect Clerk configuration
 2. Missing or invalid Clerk API keys
 3. Network issues connecting to Clerk
@@ -27,6 +28,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Verify Clerk API Keys**:
+
    ```bash
    # Check .env.local (development)
    cat .env.local | grep CLERK
@@ -37,16 +39,19 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Check Clerk Dashboard**:
+
    - Go to [Clerk Dashboard](https://dashboard.clerk.com)
    - Verify API keys match your environment
    - Check that application is active
 
 3. **Clear Browser Cache**:
+
    - Clear cookies and local storage
    - Try incognito/private mode
    - Try different browser
 
 4. **Check Network Tab**:
+
    - Open browser DevTools → Network tab
    - Look for failed requests to `clerk.com`
    - Check for CORS errors
@@ -61,6 +66,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Successfully sign in but immediately get "Unauthorized" error
 
 **Possible Causes**:
+
 1. User role not set in Clerk
 2. Middleware not recognizing session
 3. Cookie issues
@@ -68,10 +74,12 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Verify User Role**:
+
    - Clerk Dashboard → Users → Select user
    - Check `publicMetadata.role` field
    - Should be either `"manager"` or `"rep"`
    - Set if missing:
+
    ```json
    {
      "role": "rep"
@@ -79,11 +87,13 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Check Middleware Configuration**:
+
    - Verify `middleware.ts` exists in project root
    - Check routes are properly protected
    - Review middleware logs in terminal
 
 3. **Clear Clerk Session**:
+
    ```javascript
    // In browser console
    localStorage.clear();
@@ -96,6 +106,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Can sign in but get "Forbidden" when trying to view certain pages
 
 **Possible Causes**:
+
 1. RBAC restrictions (rep trying to access manager data)
 2. Attempting to view another rep's data
 3. Role misconfigured
@@ -103,11 +114,13 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Check Your Role**:
+
    - Go to Profile page
    - Verify role is correct
    - Contact admin if wrong
 
 2. **Verify Access Permissions**:
+
    - **Reps**: Can only view own data
    - **Managers**: Can view all data
    - Check URL to ensure you're accessing appropriate data
@@ -122,6 +135,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Randomly logged out or "Session expired" messages
 
 **Possible Causes**:
+
 1. Clerk session timeout
 2. Token expiration
 3. Clock skew
@@ -129,11 +143,13 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Sign Out and Back In**:
+
    - Click user menu → Sign Out
    - Sign in again
    - Session should refresh
 
 2. **Check System Clock**:
+
    - Ensure computer clock is accurate
    - Enable automatic time sync
 
@@ -149,6 +165,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: API requests failing with "Rate limit exceeded"
 
 **Possible Causes**:
+
 1. Too many requests in short time
 2. Script or automation hitting API
 3. Multiple browser tabs open
@@ -156,15 +173,18 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Wait for Rate Limit Reset**:
+
    - Check `X-RateLimit-Reset` header
    - Wait until reset time (Unix timestamp)
 
 2. **Reduce Request Frequency**:
+
    - Close duplicate tabs
    - Stop any scripts hitting API
    - Wait 1 hour and try again
 
 3. **Check Rate Limit Status**:
+
    ```bash
    # Make API request and check headers
    curl -I http://localhost:3000/api/coaching/analyze-call \
@@ -181,6 +201,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: API requests failing with generic server error
 
 **Possible Causes**:
+
 1. MCP backend unreachable
 2. MCP backend error
 3. Bug in API route code
@@ -189,6 +210,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Check API Logs**:
+
    ```bash
    # Development: Check terminal running `npm run dev`
    # Look for error stack traces
@@ -198,6 +220,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Verify MCP Backend**:
+
    ```bash
    # Check if backend is running
    curl http://localhost:8000/health
@@ -207,6 +230,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 3. **Check Environment Variables**:
+
    ```bash
    # Verify MCP backend URL is set
    echo $NEXT_PUBLIC_MCP_BACKEND_URL
@@ -215,6 +239,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 4. **Test API Route Directly**:
+
    ```bash
    # Use curl to isolate issue
    curl -X POST http://localhost:3000/api/coaching/analyze-call \
@@ -228,6 +253,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: API rejecting request with validation errors
 
 **Possible Causes**:
+
 1. Missing required fields
 2. Invalid data format
 3. Type mismatch
@@ -235,7 +261,9 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Check Validation Error Details**:
+
    - Look at response body for specific field errors
+
    ```json
    {
      "error": "Invalid request parameters",
@@ -247,11 +275,13 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Verify Request Format**:
+
    - Ensure required fields are present
    - Check data types match schema
    - See [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
 
 3. **Test with Minimal Request**:
+
    ```bash
    # Start with minimal valid request
    curl -X POST http://localhost:3000/api/coaching/analyze-call \
@@ -264,6 +294,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Requests timing out or failing to connect
 
 **Possible Causes**:
+
 1. MCP backend down
 2. Network connectivity issues
 3. CORS problems
@@ -272,6 +303,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Check Network Connectivity**:
+
    ```bash
    # Ping backend server
    ping coaching-api.prefect.io
@@ -281,12 +313,14 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Verify Backend Health**:
+
    ```bash
    # Check if backend is responding
    curl -v http://localhost:8000/
    ```
 
 3. **Check Browser Console**:
+
    - Open DevTools → Console
    - Look for CORS errors
    - Check Network tab for failed requests
@@ -302,6 +336,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Build or dev server fails with module import errors
 
 **Possible Causes**:
+
 1. Missing dependencies
 2. Incorrect import paths
 3. TypeScript path alias issues
@@ -309,6 +344,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Reinstall Dependencies**:
+
    ```bash
    # Delete node_modules and reinstall
    rm -rf node_modules package-lock.json
@@ -316,15 +352,17 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Check Import Paths**:
+
    ```typescript
    // Correct: Use @ alias for project root
-   import { Button } from '@/components/ui/button';
+   import { Button } from "@/components/ui/button";
 
    // Incorrect: Relative paths from src
-   import { Button } from '../../../components/ui/button';
+   import { Button } from "../../../components/ui/button";
    ```
 
 3. **Verify tsconfig.json**:
+
    ```json
    {
      "compilerOptions": {
@@ -337,6 +375,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 4. **Clear Next.js Cache**:
+
    ```bash
    # Delete .next directory
    rm -rf .next
@@ -350,6 +389,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Type errors preventing compilation
 
 **Possible Causes**:
+
 1. Missing type definitions
 2. Type mismatches
 3. Strict mode violations
@@ -357,12 +397,14 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Install Type Definitions**:
+
    ```bash
    # Install missing @types packages
    npm install --save-dev @types/node @types/react @types/react-dom
    ```
 
 2. **Check Type Errors**:
+
    ```bash
    # Run type checker without building
    npx tsc --noEmit
@@ -371,6 +413,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 3. **Fix Common Issues**:
+
    ```typescript
    // Issue: Implicit 'any' type
    // Solution: Add explicit type
@@ -390,6 +433,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: `process.env.VARIABLE_NAME` is undefined
 
 **Possible Causes**:
+
 1. Missing `.env.local` file
 2. Incorrect variable name
 3. Dev server not restarted
@@ -398,6 +442,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Create .env.local**:
+
    ```bash
    # Copy example file
    cp .env.example .env.local
@@ -407,10 +452,12 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Check Variable Names**:
+
    - Client-side variables MUST start with `NEXT_PUBLIC_`
    - Server-side variables don't need prefix
 
 3. **Restart Dev Server**:
+
    ```bash
    # Stop dev server (Ctrl+C)
    # Start again
@@ -418,10 +465,11 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 4. **Verify Variables Are Set**:
+
    ```typescript
    // In a server component or API route
-   console.log('Backend URL:', process.env.NEXT_PUBLIC_MCP_BACKEND_URL);
-   console.log('Clerk Secret:', !!process.env.CLERK_SECRET_KEY); // Don't log actual secret
+   console.log("Backend URL:", process.env.NEXT_PUBLIC_MCP_BACKEND_URL);
+   console.log("Clerk Secret:", !!process.env.CLERK_SECRET_KEY); // Don't log actual secret
    ```
 
 ### Port Already in Use
@@ -431,6 +479,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Kill Process on Port**:
+
    ```bash
    # macOS/Linux
    lsof -ti:3000 | xargs kill -9
@@ -440,6 +489,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Find and Kill Process**:
+
    ```bash
    # Find process using port 3000
    lsof -i :3000
@@ -455,6 +505,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Components have no styling or incorrect styling
 
 **Possible Causes**:
+
 1. Tailwind not compiling
 2. CSS not imported
 3. Class name errors
@@ -462,6 +513,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Verify Tailwind Setup**:
+
    ```bash
    # Check tailwind.config.ts exists
    ls tailwind.config.ts
@@ -471,23 +523,24 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Check Global CSS Import**:
+
    ```typescript
    // app/layout.tsx should import
-   import '@/app/globals.css';
+   import "@/app/globals.css";
    ```
 
 3. **Clear Build Cache**:
+
    ```bash
    rm -rf .next
    npm run dev
    ```
 
 4. **Test Tailwind Classes**:
+
    ```tsx
    // Try simple test component
-   <div className="bg-red-500 p-4 text-white">
-     Test - should have red background
-   </div>
+   <div className="bg-red-500 p-4 text-white">Test - should have red background</div>
    ```
 
 ### Components Not Rendering
@@ -495,6 +548,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Blank page or components not appearing
 
 **Possible Causes**:
+
 1. JavaScript errors preventing render
 2. Server component errors
 3. Missing data
@@ -502,16 +556,19 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Check Browser Console**:
+
    - Open DevTools → Console
    - Look for error messages
    - Fix JavaScript errors
 
 2. **Check Server Logs**:
+
    - Terminal running `npm run dev`
    - Look for server component errors
    - Fix server-side errors
 
 3. **Add Error Boundaries**:
+
    ```tsx
    // Wrap components in error boundary
    <ErrorBoundary fallback={<div>Error loading</div>}>
@@ -520,6 +577,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 4. **Test with Simple Component**:
+
    ```tsx
    // Replace complex component with simple one
    export default function TestPage() {
@@ -532,6 +590,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Recharts components not rendering
 
 **Possible Causes**:
+
 1. Missing data
 2. Invalid data format
 3. Recharts import errors
@@ -539,18 +598,20 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Check Data Format**:
+
    ```typescript
    // Ensure data matches expected format
-   console.log('Chart data:', data);
+   console.log("Chart data:", data);
 
    // Recharts expects array of objects
    const validData = [
-     { date: '2024-01-01', score: 75 },
-     { date: '2024-01-02', score: 80 },
+     { date: "2024-01-01", score: 75 },
+     { date: "2024-01-02", score: 80 },
    ];
    ```
 
 2. **Verify Imports**:
+
    ```typescript
    // Correct imports
    import {
@@ -561,20 +622,21 @@ Common issues and solutions for the Gong Call Coaching frontend application.
      CartesianGrid,
      Tooltip,
      ResponsiveContainer,
-   } from 'recharts';
+   } from "recharts";
    ```
 
 3. **Add Fallback**:
+
    ```tsx
-   {data?.length > 0 ? (
-     <ResponsiveContainer width="100%" height={300}>
-       <LineChart data={data}>
-         {/* chart components */}
-       </LineChart>
-     </ResponsiveContainer>
-   ) : (
-     <div>No data available</div>
-   )}
+   {
+     data?.length > 0 ? (
+       <ResponsiveContainer width="100%" height={300}>
+         <LineChart data={data}>{/* chart components */}</LineChart>
+       </ResponsiveContainer>
+     ) : (
+       <div>No data available</div>
+     );
+   }
    ```
 
 ## Performance Issues
@@ -584,6 +646,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Pages take long time to load
 
 **Possible Causes**:
+
 1. Large JavaScript bundles
 2. Unoptimized images
 3. Slow API requests
@@ -592,6 +655,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Check Bundle Size**:
+
    ```bash
    # Analyze bundle
    npm run build
@@ -600,9 +664,10 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Optimize Images**:
+
    ```tsx
    // Use Next.js Image component
-   import Image from 'next/image';
+   import Image from "next/image";
 
    <Image
      src="/logo.png"
@@ -610,10 +675,11 @@ Common issues and solutions for the Gong Call Coaching frontend application.
      width={200}
      height={100}
      priority // For above-fold images
-   />
+   />;
    ```
 
 3. **Use Server Components**:
+
    ```tsx
    // Default: Server component (faster)
    export default async function Page() {
@@ -625,9 +691,10 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 4. **Enable Caching**:
+
    ```typescript
    // Use SWR for client-side caching
-   const { data } = useSWR('/api/data', fetcher, {
+   const { data } = useSWR("/api/data", fetcher, {
      revalidateOnFocus: false,
      dedupingInterval: 60000, // Cache for 1 minute
    });
@@ -640,12 +707,14 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Restart Dev Server**:
+
    ```bash
    # Stop and restart
    npm run dev
    ```
 
 2. **Clear Browser Cache**:
+
    - DevTools → Application → Clear storage
    - Restart browser
 
@@ -661,6 +730,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: UI shows stale data, doesn't reflect changes
 
 **Possible Causes**:
+
 1. SWR cache not invalidating
 2. Backend data not updating
 3. Browser cache
@@ -668,18 +738,20 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Force Revalidation**:
+
    ```typescript
    // In your component
-   const { data, mutate } = useSWR('/api/data');
+   const { data, mutate } = useSWR("/api/data");
 
    // Force refresh
    mutate();
    ```
 
 2. **Check SWR Config**:
+
    ```typescript
    // Reduce cache time if data changes frequently
-   const { data } = useSWR('/api/data', fetcher, {
+   const { data } = useSWR("/api/data", fetcher, {
      refreshInterval: 30000, // Refresh every 30s
      revalidateOnFocus: true,
    });
@@ -694,6 +766,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Symptom**: Data is empty, null, or wrong
 
 **Possible Causes**:
+
 1. API returning unexpected format
 2. Data transformation errors
 3. Backend data issues
@@ -701,6 +774,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
 **Solutions**:
 
 1. **Check API Response**:
+
    ```bash
    # Test API directly
    curl http://localhost:3000/api/coaching/analyze-call \
@@ -712,6 +786,7 @@ Common issues and solutions for the Gong Call Coaching frontend application.
    ```
 
 2. **Add Data Validation**:
+
    ```typescript
    // Validate data before using
    if (!data || typeof data !== 'object') {
@@ -732,18 +807,21 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment troubleshooting.
 ### Quick Deployment Fixes
 
 **Build Fails in Vercel**:
+
 1. Check build logs in Vercel dashboard
 2. Verify environment variables are set
 3. Test build locally: `npm run build`
 4. Fix errors and redeploy
 
 **Site Not Updating After Deploy**:
+
 1. Clear CDN cache (automatic in Vercel)
 2. Hard refresh browser: Ctrl+Shift+R
 3. Check deployment status in Vercel
 4. Verify correct branch was deployed
 
 **Environment Variables Not Working**:
+
 1. Verify variables in Vercel dashboard
 2. Check correct environment (Production vs Preview)
 3. Redeploy to apply changes

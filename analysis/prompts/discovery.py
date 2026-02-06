@@ -2,6 +2,7 @@
 Discovery quality analysis prompt template.
 Evaluates question quality, active listening, and MEDDIC coverage.
 """
+
 from typing import Any
 
 
@@ -275,16 +276,12 @@ Please analyze this call for discovery quality. Focus on question effectiveness,
         {
             "role": "user",
             "content": [
-                {
-                    "type": "text",
-                    "text": system_prompt,
-                    "cache_control": {"type": "ephemeral"}
-                },
+                {"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}},
                 {
                     "type": "text",
                     "text": user_prompt,
-                }
-            ]
+                },
+            ],
         }
     ]
 
@@ -309,10 +306,10 @@ def _format_criteria(criteria: dict[str, Any]) -> str:
     """Format evaluation criteria."""
     lines = []
     for criterion, details in criteria.items():
-        if criterion == 'five_wins_coverage':
+        if criterion == "five_wins_coverage":
             continue  # Handle separately
-        weight = details.get('weight', 0)
-        description = details.get('description', '')
+        weight = details.get("weight", 0)
+        description = details.get("description", "")
         lines.append(f"### {criterion.replace('_', ' ').title()} ({weight}%)")
         lines.append(f"{description}\n")
     return "\n".join(lines)
@@ -323,10 +320,10 @@ def _format_five_wins(five_wins_criteria: dict[str, Any]) -> str:
     if not five_wins_criteria:
         return "Standard 5 Wins framework elements"
 
-    wins = five_wins_criteria.get('wins', {})
+    wins = five_wins_criteria.get("wins", {})
     if not wins:
         # Fallback to simple elements format
-        elements = five_wins_criteria.get('elements', {})
+        elements = five_wins_criteria.get("elements", {})
         lines = []
         for element, description in elements.items():
             lines.append(f"- **{element.replace('_', ' ').title()}**: {description}")
@@ -334,12 +331,12 @@ def _format_five_wins(five_wins_criteria: dict[str, Any]) -> str:
 
     lines = []
     for win_name, win_details in wins.items():
-        weight = win_details.get('weight', 0)
+        weight = win_details.get("weight", 0)
         lines.append(f"\n### {win_name.replace('_', ' ').title()} ({weight}%)")
 
-        components = win_details.get('components', {})
+        components = win_details.get("components", {})
         for component_name, component_value in components.items():
-            component_title = component_name.replace('_', ' ').title()
+            component_title = component_name.replace("_", " ").title()
 
             if isinstance(component_value, dict):
                 # Nested sub-components (e.g., business_discovery, technical_discovery)

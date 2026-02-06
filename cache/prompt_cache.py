@@ -15,6 +15,7 @@ Cache Blocks:
 
 Reference: https://docs.anthropic.com/claude/docs/prompt-caching
 """
+
 import logging
 from typing import Any
 
@@ -67,39 +68,34 @@ class PromptCacheManager:
 
         # Block 1: General coaching instructions (always cached)
         general_instructions = self._build_general_instructions(dimension)
-        messages.append({
-            "type": "text",
-            "text": general_instructions,
-            "cache_control": {"type": "ephemeral"}
-        })
+        messages.append(
+            {"type": "text", "text": general_instructions, "cache_control": {"type": "ephemeral"}}
+        )
 
         # Block 2: Role-specific rubric (cached - changes quarterly)
         if rubric.get("role_rubric"):
             role_rubric_text = self._format_role_rubric(
-                rubric["role_rubric"],
-                rubric.get("evaluated_as_role", "ae")
+                rubric["role_rubric"], rubric.get("evaluated_as_role", "ae")
             )
-            messages.append({
-                "type": "text",
-                "text": role_rubric_text,
-                "cache_control": {"type": "ephemeral"}
-            })
+            messages.append(
+                {"type": "text", "text": role_rubric_text, "cache_control": {"type": "ephemeral"}}
+            )
 
         # Block 3: Knowledge base (cached - changes monthly)
         if knowledge_base and dimension == CoachingDimension.PRODUCT_KNOWLEDGE:
-            messages.append({
-                "type": "text",
-                "text": f"# Product Knowledge Base\n\n{knowledge_base}",
-                "cache_control": {"type": "ephemeral"}
-            })
+            messages.append(
+                {
+                    "type": "text",
+                    "text": f"# Product Knowledge Base\n\n{knowledge_base}",
+                    "cache_control": {"type": "ephemeral"},
+                }
+            )
 
         # Block 4: Dimension-specific criteria (cached - rare changes)
         criteria_text = self._format_dimension_criteria(dimension, rubric)
-        messages.append({
-            "type": "text",
-            "text": criteria_text,
-            "cache_control": {"type": "ephemeral"}
-        })
+        messages.append(
+            {"type": "text", "text": criteria_text, "cache_control": {"type": "ephemeral"}}
+        )
 
         logger.debug(
             f"Built cached system prompt with {len(messages)} blocks "
@@ -280,12 +276,7 @@ Apply role-appropriate expectations when evaluating performance.
 
         # Return message array in Claude API format
         return [
-            {
-                "role": "user",
-                "content": system_content + [
-                    {"type": "text", "text": user_prompt}
-                ]
-            }
+            {"role": "user", "content": system_content + [{"type": "text", "text": user_prompt}]}
         ]
 
     def estimate_cache_savings(
@@ -325,10 +316,7 @@ Apply role-appropriate expectations when evaluating performance.
         # With caching: 5% at full price, 95% at cache price
         full_price_tokens = total_cached_tokens * (1 - cache_hit_rate)
         cached_tokens = total_cached_tokens * cache_hit_rate
-        cost_with_caching = (
-            (full_price_tokens / 1000) * 0.003 +
-            (cached_tokens / 1000) * 0.0003
-        )
+        cost_with_caching = (full_price_tokens / 1000) * 0.003 + (cached_tokens / 1000) * 0.0003
 
         savings = cost_without_caching - cost_with_caching
         savings_pct = (savings / cost_without_caching) * 100 if cost_without_caching > 0 else 0

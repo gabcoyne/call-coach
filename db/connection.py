@@ -2,9 +2,11 @@
 Database connection management with connection pooling.
 Uses psycopg2 for synchronous operations (Prefect flows, MCP tools).
 """
+
 import logging
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Generator
+from typing import Any
 
 import psycopg2
 from psycopg2 import pool
@@ -40,9 +42,10 @@ def get_db_pool() -> pool.ThreadedConnectionPool:
         except Exception as e:
             # Sanitize error message to avoid logging database credentials
             error_msg = str(e)
-            if settings.database_url and 'password=' in settings.database_url:
+            if settings.database_url and "password=" in settings.database_url:
                 import re
-                for match in re.finditer(r'(?:password|pwd)=([^&\s]+)', error_msg, re.IGNORECASE):
+
+                for match in re.finditer(r"(?:password|pwd)=([^&\s]+)", error_msg, re.IGNORECASE):
                     error_msg = error_msg.replace(match.group(1), "***")
             logger.error(f"Failed to initialize database pool: {error_msg}")
             raise
@@ -99,10 +102,13 @@ def execute_query(
                 conn.rollback()
                 # Sanitize params to avoid logging sensitive connection info
                 sanitized_params = str(params)
-                if settings.database_url and 'password=' in settings.database_url:
+                if settings.database_url and "password=" in settings.database_url:
                     # Extract password from database_url and mask it
                     import re
-                    for match in re.finditer(r'(?:password|pwd)=([^&\s]+)', sanitized_params, re.IGNORECASE):
+
+                    for match in re.finditer(
+                        r"(?:password|pwd)=([^&\s]+)", sanitized_params, re.IGNORECASE
+                    ):
                         sanitized_params = sanitized_params.replace(match.group(1), "***")
                 logger.error(f"Query failed: {e}\nQuery: {query}\nParams: {sanitized_params}")
                 raise

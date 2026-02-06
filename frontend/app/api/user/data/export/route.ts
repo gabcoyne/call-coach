@@ -95,10 +95,7 @@ export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await currentUser();
@@ -150,7 +147,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Log export for audit trail
-    console.log(`Data export for user ${userId}: ${format} format, includes transcripts: ${includeTranscripts}`);
+    console.log(
+      `Data export for user ${userId}: ${format} format, includes transcripts: ${includeTranscripts}`
+    );
 
     return new NextResponse(content, {
       status: 200,

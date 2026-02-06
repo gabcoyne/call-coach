@@ -4,16 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-import {
-  LayoutDashboard,
-  Search,
-  Rss,
-  User,
-  Phone,
-  Target,
-  Settings,
-  Shield,
-} from "lucide-react";
+import { LayoutDashboard, Search, Rss, User, Phone, Target, Settings, Shield } from "lucide-react";
 
 const navigation = [
   {
@@ -144,9 +135,7 @@ export function Sidebar() {
 
       {/* Footer with version */}
       <div className="flex-shrink-0 px-6 py-2 border-t border-border">
-        <p className="text-xs text-muted-foreground">
-          v0.1.0
-        </p>
+        <p className="text-xs text-muted-foreground">v0.1.0</p>
       </div>
     </div>
   );

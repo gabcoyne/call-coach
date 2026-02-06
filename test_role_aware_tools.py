@@ -3,8 +3,8 @@ Test script for role-aware MCP tools.
 
 Tests that role detection and role-aware filtering work correctly across all tools.
 """
+
 import logging
-from uuid import UUID
 
 from coaching_mcp.tools.analyze_call import analyze_call_tool
 from coaching_mcp.tools.search_calls import search_calls_tool
@@ -59,6 +59,7 @@ def test_analyze_call_with_role_detection():
     except Exception as e:
         print(f"❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -99,7 +100,7 @@ def test_analyze_call_with_role_override():
         rep_analyzed = result.get("rep_analyzed")
         if rep_analyzed:
             evaluated_as_role = rep_analyzed.get("evaluated_as_role")
-            print(f"✅ Forced role: se")
+            print("✅ Forced role: se")
             print(f"   Evaluated as: {evaluated_as_role}")
             assert evaluated_as_role == "se", f"Expected 'se' but got '{evaluated_as_role}'"
         else:
@@ -110,6 +111,7 @@ def test_analyze_call_with_role_override():
     except Exception as e:
         print(f"❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -138,6 +140,7 @@ def test_search_calls_with_role_filter():
     except Exception as e:
         print(f"❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -180,6 +183,7 @@ def test_role_detection_logic():
     except Exception as e:
         print(f"❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -205,6 +209,7 @@ def main():
         except Exception as e:
             print(f"\n❌ Test failed with exception: {e}")
             import traceback
+
             traceback.print_exc()
             results.append(False)
 

@@ -33,30 +33,35 @@ Sales teams need AI-powered coaching insights from Gong calls to improve perform
 ## Impact
 
 **New Infrastructure:**
+
 - Neon Postgres database with 14 tables, quarterly partitioning, and optimized indexes
 - FastAPI webhook server (always-on, <500ms response)
 - Prefect flows on Horizon (process_new_call, weekly_coaching_review)
 - FastMCP server for Claude Desktop integration
 
 **External Dependencies:**
+
 - Gong API (calls, transcripts, webhooks)
 - Claude API (Sonnet 4.5 for analysis)
 - Neon Postgres (production database)
 - Prefect Cloud (flow orchestration)
 
 **Data Storage:**
+
 - ~100 calls/week × 30K tokens avg = 3M tokens/week stored as transcripts
 - Coaching sessions partitioned quarterly (5-year retention = 20 partitions)
 - Full-text search indexes on transcripts
 - Knowledge base with product docs and rubrics
 
 **Cost Impact:**
+
 - Without optimization: $1,787/month (100 calls/week)
 - With caching: $317/month (82% reduction)
 - Database: $19/month (Neon Starter)
 - **Total**: ~$336/month
 
 **Team Impact:**
+
 - SEs, AEs, CSMs: Access to on-demand coaching insights via Claude Desktop
 - Sales Managers: Weekly team performance reports and trend analysis
 - Sales Leadership: Aggregate metrics and skill gap identification

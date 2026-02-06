@@ -45,10 +45,7 @@ export function ExportResults({ results }: ExportResultsProps) {
     ]);
 
     // Combine headers and rows
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.join(",")),
-    ].join("\n");
+    const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
 
     // Create blob and download
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });

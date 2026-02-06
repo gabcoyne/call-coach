@@ -3,6 +3,7 @@ Vercel serverless function for daily Gong sync cron job.
 
 Scheduled to run daily at 6am via vercel.json cron configuration.
 """
+
 import json
 import logging
 from http.server import BaseHTTPRequestHandler

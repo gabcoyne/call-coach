@@ -5,6 +5,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 ## Pre-Deployment Checklist
 
 ### Code Readiness
+
 - [ ] All tests passing (`npm run test`)
 - [ ] No TypeScript errors (`npm run lint`)
 - [ ] Successful local build (`cd frontend && npm run build`)
@@ -12,6 +13,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 - [ ] CHANGELOG.md updated with version and changes
 
 ### Environment Configuration
+
 - [ ] `.env.example` up to date with all required variables
 - [ ] Clerk production application created and configured
 - [ ] Clerk production keys obtained (`pk_live_*` and `sk_live_*`)
@@ -19,6 +21,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 - [ ] Custom domain DNS configured (`coaching.prefect.io`)
 
 ### Documentation
+
 - [ ] README.md updated with deployment instructions
 - [ ] API documentation current
 - [ ] User guide reflects latest features
@@ -26,6 +29,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 ## Vercel Initial Setup (One-Time)
 
 ### Account and Project Setup
+
 - [ ] Vercel account created with GitHub authentication
 - [ ] GitHub repository linked to Vercel
 - [ ] Project imported with Next.js framework preset
@@ -33,6 +37,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 - [ ] Build and output directories verified
 
 ### Environment Variables (Production)
+
 - [ ] `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` set
 - [ ] `CLERK_SECRET_KEY` set
 - [ ] `NEXT_PUBLIC_CLERK_SIGN_IN_URL` set to `/sign-in`
@@ -43,11 +48,13 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 - [ ] `NEXT_PUBLIC_APP_URL` set to `https://coaching.prefect.io`
 
 ### Environment Variables (Preview/Staging)
+
 - [ ] All above variables configured for Preview environment
 - [ ] Clerk test keys used for Preview (`pk_test_*` and `sk_test_*`)
 - [ ] MCP backend staging URL configured
 
 ### Domain and SSL
+
 - [ ] Custom domain `coaching.prefect.io` added to Vercel
 - [ ] DNS CNAME record configured (points to `cname.vercel-dns.com`)
 - [ ] DNS verification successful
@@ -56,12 +63,14 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 - [ ] HTTPS redirects enabled
 
 ### Deployment Settings
+
 - [ ] Production branch set to `main`
 - [ ] Automatic production deployments enabled
 - [ ] Preview deployments enabled for all branches
 - [ ] GitHub branch protection rules configured
 
 ### Security Configuration
+
 - [ ] `vercel.json` security headers verified
 - [ ] CSP (Content Security Policy) configured
 - [ ] HSTS (Strict-Transport-Security) enabled
@@ -69,6 +78,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 - [ ] Security headers scan passes (securityheaders.com)
 
 ### Monitoring and Notifications
+
 - [ ] Slack integration added
 - [ ] Deployment notifications channel configured
 - [ ] Email notifications configured for production failures
@@ -78,12 +88,14 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 ## First Deployment Verification
 
 ### Deployment Process
+
 - [ ] Initial deployment triggered (push to `main` or manual deploy)
 - [ ] Build logs reviewed for warnings/errors
 - [ ] Deployment completed successfully
 - [ ] Deployment URL accessible
 
 ### Functionality Testing
+
 - [ ] Homepage loads correctly
 - [ ] Custom domain resolves (`https://coaching.prefect.io`)
 - [ ] HTTPS certificate valid (no browser warnings)
@@ -98,6 +110,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 - [ ] Mobile responsive design verified
 
 ### Performance Testing
+
 - [ ] Lighthouse audit score > 90 (Performance)
 - [ ] LCP (Largest Contentful Paint) < 2.5s
 - [ ] FID (First Input Delay) < 100ms
@@ -105,6 +118,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 - [ ] TTFB (Time to First Byte) < 600ms
 
 ### Security Testing
+
 - [ ] Security headers present (check browser DevTools Network tab)
 - [ ] CSP violations checked (no console errors)
 - [ ] CORS configured correctly for MCP backend
@@ -116,6 +130,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 ## Preview Deployment Testing
 
 ### PR Preview Workflow
+
 - [ ] Create test branch and open PR
 - [ ] Vercel preview deployment triggered automatically
 - [ ] Preview URL accessible from GitHub PR checks
@@ -124,6 +139,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 - [ ] All functionality works in preview environment
 
 ### Preview Environment Validation
+
 - [ ] Clerk test keys work correctly
 - [ ] Staging backend data displayed
 - [ ] No production data leaked to preview
@@ -132,6 +148,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 ## Post-Deployment Monitoring
 
 ### First 24 Hours
+
 - [ ] Monitor deployment notifications in Slack
 - [ ] Check error rates in Vercel Functions logs
 - [ ] Review Core Web Vitals in Vercel Analytics
@@ -140,6 +157,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 - [ ] Review browser console errors (real user monitoring)
 
 ### First Week
+
 - [ ] Weekly analytics review (traffic, performance, errors)
 - [ ] User feedback collected and triaged
 - [ ] Performance optimization opportunities identified
@@ -159,18 +177,21 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 ## Ongoing Maintenance
 
 ### Weekly Tasks
+
 - [ ] Review Vercel Analytics dashboard
 - [ ] Check for dependency updates (`npm outdated`)
 - [ ] Review and respond to user feedback
 - [ ] Monitor Core Web Vitals trends
 
 ### Monthly Tasks
+
 - [ ] Security dependency updates (`npm audit`)
 - [ ] Clerk dashboard review (user stats, authentication logs)
 - [ ] Performance optimization review
 - [ ] Cost analysis (Vercel usage, API calls)
 
 ### Quarterly Tasks
+
 - [ ] Rotate Clerk API keys
 - [ ] Review and update CSP rules
 - [ ] Security audit (penetration testing)
@@ -180,7 +201,7 @@ Use this checklist when deploying the Call Coach frontend to Vercel. Reference t
 ## Emergency Contacts
 
 - **Vercel Support**: Support tab in Vercel dashboard (Pro plan)
-- **Clerk Support**: https://clerk.com/support
+- **Clerk Support**: <https://clerk.com/support>
 - **DNS/Domain Support**: [Your DNS provider support contact]
 - **Team Lead**: [Name and contact]
 - **On-Call Engineer**: [Pager/phone number]

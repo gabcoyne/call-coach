@@ -3,17 +3,23 @@ Example usage of the notification system.
 
 These examples demonstrate how to integrate notifications into your workflow.
 """
+
 from datetime import datetime
 from uuid import UUID
 
-from notifications.in_app import NotificationStore, NotificationBuilder, NotificationType, NotificationPriority
-from notifications.preferences import NotificationPreferencesManager, DeliveryChannel
-from notifications.slack_formatter import SlackFormatter
 from flows.notifications import (
     send_coaching_insight_notifications,
-    send_score_improvement_notifications,
     send_notifications_flow,
+    send_score_improvement_notifications,
 )
+from notifications.in_app import (
+    NotificationBuilder,
+    NotificationPriority,
+    NotificationStore,
+    NotificationType,
+)
+from notifications.preferences import DeliveryChannel, NotificationPreferencesManager
+from notifications.slack_formatter import SlackFormatter
 
 
 # Example 1: Send a coaching insight to a single user
@@ -79,11 +85,13 @@ def example_create_inapp_notification():
         .priority(NotificationPriority.HIGH)
         .action("https://callcoach.ai/playbooks/objections", "View Playbook")
         .expires_in(48)  # Expires in 48 hours
-        .data({
-            "dimension": "objection_handling",
-            "current_score": 65,
-            "playbook_id": "objections-101"
-        })
+        .data(
+            {
+                "dimension": "objection_handling",
+                "current_score": 65,
+                "playbook_id": "objections-101",
+            }
+        )
         .build()
     )
 
@@ -101,11 +109,7 @@ def example_manage_notifications():
     print(f"Unread notifications: {unread_count}")
 
     # Get all unread notifications
-    unread = NotificationStore.get_user_notifications(
-        user_id=user_id,
-        unread_only=True,
-        limit=10
-    )
+    unread = NotificationStore.get_user_notifications(user_id=user_id, unread_only=True, limit=10)
 
     for notif in unread:
         print(f"- [{notif.type}] {notif.title}")
@@ -113,10 +117,7 @@ def example_manage_notifications():
         NotificationStore.mark_as_read(notif.id)
 
     # Archive old notifications
-    all_notifications = NotificationStore.get_user_notifications(
-        user_id=user_id,
-        limit=50
-    )
+    all_notifications = NotificationStore.get_user_notifications(user_id=user_id, limit=50)
     old_notifs = [n for n in all_notifications if (datetime.utcnow() - n.created_at).days > 7]
     for notif in old_notifs:
         NotificationStore.archive(notif.id)
@@ -138,21 +139,19 @@ def example_manage_preferences():
         email=True,
         slack=True,
         in_app=True,
-        frequency="immediate"
+        frequency="immediate",
     )
 
     # Disable score decline emails (but keep other channels)
     NotificationPreferencesManager.update_notification_type_preference(
         user_id=user_id,
         notification_type="score_declines",
-        email=False  # Turn off emails but keep Slack and in-app
+        email=False,  # Turn off emails but keep Slack and in-app
     )
 
     # Check if should send
     should_send = NotificationPreferencesManager.should_send_notification(
-        user_id=user_id,
-        notification_type="coaching_insights",
-        channel=DeliveryChannel.EMAIL
+        user_id=user_id, notification_type="coaching_insights", channel=DeliveryChannel.EMAIL
     )
     print(f"Should send coaching_insights via email: {should_send}")
 
@@ -173,7 +172,7 @@ def example_batch_notifications():
                 "insight_description": "Try asking more probing questions.",
                 "current_score": 70,
                 "insight_id": "insight-001",
-            }
+            },
         },
         {
             "type": "coaching_insight",
@@ -187,8 +186,8 @@ def example_batch_notifications():
                 "insight_description": "Your engagement score improved!",
                 "current_score": 85,
                 "insight_id": "insight-002",
-            }
-        }
+            },
+        },
     ]
 
     result = send_notifications_flow(requests)
@@ -213,15 +212,12 @@ def example_slack_formatting():
         dimension="Objection Handling",
         score=65,
         insight_description="Focus on price objection rebuttals",
-        insight_id="insight-123"
+        insight_id="insight-123",
     )
 
     # Score improvement
     improvement_blocks = SlackFormatter.score_improvement(
-        rep_name="John Smith",
-        dimension="Discovery",
-        previous_score=70,
-        current_score=82
+        rep_name="John Smith", dimension="Discovery", previous_score=70, current_score=82
     )
 
     # Weekly summary
@@ -231,7 +227,7 @@ def example_slack_formatting():
             {"name": "John Smith", "score": 75, "trend": "up"},
             {"name": "Jane Doe", "score": 82, "trend": "stable"},
         ],
-        team_avg_score=78.5
+        team_avg_score=78.5,
     )
 
     # Low score alert
@@ -239,7 +235,7 @@ def example_slack_formatting():
         rep_name="John Smith",
         dimension="Product Knowledge",
         score=55,
-        recommendation="Review the product sheet and demo script"
+        recommendation="Review the product sheet and demo script",
     )
 
     # Objection pattern
@@ -250,8 +246,8 @@ def example_slack_formatting():
         examples=[
             "Client said 'That's too expensive'",
             "Customer asked for a 20% discount",
-            "They want to compare with competitors first"
-        ]
+            "They want to compare with competitors first",
+        ],
     )
 
     # Send to Slack
@@ -280,7 +276,7 @@ def example_with_coaching_analysis():
                 "title": "Demo Call - Acme Corp",
                 "quote": "The customer raised pricing concerns...",
             }
-        ]
+        ],
     }
 
     # Send notifications based on analysis

@@ -115,7 +115,13 @@ export default function DataPage() {
 
       {/* Status Message */}
       {message && (
-        <div className={`p-4 rounded-lg flex items-center gap-2 ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+        <div
+          className={`p-4 rounded-lg flex items-center gap-2 ${
+            message.type === "success"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
           {message.type === "success" ? (
             <CheckCircle className="h-5 w-5 flex-shrink-0" />
           ) : (
@@ -141,7 +147,10 @@ export default function DataPage() {
           <div className="space-y-4">
             <div>
               <Label htmlFor="format">Export Format</Label>
-              <Select value={exportFormat} onValueChange={(value) => setExportFormat(value as DataExportFormat)}>
+              <Select
+                value={exportFormat}
+                onValueChange={(value) => setExportFormat(value as DataExportFormat)}
+              >
                 <SelectTrigger id="format" className="w-full mt-2">
                   <SelectValue />
                 </SelectTrigger>
@@ -221,8 +230,8 @@ export default function DataPage() {
           </Button>
 
           <p className="text-xs text-muted-foreground">
-            Your export will contain all your personal data and coaching history. This complies
-            with GDPR and other data protection regulations.
+            Your export will contain all your personal data and coaching history. This complies with
+            GDPR and other data protection regulations.
           </p>
         </CardContent>
       </Card>
@@ -231,14 +240,15 @@ export default function DataPage() {
       <Card>
         <CardHeader>
           <CardTitle>Data Retention Policy</CardTitle>
-          <CardDescription>
-            Automatically delete your data after a specified period
-          </CardDescription>
+          <CardDescription>Automatically delete your data after a specified period</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="retention">Retention Period</Label>
-            <Select value={retentionDays} onValueChange={(value) => setRetentionDays(value as DataRetention)}>
+            <Select
+              value={retentionDays}
+              onValueChange={(value) => setRetentionDays(value as DataRetention)}
+            >
               <SelectTrigger id="retention" className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -280,13 +290,15 @@ export default function DataPage() {
             <div>
               <h4 className="font-semibold text-sm text-foreground mb-1">Data Encryption</h4>
               <p className="text-sm text-muted-foreground">
-                All your data is encrypted in transit and at rest using industry-standard encryption.
+                All your data is encrypted in transit and at rest using industry-standard
+                encryption.
               </p>
             </div>
             <div>
               <h4 className="font-semibold text-sm text-foreground mb-1">Access Controls</h4>
               <p className="text-sm text-muted-foreground">
-                Only authorized personnel can access your data, and all access is logged for audit purposes.
+                Only authorized personnel can access your data, and all access is logged for audit
+                purposes.
               </p>
             </div>
             <div>
@@ -298,8 +310,8 @@ export default function DataPage() {
             <div>
               <h4 className="font-semibold text-sm text-foreground mb-1">GDPR Compliance</h4>
               <p className="text-sm text-muted-foreground">
-                We comply with GDPR and other data protection regulations. You can request data deletion
-                at any time.
+                We comply with GDPR and other data protection regulations. You can request data
+                deletion at any time.
               </p>
             </div>
           </div>
@@ -324,12 +336,10 @@ export default function DataPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-900 font-medium mb-3">
-              Delete All Your Data
-            </p>
+            <p className="text-sm text-red-900 font-medium mb-3">Delete All Your Data</p>
             <p className="text-sm text-red-800 mb-4">
-              This action will permanently delete all your personal data, coaching sessions, transcripts,
-              and feedback. This cannot be undone.
+              This action will permanently delete all your personal data, coaching sessions,
+              transcripts, and feedback. This cannot be undone.
             </p>
             <Button variant="destructive" className="w-full">
               Delete All My Data

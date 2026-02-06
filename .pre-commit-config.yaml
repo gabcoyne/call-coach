@@ -1,0 +1,109 @@
+# Pre-commit hooks for call-coach project
+# See https://pre-commit.com for more information
+
+repos:
+  # Python code formatting with Black
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        language_version: python3.11
+        args: [--line-length=100]
+        exclude: ^(\.venv|venv|build|dist)/
+
+  # Python linting with Ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        exclude: ^(\.venv|venv|build|dist)/
+
+  # Python import sorting with isort
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=100]
+        exclude: ^(\.venv|venv|build|dist)/
+
+  # Type checking with MyPy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-requests, types-PyYAML]
+        args: [--ignore-missing-imports, --no-strict-optional]
+        exclude: ^(tests/|\.venv|venv|build|dist)/
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(\.md|\.txt)$
+      - id: end-of-file-fixer
+        exclude: ^(\.md|\.txt)$
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-json
+        exclude: ^(\.vscode|\.beads)/
+      - id: check-toml
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: detect-private-key
+        exclude: ^(tests/|docs/|\.github/)
+
+  # Python security checks with Bandit
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.7
+    hooks:
+      - id: bandit
+        args: [-c, pyproject.toml]
+        additional_dependencies: ["bandit[toml]"]
+        exclude: ^(tests/|\.venv|venv)/
+
+  # JavaScript/TypeScript formatting with Prettier
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, json, css, scss, markdown]
+        exclude: ^(node_modules|\.next|build|dist)/
+        additional_dependencies:
+          - prettier@3.1.0
+          - prettier-plugin-tailwindcss@0.5.9
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+        exclude: ^(node_modules|\.next|CHANGELOG\.md)/
+
+  # Shell script checking
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        exclude: ^(node_modules|\.venv)/
+
+  # Secrets detection (commented out - run manually with: detect-secrets scan)
+  # - repo: https://github.com/Yelp/detect-secrets
+  #   rev: v1.4.0
+  #   hooks:
+  #     - id: detect-secrets
+  #       args: []
+  #       exclude: ^(\.venv|venv|node_modules|\.git)/
+
+# Configuration
+default_language_version:
+  python: python3.11
+  node: 18.18.0
+
+fail_fast: false

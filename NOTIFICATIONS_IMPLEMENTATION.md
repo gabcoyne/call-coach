@@ -16,6 +16,7 @@ Successfully implemented a comprehensive, production-ready notification system w
 Created 5 responsive HTML email templates with mobile-first design and inline CSS:
 
 #### Weekly Report Enhanced
+
 - **File:** `/reports/templates/weekly_report_enhanced.html`
 - **Features:**
   - Improved responsive design with grid layout
@@ -27,6 +28,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
   - Accessible color contrast (WCAG AA)
 
 #### Coaching Insight
+
 - **File:** `/reports/templates/coaching_insight.html`
 - **Features:**
   - Single insight delivery with score indicators
@@ -37,6 +39,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
   - Unsubscribe link with token
 
 #### Skill Improvement (Celebration Email)
+
 - **File:** `/reports/templates/skill_improvement.html`
 - **Features:**
   - Celebratory tone with emoji and gradient header
@@ -47,6 +50,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
   - Stats section showing activity metrics
 
 #### Manager Summary
+
 - **File:** `/reports/templates/manager_summary.html`
 - **Features:**
   - Team performance overview
@@ -57,6 +61,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
   - Color-coded trends (up/down/stable)
 
 #### Welcome Onboarding
+
 - **File:** `/reports/templates/welcome.html`
 - **Features:**
   - New user orientation
@@ -71,6 +76,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
 **File:** `/notifications/slack_formatter.py`
 
 - **SlackFormatter class** with 6 static methods:
+
   - `coaching_insight()` - Formatted coaching messages with View/Dismiss buttons
   - `score_improvement()` - Celebration messages with progress visualization
   - `weekly_summary()` - Team performance overview with member list
@@ -89,12 +95,14 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
 ### 3. In-App Notification System
 
 **Files:**
+
 - `/notifications/__init__.py` - Module initialization
 - `/notifications/in_app.py` - Core notification system
 
 **Components:**
 
 #### InAppNotification Model
+
 - UUID-based notification IDs
 - User targeting with UUID foreign key
 - Type classification (coaching_insight, score_improvement, achievement, etc.)
@@ -105,6 +113,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
 - Automatic expiration support
 
 #### NotificationStore Class
+
 - `create()` - Persist notifications to database
 - `get()` - Retrieve by ID
 - `get_user_notifications()` - Paginated retrieval with filtering
@@ -115,6 +124,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
 - `cleanup_expired()` - Automatic expiration handling
 
 #### NotificationBuilder Class
+
 - Fluent API for notification creation
 - Chainable methods: title(), message(), priority(), action(), expires_in(), data()
 - Type-safe with Pydantic validation
@@ -127,6 +137,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
 **NotificationPreferencesManager Class:**
 
 - Per-notification-type control (7 types):
+
   - weekly_reports
   - coaching_insights
   - score_improvements
@@ -136,6 +147,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
   - system_alerts
 
 - Per-channel delivery options:
+
   - Email
   - Slack
   - In-App
@@ -147,6 +159,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
   - never
 
 **Features:**
+
 - `get_preferences()` - Retrieve user preferences
 - `update_notification_type_preference()` - Update specific settings
 - `should_send_notification()` - Check before sending
@@ -162,6 +175,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
 
 - `send_notifications_flow()` - Main orchestration flow
 - Task-based delivery:
+
   - `send_coaching_insight_email()` - Email delivery with retries
   - `send_weekly_report_email()` - Templated email
   - `send_slack_notification()` - Webhook delivery
@@ -169,6 +183,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
   - `create_inapp_notification()` - Database persistence
 
 - **Orchestration Features:**
+
   - Concurrent task execution
   - 2x automatic retry with 30-second delays
   - Preference-aware channel selection
@@ -186,6 +201,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
 **File:** `/db/migrations/004_create_notifications_tables.sql`
 
 #### notifications table
+
 - UUID primary key with auto-generation
 - Foreign key to speakers (user_id)
 - Type classification (VARCHAR 50)
@@ -199,6 +215,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
 - Indexes on: user_id, created_at, type, expiration
 
 #### user_notification_preferences table
+
 - Composite primary key (user_id, notification_type)
 - Enabled boolean (master switch)
 - Per-channel booleans (email, slack, in_app)
@@ -207,6 +224,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
 - Indexes on: enabled, frequency
 
 #### notification_delivery_log table
+
 - UUID primary key
 - References to notification_id and user_id
 - Channel enum (email/slack/in_app)
@@ -220,6 +238,7 @@ Created 5 responsive HTML email templates with mobile-first design and inline CS
 **File:** `/flows/README_NOTIFICATIONS.md`
 
 Comprehensive guide covering:
+
 - Architecture overview
 - Component descriptions
 - Usage examples for each feature
@@ -235,6 +254,7 @@ Comprehensive guide covering:
 **File:** `/notifications/examples.py`
 
 8 complete working examples:
+
 1. Send coaching insight via all channels
 2. Send score improvement celebration
 3. Create custom in-app notification
@@ -247,21 +267,25 @@ Comprehensive guide covering:
 ## Integration Points
 
 ### Existing Code
+
 - **reports/email_sender.py** - Reused for SMTP, SendGrid, SES delivery
 - **flows/weekly_review.py** - Can use new email templates
 - **db/models.py** - Uses CoachingDimension enum, NotificationType enum
 
 ### Database
+
 - Requires running migration 004
 - Uses existing speakers table for user_id foreign keys
 - Compatible with current connection pooling
 
 ### Email Providers
+
 - Auto-detection: SendGrid API → SMTP → Console
 - Supports: SendGrid, AWS SES, SMTP, Console logging
-- Environment variables: SENDGRID_API_KEY, SMTP_*, AWS credentials
+- Environment variables: SENDGRID*API_KEY, SMTP*\*, AWS credentials
 
 ### Slack Integration
+
 - Webhook-based delivery (no OAuth needed)
 - User-provided webhook URLs
 - Block Kit formatting for rich messages
@@ -270,6 +294,7 @@ Comprehensive guide covering:
 ## Key Features
 
 ### Responsive Design
+
 - Mobile-first CSS
 - Tested at multiple viewport sizes
 - Inline styles for email client compatibility
@@ -277,6 +302,7 @@ Comprehensive guide covering:
 - Emoji support
 
 ### Scalability
+
 - Database partitioning by month
 - Batch notification operations
 - Concurrent task execution
@@ -284,6 +310,7 @@ Comprehensive guide covering:
 - Efficient indexes
 
 ### Reliability
+
 - Automatic retries (2x with 30s delay)
 - Preference-aware routing prevents unwanted notifications
 - Error logging and auditing
@@ -291,6 +318,7 @@ Comprehensive guide covering:
 - Delivery status tracking
 
 ### User Control
+
 - Per-notification-type preferences
 - Per-channel opt-in/out
 - Frequency settings (immediate/digest)
@@ -298,6 +326,7 @@ Comprehensive guide covering:
 - Unsubscribe links in emails
 
 ### Extensibility
+
 - Clean separation of concerns
 - Fluent builder API
 - Template-based email generation
@@ -338,6 +367,7 @@ db/
 ## Testing Considerations
 
 ### Unit Tests (Recommended)
+
 - SlackFormatter block generation
 - NotificationBuilder fluent API
 - NotificationStore CRUD operations
@@ -345,12 +375,14 @@ db/
 - Template rendering with context
 
 ### Integration Tests
+
 - Email delivery via all providers
 - Database transactions and rollbacks
 - Preference-aware routing
 - Batch notifications with multiple users
 
 ### Manual Testing
+
 - Rendered HTML in email clients (Litmus/Email on Acid)
 - Slack message rendering in Slack
 - Database queries and partitioning performance
@@ -359,16 +391,19 @@ db/
 ## Deployment Steps
 
 1. **Database Migration**
+
    ```bash
    psql $DATABASE_URL < db/migrations/004_create_notifications_tables.sql
    ```
 
 2. **Configuration**
-   - Set email provider credentials (SENDGRID_API_KEY or SMTP_*)
+
+   - Set email provider credentials (SENDGRID*API_KEY or SMTP*\*)
    - Configure Slack webhooks per-user or team-wide
    - Set APP_URL environment variable for email links
 
 3. **Initialization**
+
    - Seed default preferences for existing users
    - Run preference migration script (not provided, TODO)
 

@@ -29,14 +29,11 @@ export async function GET(request: NextRequest) {
     if (allVersions) params.append("all_versions", "true");
     params.append("active_only", String(activeOnly));
 
-    const response = await fetch(
-      `${API_BASE}/knowledge/rubrics?${params.toString()}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${API_BASE}/knowledge/rubrics?${params.toString()}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -46,10 +43,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching rubrics:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch rubrics" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch rubrics" }, { status: 500 });
   }
 }
 
@@ -95,8 +89,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating rubric:", error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Failed to create rubric",
+        error: error instanceof Error ? error.message : "Failed to create rubric",
       },
       { status: 500 }
     );
@@ -114,10 +107,7 @@ export async function PATCH(request: NextRequest) {
     const rubricId = searchParams.get("id");
 
     if (!rubricId) {
-      return NextResponse.json(
-        { error: "Missing required parameter: id" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required parameter: id" }, { status: 400 });
     }
 
     const body = await request.json();
@@ -144,8 +134,7 @@ export async function PATCH(request: NextRequest) {
     console.error("Error updating rubric:", error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Failed to update rubric",
+        error: error instanceof Error ? error.message : "Failed to update rubric",
       },
       { status: 500 }
     );

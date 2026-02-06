@@ -98,9 +98,7 @@ export function RoleAssignmentTable() {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        (s) =>
-          s.name.toLowerCase().includes(query) ||
-          s.email.toLowerCase().includes(query)
+        (s) => s.name.toLowerCase().includes(query) || s.email.toLowerCase().includes(query)
       );
     }
 
@@ -315,11 +313,7 @@ export function RoleAssignmentTable() {
             <span className="text-sm font-medium text-blue-900">
               {selectedEmails.size} selected
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedEmails(new Set())}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setSelectedEmails(new Set())}>
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -337,10 +331,7 @@ export function RoleAssignmentTable() {
                 <SelectItem value="csm">Customer Success Manager</SelectItem>
               </SelectContent>
             </Select>
-            <Button
-              onClick={handleBulkAssignment}
-              disabled={!bulkRole || updatingEmails.size > 0}
-            >
+            <Button onClick={handleBulkAssignment} disabled={!bulkRole || updatingEmails.size > 0}>
               Assign Role
             </Button>
           </div>
@@ -380,10 +371,7 @@ export function RoleAssignmentTable() {
               const isUpdating = updatingEmails.has(staff.email);
 
               return (
-                <tr
-                  key={staff.email}
-                  className={isSelected ? "bg-blue-50" : "hover:bg-gray-50"}
-                >
+                <tr key={staff.email} className={isSelected ? "bg-blue-50" : "hover:bg-gray-50"}>
                   <td className="px-6 py-4">
                     <Checkbox
                       checked={isSelected}
@@ -402,7 +390,8 @@ export function RoleAssignmentTable() {
                     <Select
                       value={staff.role || "unassigned"}
                       onValueChange={(value) => {
-                        const newRole = value === "unassigned" ? null : (value as "ae" | "se" | "csm");
+                        const newRole =
+                          value === "unassigned" ? null : (value as "ae" | "se" | "csm");
                         updateRole(staff.email, newRole);
                       }}
                       disabled={isUpdating}
@@ -431,7 +420,9 @@ export function RoleAssignmentTable() {
                       className="cursor-help"
                       title={
                         staff.assigned_by
-                          ? `Assigned by ${staff.assigned_by} on ${new Date(staff.updated_at!).toLocaleString()}`
+                          ? `Assigned by ${staff.assigned_by} on ${new Date(
+                              staff.updated_at!
+                            ).toLocaleString()}`
                           : "Never assigned"
                       }
                     >

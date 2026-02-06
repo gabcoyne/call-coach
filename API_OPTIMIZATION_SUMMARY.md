@@ -15,6 +15,7 @@ February 5, 2026
 **Location**: `/Users/gcoyne/src/prefect/call-coach/db/performance/slow_queries.sql`
 
 **Features**:
+
 - EXPLAIN ANALYZE queries for common patterns
 - Composite index recommendations:
   - `idx_calls_product_scheduled` - Call filtering by product and date
@@ -30,6 +31,7 @@ February 5, 2026
 - Query performance analysis tools
 
 **Benefits**:
+
 - Faster query execution for filtered searches (2-10x improvement expected)
 - Reduced database load from repeated queries
 - Better query planner decisions with updated statistics
@@ -39,6 +41,7 @@ February 5, 2026
 **Location**: `/Users/gcoyne/src/prefect/call-coach/middleware/compression.py`
 
 **Features**:
+
 - Automatic gzip compression for responses > 500 bytes
 - Content-Type aware compression (JSON, HTML, XML, etc.)
 - Configurable compression level (default: 6)
@@ -46,6 +49,7 @@ February 5, 2026
 - Proper Vary and Content-Encoding headers
 
 **Benefits**:
+
 - 60-80% reduction in response size for JSON payloads
 - Faster page loads and API responses
 - Reduced bandwidth costs
@@ -55,12 +59,14 @@ February 5, 2026
 **Location**: `/Users/gcoyne/src/prefect/call-coach/db/pagination.py`
 
 **Features**:
+
 - Offset-based pagination with page/page_size parameters
 - Cursor-based pagination for infinite scrolling
 - Generic PaginatedResult type with metadata (total, has_next, etc.)
 - Helper functions for adding pagination to queries
 
 **Benefits**:
+
 - Reduced memory usage for large result sets
 - Faster initial page loads
 - Better user experience with progressive loading
@@ -70,20 +76,23 @@ February 5, 2026
 **Location**: `/Users/gcoyne/src/prefect/call-coach/middleware/rate_limit.py`
 
 **Features**:
+
 - Token bucket algorithm with configurable rates
 - Per-user rate limits (identified by email, API key, or IP)
 - Per-endpoint rate limits with different tiers:
   - General endpoints: 100 req/min (burst: 150)
   - Expensive endpoints: 20 req/min (burst: 30)
-- Standard rate limit headers (X-RateLimit-*)
+- Standard rate limit headers (X-RateLimit-\*)
 - Automatic bucket cleanup for inactive users
 
 **Expensive Endpoints**:
+
 - `/tools/analyze_call`
 - `/tools/analyze_opportunity`
 - `/tools/get_learning_insights`
 
 **Benefits**:
+
 - Protection against abuse and DoS attacks
 - Fair resource allocation across users
 - Predictable API behavior under load
@@ -93,6 +102,7 @@ February 5, 2026
 **Location**: `/Users/gcoyne/src/prefect/call-coach/api/v1/`
 
 **Features**:
+
 - Versioned endpoints under `/api/v1/` prefix
 - Separate request/response schemas per version
 - Version field in all responses
@@ -100,6 +110,7 @@ February 5, 2026
 - Deprecation warning support
 
 **Endpoints Versioned**:
+
 - `POST /api/v1/tools/analyze_call`
 - `POST /api/v1/tools/get_rep_insights`
 - `POST /api/v1/tools/search_calls` (with pagination)
@@ -107,6 +118,7 @@ February 5, 2026
 - `POST /api/v1/tools/get_learning_insights`
 
 **Benefits**:
+
 - Safe API evolution without breaking clients
 - Clear migration path for frontend
 - Ability to test new features alongside stable API
@@ -116,7 +128,9 @@ February 5, 2026
 **Location**: `/Users/gcoyne/src/prefect/call-coach/api/error_handlers.py`
 
 **Features**:
+
 - Standardized error response format:
+
   ```json
   {
     "error": "error_code",
@@ -125,6 +139,7 @@ February 5, 2026
     "request_id": "uuid"
   }
   ```
+
 - Specialized handlers for:
   - HTTP exceptions (4xx/5xx)
   - Validation errors (422)
@@ -135,6 +150,7 @@ February 5, 2026
 - Request ID tracking through error chain
 
 **Benefits**:
+
 - Consistent error experience for frontend
 - Easier debugging with request IDs
 - Automatic retry for transient failures
@@ -145,6 +161,7 @@ February 5, 2026
 **Location**: `/Users/gcoyne/src/prefect/call-coach/api/monitoring.py`
 
 **Features**:
+
 - Real-time metrics collection:
   - Request counts per endpoint
   - Response time percentiles (p50, p95, p99)
@@ -160,6 +177,7 @@ February 5, 2026
 - Configurable sample size for percentile calculations
 
 **Benefits**:
+
 - Real-time visibility into API performance
 - Early detection of performance degradation
 - Data-driven optimization decisions
@@ -170,6 +188,7 @@ February 5, 2026
 **Location**: `/Users/gcoyne/src/prefect/call-coach/api/rest_server.py`
 
 **Changes**:
+
 - Integrated all middleware components
 - Added request ID generation and propagation
 - Added response time tracking
@@ -179,6 +198,7 @@ February 5, 2026
 - Included v1 versioned API routes
 
 **New Headers**:
+
 - `X-Request-ID` - Unique request identifier
 - `X-Response-Time` - Response time in milliseconds
 - `X-RateLimit-Limit` - Rate limit capacity
@@ -206,23 +226,26 @@ February 5, 2026
 ### For Frontend Developers
 
 1. **Use Versioned Endpoints**:
+
    ```typescript
    // Old (still works)
-   POST /tools/analyze_call
+   POST / tools / analyze_call;
 
    // New (recommended)
-   POST /api/v1/tools/analyze_call
+   POST / api / v1 / tools / analyze_call;
    ```
 
 2. **Handle Rate Limits**:
+
    ```typescript
    if (response.status === 429) {
-     const retryAfter = response.headers.get('Retry-After');
+     const retryAfter = response.headers.get("Retry-After");
      // Wait and retry
    }
    ```
 
 3. **Use Pagination**:
+
    ```typescript
    // Search calls with pagination
    POST /api/v1/tools/search_calls
@@ -245,6 +268,7 @@ February 5, 2026
    ```
 
 4. **Handle Errors Consistently**:
+
    ```typescript
    try {
      const response = await fetch('/api/v1/tools/analyze_call', ...);
@@ -263,12 +287,14 @@ February 5, 2026
 ### For DevOps/Deployment
 
 1. **Database Indexes**:
+
    ```bash
    # Run index creation (CONCURRENTLY to avoid locks)
    psql $DATABASE_URL -f db/performance/slow_queries.sql
    ```
 
 2. **Monitoring Setup**:
+
    ```bash
    # Health check for load balancer
    curl http://api:8000/monitoring/health
@@ -278,6 +304,7 @@ February 5, 2026
    ```
 
 3. **Rate Limit Configuration**:
+
    ```python
    # In rest_server.py, adjust as needed:
    app.add_middleware(
@@ -292,6 +319,7 @@ February 5, 2026
 ### Manual Testing
 
 1. **Rate Limiting**:
+
    ```bash
    # Send 100+ requests quickly
    for i in {1..110}; do
@@ -305,6 +333,7 @@ February 5, 2026
    ```
 
 2. **Compression**:
+
    ```bash
    # Request with gzip support
    curl -H "Accept-Encoding: gzip" \
@@ -315,6 +344,7 @@ February 5, 2026
    ```
 
 3. **Monitoring**:
+
    ```bash
    # Check metrics
    curl http://localhost:8000/monitoring/metrics | jq
@@ -326,6 +356,7 @@ February 5, 2026
 ### Automated Tests
 
 TODO: Add test suite covering:
+
 - Rate limit enforcement
 - Compression for different content types
 - Pagination edge cases
@@ -335,21 +366,25 @@ TODO: Add test suite covering:
 ## Future Enhancements
 
 1. **Response Caching**:
+
    - Add ETag support for conditional requests
    - Cache-Control headers for static responses
    - Redis-backed response cache
 
 2. **Request Tracing**:
+
    - Distributed tracing with OpenTelemetry
    - Correlation IDs across services
    - Trace context propagation
 
 3. **Advanced Rate Limiting**:
+
    - Redis-backed rate limiter for multi-instance deployment
    - Rate limit by API key tier (free/premium)
    - Dynamic rate limits based on load
 
 4. **Metrics Export**:
+
    - Prometheus /metrics endpoint
    - StatsD integration
    - Custom metrics for business logic
@@ -362,6 +397,7 @@ TODO: Add test suite covering:
 ## Contact
 
 For questions or issues related to these optimizations, contact the api-optimization-agent or review the implementation in:
+
 - `/Users/gcoyne/src/prefect/call-coach/middleware/`
 - `/Users/gcoyne/src/prefect/call-coach/api/v1/`
 - `/Users/gcoyne/src/prefect/call-coach/db/performance/`

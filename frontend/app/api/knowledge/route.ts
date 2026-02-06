@@ -29,14 +29,11 @@ export async function GET(request: NextRequest) {
     if (product) params.append("product", product);
     if (category) params.append("category", category);
 
-    const response = await fetch(
-      `${API_BASE}/knowledge?${params.toString()}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${API_BASE}/knowledge?${params.toString()}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -46,10 +43,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching knowledge entries:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch knowledge entries" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch knowledge entries" }, { status: 500 });
   }
 }
 
@@ -96,10 +90,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating/updating knowledge entry:", error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to create/update knowledge entry",
+        error: error instanceof Error ? error.message : "Failed to create/update knowledge entry",
       },
       { status: 500 }
     );
@@ -124,15 +115,12 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const response = await fetch(
-      `${API_BASE}/knowledge?product=${product}&category=${category}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${API_BASE}/knowledge?product=${product}&category=${category}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -141,9 +129,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting knowledge entry:", error);
-    return NextResponse.json(
-      { error: "Failed to delete knowledge entry" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to delete knowledge entry" }, { status: 500 });
   }
 }

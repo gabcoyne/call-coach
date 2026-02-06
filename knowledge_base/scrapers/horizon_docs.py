@@ -2,6 +2,7 @@
 Scraper for Prefect Horizon documentation.
 Extracts features, configuration, and deployment information.
 """
+
 import logging
 from typing import Any
 from urllib.parse import urljoin

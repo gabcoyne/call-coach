@@ -6,6 +6,7 @@ Version 1 of the Call Coaching API with:
 - Stable response schemas
 - Deprecation warnings for future changes
 """
+
 from fastapi import APIRouter
 
 from .tools import router as tools_router

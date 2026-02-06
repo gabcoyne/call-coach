@@ -21,16 +21,13 @@ from knowledge.loader import load_all, verify_knowledge_base
 from knowledge_base.loader import KnowledgeBaseManager
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Load initial knowledge base content"
-    )
+    parser = argparse.ArgumentParser(description="Load initial knowledge base content")
     parser.add_argument(
         "--verify-only",
         action="store_true",

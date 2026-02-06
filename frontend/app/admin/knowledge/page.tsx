@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Upload, Download, History, Plus, Trash2, Save } from "lucide-react";
@@ -139,10 +145,9 @@ export default function KnowledgeManagementPage() {
     }
 
     try {
-      const response = await fetch(
-        `/api/knowledge?product=${product}&category=${category}`,
-        { method: "DELETE" }
-      );
+      const response = await fetch(`/api/knowledge?product=${product}&category=${category}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to delete entry");
@@ -258,12 +263,8 @@ export default function KnowledgeManagementPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>
-                  {editingEntry ? "Edit Entry" : "Create New Entry"}
-                </CardTitle>
-                <CardDescription>
-                  Add or update product documentation
-                </CardDescription>
+                <CardTitle>{editingEntry ? "Edit Entry" : "Create New Entry"}</CardTitle>
+                <CardDescription>Add or update product documentation</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -338,9 +339,7 @@ export default function KnowledgeManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Existing Entries</CardTitle>
-                <CardDescription>
-                  {entries.length} knowledge base entries
-                </CardDescription>
+                <CardDescription>{entries.length} knowledge base entries</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-[500px] overflow-y-auto">
@@ -385,9 +384,7 @@ export default function KnowledgeManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Create New Rubric</CardTitle>
-                <CardDescription>
-                  Add a new version of a coaching rubric
-                </CardDescription>
+                <CardDescription>Add a new version of a coaching rubric</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -472,18 +469,12 @@ export default function KnowledgeManagementPage() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <h4 className="font-medium">{rubric.name}</h4>
-                            {rubric.active && (
-                              <Badge variant="default">Active</Badge>
-                            )}
-                            {rubric.deprecated_at && (
-                              <Badge variant="secondary">Deprecated</Badge>
-                            )}
+                            {rubric.active && <Badge variant="default">Active</Badge>}
+                            {rubric.deprecated_at && <Badge variant="secondary">Deprecated</Badge>}
                           </div>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge variant="outline">{rubric.category}</Badge>
-                            <span className="text-sm text-muted-foreground">
-                              v{rubric.version}
-                            </span>
+                            <span className="text-sm text-muted-foreground">v{rubric.version}</span>
                           </div>
                           <p className="text-xs text-muted-foreground mt-1">
                             Created {new Date(rubric.created_at).toLocaleDateString()}
@@ -511,9 +502,7 @@ export default function KnowledgeManagementPage() {
                   <p className="text-sm text-muted-foreground">Knowledge Entries</p>
                 </div>
                 <div className="p-4 border rounded-lg">
-                  <div className="text-2xl font-bold">
-                    {rubrics.filter((r) => r.active).length}
-                  </div>
+                  <div className="text-2xl font-bold">{rubrics.filter((r) => r.active).length}</div>
                   <p className="text-sm text-muted-foreground">Active Rubrics</p>
                 </div>
                 <div className="p-4 border rounded-lg">

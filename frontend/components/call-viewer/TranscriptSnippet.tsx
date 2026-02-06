@@ -32,19 +32,13 @@ function SnippetItem({ text, type, onClick }: SnippetItemProps) {
         <div className="flex-1">
           <p className="text-sm leading-relaxed">{text}</p>
         </div>
-        {onClick && (
-          <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-        )}
+        {onClick && <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />}
       </div>
     </div>
   );
 }
 
-export function TranscriptSnippet({
-  examples,
-  callId,
-  className,
-}: TranscriptSnippetProps) {
+export function TranscriptSnippet({ examples, callId, className }: TranscriptSnippetProps) {
   if (!examples || (!examples.good?.length && !examples.needs_work?.length)) {
     return null;
   }

@@ -7,8 +7,9 @@ Includes:
 - Request logging
 - Performance monitoring
 """
-from .rate_limit import RateLimitMiddleware
+
 from .compression import CompressionMiddleware
+from .rate_limit import RateLimitMiddleware
 
 __all__ = [
     "RateLimitMiddleware",

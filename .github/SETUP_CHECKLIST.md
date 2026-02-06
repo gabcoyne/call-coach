@@ -5,18 +5,21 @@ Use this checklist to ensure the CI/CD pipeline is properly configured.
 ## Phase 1: Initial Setup (5 minutes)
 
 - [ ] **Scripts are executable**
+
   ```bash
   ls -la scripts/ci/*.sh
   # Should show: -rwxr-xr-x (executable)
   ```
 
 - [ ] **All workflow files exist**
+
   ```bash
   ls -la .github/workflows/
   # Should show: tests.yml, build.yml, deploy-*.yml, migrate.yml, security.yml, release.yml
   ```
 
 - [ ] **Documentation files exist**
+
   ```bash
   ls -la .github/
   # Should show: CODEOWNERS, CICD_QUICK_START.md, CI_CD_IMPLEMENTATION_SUMMARY.md, WORKFLOW_DIAGRAM.md
@@ -27,11 +30,13 @@ Use this checklist to ensure the CI/CD pipeline is properly configured.
 ### Secrets Configuration
 
 - [ ] **Run secrets setup script**
+
   ```bash
   scripts/ci/setup-secrets.sh
   ```
 
 - [ ] **Verify required secrets are set**
+
   ```bash
   gh secret list --repo gabcoyne/call-coach
   ```
@@ -39,6 +44,7 @@ Use this checklist to ensure the CI/CD pipeline is properly configured.
 ## Phase 3: Local Testing (5 minutes)
 
 - [ ] **Test suite runs locally**
+
   ```bash
   scripts/ci/run-tests-locally.sh all
   ```
@@ -46,6 +52,7 @@ Use this checklist to ensure the CI/CD pipeline is properly configured.
 ## Phase 4: GitHub Actions Verification (10 minutes)
 
 - [ ] **Visit Actions tab in GitHub**
+
   - Go to your repository
   - Click "Actions" tab
 
@@ -61,6 +68,7 @@ Use this checklist to ensure the CI/CD pipeline is properly configured.
 ## Phase 5: First Test Run (10-20 minutes)
 
 - [ ] **Create a test PR**
+
   ```bash
   git checkout -b test/cicd-validation
   echo "# CI/CD Test" > CICD_TEST.md

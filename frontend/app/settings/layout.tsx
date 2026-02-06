@@ -4,11 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { SettingsNav } from "@/components/settings/settings-nav";
 import { Card } from "@/components/ui/card";
 
-export default function SettingsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function SettingsLayout({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn } = useAuth();
 
   if (!isLoaded) {
@@ -45,9 +41,7 @@ export default function SettingsLayout({
 
       {/* Settings Content */}
       <div className="md:col-span-3">
-        <div className="space-y-6">
-          {children}
-        </div>
+        <div className="space-y-6">{children}</div>
       </div>
     </div>
   );

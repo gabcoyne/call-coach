@@ -45,6 +45,7 @@ Access control is enforced at two levels:
 2. **Authorization**: User must have permission to access the requested resource (enforced by RBAC)
 
 **Roles**:
+
 - `manager`: Can access all reps' data and team insights
 - `rep`: Can only access their own data
 
@@ -53,11 +54,13 @@ Access control is enforced at two levels:
 Rate limits are enforced per user and per endpoint to prevent abuse.
 
 **Default Limits**:
+
 - `analyze-call`: 60 requests per hour per user
 - `rep-insights`: 120 requests per hour per user
 - `search-calls`: 180 requests per hour per user
 
 **Rate Limit Headers** (included in all responses):
+
 ```
 X-RateLimit-Limit: 60
 X-RateLimit-Remaining: 59
@@ -65,6 +68,7 @@ X-RateLimit-Reset: 1707180000
 ```
 
 **Rate Limit Exceeded Response** (HTTP 429):
+
 ```json
 {
   "error": "Rate limit exceeded"
@@ -99,6 +103,7 @@ All errors follow a consistent format:
 ### Common Error Scenarios
 
 **Authentication Required**:
+
 ```json
 {
   "error": "Unauthorized",
@@ -107,6 +112,7 @@ All errors follow a consistent format:
 ```
 
 **RBAC Forbidden**:
+
 ```json
 {
   "error": "Forbidden: You can only access your own insights"
@@ -114,6 +120,7 @@ All errors follow a consistent format:
 ```
 
 **Validation Error**:
+
 ```json
 {
   "error": "Invalid request parameters",
@@ -143,11 +150,13 @@ Analyze a specific Gong call and return coaching insights across multiple dimens
 ```
 
 **Validation Rules**:
+
 - `call_id`: Required, non-empty string
 - `dimensions`: Optional array of valid dimension names
 - Booleans default to `true` for cache and snippets, `false` for force
 
 **Valid Dimensions**:
+
 - `product_knowledge`
 - `discovery`
 - `objection_handling`
@@ -264,11 +273,13 @@ Get performance trends and coaching history for a specific sales rep over a time
 ```
 
 **Validation Rules**:
+
 - `rep_email`: Required, valid email format
 - `time_period`: Optional enum value
 - `product_filter`: Optional enum value
 
 **Valid Time Periods**:
+
 - `last_7_days`
 - `last_30_days`
 - `last_quarter`
@@ -276,6 +287,7 @@ Get performance trends and coaching history for a specific sales rep over a time
 - `all_time`
 
 **Valid Product Filters**:
+
 - `prefect`
 - `horizon`
 - `both`
@@ -388,23 +400,27 @@ Search for calls matching specific criteria with advanced filtering and sorting.
 ```
 
 **Validation Rules**:
+
 - All fields are optional
 - Dates must be valid ISO 8601 datetime strings
 - Scores must be integers between 0-100
 - Limit must be between 1-100
 
 **Valid Products**:
+
 - `prefect`
 - `horizon`
 - `both`
 
 **Valid Call Types**:
+
 - `discovery`
 - `demo`
 - `technical_deep_dive`
 - `negotiation`
 
 **Valid Objection Types**:
+
 - `pricing`
 - `timing`
 - `technical`
@@ -432,14 +448,14 @@ Search for calls matching specific criteria with advanced filtering and sorting.
 Array<{
   call_id: string;
   title: string;
-  date: string | null;          // ISO 8601 date
+  date: string | null; // ISO 8601 date
   duration_seconds: number;
   call_type: string | null;
   product: string | null;
   overall_score: number | null; // 0-100
   customer_names: string[];
   prefect_reps: string[];
-}>
+}>;
 ```
 
 #### Authorization
@@ -493,14 +509,14 @@ import type {
   RepInsightsResponse,
   SearchCallsRequest,
   SearchCallsResponse,
-} from '@/types/coaching';
+} from "@/types/coaching";
 
 // Import validation schemas
 import {
   analyzeCallRequestSchema,
   repInsightsRequestSchema,
   searchCallsRequestSchema,
-} from '@/types/coaching';
+} from "@/types/coaching";
 ```
 
 ### Runtime Validation
@@ -513,11 +529,7 @@ const validationResult = analyzeCallRequestSchema.safeParse(requestBody);
 
 if (!validationResult.success) {
   // Returns 400 with validation errors
-  return apiError(
-    'Invalid request parameters',
-    400,
-    validationResult.error.format()
-  );
+  return apiError("Invalid request parameters", 400, validationResult.error.format());
 }
 
 const params = validationResult.data; // Type-safe validated data

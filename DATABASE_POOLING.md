@@ -17,6 +17,7 @@ We use **Neon Postgres with connection pooling** and configure our pool for serv
 ### 1. Neon Connection Pooler
 
 Neon provides a built-in connection pooler that:
+
 - Manages connections server-side
 - Supports many concurrent clients with fewer database connections
 - Works seamlessly with serverless functions
@@ -48,6 +49,7 @@ DATABASE_POOL_MAX_SIZE=10
 ```
 
 Why smaller?
+
 - Each serverless function instance gets its own pool
 - Many parallel function invocations = many pools
 - Smaller pools prevent exhausting Neon connection limits
@@ -72,6 +74,7 @@ def get_db_connection():
 ```
 
 Key features:
+
 - **Context Manager**: Ensures connections are always returned
 - **Statement Timeout**: Prevents long-running queries (30s limit)
 - **Per-Connection Settings**: Compatible with Neon pooler
@@ -101,10 +104,10 @@ DATABASE_POOL_MAX_SIZE=10
 Match pool sizes to your Neon plan:
 
 | Neon Plan | Max Connections | Recommended MAX_SIZE |
-|-----------|----------------|---------------------|
-| Free      | 10             | 5                   |
-| Launch    | 100            | 10                  |
-| Scale     | 1000           | 20                  |
+| --------- | --------------- | -------------------- |
+| Free      | 10              | 5                    |
+| Launch    | 100             | 10                   |
+| Scale     | 1000            | 20                   |
 
 ## Monitoring Connection Usage
 
@@ -142,6 +145,7 @@ vercel logs --query="connection"
 **Cause**: Pool size exceeds Neon plan limit
 
 **Solution**:
+
 1. Reduce `DATABASE_POOL_MAX_SIZE`
 2. Upgrade Neon plan
 3. Add connection retry logic
@@ -151,6 +155,7 @@ vercel logs --query="connection"
 **Cause**: Slow cold starts or network issues
 
 **Solution**:
+
 1. Verify using pooler endpoint
 2. Check Neon dashboard for issues
 3. Increase function timeout
@@ -160,6 +165,7 @@ vercel logs --query="connection"
 **Cause**: Many concurrent serverless functions
 
 **Solution**:
+
 1. Each function invocation creates a pool
 2. Reduce pool size per function
 3. Connections are released when function completes
@@ -167,6 +173,7 @@ vercel logs --query="connection"
 ## Best Practices
 
 1. **Always use context managers**
+
    ```python
    with get_db_connection() as conn:
        # Use connection
@@ -175,15 +182,18 @@ vercel logs --query="connection"
    ```
 
 2. **Keep queries fast**
+
    - Use indexes
    - Limit result sets
    - Avoid full table scans
 
 3. **Set statement timeouts**
+
    - Prevents runaway queries
    - Already configured per-connection
 
 4. **Monitor connection usage**
+
    - Check Neon dashboard regularly
    - Alert on high connection counts
 
@@ -200,6 +210,7 @@ Expected cold start times:
 - **Function warmup**: Next.js caches for ~5 minutes
 
 To minimize cold starts:
+
 1. Use Vercel Pro plan (faster infrastructure)
 2. Keep pool sizes small
 3. Optimize database schema with indexes
@@ -212,11 +223,11 @@ To minimize cold starts:
 
 ## Summary
 
-| Setting | Local Dev | Vercel Production |
-|---------|-----------|------------------|
-| `DATABASE_POOL_MIN_SIZE` | 5 | 2 |
-| `DATABASE_POOL_MAX_SIZE` | 20 | 10 |
-| `statement_timeout` | 30s | 30s |
-| Neon Endpoint | Pooler | Pooler |
+| Setting                  | Local Dev | Vercel Production |
+| ------------------------ | --------- | ----------------- |
+| `DATABASE_POOL_MIN_SIZE` | 5         | 2                 |
+| `DATABASE_POOL_MAX_SIZE` | 20        | 10                |
+| `statement_timeout`      | 30s       | 30s               |
+| Neon Endpoint            | Pooler    | Pooler            |
 
 For serverless: **Smaller pools + Neon pooler = Reliable connections**

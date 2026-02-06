@@ -88,9 +88,7 @@ export function OpportunitiesList() {
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStage, setSelectedStage] = useState<string>("all");
-  const [healthScoreRange, setHealthScoreRange] = useState<[number, number]>([
-    0, 100,
-  ]);
+  const [healthScoreRange, setHealthScoreRange] = useState<[number, number]>([0, 100]);
   const [sortBy, setSortBy] = useState("updated_at");
   const [sortDir, setSortDir] = useState<"ASC" | "DESC">("DESC");
   const [page, setPage] = useState(1);
@@ -104,24 +102,14 @@ export function OpportunitiesList() {
     const params = new URLSearchParams();
     if (debouncedSearch) params.set("search", debouncedSearch);
     if (selectedStage !== "all") params.set("stage", selectedStage);
-    if (healthScoreRange[0] > 0)
-      params.set("health_score_min", String(healthScoreRange[0]));
-    if (healthScoreRange[1] < 100)
-      params.set("health_score_max", String(healthScoreRange[1]));
+    if (healthScoreRange[0] > 0) params.set("health_score_min", String(healthScoreRange[0]));
+    if (healthScoreRange[1] < 100) params.set("health_score_max", String(healthScoreRange[1]));
     params.set("sort", sortBy);
     params.set("sort_dir", sortDir);
     params.set("page", String(page));
     params.set("limit", String(limit));
     return params.toString();
-  }, [
-    debouncedSearch,
-    selectedStage,
-    healthScoreRange,
-    sortBy,
-    sortDir,
-    page,
-    limit,
-  ]);
+  }, [debouncedSearch, selectedStage, healthScoreRange, sortBy, sortDir, page, limit]);
 
   // Fetch data
   const { data, error, isLoading } = useSWR<OpportunitiesResponse>(
@@ -169,8 +157,7 @@ export function OpportunitiesList() {
 
   // Check if opportunity is stale (14+ days since last update)
   const isStale = (updatedAt: string) => {
-    const daysSinceUpdate =
-      (Date.now() - new Date(updatedAt).getTime()) / (1000 * 60 * 60 * 24);
+    const daysSinceUpdate = (Date.now() - new Date(updatedAt).getTime()) / (1000 * 60 * 60 * 24);
     return daysSinceUpdate >= 14;
   };
 
@@ -269,9 +256,7 @@ export function OpportunitiesList() {
       {error && (
         <Card className="border-destructive">
           <CardContent className="pt-6">
-            <p className="text-destructive">
-              Failed to load opportunities. Please try again.
-            </p>
+            <p className="text-destructive">Failed to load opportunities. Please try again.</p>
           </CardContent>
         </Card>
       )}
@@ -287,27 +272,13 @@ export function OpportunitiesList() {
                 <table className="w-full">
                   <thead className="border-b bg-muted/50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">
-                        Opportunity
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">
-                        Account
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">
-                        Stage
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">
-                        Close Date
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">
-                        Amount
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">
-                        Health
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">
-                        Activity
-                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Opportunity</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Account</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Stage</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Close Date</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Amount</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Health</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Activity</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -340,9 +311,7 @@ export function OpportunitiesList() {
                                 </Badge>
                               )}
                             </div>
-                            <div className="text-xs text-muted-foreground">
-                              {opp.owner_email}
-                            </div>
+                            <div className="text-xs text-muted-foreground">{opp.owner_email}</div>
                           </td>
                           <td className="px-4 py-3">{opp.account_name}</td>
                           <td className="px-4 py-3">
@@ -351,9 +320,7 @@ export function OpportunitiesList() {
                           <td className="px-4 py-3">
                             {new Date(opp.close_date).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-3">
-                            ${opp.amount.toLocaleString()}
-                          </td>
+                          <td className="px-4 py-3">${opp.amount.toLocaleString()}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               <Badge variant={getHealthColor(opp.health_score)}>
@@ -401,22 +368,15 @@ export function OpportunitiesList() {
                         <CardTitle className="text-lg flex items-center gap-2">
                           {opp.name}
                           {isStale(opp.updated_at) && (
-                            <Badge
-                              variant="warning"
-                              className="flex items-center gap-1"
-                            >
+                            <Badge variant="warning" className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
                               Stale
                             </Badge>
                           )}
                         </CardTitle>
-                        <div className="text-sm text-muted-foreground mt-1">
-                          {opp.account_name}
-                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">{opp.account_name}</div>
                       </div>
-                      <Badge variant={getHealthColor(opp.health_score)}>
-                        {opp.health_score}
-                      </Badge>
+                      <Badge variant={getHealthColor(opp.health_score)}>{opp.health_score}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-2">
@@ -426,15 +386,11 @@ export function OpportunitiesList() {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Close Date:</span>
-                      <span>
-                        {new Date(opp.close_date).toLocaleDateString()}
-                      </span>
+                      <span>{new Date(opp.close_date).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Amount:</span>
-                      <span className="font-medium">
-                        ${opp.amount.toLocaleString()}
-                      </span>
+                      <span className="font-medium">${opp.amount.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Activity:</span>
@@ -458,8 +414,8 @@ export function OpportunitiesList() {
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-muted-foreground">
                     Showing {(page - 1) * limit + 1} to{" "}
-                    {Math.min(page * limit, data.pagination.total)} of{" "}
-                    {data.pagination.total} opportunities
+                    {Math.min(page * limit, data.pagination.total)} of {data.pagination.total}{" "}
+                    opportunities
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -477,11 +433,7 @@ export function OpportunitiesList() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        setPage((p) =>
-                          Math.min(data.pagination.totalPages, p + 1)
-                        )
-                      }
+                      onClick={() => setPage((p) => Math.min(data.pagination.totalPages, p + 1))}
                       disabled={!data.pagination.hasMore}
                     >
                       Next

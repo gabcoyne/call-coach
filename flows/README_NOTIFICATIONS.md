@@ -15,6 +15,7 @@ Users control how they receive notifications through comprehensive preference ma
 ### Components
 
 1. **Email Templates** (`reports/templates/`)
+
    - `weekly_report_enhanced.html` - Enhanced weekly report with score visualization
    - `coaching_insight.html` - Single coaching insight notification
    - `skill_improvement.html` - Celebration email for score improvements
@@ -22,17 +23,20 @@ Users control how they receive notifications through comprehensive preference ma
    - `welcome.html` - Onboarding email for new users
 
 2. **Slack Formatter** (`notifications/slack_formatter.py`)
+
    - `SlackFormatter` class with static methods for each notification type
    - Returns Block Kit formatted JSON for Slack API
    - Includes interactive buttons for CTAs
 
 3. **In-App Notification System** (`notifications/in_app.py`)
+
    - `InAppNotification` - Pydantic model for notifications
    - `NotificationStore` - CRUD operations and querying
    - `NotificationBuilder` - Fluent API for building notifications
    - Database backed storage with expiration support
 
 4. **Notification Preferences** (`notifications/preferences.py`)
+
    - `NotificationPreferencesManager` - User preference management
    - Per-notification-type control (enabled/disabled)
    - Per-channel control (email, Slack, in-app)
@@ -152,6 +156,7 @@ NotificationStore.archive(notification_id)
 ## Database Schema
 
 ### notifications table
+
 Stores all in-app notifications with support for expiration and archival.
 
 ```sql
@@ -172,6 +177,7 @@ Stores all in-app notifications with support for expiration and archival.
 ```
 
 ### user_notification_preferences table
+
 Stores user's notification delivery preferences.
 
 ```sql
@@ -185,6 +191,7 @@ Stores user's notification delivery preferences.
 ```
 
 ### notification_delivery_log table
+
 Audit log of all notification deliveries.
 
 ```sql
@@ -200,6 +207,7 @@ Audit log of all notification deliveries.
 ## Email Templates
 
 All templates are responsive and built with:
+
 - Mobile-first design
 - Inline CSS for email compatibility
 - Dark/light mode awareness
@@ -211,6 +219,7 @@ All templates are responsive and built with:
 Each template expects specific context variables. Examples:
 
 **coaching_insight.html**
+
 ```python
 {
     "rep_name": "John Smith",
@@ -228,6 +237,7 @@ Each template expects specific context variables. Examples:
 ```
 
 **skill_improvement.html**
+
 ```python
 {
     "rep_name": "John Smith",
@@ -247,6 +257,7 @@ Each template expects specific context variables. Examples:
 ```
 
 **manager_summary.html**
+
 ```python
 {
     "period_label": "This Week",
@@ -310,11 +321,13 @@ blocks = SlackFormatter.weekly_summary(
 ### Environment Variables
 
 Email delivery requires one of:
+
 - `SENDGRID_API_KEY` - SendGrid API key
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` - SMTP settings
 - Default to console logging if none configured
 
 Slack delivery requires:
+
 - User's Slack webhook URL (stored in user preferences or passed directly)
 
 ### Default Preferences

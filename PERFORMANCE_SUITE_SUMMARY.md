@@ -15,6 +15,7 @@ A Locust-based load testing system that simulates realistic user load:
 - **Concurrent Users:** 100 simultaneous users
 - **Test Coverage:** 1000+ coaching analyses, multiple search patterns
 - **Measured Endpoints:**
+
   - `/tools/analyze_call` - Call analysis with caching
   - `/tools/get_rep_insights` - Rep performance insights
   - `/tools/search_calls` - Complex search with filters
@@ -28,6 +29,7 @@ A Locust-based load testing system that simulates realistic user load:
   - Per-endpoint metrics
 
 **Usage:**
+
 ```bash
 locust -f tests/performance/load_test.py \
   --host=http://localhost:8000 \
@@ -52,6 +54,7 @@ An async-based stress testing framework that identifies system breaking points:
   - Recovery behavior
 
 **Usage:**
+
 ```bash
 python tests/performance/stress_test.py
 ```
@@ -59,11 +62,13 @@ python tests/performance/stress_test.py
 ### 3. Benchmarking Suite
 
 #### 3.1 API Benchmarks
+
 **File:** `/Users/gcoyne/src/prefect/call-coach/benchmarks/api_benchmarks.py`
 
 Pytest-benchmark based endpoint performance measurement:
 
 - **13 Benchmark Tests:**
+
   - Health check
   - Analyze call (cached, uncached, with transcript)
   - Rep insights (7/30/90 days, with product filters)
@@ -77,16 +82,19 @@ Pytest-benchmark based endpoint performance measurement:
   - Per-operation metrics
 
 **Usage:**
+
 ```bash
 pytest benchmarks/api_benchmarks.py -v
 ```
 
 #### 3.2 Database Benchmarks
+
 **File:** `/Users/gcoyne/src/prefect/call-coach/benchmarks/db_benchmarks.py`
 
 Database query performance measurement:
 
 - **14 Query Benchmarks:**
+
   - Call metadata and transcript retrieval
   - Rep-based and product-based searches
   - Date range searches with complex filters
@@ -101,16 +109,19 @@ Database query performance measurement:
   - Query plan analysis
 
 **Usage:**
+
 ```bash
 pytest benchmarks/db_benchmarks.py -v
 ```
 
 #### 3.3 Cache Benchmarks
+
 **File:** `/Users/gcoyne/src/prefect/call-coach/benchmarks/cache_benchmarks.py`
 
 Redis cache performance measurement:
 
 - **18 Cache Benchmarks:**
+
   - GET/SET operations
   - Cache hit/miss scenarios
   - Batch operations
@@ -127,6 +138,7 @@ Redis cache performance measurement:
   - Eviction performance
 
 **Usage:**
+
 ```bash
 pytest benchmarks/cache_benchmarks.py -v
 ```
@@ -136,11 +148,13 @@ pytest benchmarks/cache_benchmarks.py -v
 Real-world usage patterns combining multiple API calls:
 
 #### 4.1 Coaching Analysis Scenario
+
 **File:** `/Users/gcoyne/src/prefect/call-coach/tests/performance/scenarios/coaching_analysis.py`
 
 Tests analyzing 100 coaching calls:
 
 - **5 Scenario Tests:**
+
   - Sequential analysis of 100 calls
   - Different dimension configurations
   - Cache effectiveness measurement
@@ -154,16 +168,19 @@ Tests analyzing 100 coaching calls:
   - Throughput under various conditions
 
 **Usage:**
+
 ```bash
 pytest tests/performance/scenarios/coaching_analysis.py -v -m performance
 ```
 
 #### 4.2 Dashboard Load Scenario
+
 **File:** `/Users/gcoyne/src/prefect/call-coach/tests/performance/scenarios/dashboard_load.py`
 
 Tests rep dashboard loading performance:
 
 - **7 Scenario Tests:**
+
   - Single rep dashboard load
   - All 50 reps dashboard load
   - Time period variations (7/30/90 days)
@@ -179,16 +196,19 @@ Tests rep dashboard loading performance:
   - Filter performance impact
 
 **Usage:**
+
 ```bash
 pytest tests/performance/scenarios/dashboard_load.py -v -m performance
 ```
 
 #### 4.3 Search Scenario
+
 **File:** `/Users/gcoyne/src/prefect/call-coach/tests/performance/scenarios/search.py`
 
 Tests complex search query performance:
 
 - **7 Scenario Tests:**
+
   - Simple searches
   - Product-filtered searches
   - Rep-based searches
@@ -204,6 +224,7 @@ Tests complex search query performance:
   - Sorting performance
 
 **Usage:**
+
 ```bash
 pytest tests/performance/scenarios/search.py -v -m performance
 ```
@@ -215,6 +236,7 @@ pytest tests/performance/scenarios/search.py -v -m performance
 HTML report generator with performance visualization:
 
 - **Report Sections:**
+
   - Executive summary metrics
   - Endpoint performance table
   - Database query analysis
@@ -229,6 +251,7 @@ HTML report generator with performance visualization:
   - Printable format
 
 **Usage:**
+
 ```bash
 python benchmarks/report.py
 ```
@@ -242,11 +265,13 @@ Output: `benchmarks/reports/performance_report.html`
 Automated performance testing on every PR and push:
 
 **Triggers:**
+
 - Every PR to main/develop
 - Every push to main/develop
 - Daily schedule (2 AM UTC)
 
 **Pipeline Steps:**
+
 1. Set up PostgreSQL and Redis services
 2. Install dependencies (pytest, pytest-benchmark, locust)
 3. Set up test database
@@ -264,6 +289,7 @@ Automated performance testing on every PR and push:
 15. Upload load test results
 
 **Regression Detection:**
+
 - Fails if mean response time increases >10%
 - Compares against stored baseline
 - Posts warning comments on failing PRs
@@ -282,6 +308,7 @@ Automated performance testing on every PR and push:
 **File:** `/Users/gcoyne/src/prefect/call-coach/PERFORMANCE_TESTING.md`
 
 Comprehensive documentation including:
+
 - Overview of all testing components
 - Detailed usage instructions for each test
 - Performance targets and thresholds
@@ -318,12 +345,14 @@ Comprehensive documentation including:
 ## Dependencies
 
 Added to `pyproject.toml`:
+
 ```
 pytest-benchmark>=4.0.0  # For microbenchmarking
 locust>=2.17.0          # For load testing
 ```
 
 Already included:
+
 ```
 pytest>=8.0.0           # Testing framework
 pytest-asyncio>=0.23.0  # Async testing
@@ -362,6 +391,7 @@ python benchmarks/report.py
 ### CI/CD Testing
 
 The pipeline will automatically:
+
 1. Run all benchmarks on every PR
 2. Compare to baseline and flag regressions
 3. Run load/stress tests on push to main
@@ -371,24 +401,28 @@ The pipeline will automatically:
 ## Performance Metrics Collected
 
 ### Load Testing
+
 - Response time percentiles (P50, P95, P99)
 - Throughput (requests/second)
 - Error rate percentage
 - Per-endpoint metrics
 
 ### Stress Testing
+
 - Breaking point (users at failure)
 - Error rates under increasing load
 - Response time degradation
 - Recovery behavior
 
 ### Benchmarks
+
 - Execution time per operation
 - Mean/min/max/stdev
 - Baseline comparison
 - Regression detection
 
 ### Scenarios
+
 - End-to-end operation time
 - Component success rates
 - Cache effectiveness
@@ -408,6 +442,7 @@ The performance suite integrates with:
 ## Future Enhancements
 
 Potential improvements:
+
 - Add tracing/profiling integration (Jaeger, Opentelemetry)
 - Database query analysis with EXPLAIN PLAN
 - Memory profiling with tracemalloc
@@ -432,6 +467,7 @@ For detailed instructions, see `/Users/gcoyne/src/prefect/call-coach/PERFORMANCE
 ## Summary
 
 A complete, production-ready performance testing suite has been created with:
+
 - ✅ 6 load/stress test configurations
 - ✅ 45+ individual benchmarks
 - ✅ 19 real-world scenario tests

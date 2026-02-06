@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  User,
-  Bell,
-  Sliders,
-  Lock,
-} from "lucide-react";
+import { User, Bell, Sliders, Lock } from "lucide-react";
 
 const settingsNavigation = [
   {
@@ -57,10 +52,17 @@ export function SettingsNav() {
                 : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             )}
           >
-            <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-primary-foreground" : "")} />
+            <Icon
+              className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-primary-foreground" : "")}
+            />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium">{item.name}</p>
-              <p className={cn("text-xs truncate", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+              <p
+                className={cn(
+                  "text-xs truncate",
+                  isActive ? "text-primary-foreground/80" : "text-muted-foreground"
+                )}
+              >
                 {item.description}
               </p>
             </div>

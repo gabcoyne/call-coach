@@ -12,9 +12,7 @@ interface BreadcrumbItem {
 
 function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
   const paths = pathname.split("/").filter(Boolean);
-  const breadcrumbs: BreadcrumbItem[] = [
-    { label: "Home", href: "/" },
-  ];
+  const breadcrumbs: BreadcrumbItem[] = [{ label: "Home", href: "/" }];
 
   let currentPath = "";
   paths.forEach((path, index) => {
@@ -55,9 +53,7 @@ export function Breadcrumb() {
     <nav className="flex items-center space-x-2 text-sm text-muted-foreground px-4 py-3 border-b border-border bg-card/50">
       {breadcrumbs.map((item, index) => (
         <div key={item.href || item.label} className="flex items-center">
-          {index > 0 && (
-            <ChevronRight className="h-4 w-4 mx-2 flex-shrink-0" />
-          )}
+          {index > 0 && <ChevronRight className="h-4 w-4 mx-2 flex-shrink-0" />}
           {index === 0 ? (
             <Link
               href={item.href}
@@ -66,10 +62,7 @@ export function Breadcrumb() {
               <Home className="h-4 w-4" />
             </Link>
           ) : item.href ? (
-            <Link
-              href={item.href}
-              className="hover:text-foreground transition-colors"
-            >
+            <Link href={item.href} className="hover:text-foreground transition-colors">
               {item.label}
             </Link>
           ) : (

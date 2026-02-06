@@ -6,10 +6,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
 
@@ -18,11 +15,7 @@ export async function GET(
     // For now, return mock insights to demonstrate the UI
     const mockInsights = {
       insights: {
-        themes: [
-          "Budget constraints",
-          "Technical integration concerns",
-          "Timeline pressure",
-        ],
+        themes: ["Budget constraints", "Technical integration concerns", "Timeline pressure"],
         objections: [
           {
             objection: "Pricing is higher than competitors",
@@ -64,9 +57,6 @@ export async function GET(
     return NextResponse.json(mockInsights);
   } catch (error) {
     console.error(`Error generating insights for opportunity ${params.id}:`, error);
-    return NextResponse.json(
-      { error: "Failed to generate insights" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to generate insights" }, { status: 500 });
   }
 }

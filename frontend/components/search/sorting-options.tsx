@@ -19,11 +19,7 @@ interface SortingOptionsProps {
   onSortChange: (field: SortField, direction: SortDirection) => void;
 }
 
-export function SortingOptions({
-  sortField,
-  sortDirection,
-  onSortChange,
-}: SortingOptionsProps) {
+export function SortingOptions({ sortField, sortDirection, onSortChange }: SortingOptionsProps) {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
@@ -35,9 +31,7 @@ export function SortingOptions({
       <div className="flex gap-2">
         <Select
           value={sortField}
-          onValueChange={(value) =>
-            onSortChange(value as SortField, sortDirection)
-          }
+          onValueChange={(value) => onSortChange(value as SortField, sortDirection)}
         >
           <SelectTrigger id="sort-field" className="w-[140px]">
             <SelectValue />
@@ -51,9 +45,7 @@ export function SortingOptions({
 
         <Select
           value={sortDirection}
-          onValueChange={(value) =>
-            onSortChange(sortField, value as SortDirection)
-          }
+          onValueChange={(value) => onSortChange(sortField, value as SortDirection)}
         >
           <SelectTrigger className="w-[120px]">
             <SelectValue />

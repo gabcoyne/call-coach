@@ -4,16 +4,18 @@ Performance profiling for identifying bottlenecks and slow requests.
 Generates flame graphs and performance reports for coaching analysis operations.
 Helps identify optimization opportunities in API and analysis pipelines.
 """
-import logging
-import time
+
 import cProfile
-import pstats
 import io
-from typing import Callable, Any, Optional, Dict
+import logging
+import pstats
+import time
+from collections.abc import Callable
 from contextlib import contextmanager
-from functools import wraps
 from datetime import datetime
+from functools import wraps
 from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +23,7 @@ logger = logging.getLogger(__name__)
 class PerformanceProfiler:
     """Profiles function execution time and resource usage."""
 
-    def __init__(self, output_dir: Optional[Path] = None):
+    def __init__(self, output_dir: Path | None = None):
         """
         Initialize performance profiler.
 
@@ -30,7 +32,7 @@ class PerformanceProfiler:
         """
         self.output_dir = output_dir or Path("./profiling_results")
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        self.profiles: Dict[str, Dict[str, Any]] = {}
+        self.profiles: dict[str, dict[str, Any]] = {}
 
     @contextmanager
     def profile_block(self, block_name: str):
@@ -78,6 +80,7 @@ class PerformanceProfiler:
         Args:
             func: Function to profile
         """
+
         @wraps(func)
         def wrapper(*args, **kwargs) -> Any:
             func_name = func.__qualname__
@@ -93,6 +96,7 @@ class PerformanceProfiler:
         Args:
             func: Async function to profile
         """
+
         @wraps(func)
         async def wrapper(*args, **kwargs) -> Any:
             func_name = func.__qualname__
@@ -101,7 +105,7 @@ class PerformanceProfiler:
 
         return wrapper
 
-    def get_report(self, block_name: Optional[str] = None) -> str:
+    def get_report(self, block_name: str | None = None) -> str:
         """
         Get profiling report for a specific block or all blocks.
 
@@ -124,7 +128,9 @@ class PerformanceProfiler:
             else self.profiles
         )
 
-        for name, data in sorted(profiles_to_report.items(), key=lambda x: x[1]["total_time"], reverse=True):
+        for name, data in sorted(
+            profiles_to_report.items(), key=lambda x: x[1]["total_time"], reverse=True
+        ):
             report.append(f"Block: {name}")
             report.append(f"  Calls: {data['calls']}")
             report.append(f"  Total Time: {data['total_time']:.3f}s")
@@ -142,7 +148,7 @@ class PerformanceProfiler:
 
         return "\n".join(report)
 
-    def save_report(self, block_name: Optional[str] = None) -> Path:
+    def save_report(self, block_name: str | None = None) -> Path:
         """
         Save profiling report to file.
 
@@ -178,7 +184,7 @@ class PerformanceProfiler:
 class CPUProfiler:
     """CPU profiler using cProfile for detailed function-level profiling."""
 
-    def __init__(self, output_dir: Optional[Path] = None):
+    def __init__(self, output_dir: Path | None = None):
         """
         Initialize CPU profiler.
 
@@ -233,6 +239,7 @@ class CPUProfiler:
         Args:
             func: Function to profile
         """
+
         @wraps(func)
         def wrapper(*args, **kwargs) -> Any:
             func_name = func.__qualname__
@@ -253,14 +260,14 @@ class SlowRequestDetector:
             threshold_seconds: Threshold for considering request slow
         """
         self.threshold_seconds = threshold_seconds
-        self.slow_requests: list[Dict[str, Any]] = []
+        self.slow_requests: list[dict[str, Any]] = []
 
     def check_request(
         self,
         request_id: str,
         endpoint: str,
         duration: float,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """
         Check if request was slow and log if needed.
@@ -285,7 +292,7 @@ class SlowRequestDetector:
                 f"Slow request detected: {endpoint} took {duration:.2f}s (threshold: {self.threshold_seconds}s)"
             )
 
-    def get_slow_requests(self, limit: Optional[int] = None) -> list[Dict[str, Any]]:
+    def get_slow_requests(self, limit: int | None = None) -> list[dict[str, Any]]:
         """
         Get slow requests, optionally limited.
 
@@ -304,9 +311,9 @@ class SlowRequestDetector:
 
 
 # Global profiler instances
-_performance_profiler: Optional[PerformanceProfiler] = None
-_cpu_profiler: Optional[CPUProfiler] = None
-_slow_detector: Optional[SlowRequestDetector] = None
+_performance_profiler: PerformanceProfiler | None = None
+_cpu_profiler: CPUProfiler | None = None
+_slow_detector: SlowRequestDetector | None = None
 
 
 def get_performance_profiler() -> PerformanceProfiler:
@@ -340,6 +347,7 @@ def profile_request(func: Callable) -> Callable:
     Args:
         func: Request handler function
     """
+
     @wraps(func)
     async def async_wrapper(*args, **kwargs) -> Any:
         profiler = get_performance_profiler()
@@ -363,7 +371,7 @@ def profile_request(func: Callable) -> Callable:
         return sync_wrapper
 
 
-def initialize_profiling(output_dir: Optional[str] = None) -> None:
+def initialize_profiling(output_dir: str | None = None) -> None:
     """Initialize profiling infrastructure."""
     global _performance_profiler, _cpu_profiler, _slow_detector
     _performance_profiler = PerformanceProfiler(Path(output_dir) if output_dir else None)

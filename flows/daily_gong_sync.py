@@ -4,13 +4,14 @@ Daily Gong synchronization flow.
 Polls Gong API for opportunities, calls, and emails and caches in Neon PostgreSQL.
 Supports both local execution (via uv run) and Vercel serverless function deployment.
 """
+
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
-from gong.client import GongClient
 from db import queries
+from gong.client import GongClient
 
 logger = logging.getLogger(__name__)
 
@@ -260,7 +261,7 @@ def main() -> dict[str, Any]:
     Returns:
         Dict with sync results
     """
-    start_time = datetime.now(timezone.utc)
+    start_time = datetime.now(UTC)
     logger.info(f"Daily Gong sync started at {start_time.isoformat()}")
 
     try:
@@ -271,7 +272,7 @@ def main() -> dict[str, Any]:
         assoc_results = sync_all_opportunity_associations()
 
         # Calculate total time
-        end_time = datetime.now(timezone.utc)
+        end_time = datetime.now(UTC)
         duration = (end_time - start_time).total_seconds()
 
         results = {

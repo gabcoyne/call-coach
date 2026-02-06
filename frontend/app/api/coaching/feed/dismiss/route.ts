@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { withAuthMiddleware } from '@/lib/auth-middleware';
-import { withRateLimit } from '@/lib/rate-limit';
-import { logApiRequest, logApiResponse, logApiError } from '@/lib/api-logger';
-import { getCurrentUserEmail } from '@/lib/auth';
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { withAuthMiddleware } from "@/lib/auth-middleware";
+import { withRateLimit } from "@/lib/rate-limit";
+import { logApiRequest, logApiResponse, logApiError } from "@/lib/api-logger";
+import { getCurrentUserEmail } from "@/lib/auth";
 
 const dismissSchema = z.object({
-  item_id: z.string().min(1, 'Item ID is required'),
+  item_id: z.string().min(1, "Item ID is required"),
 });
 
 async function handlePost(req: NextRequest) {
@@ -18,14 +18,14 @@ async function handlePost(req: NextRequest) {
     const validatedData = dismissSchema.parse(body);
     const userEmail = await getCurrentUserEmail();
 
-    logApiRequest(requestId, 'POST', '/api/coaching/feed/dismiss', validatedData);
+    logApiRequest(requestId, "POST", "/api/coaching/feed/dismiss", validatedData);
 
     // Call MCP backend to dismiss item
-    const mcpBackendUrl = process.env.MCP_BACKEND_URL || 'http://localhost:8000';
+    const mcpBackendUrl = process.env.MCP_BACKEND_URL || "http://localhost:8000";
     const mcpResponse = await fetch(`${mcpBackendUrl}/coaching/feed/dismiss`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         ...validatedData,
@@ -50,8 +50,8 @@ async function handlePost(req: NextRequest) {
       logApiError(requestId, error, 400, duration);
       return NextResponse.json(
         {
-          error: 'Validation Error',
-          message: 'Invalid request body',
+          error: "Validation Error",
+          message: "Invalid request body",
           details: error.errors,
         },
         { status: 400 }
@@ -61,16 +61,12 @@ async function handlePost(req: NextRequest) {
     logApiError(requestId, error, 500, duration);
     return NextResponse.json(
       {
-        error: 'Internal Server Error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Internal Server Error",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
   }
 }
 
-export const POST = withRateLimit(
-  withAuthMiddleware(handlePost),
-  60,
-  'dismiss'
-);
+export const POST = withRateLimit(withAuthMiddleware(handlePost), 60, "dismiss");

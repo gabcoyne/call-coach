@@ -18,11 +18,7 @@ interface Note {
   timestamp: string;
 }
 
-export function CoachingNotes({
-  callId,
-  isManager,
-  className,
-}: CoachingNotesProps) {
+export function CoachingNotes({ callId, isManager, className }: CoachingNotesProps) {
   // Manager-only feature
   if (!isManager) {
     return null;
@@ -61,9 +57,7 @@ export function CoachingNotes({
         <CardTitle className="flex items-center gap-2">
           <MessageSquarePlus className="h-5 w-5" />
           Coaching Notes
-          <span className="text-xs font-normal text-muted-foreground ml-auto">
-            Manager Only
-          </span>
+          <span className="text-xs font-normal text-muted-foreground ml-auto">Manager Only</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -75,11 +69,7 @@ export function CoachingNotes({
             className="w-full min-h-[100px] p-3 text-sm border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-prefect-blue-500"
           />
           <div className="flex justify-end">
-            <Button
-              onClick={handleSaveNote}
-              disabled={!newNote.trim() || isSaving}
-              size="sm"
-            >
+            <Button onClick={handleSaveNote} disabled={!newNote.trim() || isSaving} size="sm">
               <Save className="h-4 w-4 mr-2" />
               {isSaving ? "Saving..." : "Save Note"}
             </Button>
@@ -90,10 +80,7 @@ export function CoachingNotes({
           <div className="space-y-3 mt-4">
             <h4 className="text-sm font-semibold">Previous Notes</h4>
             {notes.map((note) => (
-              <div
-                key={note.id}
-                className="p-3 rounded-md bg-muted/50 border space-y-1"
-              >
+              <div key={note.id} className="p-3 rounded-md bg-muted/50 border space-y-1">
                 <p className="text-sm">{note.content}</p>
                 <p className="text-xs text-muted-foreground">
                   {note.authorName} •{" "}

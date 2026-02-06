@@ -168,7 +168,7 @@
 
 - [x] 14.1 Create frontend/README.md with setup instructions
 - [x] 14.2 Document environment variables and configuration
-- [x] 14.3 Write API documentation for /api/coaching/* endpoints
+- [x] 14.3 Write API documentation for /api/coaching/\* endpoints
 - [x] 14.4 Create user guide for sales managers and reps
 - [x] 14.5 Document deployment process and rollback procedures
 - [x] 14.6 Add troubleshooting guide for common issues

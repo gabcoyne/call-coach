@@ -7,8 +7,9 @@ Provides multi-channel notification delivery:
 - In-app notification storage and retrieval
 - Notification preferences management
 """
-from notifications.slack_formatter import SlackFormatter
+
 from notifications.in_app import InAppNotification, NotificationStore
+from notifications.slack_formatter import SlackFormatter
 
 __all__ = [
     "SlackFormatter",

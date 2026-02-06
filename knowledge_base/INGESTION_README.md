@@ -31,7 +31,9 @@ Knowledge Base Table
 ### Web Scrapers
 
 #### PrefectDocsScraper
-Scrapes https://docs.prefect.io with:
+
+Scrapes <https://docs.prefect.io> with:
+
 - Pagination and depth limiting (max 500 pages)
 - Rate limiting (2 second delay between requests)
 - Respectful User-Agent header
@@ -46,7 +48,9 @@ async with PrefectDocsScraper() as scraper:
 ```
 
 #### HorizonDocsScraper
+
 Scrapes Prefect Horizon documentation with similar capabilities, focused on:
+
 - Account management
 - Configuration and deployment
 - Authentication and security
@@ -56,6 +60,7 @@ Scrapes Prefect Horizon documentation with similar capabilities, focused on:
 ### Content Processor
 
 Converts raw HTML into structured markdown:
+
 - Extracts titles and main content
 - Identifies code examples (auto-detects language)
 - Builds section hierarchy
@@ -70,6 +75,7 @@ processed_docs = processor.process_batch(raw_documents)
 ```
 
 Output includes:
+
 - Clean markdown content
 - Extracted code examples
 - Section structure
@@ -93,6 +99,7 @@ doc_id = loader.store_document({
 ```
 
 Features:
+
 - Automatic duplicate detection (upsert)
 - Content hashing for change detection
 - Version tracking in `knowledge_base_versions`
@@ -104,6 +111,7 @@ Features:
 Three validation levels:
 
 #### Structure Validation
+
 ```python
 validator = DocumentationValidator()
 result = validator.validate_structure(document)
@@ -111,6 +119,7 @@ result = validator.validate_structure(document)
 ```
 
 #### Link Validation
+
 ```python
 async with DocumentationValidator() as validator:
     results = await validator.validate_links_batch(urls)
@@ -118,6 +127,7 @@ async with DocumentationValidator() as validator:
 ```
 
 #### Compliance Validation
+
 ```python
 compliance = ComplianceValidator()
 seo = compliance.validate_seo_metadata(document)
@@ -152,6 +162,7 @@ prefect worker start -p default
 ```
 
 The flow automatically:
+
 - Scrapes documentation
 - Processes content
 - Stores in database
@@ -189,6 +200,7 @@ knowledge_base/ingested/
 ```
 
 Each document includes:
+
 - Markdown content
 - Original URL and source
 - Product and category
@@ -199,6 +211,7 @@ Each document includes:
 ## Database Schema
 
 ### knowledge_base (main table)
+
 - `id` - UUID
 - `product` - 'prefect', 'horizon'
 - `category` - feature, guide, api, tutorial, etc.
@@ -207,6 +220,7 @@ Each document includes:
 - `last_updated` - Automatic timestamp
 
 ### knowledge_base_versions
+
 - `id` - UUID
 - `knowledge_base_id` - FK to knowledge_base
 - `version_number` - Sequential
@@ -215,6 +229,7 @@ Each document includes:
 - `ingestion_timestamp` - When ingested
 
 ### ingestion_jobs
+
 - `id` - UUID
 - `source` - 'prefect_docs', 'horizon_docs', etc.
 - `status` - pending, running, completed, failed
@@ -224,11 +239,13 @@ Each document includes:
 - `documents_updated` - Count
 
 ### document_sections
+
 - For indexed search of document sections
 - Links to `knowledge_base` records
 - Supports vector embeddings (pgvector)
 
 ### knowledge_base_links
+
 - Tracks all links in documents
 - Stores validation results (valid, broken, timeout)
 - Supports regular link checking
@@ -256,6 +273,7 @@ loader = KnowledgeBaseDBLoader()
 ```
 
 Changes are:
+
 - Tracked in `knowledge_base_versions` table
 - Summarized in ingestion job metadata
 - Reported to admins via Prefect artifacts
@@ -286,12 +304,12 @@ Load pre-written competitive analysis from `knowledge/competitive/`:
 title: "Prefect vs Airflow"
 product: "prefect"
 ---
-
 # Prefect Advantages
 - Lower latency...
 ```
 
 Loaded as knowledge base documents with:
+
 - Category: 'competitor'
 - Source: 'competitive_analysis'
 - YAML frontmatter for metadata
@@ -358,21 +376,25 @@ ORDER BY last_validated DESC;
 ## Troubleshooting
 
 ### Scraper hangs
+
 - Check network connectivity
 - Increase timeout: `PrefectDocsScraper(timeout=60)`
 - Reduce max_pages to limit crawl
 
 ### Missing content
+
 - Verify scraper selectors for target site
 - Check if site uses JavaScript (scrapers only get static HTML)
 - Ensure robots.txt allows crawling
 
 ### Database errors
+
 - Run migrations: `python db/migrations/...`
 - Check database connection in `.env`
 - Verify knowledge_base table exists
 
 ### Link validation failures
+
 - Some links may be behind auth walls
 - Timeouts are normal (set tolerance)
 - Check `knowledge_base_links` table for details
@@ -380,6 +402,7 @@ ORDER BY last_validated DESC;
 ## Performance
 
 Typical ingestion times:
+
 - Prefect docs: 5-10 minutes (500 pages)
 - Horizon docs: 3-5 minutes (300 pages)
 - Competitive: < 1 minute

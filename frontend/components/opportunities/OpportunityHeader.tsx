@@ -44,8 +44,7 @@ export function OpportunityHeader({ opportunity }: OpportunityHeaderProps) {
   };
 
   const getHealthIcon = (score: number) => {
-    if (score >= 70)
-      return <TrendingUp className="h-5 w-5 text-green-500" />;
+    if (score >= 70) return <TrendingUp className="h-5 w-5 text-green-500" />;
     if (score >= 40) return <Activity className="h-5 w-5 text-yellow-500" />;
     return <TrendingDown className="h-5 w-5 text-red-500" />;
   };
@@ -60,9 +59,7 @@ export function OpportunityHeader({ opportunity }: OpportunityHeaderProps) {
           {/* Title and Health */}
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-foreground">
-                {opportunity.name}
-              </h1>
+              <h1 className="text-3xl font-bold text-foreground">{opportunity.name}</h1>
               <div className="flex items-center gap-2 mt-2 text-muted-foreground">
                 <Building className="h-4 w-4" />
                 <span className="text-lg">{opportunity.account_name}</span>
@@ -71,13 +68,8 @@ export function OpportunityHeader({ opportunity }: OpportunityHeaderProps) {
             <div className="flex items-center gap-3">
               {healthIcon}
               <div className="text-right">
-                <div className="text-xs text-muted-foreground uppercase">
-                  Health Score
-                </div>
-                <Badge
-                  variant={healthColor}
-                  className="text-lg px-4 py-1 mt-1"
-                >
+                <div className="text-xs text-muted-foreground uppercase">Health Score</div>
+                <Badge variant={healthColor} className="text-lg px-4 py-1 mt-1">
                   {opportunity.health_score}
                 </Badge>
               </div>
@@ -118,14 +110,11 @@ export function OpportunityHeader({ opportunity }: OpportunityHeaderProps) {
               <div>
                 <div className="text-xs text-muted-foreground">Close Date</div>
                 <div className="font-medium">
-                  {new Date(opportunity.close_date).toLocaleDateString(
-                    "en-US",
-                    {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    }
-                  )}
+                  {new Date(opportunity.close_date).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
                 </div>
               </div>
             </div>
@@ -137,9 +126,7 @@ export function OpportunityHeader({ opportunity }: OpportunityHeaderProps) {
               </div>
               <div>
                 <div className="text-xs text-muted-foreground">Amount</div>
-                <div className="font-medium text-lg">
-                  ${opportunity.amount.toLocaleString()}
-                </div>
+                <div className="font-medium text-lg">${opportunity.amount.toLocaleString()}</div>
               </div>
             </div>
           </div>
@@ -149,15 +136,13 @@ export function OpportunityHeader({ opportunity }: OpportunityHeaderProps) {
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">
-                <span className="font-semibold">{opportunity.call_count}</span>{" "}
-                calls
+                <span className="font-semibold">{opportunity.call_count}</span> calls
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">
-                <span className="font-semibold">{opportunity.email_count}</span>{" "}
-                emails
+                <span className="font-semibold">{opportunity.email_count}</span> emails
               </span>
             </div>
             <div className="text-sm text-muted-foreground ml-auto">

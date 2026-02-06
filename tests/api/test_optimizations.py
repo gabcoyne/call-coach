@@ -8,12 +8,11 @@ Tests:
 - Pagination
 - Monitoring endpoints
 """
-import asyncio
-import gzip
-import json
+
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import Mock, patch
 
 from api.rest_server import app
 
@@ -67,10 +66,7 @@ class TestRateLimiting:
 
             expensive_responses = []
             for _ in range(35):  # Exceed expensive burst of 30
-                response = client.post(
-                    "/tools/analyze_call",
-                    json={"call_id": "test-call-id"}
-                )
+                response = client.post("/tools/analyze_call", json={"call_id": "test-call-id"})
                 expensive_responses.append(response)
 
             expensive_limited = [r for r in expensive_responses if r.status_code == 429]
@@ -84,10 +80,7 @@ class TestCompression:
 
     def test_gzip_compression_applied(self, client):
         """Test that responses are gzip compressed when requested."""
-        response = client.get(
-            "/health",
-            headers={"Accept-Encoding": "gzip"}
-        )
+        response = client.get("/health", headers={"Accept-Encoding": "gzip"})
 
         # Check for compression headers
         assert response.headers.get("Content-Encoding") == "gzip"
@@ -96,10 +89,7 @@ class TestCompression:
     def test_small_responses_not_compressed(self, client):
         """Test that small responses are not compressed."""
         # Health check response is small
-        response = client.get(
-            "/health",
-            headers={"Accept-Encoding": "gzip"}
-        )
+        response = client.get("/health", headers={"Accept-Encoding": "gzip"})
 
         # May or may not be compressed based on size
         # Just verify it doesn't error
@@ -124,14 +114,12 @@ class TestCompression:
             response_uncompressed = client.post(
                 "/tools/search_calls",
                 json={"limit": 20},
-                headers={"Accept-Encoding": "identity"}  # No compression
+                headers={"Accept-Encoding": "identity"},  # No compression
             )
 
             # Get compressed size
             response_compressed = client.post(
-                "/tools/search_calls",
-                json={"limit": 20},
-                headers={"Accept-Encoding": "gzip"}
+                "/tools/search_calls", json={"limit": 20}, headers={"Accept-Encoding": "gzip"}
             )
 
             # Compressed should be smaller
@@ -147,10 +135,7 @@ class TestErrorHandling:
     def test_error_response_format(self, client):
         """Test that errors have standardized format."""
         # Trigger validation error
-        response = client.post(
-            "/tools/analyze_call",
-            json={}  # Missing required field
-        )
+        response = client.post("/tools/analyze_call", json={})  # Missing required field
 
         assert response.status_code == 422
         data = response.json()
@@ -162,9 +147,7 @@ class TestErrorHandling:
     def test_request_id_in_errors(self, client):
         """Test that request ID is included in errors."""
         response = client.post(
-            "/tools/analyze_call",
-            json={},
-            headers={"X-Request-ID": "test-request-123"}
+            "/tools/analyze_call", json={}, headers={"X-Request-ID": "test-request-123"}
         )
 
         data = response.json()
@@ -185,14 +168,9 @@ class TestPagination:
     def test_paginated_search_response(self, client):
         """Test that paginated endpoints return proper metadata."""
         with patch("api.rest_server.search_calls_tool") as mock_tool:
-            mock_tool.return_value = [
-                {"call_id": f"call-{i}"} for i in range(20)
-            ]
+            mock_tool.return_value = [{"call_id": f"call-{i}"} for i in range(20)]
 
-            response = client.post(
-                "/api/v1/tools/search_calls",
-                json={"limit": 20, "offset": 0}
-            )
+            response = client.post("/api/v1/tools/search_calls", json={"limit": 20, "offset": 0})
 
             assert response.status_code == 200
             data = response.json()
@@ -271,10 +249,7 @@ class TestAPIVersioning:
         with patch("api.rest_server.search_calls_tool") as mock_tool:
             mock_tool.return_value = []
 
-            response = client.post(
-                "/api/v1/tools/search_calls",
-                json={"limit": 20}
-            )
+            response = client.post("/api/v1/tools/search_calls", json={"limit": 20})
 
             assert response.status_code == 200
             data = response.json()
@@ -287,10 +262,7 @@ class TestAPIVersioning:
         with patch("api.rest_server.search_calls_tool") as mock_tool:
             mock_tool.return_value = []
 
-            response = client.post(
-                "/tools/search_calls",
-                json={"limit": 20}
-            )
+            response = client.post("/tools/search_calls", json={"limit": 20})
 
             # Should still work for backward compatibility
             assert response.status_code in [200, 404]  # 404 if route removed
@@ -310,10 +282,7 @@ class TestRequestContext:
     def test_request_id_preserved(self, client):
         """Test that provided request ID is preserved."""
         custom_id = "my-custom-request-id"
-        response = client.get(
-            "/health",
-            headers={"X-Request-ID": custom_id}
-        )
+        response = client.get("/health", headers={"X-Request-ID": custom_id})
 
         assert response.headers["X-Request-ID"] == custom_id
 

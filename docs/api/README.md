@@ -39,9 +39,11 @@ curl -X POST http://localhost:8000/coaching/analyze-call \
 ## Authentication
 
 ### Local Development
+
 No authentication required when running locally.
 
 ### Production (Horizon Deployment)
+
 - MCP tools use Horizon's built-in authentication
 - REST API requests should include Bearer token (if enabled)
 
@@ -73,6 +75,7 @@ The system analyzes calls across four coaching dimensions:
 4. **Engagement** - Building rapport and customer relationships
 
 Each dimension generates:
+
 - Dimension-specific scores (0-100)
 - Key findings and observations
 - Actionable coaching recommendations
@@ -80,6 +83,7 @@ Each dimension generates:
 ### Call Analysis
 
 The system processes Gong call data to:
+
 1. Fetch transcript from Gong API
 2. Extract speakers and their roles
 3. Chunk long transcripts for analysis
@@ -92,6 +96,7 @@ Typical analysis time: 15-45 seconds per call
 ### Performance Insights
 
 Rep performance tracking includes:
+
 - Weekly coaching scores across dimensions
 - Performance trends over time
 - Skill gap identification
@@ -106,12 +111,14 @@ Analyze a single call transcript for coaching insights.
 **Tool Name**: `analyze_call`
 
 **Parameters**:
+
 - `gong_call_id` (string, required): The Gong call ID to analyze
 - `focus_area` (string, optional): Specific dimension to focus on
   - Valid values: "discovery", "product", "objections", "engagement"
   - If not specified, all dimensions analyzed
 
 **Response**:
+
 ```json
 {
   "call_id": "1464927526043145564",
@@ -157,12 +164,14 @@ Retrieve performance metrics and trends for a specific rep.
 **Tool Name**: `get_rep_insights`
 
 **Parameters**:
+
 - `rep_email` (string, required): The rep's email address
 - `time_period` (string, optional): Analysis period
   - Valid values: "week", "month", "quarter"
   - Default: "month"
 
 **Response**:
+
 ```json
 {
   "rep_email": "sarah.jones@prefect.io",
@@ -205,6 +214,7 @@ Find calls matching specific criteria.
 **Tool Name**: `search_calls`
 
 **Parameters**:
+
 - `query` (string, required): Search query
   - Searches: title, product, call type, participant names
   - Examples: "discovery", "pricing objection", "Sarah", "Horizon"
@@ -218,6 +228,7 @@ Find calls matching specific criteria.
 - `limit` (integer, optional): Max results to return (default: 10, max: 100)
 
 **Response**:
+
 ```json
 {
   "query": "discovery pricing",
@@ -250,23 +261,28 @@ Find calls matching specific criteria.
 ### Common Errors
 
 **400 Bad Request**
+
 - Missing required parameters
 - Invalid parameter values
 - Malformed JSON
 
 **401 Unauthorized**
+
 - Missing or invalid API credentials
 - Session expired
 
 **404 Not Found**
+
 - Call ID not found in database
 - Rep email not found
 
 **429 Too Many Requests**
+
 - Rate limit exceeded
 - Wait before retrying
 
 **500 Internal Server Error**
+
 - Database connection failure
 - Claude API unavailable
 - Unexpected service error
@@ -278,10 +294,12 @@ See [API Error Codes](../troubleshooting/api-errors.md) for detailed error handl
 **MCP Tools**: No rate limits (local or Horizon deployment)
 
 **REST API**:
+
 - Local development: Unlimited
 - Production (Horizon): 100 requests/minute per API key
 
 When rate limited, the API returns `429 Too Many Requests` with:
+
 ```json
 {
   "error": "Rate limit exceeded",
@@ -294,6 +312,7 @@ When rate limited, the API returns `429 Too Many Requests` with:
 ### Smart Caching
 
 Results are cached based on:
+
 ```
 cache_key = hash(transcript + dimension + rubric_version)
 ```
@@ -304,13 +323,13 @@ cache_key = hash(transcript + dimension + rubric_version)
 
 ### Performance Characteristics
 
-| Operation | Time | Notes |
-|-----------|------|-------|
-| Analyze call (cold) | 30-45s | First analysis, no cache |
-| Analyze call (hit) | <1s | From cache |
-| Rep insights (cold) | 45-120s | Analyzes multiple calls |
-| Rep insights (hit) | 2-5s | From cache |
-| Search calls | 1-5s | Database query |
+| Operation           | Time    | Notes                    |
+| ------------------- | ------- | ------------------------ |
+| Analyze call (cold) | 30-45s  | First analysis, no cache |
+| Analyze call (hit)  | <1s     | From cache               |
+| Rep insights (cold) | 45-120s | Analyzes multiple calls  |
+| Rep insights (hit)  | 2-5s    | From cache               |
+| Search calls        | 1-5s    | Database query           |
 
 ## API Versions
 
@@ -319,6 +338,7 @@ Current version: **1.0.0**
 ### Changelog
 
 **v1.0.0** (2026-02-05)
+
 - Initial API release
 - 3 core tools: analyze_call, get_rep_insights, search_calls
 - MCP and REST interfaces
@@ -355,13 +375,13 @@ for dim, data in analysis['dimensions'].items():
 
 ```typescript
 // Using fetch API
-const response = await fetch('http://localhost:8000/coaching/analyze-call', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+const response = await fetch("http://localhost:8000/coaching/analyze-call", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    gong_call_id: '1464927526043145564',
-    focus_area: 'discovery'
-  })
+    gong_call_id: "1464927526043145564",
+    focus_area: "discovery",
+  }),
 });
 
 const analysis = await response.json();
@@ -403,8 +423,8 @@ curl -X POST http://localhost:8000/coaching/search \
 
 When running locally, view interactive API documentation at:
 
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+- **Swagger UI**: <http://localhost:8000/docs>
+- **ReDoc**: <http://localhost:8000/redoc>
 
 These interfaces let you test API calls directly from your browser.
 

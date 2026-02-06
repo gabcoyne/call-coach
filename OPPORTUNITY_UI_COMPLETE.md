@@ -9,9 +9,11 @@ Successfully implemented all 33 UI tasks (9.1-9.13, 10.1-10.13, 14.1-14.10) for 
 ### Task 9: Opportunities List Page (13 tasks)
 
 **File: `/frontend/app/opportunities/page.tsx`**
+
 - Server component wrapper with Suspense for loading states
 
 **File: `/frontend/components/opportunities/OpportunitiesList.tsx`**
+
 - Interactive client component with full search, filter, and sort capabilities
 - Search input with 300ms debounced onChange handler
 - Stage filter dropdown (all stages + individual stages)
@@ -28,21 +30,25 @@ Successfully implemented all 33 UI tasks (9.1-9.13, 10.1-10.13, 14.1-14.10) for 
 - Fetches from `/api/opportunities` with useSWR
 
 **File: `/frontend/lib/hooks/useDebounce.ts`**
+
 - Custom hook for debouncing search input (300ms delay)
 
 ### Task 10: Opportunity Detail Page (13 tasks)
 
 **File: `/frontend/app/opportunities/[id]/page.tsx`**
+
 - Dynamic route with opportunity ID parameter
 - Server component wrapper with loading skeleton
 
 **File: `/frontend/components/opportunities/OpportunityDetail.tsx`**
+
 - Main container component
 - Breadcrumb navigation (Opportunities > [Opportunity Name])
 - Error handling with user-friendly messages
 - Fetches opportunity data with useSWR
 
 **File: `/frontend/components/opportunities/OpportunityHeader.tsx`**
+
 - Displays opportunity metadata:
   - Name and account name
   - Owner email
@@ -57,6 +63,7 @@ Successfully implemented all 33 UI tasks (9.1-9.13, 10.1-10.13, 14.1-14.10) for 
 - Responsive grid layout for metadata
 
 **File: `/frontend/components/opportunities/OpportunityTimeline.tsx`**
+
 - Chronological timeline of calls and emails
 - Fetches from `/api/opportunities/[id]/timeline` with pagination
 - Load More button for infinite scroll experience
@@ -64,6 +71,7 @@ Successfully implemented all 33 UI tasks (9.1-9.13, 10.1-10.13, 14.1-14.10) for 
 - Lazy loading: Only fetches when page changes
 
 **File: `/frontend/components/opportunities/CallTimelineCard.tsx`**
+
 - Collapsible card for call entries
 - Collapsed state shows: title, timestamp, duration
 - Expanded state shows:
@@ -75,6 +83,7 @@ Successfully implemented all 33 UI tasks (9.1-9.13, 10.1-10.13, 14.1-14.10) for 
 - Blue left border for visual distinction
 
 **File: `/frontend/components/opportunities/EmailTimelineCard.tsx`**
+
 - Collapsible card for email entries
 - Collapsed state shows: subject, sender, timestamp
 - Expanded state shows:
@@ -85,12 +94,14 @@ Successfully implemented all 33 UI tasks (9.1-9.13, 10.1-10.13, 14.1-14.10) for 
 - Purple left border for visual distinction
 
 **API Routes Created:**
+
 - `/frontend/app/api/calls/[id]/route.ts` - Get call details with transcript
 - `/frontend/app/api/emails/[id]/route.ts` - Get email details with body
 
 ### Task 14: Opportunity Insights Component (10 tasks)
 
 **File: `/frontend/components/opportunities/OpportunityInsights.tsx`**
+
 - AI-powered coaching insights component
 - Expand/collapse functionality (expanded by default)
 - Lazy loading: Only fetches when expanded for the first time
@@ -108,6 +119,7 @@ Successfully implemented all 33 UI tasks (9.1-9.13, 10.1-10.13, 14.1-14.10) for 
 - Prefect pink accent color for AI branding
 
 **File: `/frontend/app/api/opportunities/[id]/insights/route.ts`**
+
 - API endpoint for generating insights
 - Currently returns mock data for demonstration
 - TODO: Integrate with actual MCP tool (analyze_opportunity)
@@ -120,6 +132,7 @@ Successfully implemented all 33 UI tasks (9.1-9.13, 10.1-10.13, 14.1-14.10) for 
 ### Navigation Updates
 
 **Files Modified:**
+
 - `/frontend/components/navigation/sidebar.tsx`
 - `/frontend/components/navigation/mobile-nav.tsx`
 
@@ -128,6 +141,7 @@ Added "Opportunities" navigation item with Target icon to both desktop sidebar a
 ### Dependencies Added
 
 **File: `/frontend/package.json`**
+
 - `pg` - PostgreSQL client for Node.js
 - `@types/pg` - TypeScript types for pg
 - `@radix-ui/react-checkbox` - Checkbox primitives
@@ -136,24 +150,28 @@ Added "Opportunities" navigation item with Target icon to both desktop sidebar a
 ## Architecture Decisions
 
 ### Data Fetching
+
 - Used SWR for all data fetching (consistent with existing codebase)
 - Implemented lazy loading for expanded content (calls, emails, insights)
 - Debounced search input to reduce API calls
 - Kept previous data during pagination transitions
 
 ### Component Structure
+
 - Followed existing patterns (Server Components for pages, Client Components for interactivity)
 - Separated concerns: Header, Timeline, Insights are independent components
 - Reusable timeline cards for calls and emails
 - Consistent error handling across all components
 
 ### Styling
+
 - Used existing shadcn/ui components for consistency
 - Followed Prefect design system (pink/sunrise color scheme)
 - Responsive design with mobile-first approach
 - Smooth animations for expand/collapse
 
 ### Performance Optimizations
+
 - Lazy loading of transcript/email body only when expanded
 - Debounced search (300ms)
 - Pagination to limit data transferred
@@ -163,6 +181,7 @@ Added "Opportunities" navigation item with Target icon to both desktop sidebar a
 ## Testing Instructions
 
 1. Start the development server:
+
    ```bash
    cd frontend
    npm run dev
@@ -171,6 +190,7 @@ Added "Opportunities" navigation item with Target icon to both desktop sidebar a
 2. Navigate to `http://localhost:3000/opportunities`
 
 3. Test Opportunities List:
+
    - Try search input (should debounce)
    - Filter by stage
    - Adjust health score slider
@@ -180,6 +200,7 @@ Added "Opportunities" navigation item with Target icon to both desktop sidebar a
    - Click on an opportunity
 
 4. Test Opportunity Detail:
+
    - Verify header displays correctly
    - Check health indicator color matches score
    - Expand/collapse insights section
@@ -196,11 +217,12 @@ Added "Opportunities" navigation item with Target icon to both desktop sidebar a
 ## Known Limitations / TODO
 
 1. **Insights API**: Currently returns mock data. Need to integrate with actual MCP tool:
+
    ```typescript
    // TODO: Replace mock data in /api/opportunities/[id]/insights/route.ts
-   const response = await fetch('http://localhost:8000/mcp/analyze_opportunity', {
-     method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
+   const response = await fetch("http://localhost:8000/mcp/analyze_opportunity", {
+     method: "POST",
+     headers: { "Content-Type": "application/json" },
      body: JSON.stringify({ opportunity_id: id }),
    });
    ```
@@ -214,10 +236,12 @@ Added "Opportunities" navigation item with Target icon to both desktop sidebar a
 ## Files Created
 
 ### Pages
+
 - `/frontend/app/opportunities/page.tsx`
 - `/frontend/app/opportunities/[id]/page.tsx`
 
 ### Components
+
 - `/frontend/components/opportunities/OpportunitiesList.tsx`
 - `/frontend/components/opportunities/OpportunityDetail.tsx`
 - `/frontend/components/opportunities/OpportunityHeader.tsx`
@@ -228,14 +252,17 @@ Added "Opportunities" navigation item with Target icon to both desktop sidebar a
 - `/frontend/components/opportunities/index.ts`
 
 ### API Routes
+
 - `/frontend/app/api/calls/[id]/route.ts`
 - `/frontend/app/api/emails/[id]/route.ts`
 - `/frontend/app/api/opportunities/[id]/insights/route.ts`
 
 ### Hooks
+
 - `/frontend/lib/hooks/useDebounce.ts`
 
 ### Navigation
+
 - Modified: `/frontend/components/navigation/sidebar.tsx`
 - Modified: `/frontend/components/navigation/mobile-nav.tsx`
 
@@ -251,6 +278,7 @@ Added "Opportunities" navigation item with Target icon to both desktop sidebar a
 ## Commit
 
 All changes committed to `main` branch:
+
 - Commit hash: 0b9c362
 - Message: "feat: Complete opportunity coaching UI (tasks 9, 10, 14)"
 - 19 files changed, 2293 insertions(+), 38 deletions(-)

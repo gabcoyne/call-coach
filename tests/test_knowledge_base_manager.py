@@ -4,12 +4,13 @@ Tests for Knowledge Base Management System
 Tests CRUD operations, version control, and API endpoints
 for knowledge entries and coaching rubrics.
 """
-import json
-import pytest
-from uuid import uuid4
 
+import json
+
+import pytest
+
+from db.models import CoachingDimension, KnowledgeBaseCategory, Product
 from knowledge_base.loader import KnowledgeBaseManager
-from db.models import Product, KnowledgeBaseCategory, CoachingDimension
 
 
 @pytest.fixture
@@ -250,9 +251,7 @@ class TestCoachingRubricManagement:
         assert len(all_rubrics) >= len(active_rubrics)
 
         # Filter by category
-        discovery_rubrics = kb_manager.list_rubrics(
-            category=CoachingDimension.DISCOVERY
-        )
+        discovery_rubrics = kb_manager.list_rubrics(category=CoachingDimension.DISCOVERY)
         assert all(r.category == CoachingDimension.DISCOVERY for r in discovery_rubrics)
 
     def test_get_rubric_versions(self, kb_manager, sample_rubric):
@@ -279,9 +278,7 @@ class TestCoachingRubricManagement:
 
         # Update examples
         new_examples = {"additional": "More examples"}
-        updated = kb_manager.update_rubric(
-            rubric.id, {"examples": new_examples}
-        )
+        updated = kb_manager.update_rubric(rubric.id, {"examples": new_examples})
 
         assert updated is not None
         assert updated.examples == new_examples

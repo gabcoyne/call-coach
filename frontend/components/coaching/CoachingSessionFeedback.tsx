@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FeedbackButton } from "./FeedbackButton";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface CoachingSession {
@@ -105,10 +99,7 @@ export function CoachingSessionFeedback({ callId }: CoachingSessionFeedbackProps
       <CardContent>
         <div className="space-y-4">
           {sessions.map((session) => (
-            <div
-              key={session.id}
-              className="rounded-lg border p-4 space-y-3"
-            >
+            <div key={session.id} className="rounded-lg border p-4 space-y-3">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h3 className="font-semibold capitalize">

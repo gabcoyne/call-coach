@@ -2,6 +2,7 @@
 Engagement analysis prompt template.
 Evaluates rapport building, talk-listen ratio, energy, and customer engagement.
 """
+
 from typing import Any
 
 
@@ -161,7 +162,7 @@ Assess the call opening (agenda setting, objective clarity) and closing (summari
 
     call_context = ""
     if call_metadata:
-        call_type = call_metadata.get('call_type', 'unknown')
+        call_type = call_metadata.get("call_type", "unknown")
         call_context = f"""
 ## CALL CONTEXT
 
@@ -185,16 +186,12 @@ Please analyze this call for engagement quality. Focus on rapport building, talk
         {
             "role": "user",
             "content": [
-                {
-                    "type": "text",
-                    "text": system_prompt,
-                    "cache_control": {"type": "ephemeral"}
-                },
+                {"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}},
                 {
                     "type": "text",
                     "text": user_prompt,
-                }
-            ]
+                },
+            ],
         }
     ]
 
@@ -219,43 +216,43 @@ def _format_criteria(criteria: dict[str, Any]) -> str:
     """Format evaluation criteria."""
     lines = []
     for criterion, details in criteria.items():
-        weight = details.get('weight', 0)
-        description = details.get('description', '')
+        weight = details.get("weight", 0)
+        description = details.get("description", "")
         lines.append(f"### {criterion.replace('_', ' ').title()} ({weight}%)")
         lines.append(f"{description}\n")
 
         # Handle talk_listen_ratio targets
-        if 'targets' in details:
+        if "targets" in details:
             lines.append("**Target ratios by call type:**")
-            for call_type, target in details['targets'].items():
+            for call_type, target in details["targets"].items():
                 lines.append(f"- {call_type.replace('_', ' ').title()}: {target}")
             lines.append("")
 
         # Handle customer_engagement_signals lists
-        if 'positive_signals' in details:
+        if "positive_signals" in details:
             lines.append("**Positive signals:**")
-            for signal in details['positive_signals']:
+            for signal in details["positive_signals"]:
                 lines.append(f"- {signal}")
             lines.append("")
 
-        if 'negative_signals' in details:
+        if "negative_signals" in details:
             lines.append("**Negative signals:**")
-            for signal in details['negative_signals']:
+            for signal in details["negative_signals"]:
                 lines.append(f"- {signal}")
             lines.append("")
 
         # Handle standard indicators
-        if 'indicators' in details:
-            indicators = details['indicators']
-            if 'excellent' in indicators:
+        if "indicators" in details:
+            indicators = details["indicators"]
+            if "excellent" in indicators:
                 lines.append("**Excellent indicators:**")
-                for indicator in indicators['excellent']:
+                for indicator in indicators["excellent"]:
                     lines.append(f"- {indicator}")
                 lines.append("")
 
-            if 'poor' in indicators:
+            if "poor" in indicators:
                 lines.append("**Poor indicators:**")
-                for indicator in indicators['poor']:
+                for indicator in indicators["poor"]:
                     lines.append(f"- {indicator}")
                 lines.append("")
 
@@ -269,15 +266,15 @@ def _format_call_structure(call_structure: dict[str, Any]) -> str:
 
     lines = []
 
-    if 'strong_opening' in call_structure:
+    if "strong_opening" in call_structure:
         lines.append("### Strong Opening")
-        for practice in call_structure['strong_opening']:
+        for practice in call_structure["strong_opening"]:
             lines.append(f"- {practice}")
         lines.append("")
 
-    if 'strong_closing' in call_structure:
+    if "strong_closing" in call_structure:
         lines.append("### Strong Closing")
-        for practice in call_structure['strong_closing']:
+        for practice in call_structure["strong_closing"]:
             lines.append(f"- {practice}")
         lines.append("")
 

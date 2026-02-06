@@ -1,11 +1,12 @@
 """
 MCP tool for getting learning insights from top performers.
 """
+
 import logging
 from typing import Any
 
 from mcp.server import Server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 from analysis.learning_insights import get_learning_insights
 
@@ -38,7 +39,13 @@ def register_learning_insights_tool(server: Server):
         if not rep_email:
             return [TextContent(type="text", text="Error: rep_email is required")]
 
-        valid_focus_areas = ["discovery", "objections", "product_knowledge", "rapport", "next_steps"]
+        valid_focus_areas = [
+            "discovery",
+            "objections",
+            "product_knowledge",
+            "rapport",
+            "next_steps",
+        ]
         if focus_area not in valid_focus_areas:
             return [
                 TextContent(

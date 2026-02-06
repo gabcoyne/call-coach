@@ -1,8 +1,10 @@
 """Tests for REST API endpoints."""
+
+from unittest.mock import patch
+
 import pytest
-import json
-from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
+
 from api.rest_server import app
 
 
@@ -15,21 +17,21 @@ def client():
 @pytest.fixture
 def mock_analyze_call_tool():
     """Mock analyze_call_tool."""
-    with patch('api.rest_server.analyze_call_tool') as mock:
+    with patch("api.rest_server.analyze_call_tool") as mock:
         yield mock
 
 
 @pytest.fixture
 def mock_rep_insights_tool():
     """Mock get_rep_insights_tool."""
-    with patch('api.rest_server.get_rep_insights_tool') as mock:
+    with patch("api.rest_server.get_rep_insights_tool") as mock:
         yield mock
 
 
 @pytest.fixture
 def mock_search_calls_tool():
     """Mock search_calls_tool."""
-    with patch('api.rest_server.search_calls_tool') as mock:
+    with patch("api.rest_server.search_calls_tool") as mock:
         yield mock
 
 
@@ -37,22 +39,22 @@ def mock_search_calls_tool():
 def sample_call_analysis():
     """Sample call analysis response."""
     return {
-        'call_id': 'call-123',
-        'rep_analyzed': {
-            'email': 'test@example.com',
-            'name': 'Test Rep',
+        "call_id": "call-123",
+        "rep_analyzed": {
+            "email": "test@example.com",
+            "name": "Test Rep",
         },
-        'scores': {
-            'overall': 85,
-            'discovery': 80,
-            'engagement': 85,
-            'objection_handling': 85,
-            'product_knowledge': 90,
+        "scores": {
+            "overall": 85,
+            "discovery": 80,
+            "engagement": 85,
+            "objection_handling": 85,
+            "product_knowledge": 90,
         },
-        'strengths': ['Strong discovery', 'Good engagement'],
-        'areas_for_improvement': ['Better objection handling'],
-        'coaching_notes': 'Great call overall',
-        'action_items': ['Follow up next week'],
+        "strengths": ["Strong discovery", "Good engagement"],
+        "areas_for_improvement": ["Better objection handling"],
+        "coaching_notes": "Great call overall",
+        "action_items": ["Follow up next week"],
     }
 
 
@@ -65,8 +67,8 @@ class TestHealthCheck:
 
         assert response.status_code == 200
         data = response.json()
-        assert data['status'] == 'ok'
-        assert 'service' in data
+        assert data["status"] == "ok"
+        assert "service" in data
 
 
 class TestAnalyzeCallEndpoint:
@@ -76,50 +78,41 @@ class TestAnalyzeCallEndpoint:
         """Test successful call analysis."""
         mock_analyze_call_tool.return_value = sample_call_analysis
 
-        response = client.post(
-            '/tools/analyze_call',
-            json={'call_id': 'call-123'}
-        )
+        response = client.post("/tools/analyze_call", json={"call_id": "call-123"})
 
         assert response.status_code == 200
         data = response.json()
-        assert data['call_id'] == 'call-123'
-        assert 'scores' in data
+        assert data["call_id"] == "call-123"
+        assert "scores" in data
 
-    def test_analyze_call_with_dimensions(self, client, mock_analyze_call_tool, sample_call_analysis):
+    def test_analyze_call_with_dimensions(
+        self, client, mock_analyze_call_tool, sample_call_analysis
+    ):
         """Test analysis with specific dimensions."""
         mock_analyze_call_tool.return_value = sample_call_analysis
 
         response = client.post(
-            '/tools/analyze_call',
-            json={
-                'call_id': 'call-123',
-                'dimensions': ['discovery', 'engagement']
-            }
+            "/tools/analyze_call",
+            json={"call_id": "call-123", "dimensions": ["discovery", "engagement"]},
         )
 
         assert response.status_code == 200
 
     def test_analyze_call_missing_call_id(self, client):
         """Test validation of required call_id."""
-        response = client.post(
-            '/tools/analyze_call',
-            json={}
-        )
+        response = client.post("/tools/analyze_call", json={})
 
         assert response.status_code in [400, 422]
 
-    def test_analyze_call_with_cache_control(self, client, mock_analyze_call_tool, sample_call_analysis):
+    def test_analyze_call_with_cache_control(
+        self, client, mock_analyze_call_tool, sample_call_analysis
+    ):
         """Test cache control options."""
         mock_analyze_call_tool.return_value = sample_call_analysis
 
         response = client.post(
-            '/tools/analyze_call',
-            json={
-                'call_id': 'call-123',
-                'use_cache': False,
-                'force_reanalysis': True
-            }
+            "/tools/analyze_call",
+            json={"call_id": "call-123", "use_cache": False, "force_reanalysis": True},
         )
 
         assert response.status_code == 200
@@ -127,18 +120,12 @@ class TestAnalyzeCallEndpoint:
     def test_analyze_call_transcript_snippets(self, client, mock_analyze_call_tool):
         """Test including transcript snippets."""
         mock_analyze_call_tool.return_value = {
-            'call_id': 'call-123',
-            'snippets': [
-                {'text': 'Sample quote', 'timestamp': 120}
-            ]
+            "call_id": "call-123",
+            "snippets": [{"text": "Sample quote", "timestamp": 120}],
         }
 
         response = client.post(
-            '/tools/analyze_call',
-            json={
-                'call_id': 'call-123',
-                'include_transcript_snippets': True
-            }
+            "/tools/analyze_call", json={"call_id": "call-123", "include_transcript_snippets": True}
         )
 
         assert response.status_code == 200
@@ -150,20 +137,17 @@ class TestRepInsightsEndpoint:
     def test_get_rep_insights_success(self, client, mock_rep_insights_tool):
         """Test successful rep insights retrieval."""
         mock_rep_insights_tool.return_value = {
-            'rep_info': {
-                'email': 'sarah@example.com',
-                'name': 'Sarah Johnson',
-                'calls_analyzed': 15,
+            "rep_info": {
+                "email": "sarah@example.com",
+                "name": "Sarah Johnson",
+                "calls_analyzed": 15,
             },
-            'score_trends': [],
-            'skill_gaps': [],
-            'coaching_plan': [],
+            "score_trends": [],
+            "skill_gaps": [],
+            "coaching_plan": [],
         }
 
-        response = client.post(
-            '/tools/rep_insights',
-            json={'rep_email': 'sarah@example.com'}
-        )
+        response = client.post("/tools/rep_insights", json={"rep_email": "sarah@example.com"})
 
         assert response.status_code == 200
 
@@ -172,11 +156,8 @@ class TestRepInsightsEndpoint:
         mock_rep_insights_tool.return_value = {}
 
         response = client.post(
-            '/tools/rep_insights',
-            json={
-                'rep_email': 'sarah@example.com',
-                'time_period': 'last_quarter'
-            }
+            "/tools/rep_insights",
+            json={"rep_email": "sarah@example.com", "time_period": "last_quarter"},
         )
 
         assert response.status_code == 200
@@ -186,21 +167,15 @@ class TestRepInsightsEndpoint:
         mock_rep_insights_tool.return_value = {}
 
         response = client.post(
-            '/tools/rep_insights',
-            json={
-                'rep_email': 'sarah@example.com',
-                'product_filter': 'prefect'
-            }
+            "/tools/rep_insights",
+            json={"rep_email": "sarah@example.com", "product_filter": "prefect"},
         )
 
         assert response.status_code == 200
 
     def test_get_rep_insights_missing_email(self, client):
         """Test validation of required email."""
-        response = client.post(
-            '/tools/rep_insights',
-            json={}
-        )
+        response = client.post("/tools/rep_insights", json={})
 
         assert response.status_code in [400, 422]
 
@@ -212,13 +187,13 @@ class TestSearchCallsEndpoint:
         """Test searching without filters."""
         mock_search_calls_tool.return_value = [
             {
-                'id': 'call-1',
-                'title': 'Discovery Call',
-                'overall_score': 85,
+                "id": "call-1",
+                "title": "Discovery Call",
+                "overall_score": 85,
             }
         ]
 
-        response = client.post('/tools/search_calls', json={})
+        response = client.post("/tools/search_calls", json={})
 
         assert response.status_code == 200
 
@@ -227,13 +202,13 @@ class TestSearchCallsEndpoint:
         mock_search_calls_tool.return_value = []
 
         response = client.post(
-            '/tools/search_calls',
+            "/tools/search_calls",
             json={
-                'rep_email': 'sarah@example.com',
-                'product': 'prefect',
-                'min_score': 75,
-                'max_score': 95
-            }
+                "rep_email": "sarah@example.com",
+                "product": "prefect",
+                "min_score": 75,
+                "max_score": 95,
+            },
         )
 
         assert response.status_code == 200
@@ -243,13 +218,7 @@ class TestSearchCallsEndpoint:
         mock_search_calls_tool.return_value = []
 
         response = client.post(
-            '/tools/search_calls',
-            json={
-                'date_range': {
-                    'start': '2025-01-01',
-                    'end': '2025-01-31'
-                }
-            }
+            "/tools/search_calls", json={"date_range": {"start": "2025-01-01", "end": "2025-01-31"}}
         )
 
         assert response.status_code == 200
@@ -258,10 +227,7 @@ class TestSearchCallsEndpoint:
         """Test filtering by objection type."""
         mock_search_calls_tool.return_value = []
 
-        response = client.post(
-            '/tools/search_calls',
-            json={'has_objection_type': 'pricing'}
-        )
+        response = client.post("/tools/search_calls", json={"has_objection_type": "pricing"})
 
         assert response.status_code == 200
 
@@ -269,10 +235,7 @@ class TestSearchCallsEndpoint:
         """Test result limit."""
         mock_search_calls_tool.return_value = []
 
-        response = client.post(
-            '/tools/search_calls',
-            json={'limit': 10}
-        )
+        response = client.post("/tools/search_calls", json={"limit": 10})
 
         assert response.status_code == 200
 
@@ -282,33 +245,34 @@ class TestAnalyzeOpportunityEndpoint:
 
     def test_analyze_opportunity_success(self, client):
         """Test successful opportunity analysis."""
-        with patch('api.rest_server.queries.get_opportunity') as mock_get:
+        with patch("api.rest_server.queries.get_opportunity") as mock_get:
             mock_get.return_value = {
-                'id': 'opp-123',
-                'name': 'Acme Corp Deal',
-                'account_name': 'Acme Corp',
-                'owner_email': 'rep@example.com',
-                'stage': 'negotiation',
+                "id": "opp-123",
+                "name": "Acme Corp Deal",
+                "account_name": "Acme Corp",
+                "owner_email": "rep@example.com",
+                "stage": "negotiation",
             }
 
-            with patch('api.rest_server.analyze_opportunity_patterns') as mock_patterns:
+            with patch("api.rest_server.analyze_opportunity_patterns") as mock_patterns:
                 mock_patterns.return_value = {}
 
-                with patch('api.rest_server.identify_recurring_themes') as mock_themes:
+                with patch("api.rest_server.identify_recurring_themes") as mock_themes:
                     mock_themes.return_value = {}
 
-                    with patch('api.rest_server.analyze_objection_progression') as mock_obj:
+                    with patch("api.rest_server.analyze_objection_progression") as mock_obj:
                         mock_obj.return_value = {}
 
-                        with patch('api.rest_server.assess_relationship_strength') as mock_rel:
+                        with patch("api.rest_server.assess_relationship_strength") as mock_rel:
                             mock_rel.return_value = {}
 
-                            with patch('api.rest_server.generate_coaching_recommendations') as mock_rec:
+                            with patch(
+                                "api.rest_server.generate_coaching_recommendations"
+                            ) as mock_rec:
                                 mock_rec.return_value = {}
 
                                 response = client.post(
-                                    '/tools/analyze_opportunity',
-                                    json={'opportunity_id': 'opp-123'}
+                                    "/tools/analyze_opportunity", json={"opportunity_id": "opp-123"}
                                 )
 
                                 assert response.status_code == 200
@@ -319,21 +283,16 @@ class TestErrorHandling:
 
     def test_analyze_call_api_error(self, client, mock_analyze_call_tool):
         """Test handling of API errors."""
-        mock_analyze_call_tool.side_effect = Exception('API Error')
+        mock_analyze_call_tool.side_effect = Exception("API Error")
 
-        response = client.post(
-            '/tools/analyze_call',
-            json={'call_id': 'call-123'}
-        )
+        response = client.post("/tools/analyze_call", json={"call_id": "call-123"})
 
         assert response.status_code >= 400
 
     def test_invalid_json(self, client):
         """Test handling of invalid JSON."""
         response = client.post(
-            '/tools/analyze_call',
-            data='invalid json',
-            headers={'Content-Type': 'application/json'}
+            "/tools/analyze_call", data="invalid json", headers={"Content-Type": "application/json"}
         )
 
         assert response.status_code >= 400

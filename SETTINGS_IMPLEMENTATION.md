@@ -1,6 +1,7 @@
 # User Settings Pages - Implementation Complete
 
 ## Summary
+
 Successfully implemented comprehensive user settings pages for the call-coach frontend enabling users to manage their profile, notification preferences, user experience customization, and exercise GDPR-compliant data controls.
 
 **Commit:** `0a286c3` - "feat: Add comprehensive user settings pages"
@@ -10,9 +11,11 @@ Successfully implemented comprehensive user settings pages for the call-coach fr
 ### 1. Settings Pages (5 pages)
 
 #### Profile Settings Page (`/settings/profile`)
+
 **File:** `/frontend/app/settings/profile/page.tsx`
 
 Features:
+
 - Avatar management with upload functionality
 - Display name editing with Clerk integration
 - Email address display (read-only, managed through Clerk)
@@ -24,9 +27,11 @@ Components used: Card, Input, Button, Checkbox, Label
 Authentication: Clerk useUser hook
 
 #### Notifications Settings Page (`/settings/notifications`)
+
 **File:** `/frontend/app/settings/notifications/page.tsx`
 
 Features:
+
 - Email notification toggle controls:
   - Weekly summary reports
   - Coaching updates
@@ -40,9 +45,11 @@ Features:
 Components used: Card, Select, Checkbox, Button, Label, Bell/Slack icons
 
 #### Preferences Page (`/settings/preferences`)
+
 **File:** `/frontend/app/settings/preferences/page.tsx`
 
 Features:
+
 - Theme selector (light/dark/system) with immediate application
 - Compact mode toggle
 - Auto-refresh toggle
@@ -55,9 +62,11 @@ Components used: Card, Select, Checkbox, Button, Label, Sun/Moon icons
 Stored in: API + localStorage
 
 #### Data & Privacy Page (`/settings/data`)
+
 **File:** `/frontend/app/settings/data/page.tsx`
 
 Features:
+
 - GDPR-compliant data export functionality
   - CSV export format (spreadsheet compatible)
   - JSON export format (complete data structure)
@@ -76,6 +85,7 @@ Features:
 Components used: Card, Select, Checkbox, Button, Label, Download/AlertCircle/CheckCircle icons
 
 #### Settings Root Page (`/settings`)
+
 **File:** `/frontend/app/settings/page.tsx`
 
 - Redirect to profile page (default entry point)
@@ -83,12 +93,14 @@ Components used: Card, Select, Checkbox, Button, Label, Download/AlertCircle/Che
 ### 2. Settings Layout & Navigation
 
 #### Settings Layout (`/settings/layout.tsx`)
+
 - Responsive two-column grid (1 column mobile, 2 columns tablet, responsive split)
 - Sticky sidebar navigation on desktop
 - Authentication check with redirect
 - Responsive breakpoints using Tailwind (hidden md:block)
 
 #### Settings Navigation Component (`/components/settings/settings-nav.tsx`)
+
 - Reusable navigation sidebar showing all 4 settings sections
 - Icons: User (profile), Bell (notifications), Sliders (preferences), Lock (data)
 - Active state highlighting
@@ -98,14 +110,17 @@ Components used: Card, Select, Checkbox, Button, Label, Download/AlertCircle/Che
 ### 3. Backend API Routes
 
 #### User Preferences API (`/api/user/preferences`)
+
 **File:** `/frontend/app/api/user/preferences/route.ts`
 
 **GET /api/user/preferences**
+
 - Returns user's preference object with defaults
 - Includes: theme, layout, dimensions, notification settings, retention policy
 - No query parameters required
 
 **PUT /api/user/preferences**
+
 - Accepts JSON body with any/all preference fields
 - Validates incoming data:
   - Theme must be: light, dark, or system
@@ -115,6 +130,7 @@ Components used: Card, Select, Checkbox, Button, Label, Download/AlertCircle/Che
 - Uses in-memory store (ready for database integration)
 
 Response structure:
+
 ```json
 {
   "theme": "system",
@@ -133,10 +149,13 @@ Response structure:
 ```
 
 #### Data Export API (`/api/user/data/export`)
+
 **File:** `/frontend/app/api/user/data/export/route.ts`
 
 **POST /api/user/data/export**
+
 - Request body:
+
   ```json
   {
     "format": "csv" | "json",
@@ -145,6 +164,7 @@ Response structure:
     "includeCoachingFeedback": boolean
   }
   ```
+
 - Returns file stream with appropriate content-type
 - Filename: `call-coach-data-export-YYYY-MM-DD.[csv|json]`
 - Includes audit logging of exports
@@ -153,9 +173,11 @@ Response structure:
 - Ready for production: just needs database query integration
 
 #### Avatar Upload API (`/api/user/avatar`)
+
 **File:** `/frontend/app/api/user/avatar/route.ts`
 
 **POST /api/user/avatar**
+
 - Accepts multipart/form-data with 'file' field
 - Validates:
   - File type (JPEG, PNG, GIF, WebP only)
@@ -167,6 +189,7 @@ Response structure:
 ## Navigation Integration
 
 Updated main sidebar (`/components/navigation/sidebar.tsx`):
+
 - Added Settings item to main navigation
 - Icon: Settings (gear)
 - Location: Last item in main navigation menu
@@ -175,6 +198,7 @@ Updated main sidebar (`/components/navigation/sidebar.tsx`):
 ## UI/UX Features
 
 ### Form Handling
+
 - Real-time validation
 - Disabled save button on validation errors
 - Loading states with spinner icons
@@ -182,6 +206,7 @@ Updated main sidebar (`/components/navigation/sidebar.tsx`):
 - Clear error messages for user guidance
 
 ### Accessibility
+
 - Proper label associations with form inputs
 - Semantic HTML structure
 - Keyboard navigation support
@@ -189,6 +214,7 @@ Updated main sidebar (`/components/navigation/sidebar.tsx`):
 - Color contrast meets WCAG standards
 
 ### Responsive Design
+
 - Mobile-first approach
 - Single column on small screens
 - Two-column on tablet and desktop
@@ -196,6 +222,7 @@ Updated main sidebar (`/components/navigation/sidebar.tsx`):
 - Proper spacing and padding
 
 ### Visual Consistency
+
 - Uses existing design system components
 - Consistent colors and typography
 - Tailwind CSS utility classes
@@ -205,6 +232,7 @@ Updated main sidebar (`/components/navigation/sidebar.tsx`):
 ## Component Dependencies
 
 ### UI Components Used
+
 - Button (variants: default, outline, destructive, ghost)
 - Card (CardHeader, CardContent, CardFooter, CardTitle, CardDescription)
 - Input (text, email, file)
@@ -214,6 +242,7 @@ Updated main sidebar (`/components/navigation/sidebar.tsx`):
 - Icons from lucide-react
 
 ### Dependencies
+
 - @clerk/nextjs for authentication
 - react hooks (useState, useEffect, useRef, useRouter)
 - next/navigation for routing
@@ -222,6 +251,7 @@ Updated main sidebar (`/components/navigation/sidebar.tsx`):
 ## Authentication & Authorization
 
 All endpoints require Clerk authentication:
+
 - Uses `auth()` from @clerk/nextjs/server
 - Redirects unauthorized users
 - Returns 401 for missing authentication
@@ -230,6 +260,7 @@ All endpoints require Clerk authentication:
 ## Data Validation
 
 All APIs include:
+
 - Input validation on all endpoints
 - Type checking
 - Required field verification
@@ -239,6 +270,7 @@ All APIs include:
 ## Error Handling
 
 Comprehensive error handling:
+
 - Try/catch blocks on all async operations
 - User-friendly error messages
 - Console logging for debugging
@@ -248,19 +280,22 @@ Comprehensive error handling:
 ## Ready for Production
 
 ### Database Integration Needed
+
 ```typescript
 // Needs implementation in db module:
-- save_user_preferences(userId, preferences)
-- get_user_preferences(userId)
-- save_user_avatar(userId, url)
-- export_user_data(userId, options)
+-save_user_preferences(userId, preferences) -
+  get_user_preferences(userId) -
+  save_user_avatar(userId, url) -
+  export_user_data(userId, options);
 ```
 
 ### Cloud Storage Integration Needed
+
 - Avatar upload: S3, CloudFlare R2, or similar
 - Data export: Can be generated on-demand or stored temporarily
 
 ### Additional Services
+
 - Email notification system for weekly reports
 - Slack OAuth integration
 - Data retention cleanup job (cron)
@@ -268,36 +303,39 @@ Comprehensive error handling:
 
 ## File Summary
 
-| File | Type | Lines | Purpose |
-|------|------|-------|---------|
-| settings/profile/page.tsx | Page | 200+ | User profile management |
-| settings/notifications/page.tsx | Page | 250+ | Notification preferences |
-| settings/preferences/page.tsx | Page | 300+ | User experience customization |
-| settings/data/page.tsx | Page | 350+ | Data export and privacy |
-| settings/layout.tsx | Layout | 40 | Settings page layout wrapper |
-| settings/page.tsx | Page | 3 | Redirect to profile |
-| components/settings/settings-nav.tsx | Component | 60 | Settings navigation sidebar |
-| api/user/preferences/route.ts | API | 110 | Preferences endpoints |
-| api/user/data/export/route.ts | API | 130 | Data export endpoint |
-| api/user/avatar/route.ts | API | 80 | Avatar upload endpoint |
+| File                                 | Type      | Lines | Purpose                       |
+| ------------------------------------ | --------- | ----- | ----------------------------- |
+| settings/profile/page.tsx            | Page      | 200+  | User profile management       |
+| settings/notifications/page.tsx      | Page      | 250+  | Notification preferences      |
+| settings/preferences/page.tsx        | Page      | 300+  | User experience customization |
+| settings/data/page.tsx               | Page      | 350+  | Data export and privacy       |
+| settings/layout.tsx                  | Layout    | 40    | Settings page layout wrapper  |
+| settings/page.tsx                    | Page      | 3     | Redirect to profile           |
+| components/settings/settings-nav.tsx | Component | 60    | Settings navigation sidebar   |
+| api/user/preferences/route.ts        | API       | 110   | Preferences endpoints         |
+| api/user/data/export/route.ts        | API       | 130   | Data export endpoint          |
+| api/user/avatar/route.ts             | API       | 80    | Avatar upload endpoint        |
 
 **Total:** 10 files, ~1,500+ lines of code
 
 ## Testing Recommendations
 
 ### Unit Tests
+
 - Form validation logic
 - Theme application
 - Data export formats
 - File upload validation
 
 ### Integration Tests
+
 - Clerk authentication flow
 - API endpoint responses
 - Preference persistence
 - Data export functionality
 
 ### Manual Testing
+
 - Theme switching (light/dark/system)
 - Preference saving and retrieval
 - Data export download

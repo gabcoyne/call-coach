@@ -11,19 +11,19 @@ interface SkillGapCardsProps {
 
 const PRIORITY_CONFIG = {
   high: {
-    color: 'bg-red-100 text-red-800 border-red-200',
+    color: "bg-red-100 text-red-800 border-red-200",
     icon: AlertCircle,
-    label: 'High Priority',
+    label: "High Priority",
   },
   medium: {
-    color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
     icon: TrendingDown,
-    label: 'Medium Priority',
+    label: "Medium Priority",
   },
   low: {
-    color: 'bg-blue-100 text-blue-800 border-blue-200',
+    color: "bg-blue-100 text-blue-800 border-blue-200",
     icon: TrendingDown,
-    label: 'Low Priority',
+    label: "Low Priority",
   },
 };
 
@@ -55,7 +55,11 @@ export function SkillGapCards({ skillGaps }: SkillGapCardsProps) {
           const progressPercentage = (gap.current_score / gap.target_score) * 100;
 
           return (
-            <Card key={index} className="p-4 border-l-4" style={{ borderLeftColor: config.color.split(' ')[0].replace('bg-', '#') }}>
+            <Card
+              key={index}
+              className="p-4 border-l-4"
+              style={{ borderLeftColor: config.color.split(" ")[0].replace("bg-", "#") }}
+            >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h4 className="font-medium text-sm">{gap.area}</h4>
@@ -94,7 +98,7 @@ export function SkillGapCards({ skillGaps }: SkillGapCardsProps) {
                 </div>
 
                 <p className="text-xs text-muted-foreground mt-2">
-                  Based on {gap.sample_size} call{gap.sample_size !== 1 ? 's' : ''}
+                  Based on {gap.sample_size} call{gap.sample_size !== 1 ? "s" : ""}
                 </p>
               </div>
             </Card>

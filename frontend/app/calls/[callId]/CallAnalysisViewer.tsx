@@ -23,10 +23,7 @@ interface CallAnalysisViewerProps {
   userRole: string;
 }
 
-export function CallAnalysisViewer({
-  callId,
-  userRole,
-}: CallAnalysisViewerProps) {
+export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps) {
   const { data: analysis, error, isLoading, mutate } = useCallAnalysis(callId);
 
   const handleTimestampClick = (timestamp: number) => {
@@ -74,9 +71,7 @@ export function CallAnalysisViewer({
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-destructive">
-            Failed to Load Analysis
-          </h2>
+          <h2 className="text-2xl font-bold text-destructive">Failed to Load Analysis</h2>
           <p className="text-muted-foreground">{error.message}</p>
         </div>
         <Button onClick={() => mutate()} variant="outline">
@@ -97,11 +92,10 @@ export function CallAnalysisViewer({
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Call Not Yet Analyzed
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900">Call Not Yet Analyzed</h2>
           <p className="text-muted-foreground">
-            This call hasn't been analyzed yet. Click the button below to generate coaching insights.
+            This call hasn't been analyzed yet. Click the button below to generate coaching
+            insights.
           </p>
         </div>
         <Button onClick={handleAnalyzeCall} size="lg">
@@ -139,7 +133,11 @@ export function CallAnalysisViewer({
     if (!analysis.dimension_details) return annotations;
 
     Object.entries(analysis.dimension_details).forEach(([dimension, details]: [string, any]) => {
-      const dimensionKey = dimension as "product_knowledge" | "discovery" | "objection_handling" | "engagement";
+      const dimensionKey = dimension as
+        | "product_knowledge"
+        | "discovery"
+        | "objection_handling"
+        | "engagement";
 
       // Create annotation for strengths
       if (details?.strengths && details.strengths.length > 0) {
@@ -157,7 +155,9 @@ export function CallAnalysisViewer({
       if (details?.improvements && details.improvements.length > 0) {
         annotations.push({
           id: `improvement-${dimension}`,
-          timestamp: Math.floor(Math.random() * metadata.duration_seconds * 0.7 + metadata.duration_seconds * 0.3),
+          timestamp: Math.floor(
+            Math.random() * metadata.duration_seconds * 0.7 + metadata.duration_seconds * 0.3
+          ),
           dimension: dimensionKey,
           title: `${dimensionKey.replace(/_/g, " ")} Opportunity`,
           insight: details.improvements[0],
@@ -192,9 +192,7 @@ export function CallAnalysisViewer({
 
       {/* Task 4.2: Call metadata section: title, participants, date, duration, type */}
       <div className="border rounded-lg p-6 bg-white shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          {metadata.title}
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">{metadata.title}</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Date */}
@@ -242,7 +240,9 @@ export function CallAnalysisViewer({
               {metadata.participants.map((participant, index) => (
                 <div key={index} className="text-sm text-gray-600">
                   <span className="font-medium">{participant.name}</span>
-                  {participant.email && <span className="text-gray-500"> ({participant.email})</span>}
+                  {participant.email && (
+                    <span className="text-gray-500"> ({participant.email})</span>
+                  )}
                   <span className="text-gray-500"> - {participant.role}</span>
                 </div>
               ))}
@@ -280,39 +280,23 @@ export function CallAnalysisViewer({
             subtitle="Aggregate performance"
           />
           {scores.product_knowledge !== null && scores.product_knowledge !== undefined && (
-            <ScoreCard
-              score={scores.product_knowledge}
-              title="Product Knowledge"
-            />
+            <ScoreCard score={scores.product_knowledge} title="Product Knowledge" />
           )}
           {scores.discovery !== null && scores.discovery !== undefined && (
-            <ScoreCard
-              score={scores.discovery}
-              title="Discovery"
-            />
+            <ScoreCard score={scores.discovery} title="Discovery" />
           )}
           {scores.objection_handling !== null && scores.objection_handling !== undefined && (
-            <ScoreCard
-              score={scores.objection_handling}
-              title="Objection Handling"
-            />
+            <ScoreCard score={scores.objection_handling} title="Objection Handling" />
           )}
           {scores.engagement !== null && scores.engagement !== undefined && (
-            <ScoreCard
-              score={scores.engagement}
-              title="Engagement"
-            />
+            <ScoreCard score={scores.engagement} title="Engagement" />
           )}
         </div>
       </div>
 
       {/* Task 4.7: Display strengths and improvement areas using InsightCard components */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <InsightCard
-          title="Strengths"
-          strengths={analysis.strengths}
-          defaultOpen={true}
-        />
+        <InsightCard title="Strengths" strengths={analysis.strengths} defaultOpen={true} />
         <InsightCard
           title="Areas for Improvement"
           improvements={analysis.areas_for_improvement}
@@ -325,14 +309,16 @@ export function CallAnalysisViewer({
         <div>
           <h2 className="text-xl font-bold text-gray-900 mb-4">Dimension Details</h2>
           <div className="space-y-4">
-            {Object.entries(analysis.dimension_details).map(([dimension, details]: [string, any]) => (
-              <InsightCard
-                key={dimension}
-                title={dimension.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
-                strengths={details?.strengths || []}
-                improvements={details?.improvements || []}
-              />
-            ))}
+            {Object.entries(analysis.dimension_details).map(
+              ([dimension, details]: [string, any]) => (
+                <InsightCard
+                  key={dimension}
+                  title={dimension.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                  strengths={details?.strengths || []}
+                  improvements={details?.improvements || []}
+                />
+              )
+            )}
           </div>
         </div>
       )}
@@ -363,18 +349,22 @@ export function CallAnalysisViewer({
             )}
 
             {/* Needs Work Examples */}
-            {analysis.specific_examples.needs_work && analysis.specific_examples.needs_work.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium text-amber-700 mb-2">Moments to Improve</h3>
-                <div className="space-y-2">
-                  {analysis.specific_examples.needs_work.map((example, index) => (
-                    <div key={index} className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                      <p className="text-sm text-gray-700">{example}</p>
-                    </div>
-                  ))}
+            {analysis.specific_examples.needs_work &&
+              analysis.specific_examples.needs_work.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-amber-700 mb-2">Moments to Improve</h3>
+                  <div className="space-y-2">
+                    {analysis.specific_examples.needs_work.map((example, index) => (
+                      <div
+                        key={index}
+                        className="bg-amber-50 border border-amber-200 rounded-lg p-3"
+                      >
+                        <p className="text-sm text-gray-700">{example}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         ) : (
           <div className="text-center py-8">
@@ -390,22 +380,16 @@ export function CallAnalysisViewer({
           <div className="space-y-3">
             {analysis.action_items.map((item, index) => {
               // Determine priority based on keywords or position
-              const priority: 'high' | 'medium' | 'low' =
-                item.toLowerCase().includes('critical') || item.toLowerCase().includes('urgent')
-                  ? 'high'
+              const priority: "high" | "medium" | "low" =
+                item.toLowerCase().includes("critical") || item.toLowerCase().includes("urgent")
+                  ? "high"
                   : index < 2
-                    ? 'high'
+                    ? "high"
                     : index < 5
-                      ? 'medium'
-                      : 'low';
+                      ? "medium"
+                      : "low";
 
-              return (
-                <ActionItem
-                  key={index}
-                  text={item}
-                  priority={priority}
-                />
-              );
+              return <ActionItem key={index} text={item} priority={priority} />;
             })}
           </div>
         </div>

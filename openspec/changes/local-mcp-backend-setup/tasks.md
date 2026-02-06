@@ -12,7 +12,7 @@
 - [x] 2.2 Update `_validate_gong_api()` to skip Gong API connectivity check when `dev_mode=True`
 - [x] 2.3 Create `_validate_database_connection_only()` function that only tests basic connectivity without table checks
 - [x] 2.4 Update validation logic to call relaxed validation in dev mode
-- [x] 2.5 Add logging: "🏗️  Dev mode: skipping expensive validations" when --dev flag is used
+- [x] 2.5 Add logging: "🏗️ Dev mode: skipping expensive validations" when --dev flag is used
 - [x] 2.6 Test server starts in dev mode: `uv run python -m coaching_mcp.server --dev`
 - [x] 2.7 Test server still does full validation without --dev flag
 
@@ -69,9 +69,9 @@
 - [x] 9.1 Start backend in dev mode: `uv run mcp-server-dev`
 - [x] 9.2 Verify backend logs show "🚀 MCP server ready - 3 tools registered"
 - [x] 9.3 Start frontend in separate terminal: `cd frontend && npm run dev`
-- [x] 9.4 Open browser to http://localhost:3000 and verify no MCP backend errors
+- [x] 9.4 Open browser to <http://localhost:3000> and verify no MCP backend errors
 - [x] 9.5 Test call analysis page tries to load data from backend (expect no data but no connection errors)
-- [x] 9.6 Check frontend Network tab shows requests to http://localhost:8000
+- [x] 9.6 Check frontend Network tab shows requests to <http://localhost:8000>
 - [x] 9.7 Verify health check endpoint accessible: `curl http://localhost:8000/health`
 
 ## 10. Documentation Verification

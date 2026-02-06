@@ -1,16 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  ExternalLink,
-  Copy,
-  Share2,
-  Zap,
-} from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, ExternalLink, Copy, Share2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AnnotationMarker, type Annotation } from "./AnnotationMarker";
 import { CoachingOverlay } from "./CoachingOverlay";
@@ -36,12 +27,8 @@ export function CallRecordingPlayer({
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
-  const [hoveredAnnotationId, setHoveredAnnotationId] = useState<string | null>(
-    null
-  );
-  const [activeAnnotation, setActiveAnnotation] = useState<Annotation | null>(
-    null
-  );
+  const [hoveredAnnotationId, setHoveredAnnotationId] = useState<string | null>(null);
+  const [activeAnnotation, setActiveAnnotation] = useState<Annotation | null>(null);
   const [showCoachingOverlay, setShowCoachingOverlay] = useState(true);
   const [copied, setCopied] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -53,9 +40,7 @@ export function CallRecordingPlayer({
     const secs = Math.floor(seconds % 60);
 
     if (hours > 0) {
-      return `${hours}:${mins.toString().padStart(2, "0")}:${secs
-        .toString()
-        .padStart(2, "0")}`;
+      return `${hours}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     }
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
@@ -63,8 +48,7 @@ export function CallRecordingPlayer({
   // Find active annotation based on current time
   const getCurrentAnnotation = useCallback((): Annotation | null => {
     const current = annotations.find(
-      (a) =>
-        a.timestamp >= currentTime - 2 && a.timestamp <= currentTime + 2
+      (a) => a.timestamp >= currentTime - 2 && a.timestamp <= currentTime + 2
     );
     return current || null;
   }, [annotations, currentTime]);
@@ -152,15 +136,16 @@ export function CallRecordingPlayer({
   if (!gongUrl && !recordingUrl) {
     return (
       <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-        <p className="text-center text-gray-500">
-          Recording not available for this call
-        </p>
+        <p className="text-center text-gray-500">Recording not available for this call</p>
       </div>
     );
   }
 
   return (
-    <div ref={playerRef} className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+    <div
+      ref={playerRef}
+      className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm"
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white border-b">
         <div className="flex items-center gap-2">
@@ -173,17 +158,8 @@ export function CallRecordingPlayer({
           )}
         </div>
         {gongUrl && (
-          <a
-            href={gongUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs"
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
+          <a href={gongUrl} target="_blank" rel="noopener noreferrer" className="text-xs">
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
               <ExternalLink className="h-3 w-3" />
               View in Gong
             </Button>
@@ -209,9 +185,7 @@ export function CallRecordingPlayer({
         {/* Timeline with Annotations */}
         {annotations.length > 0 && (
           <div className="space-y-2">
-            <label className="text-xs font-medium text-gray-700">
-              Coaching Insights Timeline
-            </label>
+            <label className="text-xs font-medium text-gray-700">Coaching Insights Timeline</label>
             <div className="relative h-12 bg-gray-100 rounded-lg p-2 border border-gray-200">
               {/* Annotation markers */}
               {annotations.map((annotation) => (
@@ -237,18 +211,12 @@ export function CallRecordingPlayer({
             disabled={!recordingUrl}
             className="h-9 w-9 p-0"
           >
-            {isPlaying ? (
-              <Pause className="h-4 w-4" />
-            ) : (
-              <Play className="h-4 w-4" />
-            )}
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </Button>
 
           {/* Time Display and Slider */}
           <div className="flex-1 flex items-center gap-2">
-            <span className="text-xs text-gray-600 font-mono w-12">
-              {formatTime(currentTime)}
-            </span>
+            <span className="text-xs text-gray-600 font-mono w-12">{formatTime(currentTime)}</span>
             {recordingUrl && (
               <input
                 type="range"
@@ -266,17 +234,8 @@ export function CallRecordingPlayer({
 
           {/* Volume Control */}
           {recordingUrl && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleMuteToggle}
-              className="h-9 w-9 p-0"
-            >
-              {isMuted ? (
-                <VolumeX className="h-4 w-4" />
-              ) : (
-                <Volume2 className="h-4 w-4" />
-              )}
+            <Button size="sm" variant="outline" onClick={handleMuteToggle} className="h-9 w-9 p-0">
+              {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             </Button>
           )}
         </div>

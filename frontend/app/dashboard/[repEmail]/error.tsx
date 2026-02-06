@@ -25,10 +25,8 @@ export default function DashboardError({
           {error.message || "Failed to load the dashboard. Please try again."}
         </p>
         <div className="flex gap-4 justify-center">
-          <Button onClick={() => reset()}>
-            Try Again
-          </Button>
-          <Button variant="outline" onClick={() => window.location.href = "/dashboard"}>
+          <Button onClick={() => reset()}>Try Again</Button>
+          <Button variant="outline" onClick={() => (window.location.href = "/dashboard")}>
             Go to Dashboard
           </Button>
         </div>

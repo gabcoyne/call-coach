@@ -48,9 +48,7 @@ interface OpportunityTimelineProps {
   opportunityId: string;
 }
 
-export function OpportunityTimeline({
-  opportunityId,
-}: OpportunityTimelineProps) {
+export function OpportunityTimeline({ opportunityId }: OpportunityTimelineProps) {
   const [page, setPage] = useState(1);
   const [allItems, setAllItems] = useState<TimelineItem[]>([]);
   const limit = 20;
@@ -132,11 +130,7 @@ export function OpportunityTimeline({
             {/* Load More */}
             {data && data.pagination.hasMore && (
               <div className="flex justify-center pt-4">
-                <Button
-                  variant="outline"
-                  onClick={handleLoadMore}
-                  disabled={isLoading}
-                >
+                <Button variant="outline" onClick={handleLoadMore} disabled={isLoading}>
                   {isLoading && page > 1 ? "Loading..." : "Load More"}
                 </Button>
               </div>

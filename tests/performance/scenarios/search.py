@@ -4,9 +4,11 @@ Search Query Performance Scenario
 Tests performance of complex search queries.
 Measures various filter combinations and their impact on query time.
 """
+
 import time
 from datetime import datetime, timedelta
-from typing import List, Dict, Any
+from typing import Any
+
 import pytest
 
 
@@ -18,10 +20,11 @@ class TestSearchPerformanceScenario:
     def search_client(self):
         """Create HTTP client for search."""
         import httpx
+
         return httpx.Client(base_url="http://localhost:8000", timeout=60.0)
 
     @pytest.fixture
-    def search_params(self) -> Dict[str, Any]:
+    def search_params(self) -> dict[str, Any]:
         """Common search parameters."""
         return {
             "rep_emails": [f"rep_{i:02d}@example.com" for i in range(1, 26)],
@@ -32,10 +35,11 @@ class TestSearchPerformanceScenario:
     def test_simple_search(
         self,
         search_client,
-        search_params: Dict[str, Any],
+        search_params: dict[str, Any],
         benchmark,
     ):
         """Benchmark simple search with minimal filters."""
+
         def simple_search():
             total_time = 0
             successful = 0
@@ -64,7 +68,7 @@ class TestSearchPerformanceScenario:
             }
 
         result = benchmark(simple_search)
-        print(f"\nSimple Search (20 queries):")
+        print("\nSimple Search (20 queries):")
         print(f"  Successful: {result['successful']}/{result['queries']}")
         print(f"  Total Time: {result['total_time']:.2f}s")
         print(f"  Avg Query Time: {result['avg_time']:.3f}s")
@@ -72,10 +76,11 @@ class TestSearchPerformanceScenario:
     def test_search_by_product(
         self,
         search_client,
-        search_params: Dict[str, Any],
+        search_params: dict[str, Any],
         benchmark,
     ):
         """Benchmark search filtered by product."""
+
         def search_by_product():
             total_time = 0
             successful = 0
@@ -115,10 +120,11 @@ class TestSearchPerformanceScenario:
     def test_search_by_rep(
         self,
         search_client,
-        search_params: Dict[str, Any],
+        search_params: dict[str, Any],
         benchmark,
     ):
         """Benchmark search filtered by sales rep."""
+
         def search_by_rep():
             total_time = 0
             successful = 0
@@ -150,7 +156,7 @@ class TestSearchPerformanceScenario:
             }
 
         result = benchmark(search_by_rep)
-        print(f"\nSearch by Rep (10 reps):")
+        print("\nSearch by Rep (10 reps):")
         print(f"  Successful: {result['successful']}/{result['queries']}")
         print(f"  Total Time: {result['total_time']:.2f}s")
         print(f"  Avg Query Time: {result['avg_time']:.3f}s")
@@ -202,7 +208,7 @@ class TestSearchPerformanceScenario:
                 "avg_time": elapsed / 5,
             }
 
-        print(f"\nSearch by Date Range:")
+        print("\nSearch by Date Range:")
         for name, metrics in results.items():
             print(f"  {name}:")
             print(f"    Successful: {metrics['successful']}/{metrics['queries']}")
@@ -214,6 +220,7 @@ class TestSearchPerformanceScenario:
         benchmark,
     ):
         """Benchmark search with score filters."""
+
         def search_with_scores():
             score_ranges = [
                 {"min_score": 60, "max_score": 70},
@@ -253,7 +260,7 @@ class TestSearchPerformanceScenario:
             }
 
         result = benchmark(search_with_scores)
-        print(f"\nSearch with Score Filters:")
+        print("\nSearch with Score Filters:")
         print(f"  Successful: {result['successful']}/{result['queries']}")
         print(f"  Total Time: {result['total_time']:.2f}s")
         print(f"  Avg Query Time: {result['avg_time']:.3f}s")
@@ -261,10 +268,11 @@ class TestSearchPerformanceScenario:
     def test_complex_search(
         self,
         search_client,
-        search_params: Dict[str, Any],
+        search_params: dict[str, Any],
         benchmark,
     ):
         """Benchmark complex search with multiple filters."""
+
         def complex_search():
             start_date = (datetime.now() - timedelta(days=30)).isoformat()
             end_date = datetime.now().isoformat()
@@ -308,7 +316,7 @@ class TestSearchPerformanceScenario:
             }
 
         result = benchmark(complex_search)
-        print(f"\nComplex Search (Multi-filter):")
+        print("\nComplex Search (Multi-filter):")
         print(f"  Successful: {result['successful']}/{result['queries']}")
         print(f"  Total Time: {result['total_time']:.2f}s")
         print(f"  Avg Query Time: {result['avg_time']:.3f}s")
@@ -319,6 +327,7 @@ class TestSearchPerformanceScenario:
         benchmark,
     ):
         """Benchmark search with different result limits."""
+
         def paginated_search():
             limits = [10, 20, 50, 100]
             total_time = 0
@@ -348,7 +357,7 @@ class TestSearchPerformanceScenario:
             }
 
         result = benchmark(paginated_search)
-        print(f"\nSearch Pagination Limits:")
+        print("\nSearch Pagination Limits:")
         print(f"  Successful: {result['successful']}/{result['queries']}")
         print(f"  Total Time: {result['total_time']:.2f}s")
         print(f"  Avg Query Time: {result['avg_time']:.3f}s")
@@ -359,6 +368,7 @@ class TestSearchPerformanceScenario:
         benchmark,
     ):
         """Benchmark search with result sorting."""
+
         def sorted_search():
             # Test searching and then sorting results
             total_time = 0
@@ -397,7 +407,7 @@ class TestSearchPerformanceScenario:
             }
 
         result = benchmark(sorted_search)
-        print(f"\nSearch with Result Sorting:")
+        print("\nSearch with Result Sorting:")
         print(f"  Successful: {result['successful']}/{result['queries']}")
         print(f"  Total Time: {result['total_time']:.2f}s")
         print(f"  Avg Query Time: {result['avg_time']:.3f}s")

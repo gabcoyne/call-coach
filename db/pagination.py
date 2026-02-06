@@ -4,18 +4,20 @@ Database query pagination utilities.
 Provides cursor-based and offset-based pagination for efficient
 query result handling.
 """
+
 import logging
-from typing import Any, TypeVar, Generic
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class PaginationParams(BaseModel):
     """Parameters for pagination."""
+
     page: int = Field(default=1, ge=1, description="Page number (1-indexed)")
     page_size: int = Field(default=20, ge=1, le=100, description="Items per page")
 
@@ -32,6 +34,7 @@ class PaginationParams(BaseModel):
 
 class PaginatedResult(BaseModel, Generic[T]):
     """Generic paginated result container."""
+
     items: list[T]
     total: int = Field(..., description="Total number of items")
     page: int = Field(..., description="Current page number")
@@ -73,19 +76,17 @@ class PaginatedResult(BaseModel, Generic[T]):
 
 class CursorPaginationParams(BaseModel):
     """Parameters for cursor-based pagination."""
-    cursor: str | None = Field(
-        default=None,
-        description="Cursor for next page (opaque string)"
-    )
+
+    cursor: str | None = Field(default=None, description="Cursor for next page (opaque string)")
     limit: int = Field(default=20, ge=1, le=100, description="Items per page")
 
 
 class CursorPaginatedResult(BaseModel, Generic[T]):
     """Cursor-based paginated result."""
+
     items: list[T]
     next_cursor: str | None = Field(
-        None,
-        description="Cursor for next page (null if no more pages)"
+        None, description="Cursor for next page (null if no more pages)"
     )
     has_next: bool = Field(..., description="Has next page")
 
@@ -183,6 +184,7 @@ def add_cursor_pagination_to_query(
 # ============================================================================
 # EXAMPLE USAGE
 # ============================================================================
+
 
 def example_paginated_query(params: PaginationParams) -> PaginatedResult[dict]:
     """

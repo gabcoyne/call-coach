@@ -20,7 +20,7 @@ export default function DashboardPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
 
-  const isManager = user?.publicMetadata?.role === 'manager';
+  const isManager = user?.publicMetadata?.role === "manager";
   const currentUserEmail = user?.emailAddresses[0]?.emailAddress;
 
   // For non-managers, redirect to their own dashboard
@@ -30,9 +30,7 @@ export default function DashboardPage() {
   }
 
   // Fetch all calls to aggregate rep data (for manager view)
-  const { data: calls, isLoading, error } = useSearchCalls(
-    isManager ? { limit: 500 } : null
-  );
+  const { data: calls, isLoading, error } = useSearchCalls(isManager ? { limit: 500 } : null);
 
   if (!isLoaded || isLoading) {
     return (
@@ -67,12 +65,8 @@ export default function DashboardPage() {
         </div>
         <Card className="border-red-200 bg-red-50">
           <CardContent className="pt-6">
-            <p className="text-sm text-red-800">{error.message || 'Failed to load rep data'}</p>
-            <Button
-              variant="outline"
-              onClick={() => window.location.reload()}
-              className="mt-4"
-            >
+            <p className="text-sm text-red-800">{error.message || "Failed to load rep data"}</p>
+            <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
               Retry
             </Button>
           </CardContent>
@@ -82,18 +76,21 @@ export default function DashboardPage() {
   }
 
   // Aggregate rep data from calls
-  const repData = new Map<string, {
-    name: string;
-    email: string;
-    totalCalls: number;
-    scores: number[];
-    lastActivity: string | null;
-  }>();
+  const repData = new Map<
+    string,
+    {
+      name: string;
+      email: string;
+      totalCalls: number;
+      scores: number[];
+      lastActivity: string | null;
+    }
+  >();
 
   calls?.forEach((call) => {
     call.prefect_reps.forEach((repName) => {
       // Try to find email from call data, or use name as fallback
-      const repEmail = repName.toLowerCase().replace(/\s+/g, '.') + '@prefect.io';
+      const repEmail = repName.toLowerCase().replace(/\s+/g, ".") + "@prefect.io";
 
       if (!repData.has(repEmail)) {
         repData.set(repEmail, {
@@ -120,20 +117,21 @@ export default function DashboardPage() {
     });
   });
 
-  const reps = Array.from(repData.values()).map((rep) => ({
-    ...rep,
-    avgScore: rep.scores.length > 0
-      ? Math.round(rep.scores.reduce((a, b) => a + b, 0) / rep.scores.length)
-      : null,
-  })).sort((a, b) => b.totalCalls - a.totalCalls);
+  const reps = Array.from(repData.values())
+    .map((rep) => ({
+      ...rep,
+      avgScore:
+        rep.scores.length > 0
+          ? Math.round(rep.scores.reduce((a, b) => a + b, 0) / rep.scores.length)
+          : null,
+    }))
+    .sort((a, b) => b.totalCalls - a.totalCalls);
 
   return (
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Team Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Overview of all sales reps performance
-        </p>
+        <p className="text-muted-foreground mt-1">Overview of all sales reps performance</p>
       </div>
 
       {reps.length === 0 ? (
@@ -181,9 +179,7 @@ export default function DashboardPage() {
                             <span className="font-medium">{rep.name}</span>
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-sm text-gray-600">
-                          {rep.email}
-                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-600">{rep.email}</td>
                         <td className="py-3 px-4">
                           <div className="flex justify-center">
                             {rep.avgScore !== null ? (
@@ -201,9 +197,7 @@ export default function DashboardPage() {
                             )}
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-center text-sm">
-                          {rep.totalCalls}
-                        </td>
+                        <td className="py-3 px-4 text-center text-sm">{rep.totalCalls}</td>
                         <td className="py-3 px-4">
                           {rep.lastActivity ? (
                             <div className="flex items-center gap-2 text-sm text-gray-600">

@@ -4,16 +4,7 @@ import { FeedItem } from "@/types/coaching";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Bookmark,
-  Share2,
-  X,
-  TrendingUp,
-  Award,
-  Bell,
-  FileText,
-  Star
-} from "lucide-react";
+import { Bookmark, Share2, X, TrendingUp, Award, Bell, FileText, Star } from "lucide-react";
 import Link from "next/link";
 import { useFeedActions } from "@/lib/hooks";
 import { useState } from "react";
@@ -52,13 +43,13 @@ export function FeedItemCard({ item, onAction }: FeedItemCardProps) {
 
   const getIcon = () => {
     switch (item.type) {
-      case 'call_analysis':
+      case "call_analysis":
         return <FileText className="h-5 w-5" />;
-      case 'team_insight':
+      case "team_insight":
         return <TrendingUp className="h-5 w-5" />;
-      case 'highlight':
+      case "highlight":
         return <Award className="h-5 w-5" />;
-      case 'milestone':
+      case "milestone":
         return <Bell className="h-5 w-5" />;
       default:
         return <FileText className="h-5 w-5" />;
@@ -67,16 +58,16 @@ export function FeedItemCard({ item, onAction }: FeedItemCardProps) {
 
   const getTypeColor = () => {
     switch (item.type) {
-      case 'call_analysis':
-        return 'text-prefect-blue-600 bg-prefect-blue-50';
-      case 'team_insight':
-        return 'text-prefect-purple-600 bg-prefect-purple-50';
-      case 'highlight':
-        return 'text-prefect-sunrise1 bg-orange-50';
-      case 'milestone':
-        return 'text-green-600 bg-green-50';
+      case "call_analysis":
+        return "text-prefect-blue-600 bg-prefect-blue-50";
+      case "team_insight":
+        return "text-prefect-purple-600 bg-prefect-purple-50";
+      case "highlight":
+        return "text-prefect-sunrise1 bg-orange-50";
+      case "milestone":
+        return "text-green-600 bg-green-50";
       default:
-        return 'text-gray-600 bg-gray-50';
+        return "text-gray-600 bg-gray-50";
     }
   };
 
@@ -91,14 +82,14 @@ export function FeedItemCard({ item, onAction }: FeedItemCardProps) {
     if (diffMins < 60) {
       return `${diffMins} min ago`;
     } else if (diffHours < 24) {
-      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
     } else if (diffDays < 7) {
-      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+      return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
     } else {
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
       });
     }
   };
@@ -107,35 +98,31 @@ export function FeedItemCard({ item, onAction }: FeedItemCardProps) {
     <Card className="hover:shadow-md transition-shadow relative">
       {item.is_new && (
         <div className="absolute top-2 right-2">
-          <Badge variant="destructive" className="text-xs">New</Badge>
+          <Badge variant="destructive" className="text-xs">
+            New
+          </Badge>
         </div>
       )}
 
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
-          <div className={`p-2 rounded-lg ${getTypeColor()}`}>
-            {getIcon()}
-          </div>
+          <div className={`p-2 rounded-lg ${getTypeColor()}`}>{getIcon()}</div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <Badge variant="outline" className="text-xs">
-                {item.type.replace('_', ' ')}
+                {item.type.replace("_", " ")}
               </Badge>
               <span className="text-xs text-muted-foreground">
                 {formatTimestamp(item.timestamp)}
               </span>
             </div>
-            <h3 className="text-base font-semibold text-foreground line-clamp-2">
-              {item.title}
-            </h3>
+            <h3 className="text-base font-semibold text-foreground line-clamp-2">{item.title}</h3>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-3">
-        <p className="text-sm text-muted-foreground line-clamp-3">
-          {item.description}
-        </p>
+        <p className="text-sm text-muted-foreground line-clamp-3">{item.description}</p>
 
         {/* Metadata */}
         {item.metadata.call_id && (
@@ -147,9 +134,7 @@ export function FeedItemCard({ item, onAction }: FeedItemCardProps) {
         )}
 
         {item.metadata.rep_name && (
-          <div className="text-xs text-muted-foreground">
-            Rep: {item.metadata.rep_name}
-          </div>
+          <div className="text-xs text-muted-foreground">Rep: {item.metadata.rep_name}</div>
         )}
 
         {item.metadata.highlight_snippet && (
@@ -168,9 +153,9 @@ export function FeedItemCard({ item, onAction }: FeedItemCardProps) {
             className="gap-1"
           >
             <Bookmark
-              className={`h-4 w-4 ${isBookmarked ? 'fill-current text-prefect-blue-600' : ''}`}
+              className={`h-4 w-4 ${isBookmarked ? "fill-current text-prefect-blue-600" : ""}`}
             />
-            <span className="text-xs">{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+            <span className="text-xs">{isBookmarked ? "Bookmarked" : "Bookmark"}</span>
           </Button>
 
           <Button

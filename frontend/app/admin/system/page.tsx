@@ -150,16 +150,9 @@ export default function AdminSystemPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">System Health</h1>
-          <p className="text-muted-foreground mt-1">
-            Database, cache, and background job status
-          </p>
+          <p className="text-muted-foreground mt-1">Database, cache, and background job status</p>
         </div>
-        <Button
-          onClick={fetchSystemData}
-          variant="outline"
-          size="sm"
-          className="gap-2"
-        >
+        <Button onClick={fetchSystemData} variant="outline" size="sm" className="gap-2">
           <RefreshCw className="h-4 w-4" />
           Refresh
         </Button>
@@ -185,9 +178,7 @@ export default function AdminSystemPage() {
               <Database className="h-5 w-5 text-muted-foreground" />
               <div>
                 <CardTitle>Database Health</CardTitle>
-                <CardDescription>
-                  Connection pool and query performance
-                </CardDescription>
+                <CardDescription>Connection pool and query performance</CardDescription>
               </div>
             </div>
             {getStatusIcon(data.database.status)}
@@ -204,8 +195,7 @@ export default function AdminSystemPage() {
                     className="h-full bg-blue-500 rounded-full transition-all"
                     style={{
                       width: `${
-                        (data.database.activeConnections / data.database.maxConnections) *
-                        100
+                        (data.database.activeConnections / data.database.maxConnections) * 100
                       }%`,
                     }}
                   />
@@ -217,9 +207,7 @@ export default function AdminSystemPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Avg Query Time</p>
-                <p className="text-2xl font-bold">
-                  {data.database.averageQueryTime.toFixed(0)}ms
-                </p>
+                <p className="text-2xl font-bold">{data.database.averageQueryTime.toFixed(0)}ms</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Slow Queries</p>
@@ -238,9 +226,7 @@ export default function AdminSystemPage() {
               <Zap className="h-5 w-5 text-muted-foreground" />
               <div>
                 <CardTitle>Cache Statistics</CardTitle>
-                <CardDescription>
-                  Hit/miss rates and memory usage
-                </CardDescription>
+                <CardDescription>Hit/miss rates and memory usage</CardDescription>
               </div>
             </div>
             {getStatusIcon(data.cache.status)}
@@ -249,15 +235,11 @@ export default function AdminSystemPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Hit Rate</p>
-                <p className="text-2xl font-bold">
-                  {data.cache.hitRate.toFixed(1)}%
-                </p>
+                <p className="text-2xl font-bold">{data.cache.hitRate.toFixed(1)}%</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Miss Rate</p>
-                <p className="text-2xl font-bold">
-                  {data.cache.missRate.toFixed(1)}%
-                </p>
+                <p className="text-2xl font-bold">{data.cache.missRate.toFixed(1)}%</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Memory Used</p>
@@ -290,9 +272,7 @@ export default function AdminSystemPage() {
               <Clock className="h-5 w-5" />
               Background Jobs
             </CardTitle>
-            <CardDescription>
-              Status and execution history of background tasks
-            </CardDescription>
+            <CardDescription>Status and execution history of background tasks</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -309,17 +289,13 @@ export default function AdminSystemPage() {
                       {job.status === "success" && (
                         <CheckCircle className="h-5 w-5 text-green-500" />
                       )}
-                      {job.status === "failed" && (
-                        <AlertCircle className="h-5 w-5 text-red-500" />
-                      )}
+                      {job.status === "failed" && <AlertCircle className="h-5 w-5 text-red-500" />}
                       {job.status === "pending" && (
                         <AlertTriangle className="h-5 w-5 text-yellow-500" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground">
-                        {job.jobName}
-                      </p>
+                      <p className="text-sm font-medium text-foreground">{job.jobName}</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Status: <span className="font-semibold">{job.status}</span>
                       </p>
@@ -352,9 +328,7 @@ export default function AdminSystemPage() {
         <Card>
           <CardHeader>
             <CardTitle>System Metrics Over Time</CardTitle>
-            <CardDescription>
-              CPU, memory, and disk usage trends
-            </CardDescription>
+            <CardDescription>CPU, memory, and disk usage trends</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -364,24 +338,9 @@ export default function AdminSystemPage() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="cpuUsage"
-                  stroke="#8884d8"
-                  name="CPU %"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="memoryUsage"
-                  stroke="#82ca9d"
-                  name="Memory %"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="diskUsage"
-                  stroke="#ffc658"
-                  name="Disk %"
-                />
+                <Line type="monotone" dataKey="cpuUsage" stroke="#8884d8" name="CPU %" />
+                <Line type="monotone" dataKey="memoryUsage" stroke="#82ca9d" name="Memory %" />
+                <Line type="monotone" dataKey="diskUsage" stroke="#ffc658" name="Disk %" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>

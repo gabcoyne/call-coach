@@ -90,26 +90,17 @@ export function AnnotationPopover({
       {/* Header */}
       <div className="flex items-start justify-between gap-3 p-4 border-b">
         <div className="flex items-start gap-3 flex-1">
-          <div
-            className={`${config.color} p-2 rounded-lg flex-shrink-0`}
-          >
+          <div className={`${config.color} p-2 rounded-lg flex-shrink-0`}>
             <Icon className="h-4 w-4 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-gray-900">
-              {config.label}
-            </h3>
+            <h3 className="text-sm font-semibold text-gray-900">{config.label}</h3>
             <p className="text-xs text-gray-600 mt-1">
               {severityLabel[annotation.severity || "neutral"]}
             </p>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClose}
-          className="h-6 w-6 p-0 flex-shrink-0"
-        >
+        <Button variant="ghost" size="sm" onClick={onClose} className="h-6 w-6 p-0 flex-shrink-0">
           <X className="h-4 w-4" />
         </Button>
       </div>
@@ -118,12 +109,8 @@ export function AnnotationPopover({
       <div className="p-4 space-y-3">
         {/* Main insight */}
         <div>
-          <p className="text-sm font-medium text-gray-900">
-            {annotation.title}
-          </p>
-          <p className="text-sm text-gray-700 mt-2">
-            {annotation.insight}
-          </p>
+          <p className="text-sm font-medium text-gray-900">{annotation.title}</p>
+          <p className="text-sm text-gray-700 mt-2">{annotation.insight}</p>
         </div>
 
         {/* Expandable dimension details */}
@@ -131,11 +118,7 @@ export function AnnotationPopover({
           onClick={() => setIsExpanded(!isExpanded)}
           className="flex items-center gap-2 text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
         >
-          {isExpanded ? (
-            <ChevronUp className="h-3 w-3" />
-          ) : (
-            <ChevronDown className="h-3 w-3" />
-          )}
+          {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
           About {config.label}
         </button>
 
@@ -154,12 +137,7 @@ export function AnnotationPopover({
           >
             Play this moment
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={onClose}
-            className="flex-1 text-xs h-8"
-          >
+          <Button size="sm" variant="outline" onClick={onClose} className="flex-1 text-xs h-8">
             Close
           </Button>
         </div>

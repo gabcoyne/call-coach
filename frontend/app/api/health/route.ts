@@ -300,8 +300,16 @@ export async function GET(request: NextRequest) {
         checks: {
           database: { status: "down" as const, latency_ms: 0, timestamp: new Date().toISOString() },
           redis: { status: "down" as const, latency_ms: 0, timestamp: new Date().toISOString() },
-          claude_api: { status: "down" as const, latency_ms: 0, timestamp: new Date().toISOString() },
-          backend_api: { status: "down" as const, latency_ms: 0, timestamp: new Date().toISOString() },
+          claude_api: {
+            status: "down" as const,
+            latency_ms: 0,
+            timestamp: new Date().toISOString(),
+          },
+          backend_api: {
+            status: "down" as const,
+            latency_ms: 0,
+            timestamp: new Date().toISOString(),
+          },
         },
         version: process.env.APP_VERSION || "unknown",
         environment: process.env.ENVIRONMENT || "unknown",

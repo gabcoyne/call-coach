@@ -21,10 +21,7 @@ export async function GET(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const preferences = userPreferencesStore.get(userId) || {
@@ -57,10 +54,7 @@ export async function PUT(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -71,7 +65,11 @@ export async function PUT(request: NextRequest) {
       compactMode: body.compactMode ?? false,
       autoRefreshEnabled: body.autoRefreshEnabled ?? true,
       dashboardLayout: body.dashboardLayout || "grid",
-      defaultCoachingDimensions: body.defaultCoachingDimensions || ["opening", "discovery", "pitch"],
+      defaultCoachingDimensions: body.defaultCoachingDimensions || [
+        "opening",
+        "discovery",
+        "pitch",
+      ],
       weeklyReports: body.weeklyReports ?? true,
       coachingUpdates: body.coachingUpdates ?? true,
       callAnalysis: body.callAnalysis ?? true,
@@ -82,8 +80,10 @@ export async function PUT(request: NextRequest) {
     };
 
     // Validate coaching dimensions are not empty
-    if (!Array.isArray(validatedPreferences.defaultCoachingDimensions) ||
-        validatedPreferences.defaultCoachingDimensions.length === 0) {
+    if (
+      !Array.isArray(validatedPreferences.defaultCoachingDimensions) ||
+      validatedPreferences.defaultCoachingDimensions.length === 0
+    ) {
       return NextResponse.json(
         { error: "At least one coaching dimension must be selected" },
         { status: 400 }
@@ -93,19 +93,13 @@ export async function PUT(request: NextRequest) {
     // Validate notification frequency
     const validFrequencies = ["daily", "weekly", "monthly"];
     if (!validFrequencies.includes(validatedPreferences.notificationFrequency)) {
-      return NextResponse.json(
-        { error: "Invalid notification frequency" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid notification frequency" }, { status: 400 });
     }
 
     // Validate theme
     const validThemes = ["light", "dark", "system"];
     if (!validThemes.includes(validatedPreferences.theme)) {
-      return NextResponse.json(
-        { error: "Invalid theme" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid theme" }, { status: 400 });
     }
 
     // Store preferences

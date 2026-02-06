@@ -9,23 +9,27 @@ This directory contains tools and scripts for database performance analysis and 
 Comprehensive SQL script for analyzing database performance:
 
 1. **Slow Query Identification**
+
    - Queries by average execution time
    - Long-running query detection
    - Query statistics from pg_stat_statements
 
 2. **Index Analysis**
+
    - EXPLAIN ANALYZE for common query patterns
    - Index usage statistics
    - Unused index detection
    - Index size analysis
 
 3. **Index Recommendations**
+
    - Composite indexes for call filtering
    - Indexes for coaching session lookups
    - Full-text search optimization
    - Opportunity timeline query optimization
 
 4. **Table Statistics**
+
    - Table sizes and row counts
    - Dead tuple analysis (VACUUM recommendations)
    - Last VACUUM/ANALYZE timestamps
@@ -119,11 +123,13 @@ ORDER BY cs.created_at DESC;
 ### Critical Indexes (High Impact)
 
 1. **idx_calls_product_scheduled**
+
    - Speeds up call filtering by product and date
    - Used by dashboard and analytics queries
    - Expected improvement: 5-10x
 
 2. **idx_coaching_rep_created**
+
    - Optimizes rep performance queries
    - Used by insights and coaching endpoints
    - Expected improvement: 3-8x
@@ -136,6 +142,7 @@ ORDER BY cs.created_at DESC;
 ### Secondary Indexes (Medium Impact)
 
 1. **idx_speakers_email_company**
+
    - Rep email lookups
    - Expected improvement: 2-5x
 

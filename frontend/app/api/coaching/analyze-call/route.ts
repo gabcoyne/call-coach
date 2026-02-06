@@ -6,12 +6,12 @@
  * Deep-dive analysis of a specific call with coaching insights.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { mcpClient } from '@/lib/mcp-client';
-import { analyzeCallRequestSchema } from '@/types/coaching';
-import { withAuth, apiError, canAccessRepData } from '@/lib/auth-middleware';
-import { checkRateLimit, rateLimitHeaders } from '@/lib/rate-limit';
-import { logRequest, logResponse, logError } from '@/lib/api-logger';
+import { NextRequest, NextResponse } from "next/server";
+import { mcpClient } from "@/lib/mcp-client";
+import { analyzeCallRequestSchema } from "@/types/coaching";
+import { withAuth, apiError, canAccessRepData } from "@/lib/auth-middleware";
+import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
+import { logRequest, logResponse, logError } from "@/lib/api-logger";
 
 export const POST = withAuth(async (req: NextRequest, authContext) => {
   const startTime = Date.now();
@@ -21,10 +21,10 @@ export const POST = withAuth(async (req: NextRequest, authContext) => {
     logRequest(req, authContext.userId);
 
     // Check rate limit
-    const rateLimit = checkRateLimit(authContext.userId, '/api/coaching/analyze-call');
+    const rateLimit = checkRateLimit(authContext.userId, "/api/coaching/analyze-call");
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: 'Rate limit exceeded' },
+        { error: "Rate limit exceeded" },
         {
           status: 429,
           headers: rateLimitHeaders(rateLimit.limit, rateLimit.remaining, rateLimit.reset),
@@ -37,11 +37,7 @@ export const POST = withAuth(async (req: NextRequest, authContext) => {
     const validationResult = analyzeCallRequestSchema.safeParse(body);
 
     if (!validationResult.success) {
-      return apiError(
-        'Invalid request parameters',
-        400,
-        validationResult.error.format()
-      );
+      return apiError("Invalid request parameters", 400, validationResult.error.format());
     }
 
     const params = validationResult.data;
@@ -53,10 +49,7 @@ export const POST = withAuth(async (req: NextRequest, authContext) => {
     // If rep_analyzed is present, check access
     if (result.rep_analyzed?.email) {
       if (!canAccessRepData(authContext, result.rep_analyzed.email)) {
-        return apiError(
-          'Forbidden: You can only access your own call analyses',
-          403
-        );
+        return apiError("Forbidden: You can only access your own call analyses", 403);
       }
     }
 
@@ -79,6 +72,6 @@ export const POST = withAuth(async (req: NextRequest, authContext) => {
       return apiError(error.message, 500);
     }
 
-    return apiError('Internal server error', 500);
+    return apiError("Internal server error", 500);
   }
 });

@@ -4,12 +4,13 @@ Structured JSON logging for request tracing and debugging.
 Logs correlation IDs for request tracing and includes coaching session metadata
 (call_id, rep_id, dimension, tokens_used) for comprehensive observability.
 """
+
 import json
 import logging
 import uuid
-from typing import Any, Optional, Dict
-from datetime import datetime
 from contextvars import ContextVar
+from datetime import datetime
+from typing import Any
 
 # Context variables for request tracing
 _correlation_id: ContextVar[str] = ContextVar("correlation_id", default="")
@@ -73,7 +74,7 @@ class StructuredLogger:
         """Initialize structured logger."""
         self._logger = logging.getLogger(name)
 
-    def set_correlation_id(self, correlation_id: Optional[str] = None) -> str:
+    def set_correlation_id(self, correlation_id: str | None = None) -> str:
         """Set or generate correlation ID for request tracing."""
         if correlation_id is None:
             correlation_id = str(uuid.uuid4())
@@ -82,9 +83,9 @@ class StructuredLogger:
 
     def set_call_context(
         self,
-        call_id: Optional[str] = None,
-        rep_id: Optional[str] = None,
-        user_id: Optional[str] = None,
+        call_id: str | None = None,
+        rep_id: str | None = None,
+        user_id: str | None = None,
     ) -> None:
         """Set context for a coaching analysis session."""
         if call_id:
@@ -105,7 +106,7 @@ class StructuredLogger:
         self,
         level: int,
         message: str,
-        extra: Optional[Dict[str, Any]] = None,
+        extra: dict[str, Any] | None = None,
         exc_info: bool = False,
     ) -> None:
         """Internal logging method with extra data."""
@@ -128,22 +129,22 @@ class StructuredLogger:
             else:
                 self._logger.log(level, message)
 
-    def debug(self, message: str, extra: Optional[Dict[str, Any]] = None) -> None:
+    def debug(self, message: str, extra: dict[str, Any] | None = None) -> None:
         """Log debug message."""
         self._log(logging.DEBUG, message, extra)
 
-    def info(self, message: str, extra: Optional[Dict[str, Any]] = None) -> None:
+    def info(self, message: str, extra: dict[str, Any] | None = None) -> None:
         """Log info message."""
         self._log(logging.INFO, message, extra)
 
-    def warning(self, message: str, extra: Optional[Dict[str, Any]] = None) -> None:
+    def warning(self, message: str, extra: dict[str, Any] | None = None) -> None:
         """Log warning message."""
         self._log(logging.WARNING, message, extra)
 
     def error(
         self,
         message: str,
-        extra: Optional[Dict[str, Any]] = None,
+        extra: dict[str, Any] | None = None,
         exc_info: bool = False,
     ) -> None:
         """Log error message."""
@@ -152,7 +153,7 @@ class StructuredLogger:
     def critical(
         self,
         message: str,
-        extra: Optional[Dict[str, Any]] = None,
+        extra: dict[str, Any] | None = None,
         exc_info: bool = False,
     ) -> None:
         """Log critical message."""
@@ -164,7 +165,7 @@ class StructuredLogger:
         endpoint: str,
         duration: float,
         status: int,
-        response_size: Optional[int] = None,
+        response_size: int | None = None,
     ) -> None:
         """Log API request with timing."""
         extra = {
@@ -225,7 +226,7 @@ class StructuredLogger:
         operation: str,
         table: str,
         duration: float,
-        rows_affected: Optional[int] = None,
+        rows_affected: int | None = None,
     ) -> None:
         """Log database query with timing."""
         extra = {
@@ -244,7 +245,7 @@ class StructuredLogger:
         cache_type: str,
         key: str,
         hit: bool,
-        duration: Optional[float] = None,
+        duration: float | None = None,
     ) -> None:
         """Log cache operation."""
         extra = {
@@ -256,7 +257,9 @@ class StructuredLogger:
         }
         if duration:
             extra["duration_ms"] = round(duration * 1000, 2)
-        self.debug(f"Cache {operation} ({cache_type}): {key} {'hit' if hit else 'miss'}", extra=extra)
+        self.debug(
+            f"Cache {operation} ({cache_type}): {key} {'hit' if hit else 'miss'}", extra=extra
+        )
 
     def log_external_api_call(
         self,
@@ -265,7 +268,7 @@ class StructuredLogger:
         method: str,
         status: int,
         duration: float,
-        tokens_used: Optional[int] = None,
+        tokens_used: int | None = None,
     ) -> None:
         """Log external API call (Gong, Claude, etc.)."""
         extra = {
@@ -282,7 +285,7 @@ class StructuredLogger:
 
 
 # Global logger instances
-_loggers: Dict[str, StructuredLogger] = {}
+_loggers: dict[str, StructuredLogger] = {}
 
 
 def get_logger(name: str) -> StructuredLogger:

@@ -10,26 +10,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOpportunityTimeline } from "@/lib/db/opportunities";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
     const searchParams = request.nextUrl.searchParams;
 
     // Parse pagination
     const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = Math.min(
-      parseInt(searchParams.get("limit") || "20", 10),
-      100
-    );
+    const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
 
     if (page < 1 || limit < 1) {
-      return NextResponse.json(
-        { error: "Invalid pagination parameters" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid pagination parameters" }, { status: 400 });
     }
 
     const offset = (page - 1) * limit;
@@ -53,9 +44,6 @@ export async function GET(
     });
   } catch (error) {
     console.error(`Error fetching timeline for opportunity ${params.id}:`, error);
-    return NextResponse.json(
-      { error: "Failed to fetch timeline" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch timeline" }, { status: 500 });
   }
 }

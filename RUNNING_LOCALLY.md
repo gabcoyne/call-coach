@@ -57,7 +57,7 @@ npm run dev
 
 ## Access the Application
 
-1. **Open browser**: http://localhost:3000
+1. **Open browser**: <http://localhost:3000>
 2. **Sign in**: You'll be redirected to Clerk authentication
 3. **Create test user**: Sign up with email or use test credentials
 4. **Explore features**:
@@ -107,23 +107,27 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 ### Backend Issues
 
 **"Missing required environment variables"**
+
 - Ensure `.env` file exists in project root
 - Verify all required variables are set (see above)
 - Try loading manually: `source .env` (won't work with special chars)
 - Use the python-dotenv approach shown above
 
 **"Database connection failed"**
+
 - Check DATABASE_URL is correct and includes `?sslmode=require`
 - Verify Neon database is running: `psql $DATABASE_URL -c "SELECT 1"`
 - Check IP allowlist in Neon dashboard
 - Confirm database schema is applied (see root README)
 
 **"Gong API authentication failed"**
+
 - Verify GONG_API_KEY and GONG_API_SECRET are correct
 - Check GONG_API_BASE_URL uses your tenant-specific URL
 - Test credentials: `python tests/test_gong_client_live.py`
 
 **"statement_timeout parameter error"**
+
 - This should be fixed in latest version (e4cf57c)
 - If still seeing it, ensure you've pulled latest changes
 - The fix moves statement_timeout from pool init to per-connection SET
@@ -131,23 +135,27 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 ### Frontend Issues
 
 **"Cannot find module" or import errors**
+
 - Run `npm install` in frontend directory
 - Clear Next.js cache: `rm -rf .next`
 - Restart dev server
 
 **"Clerk authentication failed"**
+
 - Verify Clerk API keys in `.env.local`
-- Check Clerk dashboard: https://dashboard.clerk.com
-- Ensure test keys (pk_test_/sk_test_) for development
+- Check Clerk dashboard: <https://dashboard.clerk.com>
+- Ensure test keys (pk*test*/sk*test*) for development
 - Create test users in Clerk dashboard if needed
 
 **"API calls failing" (Network errors)**
-- Ensure MCP backend is running on http://localhost:8000
+
+- Ensure MCP backend is running on <http://localhost:8000>
 - Check `NEXT_PUBLIC_MCP_BACKEND_URL` in `.env.local`
 - Open browser DevTools → Network tab to inspect requests
 - Verify CORS settings if seeing CORS errors
 
 **Port already in use**
+
 - Frontend: `lsof -ti:3000 | xargs kill -9`
 - Backend: `lsof -ti:8000 | xargs kill -9`
 
@@ -170,18 +178,20 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 ### Testing Full Flow
 
 1. Ensure both servers are running
-2. Open browser to http://localhost:3000
+2. Open browser to <http://localhost:3000>
 3. Sign in with Clerk test credentials
 4. Navigate through Dashboard, Search, Feed
-5. Check Network tab for API calls to http://localhost:8000
+5. Check Network tab for API calls to <http://localhost:8000>
 6. Verify data flows through correctly
 
 ## Stopping Servers
 
 **Graceful shutdown**:
+
 - Press `Ctrl+C` in each terminal
 
 **Force kill**:
+
 ```bash
 # Kill MCP backend
 pkill -f "python coaching_mcp/server.py"

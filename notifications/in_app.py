@@ -4,15 +4,17 @@ In-app notification system for Call Coach.
 Manages storage, retrieval, and lifecycle of notifications displayed in the application.
 Supports real-time updates via WebSocket and polling-based delivery.
 """
+
 import json
 import logging
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
-from db import fetch_all, fetch_one, execute_query
+
+from db import execute_query, fetch_all, fetch_one
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +45,7 @@ class NotificationPriority(str, Enum):
 class InAppNotification(BaseModel):
     """Model for in-app notifications."""
 
-    id: Optional[UUID] = Field(default_factory=uuid4)
+    id: UUID | None = Field(default_factory=uuid4)
     user_id: UUID
     type: NotificationType
     title: str
@@ -51,12 +53,12 @@ class InAppNotification(BaseModel):
     priority: NotificationPriority = NotificationPriority.MEDIUM
     read: bool = False
     archived: bool = False
-    action_url: Optional[str] = None
-    action_label: Optional[str] = None
+    action_url: str | None = None
+    action_label: str | None = None
     data: dict[str, Any] = Field(default_factory=dict)
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    expires_at: Optional[datetime] = None
-    read_at: Optional[datetime] = None
+    expires_at: datetime | None = None
+    read_at: datetime | None = None
 
     class Config:
         json_encoders = {
@@ -116,7 +118,7 @@ class NotificationStore:
             raise
 
     @staticmethod
-    def get(notification_id: UUID) -> Optional[InAppNotification]:
+    def get(notification_id: UUID) -> InAppNotification | None:
         """
         Get a notification by ID.
 

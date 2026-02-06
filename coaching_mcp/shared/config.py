@@ -2,7 +2,9 @@
 Configuration management using Pydantic Settings.
 Loads configuration from environment variables with validation.
 """
+
 from pathlib import Path
+
 from pydantic import Field, PostgresDsn, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -40,7 +42,7 @@ class Settings(BaseSettings):
     gong_webhook_secret: str = Field(..., description="Secret for validating webhook signatures")
     gong_api_base_url: str = Field(
         default="https://us-79647.api.gong.io/v2",
-        description="Base URL for Gong API (tenant-specific)"
+        description="Base URL for Gong API (tenant-specific)",
     )
 
     # Claude API
@@ -54,29 +56,18 @@ class Settings(BaseSettings):
     # Analysis settings
     enable_caching: bool = Field(default=True, description="Enable intelligent caching")
     cache_ttl_days: int = Field(default=90, description="Cache TTL in days")
-    max_chunk_size_tokens: int = Field(
-        default=80000,
-        description="Max tokens per transcript chunk"
-    )
+    max_chunk_size_tokens: int = Field(default=80000, description="Max tokens per transcript chunk")
     chunk_overlap_percentage: int = Field(
-        default=20,
-        description="Overlap between chunks as percentage"
+        default=20, description="Overlap between chunks as percentage"
     )
 
     # Prefect/Horizon
-    prefect_api_url: str | None = Field(
-        default=None,
-        description="Prefect Cloud API URL"
-    )
-    prefect_api_key: str | None = Field(
-        default=None,
-        description="Prefect Cloud API key"
-    )
+    prefect_api_url: str | None = Field(default=None, description="Prefect Cloud API URL")
+    prefect_api_key: str | None = Field(default=None, description="Prefect Cloud API key")
 
     # Notifications
     slack_webhook_url: str | None = Field(
-        default=None,
-        description="Slack webhook URL for notifications"
+        default=None, description="Slack webhook URL for notifications"
     )
 
     # Webhook endpoint (FastAPI)

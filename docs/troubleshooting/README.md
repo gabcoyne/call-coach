@@ -39,11 +39,13 @@ curl https://api.anthropic.com/v1/models \
 **Error**: `ModuleNotFoundError: No module named 'coaching_mcp'`
 
 **Causes**:
+
 - Python environment not activated
 - Dependencies not installed
 - Wrong working directory
 
 **Solutions**:
+
 ```bash
 # 1. Activate environment
 source .venv/bin/activate
@@ -64,10 +66,12 @@ uv run mcp-server-dev
 **Error**: `DATABASE_URL must include sslmode=require`
 
 **Causes**:
+
 - Missing `?sslmode=require` in DATABASE_URL
 - Neon requires SSL for security
 
 **Solution**:
+
 ```bash
 # Check your DATABASE_URL
 echo $DATABASE_URL
@@ -86,11 +90,13 @@ uv run mcp-server-dev
 **Error**: `✗ Database connection failed: could not connect to server`
 
 **Causes**:
+
 - Database is down
 - Connection credentials wrong
 - Network connectivity issue
 
 **Solutions**:
+
 ```bash
 # 1. Test database connection
 psql $DATABASE_URL
@@ -113,11 +119,13 @@ grep DATABASE_URL .env
 **Error**: `✗ Gong API authentication failed`
 
 **Causes**:
+
 - Wrong API key or secret
 - Wrong tenant URL
 - Gong credentials expired
 
 **Solutions**:
+
 ```bash
 # 1. Verify credentials in .env
 grep GONG_API .env
@@ -146,11 +154,13 @@ uv run mcp-server-dev
 **Error**: `✗ Anthropic API key validated [FAILED]`
 
 **Causes**:
+
 - Wrong API key
 - API key expired or revoked
 - API key doesn't have required permissions
 
 **Solutions**:
+
 ```bash
 # 1. Check API key
 echo $ANTHROPIC_API_KEY
@@ -175,12 +185,14 @@ uv run mcp-server-dev
 **Symptom**: Call analysis exceeds 2 minutes
 
 **Causes**:
+
 - Very long call (60+ minutes)
 - Claude API is slow
 - Network latency
 - Transcript chunking overhead
 
 **Solutions**:
+
 ```bash
 # 1. Check call duration
 # Calls > 60 minutes may take 2-3 minutes
@@ -209,12 +221,14 @@ ping api.anthropic.com
 **Error**: `404 Not Found - Call ID not found in database`
 
 **Causes**:
+
 - Call hasn't been processed yet
 - Wrong call ID format
 - Call didn't complete webhook processing
 - Call is from different Gong account
 
 **Solutions**:
+
 ```bash
 # 1. Verify call ID format
 # Should be a 18-19 digit number
@@ -246,12 +260,14 @@ psql $DATABASE_URL -c "SELECT * FROM webhook_events ORDER BY received_at DESC LI
 **Symptom**: Same call analyzed multiple times returns different scores
 
 **Causes**:
+
 - Cache TTL expired (30 days)
 - Cache key mismatch
 - Rubric version changed
 - Cache database cleared
 
 **Solutions**:
+
 ```bash
 # 1. Check cache entry exists
 psql $DATABASE_URL -c "SELECT * FROM cache_keys ORDER BY created_at DESC LIMIT 10"
@@ -282,11 +298,13 @@ psql $DATABASE_URL -c "TRUNCATE cache_keys"
 **Error**: `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY not found`
 
 **Causes**:
+
 - Missing `.env.local` file
 - Clerk credentials not configured
 - Environment variables not loaded
 
 **Solutions**:
+
 ```bash
 cd frontend
 
@@ -315,11 +333,13 @@ npm run dev
 **Error**: `API calls returning 404`
 
 **Causes**:
+
 - REST API not running
 - Wrong backend URL configured
 - Network connectivity issue
 
 **Solutions**:
+
 ```bash
 # 1. Verify backend is running
 curl http://localhost:8001/health
@@ -353,10 +373,12 @@ uv run uvicorn api.rest_server:app --port 8001 --reload  # Backend
 **Error**: Port 3000 already in use
 
 **Causes**:
+
 - Another process using port 3000
 - Previous Next.js process didn't exit cleanly
 
 **Solutions**:
+
 ```bash
 # 1. Find process using port 3000
 lsof -i :3000
@@ -378,12 +400,14 @@ npm run dev
 **Symptom**: Can't sign in, always redirected to login page
 
 **Causes**:
+
 - Clerk keys not configured
 - Wrong redirect URLs
 - Clerk account not set up
 - Session cookie issues
 
 **Solutions**:
+
 ```bash
 # 1. Check Clerk dashboard
 # https://dashboard.clerk.com
@@ -427,6 +451,7 @@ See [API Error Codes](./api-errors.md) for detailed error code reference.
 **Cause**: Invalid request parameters
 
 **Solution**:
+
 ```bash
 # Check request format
 curl -X POST http://localhost:8001/coaching/analyze-call \
@@ -449,6 +474,7 @@ curl -X POST http://localhost:8001/coaching/analyze-call \
 **Cause**: Missing or invalid API key (if enabled)
 
 **Solution**:
+
 ```bash
 # In production, requests need Bearer token
 curl -H "Authorization: Bearer YOUR_API_KEY" \
@@ -464,6 +490,7 @@ curl -H "Authorization: Bearer YOUR_API_KEY" \
 **Cause**: Rate limit exceeded (production only)
 
 **Solution**:
+
 ```bash
 # Wait before retrying
 # Rate limit: 100 requests/minute
@@ -486,6 +513,7 @@ curl -i http://localhost:8001/health | grep X-RateLimit
 **Cause**: Server error (database, Claude API, etc.)
 
 **Solution**:
+
 ```bash
 # 1. Check server logs
 # Look for error messages and stack traces
@@ -512,12 +540,14 @@ uv run uvicorn api.rest_server:app --port 8001 --reload
 **Error**: `psql: could not connect to server`
 
 **Causes**:
+
 - Database is down
 - Wrong connection string
 - IP not whitelisted
 - Network issue
 
 **Solutions**:
+
 ```bash
 # 1. Check connection string
 echo $DATABASE_URL
@@ -548,11 +578,13 @@ psql postgresql://localhost/callcoach
 **Error**: `✗ Missing required database tables`
 
 **Causes**:
+
 - Migrations not run
 - Database not initialized
 - Tables accidentally dropped
 
 **Solutions**:
+
 ```bash
 # 1. Check existing tables
 psql $DATABASE_URL -c "\dt"
@@ -580,12 +612,14 @@ psql $DATABASE_URL -c "\dt"
 **Symptom**: API responses taking >5 seconds
 
 **Causes**:
+
 - Missing indexes
 - Large result set
 - Database connection pool exhausted
 - Network latency
 
 **Solutions**:
+
 ```bash
 # 1. Check query performance
 psql $DATABASE_URL
@@ -620,11 +654,13 @@ EXPLAIN SELECT * FROM coaching_sessions WHERE call_id = 'xxx';
 **Symptom**: Python process using >500MB
 
 **Causes**:
+
 - Large transcripts being loaded into memory
 - Memory leak in code
 - Tiktoken model loaded multiple times
 
 **Solutions**:
+
 ```bash
 # 1. Check memory usage
 ps aux | grep python
@@ -649,12 +685,14 @@ python -m memory_profiler coaching_mcp/server.py
 **Symptom**: Analyze call takes >3 minutes
 
 **Causes**:
+
 - Claude API is slow
 - Very long transcript (60+ min)
 - Network latency
 - Server overloaded
 
 **Solutions**:
+
 ```bash
 # 1. Check call duration
 psql $DATABASE_URL -c "SELECT duration_seconds FROM calls WHERE gong_call_id = 'xxx'"

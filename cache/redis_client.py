@@ -8,6 +8,7 @@ Cache Strategy:
 - Invalidation: Automatic on rubric version updates
 - Compression: gzip for large payloads
 """
+
 import gzip
 import json
 import logging
@@ -17,12 +18,13 @@ from typing import Any
 try:
     import redis
     from redis.connection import ConnectionPool
+
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
 
-from db.models import CoachingDimension
 from coaching_mcp.shared import settings
+from db.models import CoachingDimension
 
 logger = logging.getLogger(__name__)
 
@@ -92,8 +94,7 @@ class RedisCache:
             self._available = True
 
             logger.info(
-                f"Redis cache initialized: {host}:{port} "
-                f"(pool size: {max_connections})"
+                f"Redis cache initialized: {host}:{port} " f"(pool size: {max_connections})"
             )
 
         except Exception as e:
@@ -285,9 +286,7 @@ class RedisCache:
                     info.get("keyspace_hits", 0),
                     info.get("keyspace_misses", 0),
                 ),
-                "memory_used_mb": round(
-                    memory.get("used_memory", 0) / (1024 * 1024), 2
-                ),
+                "memory_used_mb": round(memory.get("used_memory", 0) / (1024 * 1024), 2),
                 "total_keys": self._client.dbsize(),
             }
 

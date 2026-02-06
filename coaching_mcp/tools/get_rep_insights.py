@@ -1,6 +1,7 @@
 """
 Get Rep Insights Tool - Performance trends and coaching history for a sales rep.
 """
+
 import logging
 from datetime import datetime, timedelta
 from typing import Any
@@ -202,8 +203,8 @@ def get_rep_insights_tool(
     )
 
     wins_formatted = [
-        f"{w['coaching_dimension']}: {w['score']}/100 on '{w['title']}' - " +
-        ", ".join(w["top_strengths"] or [])
+        f"{w['coaching_dimension']}: {w['score']}/100 on '{w['title']}' - "
+        + ", ".join(w["top_strengths"] or [])
         for w in recent_wins
     ]
 

@@ -2,7 +2,14 @@
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 
 export default function Error({
@@ -27,9 +34,7 @@ export default function Error({
             </div>
           </div>
           <CardTitle>Something went wrong</CardTitle>
-          <CardDescription>
-            An error occurred while processing your request
-          </CardDescription>
+          <CardDescription>An error occurred while processing your request</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="rounded-lg bg-muted p-4">
@@ -37,9 +42,7 @@ export default function Error({
               {error.message || "An unexpected error occurred"}
             </p>
             {error.digest && (
-              <p className="text-xs text-muted-foreground mt-2">
-                Error ID: {error.digest}
-              </p>
+              <p className="text-xs text-muted-foreground mt-2">Error ID: {error.digest}</p>
             )}
           </div>
         </CardContent>
@@ -47,7 +50,7 @@ export default function Error({
           <Button onClick={reset} className="flex-1">
             Try again
           </Button>
-          <Button variant="outline" onClick={() => window.location.href = "/"} className="flex-1">
+          <Button variant="outline" onClick={() => (window.location.href = "/")} className="flex-1">
             Go home
           </Button>
         </CardFooter>

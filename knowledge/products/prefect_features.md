@@ -1,9 +1,11 @@
 # Prefect Product Knowledge
 
 ## Overview
+
 Prefect is a modern workflow orchestration platform for building, running, and monitoring data pipelines. It's designed to make workflow engineering simple, scalable, and reliable.
 
 ## Core Philosophy
+
 - **Python-native**: Workflows are just Python functions, no proprietary DSLs
 - **Hybrid execution**: Run workflows anywhere (cloud, on-prem, laptop)
 - **Dynamic workflows**: Generate tasks at runtime based on data
@@ -12,15 +14,18 @@ Prefect is a modern workflow orchestration platform for building, running, and m
 ## Key Features
 
 ### 1. Python-Native Workflows
+
 **What it is**: Write workflows using standard Python functions with decorators.
 
 **Why it matters**:
+
 - No learning curve for Python developers
 - Test with pytest locally before deploying
 - Use any Python library or package
 - Familiar debugging with standard tools
 
 **Example**:
+
 ```python
 from prefect import flow, task
 
@@ -37,9 +42,11 @@ def etl_pipeline(sources: list[str]):
 **Differentiation**: Unlike Airflow's DAG syntax or complex YAML configs, it's just Python.
 
 ### 2. Dynamic Workflows
+
 **What it is**: Tasks and flows can be generated at runtime based on data.
 
 **Why it matters**:
+
 - Handle variable workloads without manual configuration
 - Process data of unknown shape/size
 - Conditional logic based on runtime state
@@ -50,15 +57,18 @@ def etl_pipeline(sources: list[str]):
 **Differentiation**: Airflow DAGs are static and must be predefined. Temporal requires more boilerplate for dynamic workflows.
 
 ### 3. Hybrid Execution Model
+
 **What it is**: Code runs where you want - cloud workers, Kubernetes, on-prem servers, even locally.
 
 **Why it matters**:
+
 - Data never leaves your environment if required
 - Gradual cloud migration path
 - Cost optimization (run expensive tasks on-prem)
 - Disaster recovery across regions
 
 **Architecture**:
+
 - Prefect Cloud: Orchestration engine (metadata, scheduling, UI)
 - Execution: Your infrastructure (work pools)
 - Decoupled: Orchestration ≠ Execution
@@ -66,9 +76,11 @@ def etl_pipeline(sources: list[str]):
 **Differentiation**: Most platforms couple orchestration with execution. Prefect decouples them.
 
 ### 4. Built-in Observability
+
 **What it is**: Comprehensive monitoring, logging, and alerting without extra setup.
 
 **Features**:
+
 - Real-time flow run tracking
 - Task-level logs with automatic capture
 - Execution graphs and visualizations
@@ -76,15 +88,18 @@ def etl_pipeline(sources: list[str]):
 - Historical run data and analytics
 
 **Why it matters**:
+
 - No need to configure external logging (Datadog, Splunk)
 - Troubleshoot failures faster with detailed logs
 - Proactive alerting prevents silent failures
 - Audit trail for compliance
 
 ### 5. Subflows and Modularity
+
 **What it is**: Flows can call other flows as subflows, creating hierarchical pipelines.
 
 **Why it matters**:
+
 - Reusable pipeline components
 - Logical separation of concerns
 - Independent testing of subflows
@@ -93,9 +108,11 @@ def etl_pipeline(sources: list[str]):
 **Use case**: Main ETL flow orchestrates separate extract, transform, load subflows.
 
 ### 6. Task Caching
+
 **What it is**: Cache task results to avoid redundant computation.
 
 **Why it matters**:
+
 - Skip expensive API calls or computations
 - Faster development iteration
 - Cost savings on cloud resources
@@ -104,9 +121,11 @@ def etl_pipeline(sources: list[str]):
 **Configuration**: Control cache expiration, invalidation, and scope.
 
 ### 7. Work Pools and Queues
+
 **What it is**: Organize execution infrastructure with work pools and prioritize with queues.
 
 **Why it matters**:
+
 - Route different workloads to appropriate infrastructure
 - Priority-based execution
 - Resource isolation (production vs. dev)
@@ -115,32 +134,39 @@ def etl_pipeline(sources: list[str]):
 **Example**: GPU work pool for ML tasks, standard pool for data processing.
 
 ### 8. Retry and Error Handling
+
 **What it is**: Configurable retry policies and error handling per task.
 
 **Features**:
+
 - Exponential backoff
 - Max retries with custom logic
 - Retry on specific exceptions
 - Failure callbacks
 
 **Why it matters**:
+
 - Handle transient failures gracefully
 - Reduce manual intervention
 - Custom business logic on failure
 
 ### 9. Parameterized Flows
+
 **What it is**: Pass parameters to flows at runtime via UI or API.
 
 **Why it matters**:
+
 - Ad-hoc execution with different inputs
 - No code changes for parameter tweaks
 - Scheduled runs with varying parameters
 - User-triggered flows
 
 ### 10. Blocks (Configuration Management)
+
 **What it is**: Reusable configuration objects for credentials, connections, settings.
 
 **Why it matters**:
+
 - Centralized secret management
 - Reuse across multiple flows
 - Version control for configurations
@@ -151,12 +177,14 @@ def etl_pipeline(sources: list[str]):
 ## Common Use Cases
 
 ### Data Engineering
+
 - ETL/ELT pipelines
 - Data lake/warehouse orchestration
 - Real-time streaming processing
 - Data validation and quality checks
 
 ### ML/AI Operations
+
 - Model training pipelines
 - Feature engineering workflows
 - Model deployment and serving
@@ -164,12 +192,14 @@ def etl_pipeline(sources: list[str]):
 - A/B test orchestration
 
 ### DevOps and IT
+
 - Infrastructure provisioning
 - CI/CD pipeline orchestration
 - Backup and disaster recovery
 - Log aggregation and processing
 
 ### Business Operations
+
 - Report generation
 - Multi-system integrations
 - Scheduled data exports
@@ -178,6 +208,7 @@ def etl_pipeline(sources: list[str]):
 ## Typical Tech Stacks
 
 Works well with:
+
 - **Data**: Pandas, Polars, Spark, Dask, DuckDB
 - **Databases**: PostgreSQL, MySQL, Snowflake, BigQuery, Redshift
 - **Storage**: S3, GCS, Azure Blob, MinIO
@@ -188,12 +219,14 @@ Works well with:
 ## Deployment Options
 
 ### Self-Hosted (Open Source)
+
 - Free and open source
 - Host Prefect Server yourself
 - Full control over infrastructure
 - Requires ops maintenance
 
 ### Prefect Cloud (SaaS)
+
 - Managed orchestration plane
 - Zero ops burden
 - Enterprise SLAs and support
@@ -202,11 +235,13 @@ Works well with:
 ## Pricing Model
 
 ### Open Source
+
 - Free forever
 - Community support
 - Self-hosted required
 
 ### Prefect Cloud
+
 - Free tier: 20K task runs/month
 - Pro: Usage-based ($0.xx per task run over limit)
 - Enterprise: Custom pricing with volume discounts, SLAs

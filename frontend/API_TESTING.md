@@ -5,6 +5,7 @@ This document provides step-by-step instructions for testing the Next.js API rou
 ## Prerequisites
 
 1. **MCP Backend Running**: Ensure the FastMCP coaching backend is running locally
+
    ```bash
    # From project root
    fastmcp dev
@@ -13,11 +14,13 @@ This document provides step-by-step instructions for testing the Next.js API rou
    ```
 
 2. **Environment Variables**: Ensure `.env.local` has the correct MCP backend URL
+
    ```bash
    NEXT_PUBLIC_MCP_BACKEND_URL=http://localhost:8000
    ```
 
 3. **Database**: Ensure Neon database has processed calls and coaching sessions
+
    ```bash
    # Verify with psql or database client
    SELECT COUNT(*) FROM calls WHERE processed_at IS NOT NULL;
@@ -33,6 +36,7 @@ This document provides step-by-step instructions for testing the Next.js API rou
 **Endpoint**: `POST /api/coaching/analyze-call`
 
 **Test Case 1.1: Successful Analysis**
+
 ```bash
 curl -X POST http://localhost:3000/api/coaching/analyze-call \
   -H "Content-Type: application/json" \
@@ -46,6 +50,7 @@ curl -X POST http://localhost:3000/api/coaching/analyze-call \
 ```
 
 **Expected Response**: 200 OK with analysis data
+
 ```json
 {
   "call_metadata": {
@@ -66,6 +71,7 @@ curl -X POST http://localhost:3000/api/coaching/analyze-call \
 ```
 
 **Test Case 1.2: Invalid Call ID**
+
 ```bash
 curl -X POST http://localhost:3000/api/coaching/analyze-call \
   -H "Content-Type: application/json" \
@@ -78,6 +84,7 @@ curl -X POST http://localhost:3000/api/coaching/analyze-call \
 **Expected Response**: 400 Bad Request or 404 Not Found
 
 **Test Case 1.3: Rate Limit Exceeded**
+
 ```bash
 # Make 11+ requests in rapid succession
 for i in {1..15}; do
@@ -89,6 +96,7 @@ done
 ```
 
 **Expected Response**: After 10 requests, 429 Too Many Requests
+
 ```json
 {
   "error": "Rate limit exceeded"
@@ -96,6 +104,7 @@ done
 ```
 
 **Headers**:
+
 ```
 X-RateLimit-Limit: 10
 X-RateLimit-Remaining: 0
@@ -107,6 +116,7 @@ X-RateLimit-Reset: <timestamp>
 **Endpoint**: `POST /api/coaching/rep-insights`
 
 **Test Case 2.1: Successful Insights (Manager)**
+
 ```bash
 curl -X POST http://localhost:3000/api/coaching/rep-insights \
   -H "Content-Type: application/json" \
@@ -119,6 +129,7 @@ curl -X POST http://localhost:3000/api/coaching/rep-insights \
 ```
 
 **Expected Response**: 200 OK with rep insights
+
 ```json
 {
   "rep_info": {
@@ -140,6 +151,7 @@ curl -X POST http://localhost:3000/api/coaching/rep-insights \
 ```
 
 **Test Case 2.2: Rep Accessing Own Data**
+
 ```bash
 curl -X POST http://localhost:3000/api/coaching/rep-insights \
   -H "Content-Type: application/json" \
@@ -152,6 +164,7 @@ curl -X POST http://localhost:3000/api/coaching/rep-insights \
 **Expected Response**: 200 OK if email matches authenticated user, 403 Forbidden otherwise
 
 **Test Case 2.3: Invalid Email**
+
 ```bash
 curl -X POST http://localhost:3000/api/coaching/rep-insights \
   -H "Content-Type: application/json" \
@@ -162,6 +175,7 @@ curl -X POST http://localhost:3000/api/coaching/rep-insights \
 ```
 
 **Expected Response**: 400 Bad Request
+
 ```json
 {
   "error": "Invalid request parameters",
@@ -178,6 +192,7 @@ curl -X POST http://localhost:3000/api/coaching/rep-insights \
 **Endpoint**: `POST /api/coaching/search-calls`
 
 **Test Case 3.1: Basic Search**
+
 ```bash
 curl -X POST http://localhost:3000/api/coaching/search-calls \
   -H "Content-Type: application/json" \
@@ -190,6 +205,7 @@ curl -X POST http://localhost:3000/api/coaching/search-calls \
 ```
 
 **Expected Response**: 200 OK with array of calls
+
 ```json
 [
   {
@@ -204,6 +220,7 @@ curl -X POST http://localhost:3000/api/coaching/search-calls \
 ```
 
 **Test Case 3.2: Search with Score Filter**
+
 ```bash
 curl -X POST http://localhost:3000/api/coaching/search-calls \
   -H "Content-Type: application/json" \
@@ -216,6 +233,7 @@ curl -X POST http://localhost:3000/api/coaching/search-calls \
 ```
 
 **Test Case 3.3: Search with Date Range**
+
 ```bash
 curl -X POST http://localhost:3000/api/coaching/search-calls \
   -H "Content-Type: application/json" \
@@ -230,6 +248,7 @@ curl -X POST http://localhost:3000/api/coaching/search-calls \
 ```
 
 **Test Case 3.4: Rep Auto-Filtering**
+
 ```bash
 # As a rep (not manager), search should auto-filter to own calls
 curl -X POST http://localhost:3000/api/coaching/search-calls \
@@ -252,41 +271,41 @@ curl -X POST http://localhost:3000/api/coaching/search-calls \
 
 ```javascript
 // Test analyze-call
-fetch('/api/coaching/analyze-call', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+fetch("/api/coaching/analyze-call", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    call_id: '1464927526043145564',
-    dimensions: ['discovery'],
-  })
+    call_id: "1464927526043145564",
+    dimensions: ["discovery"],
+  }),
 })
-  .then(r => r.json())
+  .then((r) => r.json())
   .then(console.log)
   .catch(console.error);
 
 // Test rep-insights
-fetch('/api/coaching/rep-insights', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+fetch("/api/coaching/rep-insights", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    rep_email: 'your-email@prefect.io',
-    time_period: 'last_30_days'
-  })
+    rep_email: "your-email@prefect.io",
+    time_period: "last_30_days",
+  }),
 })
-  .then(r => r.json())
+  .then((r) => r.json())
   .then(console.log)
   .catch(console.error);
 
 // Test search-calls
-fetch('/api/coaching/search-calls', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+fetch("/api/coaching/search-calls", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    product: 'prefect',
-    limit: 10
-  })
+    product: "prefect",
+    limit: 10,
+  }),
 })
-  .then(r => r.json())
+  .then((r) => r.json())
   .then(console.log)
   .catch(console.error);
 ```
@@ -328,18 +347,22 @@ X-RateLimit-Reset: 1738782360000
 ### Common Issues
 
 1. **401 Unauthorized**
+
    - Ensure you're signed in via Clerk
    - Check that Clerk environment variables are set correctly
 
 2. **403 Forbidden**
+
    - Verify RBAC rules (reps can only access own data)
    - Check user role in Clerk metadata
 
 3. **429 Rate Limit Exceeded**
+
    - Wait for rate limit window to reset
    - Check `X-RateLimit-Reset` header for reset time
 
 4. **500 Internal Server Error**
+
    - Check that MCP backend is running
    - Verify `NEXT_PUBLIC_MCP_BACKEND_URL` environment variable
    - Check backend logs for errors
@@ -370,6 +393,7 @@ ab -n 100 -c 10 -p test-payload.json -T application/json \
 ## Success Criteria
 
 All tests should pass with:
+
 - ✅ Correct HTTP status codes
 - ✅ Valid JSON responses matching TypeScript types
 - ✅ Proper authentication enforcement

@@ -2,17 +2,16 @@
 Quick test script for Claude API analysis integration.
 Tests the analysis engine with a sample transcript.
 """
-import logging
-from uuid import uuid4
 
-from analysis.engine import _run_claude_analysis, _generate_prompt_for_dimension
-from db.models import CoachingDimension
+import logging
+
+from analysis.engine import _generate_prompt_for_dimension, _run_claude_analysis
 from db import fetch_one
+from db.models import CoachingDimension
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 logger = logging.getLogger(__name__)
@@ -81,7 +80,11 @@ def test_prompt_generation():
             }
 
             # Generate prompt
-            knowledge_base = "Sample product knowledge" if dimension == CoachingDimension.PRODUCT_KNOWLEDGE else None
+            knowledge_base = (
+                "Sample product knowledge"
+                if dimension == CoachingDimension.PRODUCT_KNOWLEDGE
+                else None
+            )
             messages = _generate_prompt_for_dimension(
                 dimension=dimension,
                 transcript=sample_transcript,
@@ -90,15 +93,12 @@ def test_prompt_generation():
                 call_metadata=call_metadata,
             )
 
-            logger.info(f"✓ Prompt generated successfully")
+            logger.info("✓ Prompt generated successfully")
             logger.info(f"  - Message count: {len(messages)}")
             logger.info(f"  - Content blocks: {len(messages[0]['content'])}")
 
             # Check for cache control
-            has_cache_control = any(
-                'cache_control' in block
-                for block in messages[0]['content']
-            )
+            has_cache_control = any("cache_control" in block for block in messages[0]["content"])
             logger.info(f"  - Has cache control: {has_cache_control}")
 
         except Exception as e:
@@ -107,9 +107,9 @@ def test_prompt_generation():
 
 def test_claude_analysis():
     """Test actual Claude API call with discovery dimension."""
-    logger.info("\n" + "="*60)
+    logger.info("\n" + "=" * 60)
     logger.info("Testing actual Claude API call (discovery dimension)")
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     sample_transcript = """
     Rep: Hi Sarah, thanks for joining today. I reviewed your responses from the form -
@@ -169,19 +169,19 @@ def test_claude_analysis():
         logger.info(f"{'='*60}")
         logger.info(f"Score: {result.get('score')}/100")
         logger.info(f"\nStrengths ({len(result.get('strengths', []))}):")
-        for strength in result.get('strengths', [])[:3]:
+        for strength in result.get("strengths", [])[:3]:
             logger.info(f"  - {strength}")
 
         logger.info(f"\nAreas for Improvement ({len(result.get('areas_for_improvement', []))}):")
-        for area in result.get('areas_for_improvement', [])[:3]:
+        for area in result.get("areas_for_improvement", [])[:3]:
             logger.info(f"  - {area}")
 
         logger.info(f"\nAction Items ({len(result.get('action_items', []))}):")
-        for item in result.get('action_items', [])[:3]:
+        for item in result.get("action_items", [])[:3]:
             logger.info(f"  - {item}")
 
         # Token usage
-        metadata = result.get('metadata', {})
+        metadata = result.get("metadata", {})
         logger.info(f"\n{'='*60}")
         logger.info("TOKEN USAGE:")
         logger.info(f"{'='*60}")
@@ -193,16 +193,18 @@ def test_claude_analysis():
         logger.info(f"Cache read tokens: {metadata.get('cache_read_tokens')}")
 
         # 5 Wins coverage
-        if 'five_wins_coverage' in result:
-            wins = result['five_wins_coverage']
+        if "five_wins_coverage" in result:
+            wins = result["five_wins_coverage"]
             logger.info(f"\n{'='*60}")
             logger.info("5 WINS COVERAGE:")
             logger.info(f"{'='*60}")
             logger.info(f"Wins count: {wins.get('wins_count')}/5")
             for win_name, win_data in wins.items():
-                if win_name not in ['wins_count', 'overall_assessment'] and isinstance(win_data, dict):
-                    covered = "✓" if win_data.get('covered') else "✗"
-                    score = win_data.get('score', 0)
+                if win_name not in ["wins_count", "overall_assessment"] and isinstance(
+                    win_data, dict
+                ):
+                    covered = "✓" if win_data.get("covered") else "✗"
+                    score = win_data.get("score", 0)
                     logger.info(f"{covered} {win_name}: {score}/100")
 
         return result
@@ -219,7 +221,7 @@ if __name__ == "__main__":
     # Then test actual Claude API call
     # NOTE: This will consume API tokens!
     user_input = input("\n\nTest actual Claude API call? This will use API tokens. (y/N): ")
-    if user_input.lower() == 'y':
+    if user_input.lower() == "y":
         test_claude_analysis()
     else:
         logger.info("Skipping actual API call test.")

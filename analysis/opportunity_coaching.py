@@ -11,17 +11,16 @@ COACHING PHILOSOPHY:
 - NO encouragement language - focus on gaps and fixes
 - Provide actionable behavioral changes only
 """
+
 import json
 import logging
-from datetime import datetime, timedelta
 from typing import Any
+
+import anthropic
 
 from coaching_mcp.shared import settings
 from db import queries
 from db.models import CoachingDimension
-import anthropic
-
-from .rubric_loader import load_rubric
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +43,8 @@ def detect_speaker_role(call_id: str) -> str:
 
     # Filter to Prefect speakers (company_side=true and @prefect.io email)
     prefect_speakers = [
-        s for s in speakers
+        s
+        for s in speakers
         if s.get("company_side") and s.get("email") and s["email"].endswith("@prefect.io")
     ]
 
@@ -53,10 +53,7 @@ def detect_speaker_role(call_id: str) -> str:
         return "ae"
 
     # Select primary speaker (highest talk time)
-    primary_speaker = max(
-        prefect_speakers,
-        key=lambda s: s.get("talk_time_percentage", 0) or 0
-    )
+    primary_speaker = max(prefect_speakers, key=lambda s: s.get("talk_time_percentage", 0) or 0)
 
     speaker_email = primary_speaker["email"]
     logger.info(
@@ -186,7 +183,9 @@ def identify_recurring_themes(opportunity_id: str) -> dict[str, Any]:
             transcripts_data.append(
                 {
                     "call_id": call_id,
-                    "date": call["scheduled_at"].isoformat() if call.get("scheduled_at") else "unknown",
+                    "date": (
+                        call["scheduled_at"].isoformat() if call.get("scheduled_at") else "unknown"
+                    ),
                     "transcript": transcript[:5000],  # Limit length
                 }
             )
@@ -234,7 +233,9 @@ def analyze_objection_progression(opportunity_id: str) -> dict[str, Any]:
 
     objections_by_call = []
     for call_id in call_ids:
-        sessions = queries.get_coaching_sessions_for_call(call_id, CoachingDimension.OBJECTION_HANDLING)
+        sessions = queries.get_coaching_sessions_for_call(
+            call_id, CoachingDimension.OBJECTION_HANDLING
+        )
         call_data = queries.get_call_by_id(call_id)
 
         if sessions:
@@ -242,7 +243,11 @@ def analyze_objection_progression(opportunity_id: str) -> dict[str, Any]:
             objections_by_call.append(
                 {
                     "call_id": call_id,
-                    "call_date": call_data["scheduled_at"].isoformat() if call_data.get("scheduled_at") else None,
+                    "call_date": (
+                        call_data["scheduled_at"].isoformat()
+                        if call_data.get("scheduled_at")
+                        else None
+                    ),
                     "score": session["score"],
                     "feedback": session.get("feedback"),
                 }
@@ -382,6 +387,10 @@ Format as a numbered list of 3-5 recommendations."""
     recommendations_text = response.content[0].text
 
     # Parse into list
-    recommendations = [line.strip() for line in recommendations_text.split("\n") if line.strip() and line[0].isdigit()]
+    recommendations = [
+        line.strip()
+        for line in recommendations_text.split("\n")
+        if line.strip() and line[0].isdigit()
+    ]
 
     return recommendations

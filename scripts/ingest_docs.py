@@ -40,7 +40,7 @@ class DocumentationIngestionPipeline:
         """Load existing manifest for change detection."""
         if self.manifest_file.exists():
             try:
-                with open(self.manifest_file, "r") as f:
+                with open(self.manifest_file) as f:
                     return json.load(f)
             except Exception as e:
                 logger.warning(f"Could not load manifest: {e}")

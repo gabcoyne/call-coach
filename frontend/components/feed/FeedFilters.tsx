@@ -6,18 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  FileText,
-  TrendingUp,
-  Award,
-  Bell,
-  Calendar,
-  Filter,
-} from "lucide-react";
+import { FileText, TrendingUp, Award, Bell, Calendar, Filter } from "lucide-react";
 
 export interface FeedFilterState {
-  typeFilter: 'all' | 'call_analysis' | 'team_insight' | 'highlight' | 'milestone';
-  timeFilter: 'today' | 'this_week' | 'this_month' | 'custom';
+  typeFilter: "all" | "call_analysis" | "team_insight" | "highlight" | "milestone";
+  timeFilter: "today" | "this_week" | "this_month" | "custom";
   startDate?: string;
   endDate?: string;
 }
@@ -44,26 +37,26 @@ export function FeedFilters({
   const [showCustomDateRange, setShowCustomDateRange] = useState(false);
 
   const typeFilters = [
-    { value: 'all' as const, label: 'All', icon: Filter },
-    { value: 'call_analysis' as const, label: 'Analyses', icon: FileText },
-    ...(isManager ? [{ value: 'team_insight' as const, label: 'Insights', icon: TrendingUp }] : []),
-    { value: 'highlight' as const, label: 'Highlights', icon: Award },
-    { value: 'milestone' as const, label: 'Milestones', icon: Bell },
+    { value: "all" as const, label: "All", icon: Filter },
+    { value: "call_analysis" as const, label: "Analyses", icon: FileText },
+    ...(isManager ? [{ value: "team_insight" as const, label: "Insights", icon: TrendingUp }] : []),
+    { value: "highlight" as const, label: "Highlights", icon: Award },
+    { value: "milestone" as const, label: "Milestones", icon: Bell },
   ];
 
   const timeFilters = [
-    { value: 'today' as const, label: 'Today' },
-    { value: 'this_week' as const, label: 'This Week' },
-    { value: 'this_month' as const, label: 'This Month' },
-    { value: 'custom' as const, label: 'Custom Range' },
+    { value: "today" as const, label: "Today" },
+    { value: "this_week" as const, label: "This Week" },
+    { value: "this_month" as const, label: "This Month" },
+    { value: "custom" as const, label: "Custom Range" },
   ];
 
-  const handleTypeChange = (type: FeedFilterState['typeFilter']) => {
+  const handleTypeChange = (type: FeedFilterState["typeFilter"]) => {
     onFiltersChange({ ...filters, typeFilter: type });
   };
 
-  const handleTimeChange = (time: FeedFilterState['timeFilter']) => {
-    setShowCustomDateRange(time === 'custom');
+  const handleTimeChange = (time: FeedFilterState["timeFilter"]) => {
+    setShowCustomDateRange(time === "custom");
     onFiltersChange({ ...filters, timeFilter: time });
   };
 
@@ -94,10 +87,7 @@ export function FeedFilters({
                   <Icon className="h-4 w-4" />
                   <span>{type.label}</span>
                   {itemCounts && (
-                    <Badge
-                      variant={isActive ? "secondary" : "outline"}
-                      className="ml-1 text-xs"
-                    >
+                    <Badge variant={isActive ? "secondary" : "outline"} className="ml-1 text-xs">
                       {count}
                     </Badge>
                   )}
@@ -127,7 +117,7 @@ export function FeedFilters({
         </div>
 
         {/* Custom Date Range */}
-        {showCustomDateRange && filters.timeFilter === 'custom' && (
+        {showCustomDateRange && filters.timeFilter === "custom" && (
           <div className="p-4 bg-muted/50 rounded-lg space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
@@ -137,10 +127,8 @@ export function FeedFilters({
                 <Input
                   id="start-date"
                   type="date"
-                  value={filters.startDate || ''}
-                  onChange={(e) =>
-                    handleCustomDateChange(e.target.value, filters.endDate)
-                  }
+                  value={filters.startDate || ""}
+                  onChange={(e) => handleCustomDateChange(e.target.value, filters.endDate)}
                 />
               </div>
               <div>
@@ -150,10 +138,8 @@ export function FeedFilters({
                 <Input
                   id="end-date"
                   type="date"
-                  value={filters.endDate || ''}
-                  onChange={(e) =>
-                    handleCustomDateChange(filters.startDate, e.target.value)
-                  }
+                  value={filters.endDate || ""}
+                  onChange={(e) => handleCustomDateChange(filters.startDate, e.target.value)}
                 />
               </div>
             </div>

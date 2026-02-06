@@ -13,24 +13,24 @@ interface ImprovementAreasProps {
 const TREND_CONFIG = {
   improving: {
     icon: TrendingUp,
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
-    label: 'Improving',
+    color: "text-green-600",
+    bgColor: "bg-green-50",
+    borderColor: "border-green-200",
+    label: "Improving",
   },
   declining: {
     icon: TrendingDown,
-    color: 'text-red-600',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
-    label: 'Declining',
+    color: "text-red-600",
+    bgColor: "bg-red-50",
+    borderColor: "border-red-200",
+    label: "Declining",
   },
   stable: {
     icon: Minus,
-    color: 'text-gray-600',
-    bgColor: 'bg-gray-50',
-    borderColor: 'border-gray-200',
-    label: 'Stable',
+    color: "text-gray-600",
+    bgColor: "bg-gray-50",
+    borderColor: "border-gray-200",
+    label: "Stable",
   },
 };
 
@@ -62,16 +62,15 @@ export function ImprovementAreas({ improvementAreas, recentWins }: ImprovementAr
                           {config.label}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
-                          {area.change > 0 ? '+' : ''}{area.change} points
+                          {area.change > 0 ? "+" : ""}
+                          {area.change} points
                         </span>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-muted-foreground">Recent</p>
                       <p className="text-lg font-semibold">{area.recent_score}</p>
-                      <p className="text-xs text-muted-foreground">
-                        was {area.older_score}
-                      </p>
+                      <p className="text-xs text-muted-foreground">was {area.older_score}</p>
                     </div>
                   </div>
                 </div>
@@ -89,10 +88,7 @@ export function ImprovementAreas({ improvementAreas, recentWins }: ImprovementAr
         ) : (
           <div className="space-y-3">
             {recentWins.map((win, index) => (
-              <div
-                key={index}
-                className="p-3 rounded-lg bg-green-50 border border-green-200"
-              >
+              <div key={index} className="p-3 rounded-lg bg-green-50 border border-green-200">
                 <div className="flex items-start gap-2">
                   <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-gray-700">{win}</p>

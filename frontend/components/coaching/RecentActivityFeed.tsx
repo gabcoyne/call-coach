@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getScoreColor } from '@/lib/colors';
-import { Phone, Calendar, TrendingUp } from 'lucide-react';
-import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getScoreColor } from "@/lib/colors";
+import { Phone, Calendar, TrendingUp } from "lucide-react";
+import Link from "next/link";
 
 export interface ActivityItem {
   call_id: string;
@@ -32,7 +32,7 @@ export interface RecentActivityFeedProps {
 export function RecentActivityFeed({
   activities,
   limit = 10,
-  className = '',
+  className = "",
 }: RecentActivityFeedProps) {
   const displayActivities = activities.slice(0, limit);
 
@@ -47,9 +47,7 @@ export function RecentActivityFeed({
           <CardDescription>Last 10 calls</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500 text-center py-8">
-            No recent activity available
-          </p>
+          <p className="text-sm text-gray-500 text-center py-8">No recent activity available</p>
         </CardContent>
       </Card>
     );
@@ -67,15 +65,17 @@ export function RecentActivityFeed({
       <CardContent>
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {displayActivities.map((activity, index) => {
-            const scoreColor = activity.overall_score ? getScoreColor(activity.overall_score) : null;
-            const formattedDate = new Date(activity.date).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: '2-digit',
+            const scoreColor = activity.overall_score
+              ? getScoreColor(activity.overall_score)
+              : null;
+            const formattedDate = new Date(activity.date).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "2-digit",
             });
-            const formattedTime = new Date(activity.date).toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit',
+            const formattedTime = new Date(activity.date).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
             });
 
             // Calculate duration display
@@ -91,14 +91,12 @@ export function RecentActivityFeed({
                 {/* Left: Call info */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100">
-                    <span className="text-xs font-semibold text-blue-700">
-                      {index + 1}
-                    </span>
+                    <span className="text-xs font-semibold text-blue-700">{index + 1}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {activity.call_type || 'Call'}
+                        {activity.call_type || "Call"}
                       </p>
                       {activity.customer_name && (
                         <span className="text-xs text-gray-500 truncate">

@@ -4,18 +4,18 @@
 
 According to FastMCP documentation, the best practice for Horizon deployment is to use a `fastmcp.json` configuration file. This file is now included in the repository.
 
-### What fastmcp.json does:
+### What fastmcp.json does
 
 ```json
 {
   "source": {
-    "path": "coaching_mcp/server.py",  // Path to the server file
-    "entrypoint": "mcp"                 // Variable name of the FastMCP instance
+    "path": "coaching_mcp/server.py", // Path to the server file
+    "entrypoint": "mcp" // Variable name of the FastMCP instance
   },
   "environment": {
     "type": "uv",
-    "project": ".",                     // Use pyproject.toml in current directory
-    "editable": ["."]                   // Install current directory as editable package
+    "project": ".", // Use pyproject.toml in current directory
+    "editable": ["."] // Install current directory as editable package
   }
 }
 ```
@@ -25,11 +25,13 @@ The **`"editable": ["."]`** is the key - it tells Horizon to install the current
 ## Horizon UI Configuration
 
 ### Entrypoint
+
 ```
 coaching_mcp/server.py:mcp
 ```
 
 This means:
+
 - **File**: `coaching_mcp/server.py`
 - **Variable**: `mcp` (the FastMCP instance at line 216 in that file)
 
@@ -70,11 +72,13 @@ Use `fastmcp.json` with `"editable": ["."]` to install the local package properl
 ## Verification
 
 Once deployed, check logs for:
+
 ```
 🚀 MCP server ready - 3 tools registered
 ```
 
 And in Claude Desktop, verify 3 tools are available:
+
 - `analyze_call`
 - `get_rep_insights`
 - `search_calls`

@@ -2,20 +2,14 @@
 Helper functions for common database queries.
 Provides high-level abstractions over raw SQL.
 """
+
 import logging
 from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from .connection import fetch_one, fetch_all, execute_query
-from .models import (
-    Call,
-    Speaker,
-    CoachingSession,
-    RepPerformanceSummary,
-    CallAnalysisStatus,
-    CoachingDimension,
-)
+from .connection import execute_query, fetch_all, fetch_one
+from .models import CoachingDimension
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +17,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # CALL QUERIES
 # ============================================================================
+
 
 def get_call_by_id(call_id: UUID) -> dict[str, Any] | None:
     """Get call by database UUID."""
@@ -73,6 +68,7 @@ def get_calls_by_date_range(
 # SPEAKER QUERIES
 # ============================================================================
 
+
 def get_speakers_for_call(call_id: UUID) -> list[dict[str, Any]]:
     """Get all speakers for a call."""
     return fetch_all(
@@ -112,6 +108,7 @@ def get_reps_list() -> list[dict[str, Any]]:
 # ============================================================================
 # TRANSCRIPT QUERIES
 # ============================================================================
+
 
 def get_full_transcript(call_id: UUID) -> str:
     """Get full transcript for a call as single string."""
@@ -172,6 +169,7 @@ def search_transcripts(
 # ============================================================================
 # COACHING SESSION QUERIES
 # ============================================================================
+
 
 def get_coaching_sessions_for_call(
     call_id: UUID,
@@ -263,6 +261,7 @@ def get_call_analysis_status(call_id: UUID) -> dict[str, Any] | None:
 # ANALYTICS QUERIES
 # ============================================================================
 
+
 def get_score_trends_for_rep(
     rep_email: str,
     dimension: CoachingDimension,
@@ -338,6 +337,7 @@ def get_top_performers(
 # ============================================================================
 # OPPORTUNITY QUERIES
 # ============================================================================
+
 
 def upsert_opportunity(opp_data: dict[str, Any]) -> str:
     """
@@ -667,6 +667,7 @@ def update_sync_status(
 # STAFF ROLE QUERIES
 # ============================================================================
 
+
 def get_staff_role(email: str) -> str | None:
     """
     Get role assignment for staff member by email.
@@ -762,6 +763,7 @@ def get_prefect_staff() -> list[dict[str, Any]]:
 # ============================================================================
 # COACHING FEEDBACK QUERIES
 # ============================================================================
+
 
 def get_feedback_for_session(coaching_session_id: str) -> list[dict[str, Any]]:
     """Get all feedback for a coaching session."""
@@ -914,23 +916,27 @@ def get_coaching_quality_issues(
 
     # Issue 1: Low accuracy
     if (stats["accuracy_rate"] or 0) < 80:
-        issues.append({
-            "type": "low_accuracy",
-            "severity": "high",
-            "message": f"Coaching accuracy is {stats['accuracy_rate']}% (target: 90%+)",
-            "metric_value": stats["accuracy_rate"],
-            "affected_count": stats["inaccurate_count"],
-        })
+        issues.append(
+            {
+                "type": "low_accuracy",
+                "severity": "high",
+                "message": f"Coaching accuracy is {stats['accuracy_rate']}% (target: 90%+)",
+                "metric_value": stats["accuracy_rate"],
+                "affected_count": stats["inaccurate_count"],
+            }
+        )
 
     # Issue 2: Low helpfulness
     if (stats["helpfulness_rate"] or 0) < 70:
-        issues.append({
-            "type": "low_helpfulness",
-            "severity": "medium",
-            "message": f"Coaching helpfulness is {stats['helpfulness_rate']}% (target: 80%+)",
-            "metric_value": stats["helpfulness_rate"],
-            "affected_count": stats["not_helpful_count"],
-        })
+        issues.append(
+            {
+                "type": "low_helpfulness",
+                "severity": "medium",
+                "message": f"Coaching helpfulness is {stats['helpfulness_rate']}% (target: 80%+)",
+                "metric_value": stats["helpfulness_rate"],
+                "affected_count": stats["not_helpful_count"],
+            }
+        )
 
     # Issue 3: High missing context
     missing_context_rate = (
@@ -940,13 +946,15 @@ def get_coaching_quality_issues(
     )
 
     if missing_context_rate > 20:
-        issues.append({
-            "type": "missing_context",
-            "severity": "medium",
-            "message": f"{missing_context_rate:.0f}% of feedback indicates missing context in coaching",
-            "metric_value": missing_context_rate,
-            "affected_count": stats["missing_context_count"],
-        })
+        issues.append(
+            {
+                "type": "missing_context",
+                "severity": "medium",
+                "message": f"{missing_context_rate:.0f}% of feedback indicates missing context in coaching",
+                "metric_value": missing_context_rate,
+                "affected_count": stats["missing_context_count"],
+            }
+        )
 
     return sorted(issues, key=lambda x: {"high": 0, "medium": 1, "low": 2}[x["severity"]])
 

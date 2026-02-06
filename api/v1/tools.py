@@ -6,24 +6,26 @@ These endpoints provide stable interfaces to MCP tools with:
 - Backward compatibility guarantees
 - Deprecation warnings when needed
 """
+
 import logging
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
+from analysis.learning_insights import get_learning_insights
+from analysis.opportunity_coaching import (
+    analyze_objection_progression,
+    analyze_opportunity_patterns,
+    assess_relationship_strength,
+    generate_coaching_recommendations,
+    identify_recurring_themes,
+)
+
 # Import MCP tool implementations
 from coaching_mcp.tools.analyze_call import analyze_call_tool
 from coaching_mcp.tools.get_rep_insights import get_rep_insights_tool
 from coaching_mcp.tools.search_calls import search_calls_tool
-from analysis.opportunity_coaching import (
-    analyze_opportunity_patterns,
-    identify_recurring_themes,
-    analyze_objection_progression,
-    assess_relationship_strength,
-    generate_coaching_recommendations,
-)
-from analysis.learning_insights import get_learning_insights
 from db import queries
 
 logger = logging.getLogger(__name__)
@@ -35,8 +37,10 @@ router = APIRouter()
 # REQUEST/RESPONSE SCHEMAS (v1)
 # ============================================================================
 
+
 class AnalyzeCallRequestV1(BaseModel):
     """Request schema for call analysis (v1)."""
+
     call_id: str = Field(..., description="Gong call ID to analyze")
     dimensions: list[str] | None = Field(None, description="Dimensions to analyze")
     use_cache: bool = Field(True, description="Use cached results if available")
@@ -46,6 +50,7 @@ class AnalyzeCallRequestV1(BaseModel):
 
 class RepInsightsRequestV1(BaseModel):
     """Request schema for rep insights (v1)."""
+
     rep_email: str = Field(..., description="Email of the sales rep")
     time_period: str = Field("last_30_days", description="Time period for analysis")
     product_filter: str | None = Field(None, description="Filter by product")
@@ -53,6 +58,7 @@ class RepInsightsRequestV1(BaseModel):
 
 class SearchCallsRequestV1(BaseModel):
     """Request schema for call search (v1)."""
+
     rep_email: str | None = None
     product: str | None = None
     call_type: str | None = None
@@ -67,17 +73,20 @@ class SearchCallsRequestV1(BaseModel):
 
 class AnalyzeOpportunityRequestV1(BaseModel):
     """Request schema for opportunity analysis (v1)."""
+
     opportunity_id: str = Field(..., description="UUID of the opportunity")
 
 
 class LearningInsightsRequestV1(BaseModel):
     """Request schema for learning insights (v1)."""
+
     rep_email: str = Field(..., description="Email of the sales rep")
     focus_area: str = Field("discovery", description="Area to focus on")
 
 
 class PaginatedResponse(BaseModel):
     """Generic paginated response (v1)."""
+
     items: list[Any]
     total: int
     page: int
@@ -88,6 +97,7 @@ class PaginatedResponse(BaseModel):
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
+
 
 @router.post("/analyze_call", response_model=dict[str, Any])
 async def analyze_call_v1(request: AnalyzeCallRequestV1) -> dict[str, Any]:
@@ -165,7 +175,7 @@ async def search_calls_v1(request: SearchCallsRequestV1) -> dict[str, Any]:
                 "page": request.offset // request.limit if request.limit > 0 else 0,
                 "page_size": request.limit,
                 "has_next": len(result) == request.limit,
-            }
+            },
         }
     except Exception as e:
         logger.error(f"Error searching calls: {e}")
@@ -185,10 +195,7 @@ async def analyze_opportunity_v1(request: AnalyzeOpportunityRequestV1) -> dict[s
         # Verify opportunity exists
         opp = queries.get_opportunity(opportunity_id)
         if not opp:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Opportunity not found: {opportunity_id}"
-            )
+            raise HTTPException(status_code=404, detail=f"Opportunity not found: {opportunity_id}")
 
         # Run all analyses
         patterns = analyze_opportunity_patterns(opportunity_id)
@@ -213,7 +220,7 @@ async def analyze_opportunity_v1(request: AnalyzeOpportunityRequestV1) -> dict[s
                 "objections": objections,
                 "relationship": relationship,
                 "recommendations": recommendations,
-            }
+            },
         }
     except HTTPException:
         raise

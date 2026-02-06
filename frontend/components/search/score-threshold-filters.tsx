@@ -10,10 +10,7 @@ interface ScoreThresholdFiltersProps {
   onFiltersChange: (filters: Partial<SearchCallsRequest>) => void;
 }
 
-export function ScoreThresholdFilters({
-  filters,
-  onFiltersChange,
-}: ScoreThresholdFiltersProps) {
+export function ScoreThresholdFilters({ filters, onFiltersChange }: ScoreThresholdFiltersProps) {
   const updateFilter = (key: keyof SearchCallsRequest, value: string) => {
     const numValue = value ? Number(value) : undefined;
     onFiltersChange({
@@ -31,9 +28,7 @@ export function ScoreThresholdFilters({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Minimum Score */}
           <div className="space-y-2">
-            <Label htmlFor="min-score">
-              Minimum Overall Score (0-100)
-            </Label>
+            <Label htmlFor="min-score">Minimum Overall Score (0-100)</Label>
             <Input
               id="min-score"
               type="number"
@@ -47,9 +42,7 @@ export function ScoreThresholdFilters({
 
           {/* Maximum Score */}
           <div className="space-y-2">
-            <Label htmlFor="max-score">
-              Maximum Overall Score (0-100)
-            </Label>
+            <Label htmlFor="max-score">Maximum Overall Score (0-100)</Label>
             <Input
               id="max-score"
               type="number"
@@ -63,14 +56,10 @@ export function ScoreThresholdFilters({
         </div>
 
         <div className="mt-4 text-sm text-muted-foreground">
-          <p>
-            Filter calls by overall performance score. Leave blank for no
-            restriction.
-          </p>
+          <p>Filter calls by overall performance score. Leave blank for no restriction.</p>
           {filters.min_score !== undefined && filters.max_score !== undefined && (
             <p className="mt-2 font-medium text-foreground">
-              Showing calls with scores between {filters.min_score} and{" "}
-              {filters.max_score}
+              Showing calls with scores between {filters.min_score} and {filters.max_score}
             </p>
           )}
         </div>

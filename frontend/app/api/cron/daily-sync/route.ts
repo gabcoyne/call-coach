@@ -11,10 +11,10 @@
  * - Manual testing: POST to /api/cron/daily-sync with Authorization: Bearer <CRON_SECRET>
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import path from 'path';
+import { NextRequest, NextResponse } from "next/server";
+import { exec } from "child_process";
+import { promisify } from "util";
+import path from "path";
 
 const execAsync = promisify(exec);
 
@@ -22,11 +22,11 @@ const execAsync = promisify(exec);
  * Verify the request is from Vercel Cron or authenticated with CRON_SECRET
  */
 function isAuthorized(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
+  const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret) {
-    console.warn('CRON_SECRET not configured - cron job is unprotected!');
+    console.warn("CRON_SECRET not configured - cron job is unprotected!");
     return true; // Allow in development
   }
 
@@ -35,7 +35,7 @@ function isAuthorized(request: NextRequest): boolean {
     return true;
   }
 
-  console.error('Unauthorized cron request - invalid or missing Authorization header');
+  console.error("Unauthorized cron request - invalid or missing Authorization header");
   return false;
 }
 
@@ -43,11 +43,11 @@ function isAuthorized(request: NextRequest): boolean {
  * Execute Python sync script using uv
  */
 async function runSync(): Promise<{ status: string; output?: string; error?: string }> {
-  const projectRoot = path.resolve(process.cwd(), '..');
-  const scriptPath = 'flows.daily_gong_sync';
+  const projectRoot = path.resolve(process.cwd(), "..");
+  const scriptPath = "flows.daily_gong_sync";
 
   try {
-    console.log('Starting daily Gong sync...');
+    console.log("Starting daily Gong sync...");
     console.log(`Project root: ${projectRoot}`);
 
     // Execute Python script with uv
@@ -65,23 +65,23 @@ async function runSync(): Promise<{ status: string; output?: string; error?: str
       }
     );
 
-    console.log('Sync completed successfully');
-    console.log('STDOUT:', stdout);
+    console.log("Sync completed successfully");
+    console.log("STDOUT:", stdout);
     if (stderr) {
-      console.warn('STDERR:', stderr);
+      console.warn("STDERR:", stderr);
     }
 
     return {
-      status: 'success',
+      status: "success",
       output: stdout,
     };
   } catch (error: any) {
-    console.error('Sync failed:', error);
+    console.error("Sync failed:", error);
 
     return {
-      status: 'failed',
-      error: error.message || 'Unknown error',
-      output: error.stdout || '',
+      status: "failed",
+      error: error.message || "Unknown error",
+      output: error.stdout || "",
     };
   }
 }
@@ -94,10 +94,7 @@ async function runSync(): Promise<{ status: string; output?: string; error?: str
 export async function POST(request: NextRequest) {
   // Verify authorization
   if (!isAuthorized(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const startTime = new Date().toISOString();
@@ -109,13 +106,13 @@ export async function POST(request: NextRequest) {
 
     const endTime = new Date().toISOString();
     const response = {
-      job: 'daily-gong-sync',
+      job: "daily-gong-sync",
       startTime,
       endTime,
       ...result,
     };
 
-    if (result.status === 'success') {
+    if (result.status === "success") {
       console.log(`[${endTime}] Daily sync completed successfully`);
       return NextResponse.json(response, { status: 200 });
     } else {
@@ -132,11 +129,11 @@ export async function POST(request: NextRequest) {
     // Return 500 for unexpected errors
     return NextResponse.json(
       {
-        job: 'daily-gong-sync',
+        job: "daily-gong-sync",
         startTime,
         endTime,
-        status: 'error',
-        error: error.message || 'Internal server error',
+        status: "error",
+        error: error.message || "Internal server error",
       },
       { status: 500 }
     );
@@ -152,14 +149,14 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   // Don't require auth for GET - just returns config
   return NextResponse.json({
-    job: 'daily-gong-sync',
-    schedule: '0 6 * * *',
-    description: 'Syncs opportunities, calls, and emails from Gong API',
+    job: "daily-gong-sync",
+    schedule: "0 6 * * *",
+    description: "Syncs opportunities, calls, and emails from Gong API",
     configured: !!process.env.CRON_SECRET,
-    nextRun: 'Daily at 6:00 AM UTC',
+    nextRun: "Daily at 6:00 AM UTC",
   });
 }
 
 // Export runtime config for Vercel
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
 export const maxDuration = 300; // 5 minutes

@@ -15,6 +15,7 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 **Purpose**: Validate code quality and functionality
 
 **Components**:
+
 - **Lint Job**: Ruff formatting checks (auto-fix available)
 - **Type Check Job**: MyPy static type checking
 - **Python Tests Job**:
@@ -26,11 +27,13 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
   - E2E tests with Playwright
 
 **Triggers**:
+
 - Every push to main/develop branches
 - Every pull request to main/develop
 - On changes to Python/TypeScript files, configs, or CI files
 
 **Key Features**:
+
 - Separate jobs for fast failure feedback
 - Coverage enforcement (fails if < 70%)
 - Codecov API integration for artifact tracking
@@ -41,15 +44,18 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 **Purpose**: Build and push Docker images to GitHub Container Registry
 
 **Images Built**:
+
 1. `ghcr.io/{owner}/call-coach-mcp:tag` - FastMCP server
 2. `ghcr.io/{owner}/call-coach-webhook:tag` - Webhook server
 
 **Tagging Strategy**:
+
 - Branch name (e.g., `develop`, `main`)
 - Commit SHA with branch (e.g., `develop-abc123`)
 - Semantic version tags on releases
 
 **Features**:
+
 - Docker buildx for multi-platform support
 - Layer caching for faster builds
 - GitHub Container Registry integration
@@ -60,6 +66,7 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 **Purpose**: Automatic deployment to staging on develop branch
 
 **Deployment Pipeline**:
+
 1. Database migration (with backup)
 2. Docker image build and push
 3. Frontend deployment to Vercel (staging project)
@@ -68,6 +75,7 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 6. Health checks and verification
 
 **Features**:
+
 - Automatic on `develop` branch changes
 - Database migration prerequisites
 - Frontend + backend coordinated deployment
@@ -75,6 +83,7 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 - Deployment status notifications
 
 **Required Secrets**:
+
 - Database URLs and credentials
 - API endpoints
 - Vercel tokens and project IDs
@@ -88,6 +97,7 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 **Triggers**: Version tags (semantic versioning: `v1.0.0`)
 
 **Safety Features**:
+
 - Full test suite must pass (coverage >= 80%)
 - Pre-deployment backup
 - Database migration validation
@@ -95,6 +105,7 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 - GitHub release creation with changelog
 
 **Deployment Steps**:
+
 1. Validate version tag format
 2. Run comprehensive test suite (80% coverage minimum)
 3. Build production Docker images
@@ -106,6 +117,7 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 9. Publish to PyPI
 
 **Features**:
+
 - Semantic versioning enforcement
 - Changelog auto-generation from commits
 - Production vs staging artifact management
@@ -117,10 +129,12 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 **Purpose**: Safe, auditable database migrations
 
 **Triggers**:
+
 - Manual via `workflow_dispatch` input
 - Automatic on migration file changes (develop/main)
 
 **Migration Safety**:
+
 1. Pre-migration validation
 2. Automatic backup creation
 3. Migration execution with logging
@@ -129,6 +143,7 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 6. Migration audit logging
 
 **Features**:
+
 - Environment selection (staging/production)
 - Target version specification (optional)
 - Failure notifications
@@ -136,6 +151,7 @@ A production-ready CI/CD pipeline has been implemented for the call-coach projec
 - Rollback procedures
 
 **Usage**:
+
 ```bash
 gh workflow run migrate.yml -f environment=staging
 ```
@@ -147,23 +163,27 @@ gh workflow run migrate.yml -f environment=staging
 **Scanning Tools**:
 
 1. **Dependency Scanning**:
+
    - `pip-audit` - Python dependencies
    - `npm audit` - Node.js dependencies
    - Vulnerability severity reporting
    - SBOM generation
 
 2. **Code Security**:
+
    - `Bandit` - Python security issues
    - `Semgrep` - Semantic code patterns
    - `CodeQL` - GitHub's advanced analysis
    - Pattern-based vulnerability detection
 
 3. **Container Security**:
+
    - `Trivy` - Container image scanning
    - Layer vulnerability analysis
    - Runtime environment checks
 
 4. **Compliance**:
+
    - License compliance checking
    - `pip-licenses` - Python package licenses
    - License conflict detection
@@ -174,6 +194,7 @@ gh workflow run migrate.yml -f environment=staging
    - Pattern matching for credentials
 
 **Features**:
+
 - SARIF report integration with GitHub Security tab
 - Weekly scheduled scans
 - Artifact uploads for auditing
@@ -181,6 +202,7 @@ gh workflow run migrate.yml -f environment=staging
 - Security summary report
 
 **Triggers**:
+
 - Every push and PR
 - Weekly schedule (Monday 2 AM UTC)
 - On dependency file changes
@@ -190,11 +212,13 @@ gh workflow run migrate.yml -f environment=staging
 **Purpose**: Automated semantic versioning and release process
 
 **Version Calculation**:
+
 - Major, Minor, Patch bump support
 - Prerelease versions (alpha, beta, rc)
 - Semantic versioning validation
 
 **Release Steps**:
+
 1. Calculate next version
 2. Generate changelog from commits
 3. Update version in `pyproject.toml`
@@ -207,12 +231,14 @@ gh workflow run migrate.yml -f environment=staging
 10. Cleanup release branch
 
 **Changelog Generation**:
+
 - Automatic from commit messages
 - Categorization by type (feat, fix, docs, etc.)
 - Author attribution
 - Commit SHA references
 
 **Usage**:
+
 ```bash
 # Via GitHub CLI
 gh workflow run release.yml -f version_type=minor
@@ -226,6 +252,7 @@ gh workflow run release.yml -f version_type=minor
 ### 1. Branch Protection Rules (`.github/CODEOWNERS`)
 
 **Code Ownership**:
+
 - Python modules owned by project maintainers
 - CI/CD configuration protected
 - Database migrations protected
@@ -236,18 +263,21 @@ gh workflow run release.yml -f version_type=minor
 ### 2. Helper Scripts (in `scripts/ci/`)
 
 **`setup-secrets.sh`**:
+
 - Interactive secret configuration
 - Secret verification
 - gh CLI integration
 - Support for all required secrets
 
 **`setup-branch-protection.sh`**:
+
 - Automated branch rule configuration
 - CODEOWNERS file management
 - Status check enforcement
 - PR review requirements
 
 **`run-tests-locally.sh`**:
+
 - Lint tests: `./run-tests-locally.sh lint`
 - Type checking: `./run-tests-locally.sh type-check`
 - Unit tests: `./run-tests-locally.sh unit`
@@ -258,6 +288,7 @@ gh workflow run release.yml -f version_type=minor
 ### 3. Documentation
 
 **`scripts/ci/README.md`**:
+
 - Comprehensive 500+ line guide
 - Environment variable reference
 - Local testing instructions
@@ -265,12 +296,14 @@ gh workflow run release.yml -f version_type=minor
 - Best practices
 
 **`.github/CICD_QUICK_START.md`**:
+
 - 5-minute setup guide
 - Quick reference for common tasks
 - Next steps checklist
 - Common troubleshooting
 
 **`.github/CI_CD_IMPLEMENTATION_SUMMARY.md`**:
+
 - This document
 - Implementation overview
 - Feature descriptions
@@ -280,25 +313,27 @@ gh workflow run release.yml -f version_type=minor
 
 ### Workflow Statistics
 
-| Workflow | Jobs | Conditions | Artifacts |
-|----------|------|-----------|-----------|
-| tests.yml | 5 | PR + Push | Coverage reports |
-| build.yml | 3 | Push | Docker images |
-| deploy-staging.yml | 4 | develop push | Logs |
-| deploy-production.yml | 6 | version tags | Release notes |
-| migrate.yml | 4 | Manual + Migration changes | Migration logs |
-| security.yml | 9 | PR + Push + Schedule | SARIF, SBOMs |
-| release.yml | 6 | Manual + Workflow_dispatch | Release artifacts |
+| Workflow              | Jobs | Conditions                 | Artifacts         |
+| --------------------- | ---- | -------------------------- | ----------------- |
+| tests.yml             | 5    | PR + Push                  | Coverage reports  |
+| build.yml             | 3    | Push                       | Docker images     |
+| deploy-staging.yml    | 4    | develop push               | Logs              |
+| deploy-production.yml | 6    | version tags               | Release notes     |
+| migrate.yml           | 4    | Manual + Migration changes | Migration logs    |
+| security.yml          | 9    | PR + Push + Schedule       | SARIF, SBOMs      |
+| release.yml           | 6    | Manual + Workflow_dispatch | Release artifacts |
 
 ### Dependencies & Tools
 
 **Installed via Actions**:
+
 - Python 3.11, 3.12 (testing matrix)
 - Node.js 18 (frontend)
 - Docker buildx (image building)
 - Various security scanners
 
 **Required Secrets** (23 total):
+
 - Database URLs (2)
 - API Endpoints (4)
 - Frontend URLs (2)
@@ -341,6 +376,7 @@ gh workflow run release.yml -f version_type=minor
 ### Environment Variables & Secrets
 
 **Required to configure** (see `setup-secrets.sh`):
+
 ```
 Staging Database, API, Frontend URLs
 Production Database, API URLs
@@ -520,7 +556,7 @@ scripts/ci/
 - **Local testing guide**: Run `scripts/ci/run-tests-locally.sh help`
 - **Comprehensive docs**: See `scripts/ci/README.md`
 - **Quick reference**: See `.github/CICD_QUICK_START.md`
-- **GitHub Actions docs**: https://docs.github.com/actions
+- **GitHub Actions docs**: <https://docs.github.com/actions>
 
 ## Conclusion
 

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { Card } from '@/components/ui/card';
+import { useState, useMemo } from "react";
+import { Card } from "@/components/ui/card";
 
 export interface ActivityDay {
   date: string; // YYYY-MM-DD format
@@ -17,7 +17,7 @@ export interface ActivityTimelineProps {
   /** End date for the calendar view (YYYY-MM-DD) */
   endDate?: string;
   /** Show coaching sessions count or calls count */
-  metric?: 'calls' | 'coachingSessions';
+  metric?: "calls" | "coachingSessions";
   /** Optional className for additional styling */
   className?: string;
 }
@@ -33,13 +33,13 @@ export function ActivityTimeline({
   data,
   startDate,
   endDate,
-  metric = 'calls',
-  className = '',
+  metric = "calls",
+  className = "",
 }: ActivityTimelineProps) {
   // Convert activity data to a map for quick lookup
   const activityMap = useMemo(() => {
     const map = new Map<string, number>();
-    data.forEach(item => {
+    data.forEach((item) => {
       map.set(item.date, item.count);
     });
     return map;
@@ -47,7 +47,7 @@ export function ActivityTimeline({
 
   // Calculate max activity for color scaling
   const maxActivity = useMemo(() => {
-    return Math.max(...data.map(d => d.count), 1);
+    return Math.max(...data.map((d) => d.count), 1);
   }, [data]);
 
   // Generate date range
@@ -66,7 +66,7 @@ export function ActivityTimeline({
     const currentDate = new Date(start);
 
     while (currentDate <= end) {
-      const dateString = currentDate.toISOString().split('T')[0];
+      const dateString = currentDate.toISOString().split("T")[0];
       dates.push({ date: dateString, fullDate: new Date(currentDate) });
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -95,26 +95,41 @@ export function ActivityTimeline({
 
   // Get color intensity based on activity count
   const getActivityColor = (count: number) => {
-    if (count === 0) return 'bg-gray-100';
+    if (count === 0) return "bg-gray-100";
     const intensity = (count / maxActivity) * 4; // 4 intensity levels
     const level = Math.ceil(intensity);
 
     const colors = {
-      1: 'bg-blue-100',
-      2: 'bg-blue-300',
-      3: 'bg-blue-500',
-      4: 'bg-blue-700',
+      1: "bg-blue-100",
+      2: "bg-blue-300",
+      3: "bg-blue-500",
+      4: "bg-blue-700",
     };
 
-    return colors[level as 1 | 2 | 3 | 4] || 'bg-blue-700';
+    return colors[level as 1 | 2 | 3 | 4] || "bg-blue-700";
   };
 
-  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const monthLabels = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   if (!dateRange || dateRange.length === 0) {
     return (
-      <div className={`flex items-center justify-center border rounded-lg bg-gray-50 h-40 ${className}`}>
+      <div
+        className={`flex items-center justify-center border rounded-lg bg-gray-50 h-40 ${className}`}
+      >
         <p className="text-gray-500 text-sm">No activity data available</p>
       </div>
     );
@@ -126,7 +141,7 @@ export function ActivityTimeline({
         {/* Title and Legend */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {metric === 'calls' ? 'Call Activity' : 'Coaching Sessions'} Timeline
+            {metric === "calls" ? "Call Activity" : "Coaching Sessions"} Timeline
           </h3>
           <div className="flex items-center gap-4 text-sm">
             <span className="text-gray-600">Less</span>
@@ -147,7 +162,7 @@ export function ActivityTimeline({
             {/* Day labels column */}
             <div className="flex flex-col justify-center gap-1 text-xs text-gray-500 font-medium">
               <div className="h-6" /> {/* Space for month labels */}
-              {dayLabels.map(day => (
+              {dayLabels.map((day) => (
                 <div key={day} className="h-5 flex items-center justify-end pr-2">
                   {day}
                 </div>
@@ -161,21 +176,21 @@ export function ActivityTimeline({
                   {/* Month label */}
                   <div className="h-6 flex items-end mb-1">
                     <span className="text-xs text-gray-500 font-medium">
-                      {week.length > 0 ? monthLabels[week[0].fullDate.getMonth()] : ''}
+                      {week.length > 0 ? monthLabels[week[0].fullDate.getMonth()] : ""}
                     </span>
                   </div>
 
                   {/* Days */}
-                  {week.map(dateObj => {
+                  {week.map((dateObj) => {
                     const count = activityMap.get(dateObj.date) || 0;
                     const isHighActivity = count > maxActivity * 0.75;
 
                     return (
                       <div
                         key={dateObj.date}
-                        className={`w-5 h-5 border border-gray-300 rounded hover:border-gray-500 cursor-pointer transition-all ${getActivityColor(count)} ${
-                          isHighActivity ? 'ring-2 ring-orange-400' : ''
-                        }`}
+                        className={`w-5 h-5 border border-gray-300 rounded hover:border-gray-500 cursor-pointer transition-all ${getActivityColor(
+                          count
+                        )} ${isHighActivity ? "ring-2 ring-orange-400" : ""}`}
                         title={`${dateObj.date}: ${count} ${metric}`}
                       />
                     );
@@ -197,7 +212,9 @@ export function ActivityTimeline({
           <div>
             <p className="text-xs text-gray-500 font-medium">Average per Day</p>
             <p className="text-lg font-semibold text-gray-900">
-              {dateRange.length > 0 ? Math.round(data.reduce((sum, d) => sum + d.count, 0) / dateRange.length) : 0}
+              {dateRange.length > 0
+                ? Math.round(data.reduce((sum, d) => sum + d.count, 0) / dateRange.length)
+                : 0}
             </p>
           </div>
           <div>

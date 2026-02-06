@@ -6,7 +6,7 @@
     {
       "id": "value_realization",
       "name": "Value Realization Tracking",
-      "weight": 0.30,
+      "weight": 0.3,
       "criteria": [
         "Tracks metrics showing customer ROI and value from Prefect",
         "Identifies blockers preventing customers from realizing expected value",
@@ -42,7 +42,7 @@
     {
       "id": "relationship_depth",
       "name": "Relationship Depth",
-      "weight": 0.20,
+      "weight": 0.2,
       "criteria": [
         "Builds trusted advisor relationship with customer stakeholders",
         "Demonstrates genuine partnership and investment in customer success",
@@ -78,7 +78,7 @@
     {
       "id": "product_adoption",
       "name": "Product Adoption Coaching",
-      "weight": 0.10,
+      "weight": 0.1,
       "criteria": [
         "Identifies underutilized features that could drive more value",
         "Provides practical guidance on best practices and implementation patterns",

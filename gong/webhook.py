@@ -2,17 +2,19 @@
 Webhook handler for Gong call completed events.
 Implements HMAC-SHA256 signature verification for security.
 """
+
 import hashlib
 import hmac
 import logging
 from typing import Any
 
-from fastapi import APIRouter, Request, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import ValidationError
 
 from coaching_mcp.shared import settings
 from db import execute_query, fetch_one
 from db.models import WebhookEvent, WebhookEventStatus
+
 from .types import GongWebhookPayload
 
 logger = logging.getLogger(__name__)

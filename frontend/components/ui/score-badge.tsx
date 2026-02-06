@@ -26,9 +26,7 @@ export function ScoreBadge({
   };
 
   const variant = getVariant(percentage);
-  const displayValue = showPercentage
-    ? `${Math.round(percentage)}%`
-    : `${score}/${maxScore}`;
+  const displayValue = showPercentage ? `${Math.round(percentage)}%` : `${score}/${maxScore}`;
 
   return (
     <Badge variant={variant} className={cn("font-semibold", className)}>
@@ -55,19 +53,12 @@ export function DimensionScoreCard({
   const percentage = (score / maxScore) * 100;
 
   return (
-    <div
-      className={cn(
-        "rounded-lg border bg-card p-4 space-y-2",
-        className
-      )}
-    >
+    <div className={cn("rounded-lg border bg-card p-4 space-y-2", className)}>
       <div className="flex items-center justify-between">
         <h4 className="font-semibold">{dimension}</h4>
         <ScoreBadge score={score} maxScore={maxScore} />
       </div>
-      {description && (
-        <p className="text-sm text-muted-foreground">{description}</p>
-      )}
+      {description && <p className="text-sm text-muted-foreground">{description}</p>}
       <div className="space-y-1">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>Progress</span>

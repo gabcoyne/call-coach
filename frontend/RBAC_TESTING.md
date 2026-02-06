@@ -5,6 +5,7 @@ This document provides testing procedures to verify that role-based access contr
 ## Prerequisites
 
 Before testing, ensure you have:
+
 1. Two test users in Clerk Dashboard:
    - **Manager test user** with `publicMetadata.role = "manager"`
    - **Rep test user** with `publicMetadata.role = "rep"` (or no role set)
@@ -16,6 +17,7 @@ Before testing, ensure you have:
 **Objective:** Verify managers can access all reps' data
 
 **Steps:**
+
 1. Sign in as the manager test user
 2. Navigate to `/dashboard`
 3. Verify you see a list of all reps (manager view)
@@ -24,12 +26,14 @@ Before testing, ensure you have:
 6. Verify you can view the rep's data and insights
 
 **Expected Results:**
+
 - Manager sees team overview on `/dashboard`
 - Manager can access any rep's individual dashboard
 - Manager-only features are visible (e.g., Rep Selector, team analytics)
 - No access denied errors
 
 **Acceptance Criteria:**
+
 - [ ] Manager dashboard shows all reps
 - [ ] Can navigate to any rep's dashboard
 - [ ] Manager-only UI elements are visible
@@ -42,6 +46,7 @@ Before testing, ensure you have:
 **Objective:** Verify reps can only access their own data
 
 **Steps:**
+
 1. Sign in as the rep test user
 2. Navigate to `/dashboard`
 3. Verify you are automatically directed to your own dashboard
@@ -49,12 +54,14 @@ Before testing, ensure you have:
 5. Verify you are redirected to your own dashboard or see a 403 error
 
 **Expected Results:**
+
 - Rep only sees their own dashboard
 - Attempting to view another rep's data results in redirect or 403 error
 - Manager-only features are hidden
 - Rep can view their own calls and insights
 
 **Acceptance Criteria:**
+
 - [ ] Rep sees only their own dashboard
 - [ ] Cannot access other reps' dashboards
 - [ ] Manager-only features are hidden
@@ -68,21 +75,23 @@ Before testing, ensure you have:
 
 **Features to Check:**
 
-| Feature | Manager (Visible) | Rep (Hidden) |
-|---------|-------------------|--------------|
-| Team overview on `/dashboard` | ✅ | ❌ |
-| Rep selector dropdown | ✅ | ❌ |
-| Team analytics | ✅ | ❌ |
-| All reps' call history | ✅ | ❌ |
-| Team-wide search filters | ✅ | ❌ |
+| Feature                       | Manager (Visible) | Rep (Hidden) |
+| ----------------------------- | ----------------- | ------------ |
+| Team overview on `/dashboard` | ✅                | ❌           |
+| Rep selector dropdown         | ✅                | ❌           |
+| Team analytics                | ✅                | ❌           |
+| All reps' call history        | ✅                | ❌           |
+| Team-wide search filters      | ✅                | ❌           |
 
 **Steps:**
+
 1. Sign in as manager and note which features are visible
 2. Sign out
 3. Sign in as rep
 4. Verify those same features are hidden
 
 **Acceptance Criteria:**
+
 - [ ] Rep selector is visible to managers only
 - [ ] Team overview is manager-only
 - [ ] Search page filters show "All Reps" for managers, disabled for reps
@@ -95,18 +104,21 @@ Before testing, ensure you have:
 **Objective:** Verify 403 error page displays for unauthorized access
 
 **Steps:**
+
 1. Sign in as rep
 2. Note your email address (e.g., `rep@test.com`)
 3. Try to navigate to `/dashboard/another-rep@test.com`
 4. Verify 403 page or redirect occurs
 
 **Expected Results:**
+
 - 403 error page is displayed, OR
 - Automatic redirect to own dashboard
 - Clear error message explaining lack of permission
 - "Go back" and "Go to dashboard" buttons work
 
 **Acceptance Criteria:**
+
 - [ ] 403 page displays with clear message
 - [ ] Error message is user-friendly
 - [ ] Navigation buttons work correctly
@@ -122,25 +134,25 @@ Before testing, ensure you have:
 
 ```typescript
 // Test with manager user object
-import { isManager, isRep, canViewRepData, getUserRole } from '@/lib/auth-utils';
+import { isManager, isRep, canViewRepData, getUserRole } from "@/lib/auth-utils";
 
 // Manager tests
-const managerUser = { publicMetadata: { role: 'manager' } };
+const managerUser = { publicMetadata: { role: "manager" } };
 console.assert(isManager(managerUser) === true);
 console.assert(isRep(managerUser) === false);
-console.assert(getUserRole(managerUser) === 'manager');
-console.assert(canViewRepData(managerUser, 'any@email.com') === true);
+console.assert(getUserRole(managerUser) === "manager");
+console.assert(canViewRepData(managerUser, "any@email.com") === true);
 
 // Rep tests
 const repUser = {
-  publicMetadata: { role: 'rep' },
-  emailAddresses: [{ emailAddress: 'rep@test.com' }]
+  publicMetadata: { role: "rep" },
+  emailAddresses: [{ emailAddress: "rep@test.com" }],
 };
 console.assert(isManager(repUser) === false);
 console.assert(isRep(repUser) === true);
-console.assert(getUserRole(repUser) === 'rep');
-console.assert(canViewRepData(repUser, 'rep@test.com') === true);
-console.assert(canViewRepData(repUser, 'other@test.com') === false);
+console.assert(getUserRole(repUser) === "rep");
+console.assert(canViewRepData(repUser, "rep@test.com") === true);
+console.assert(canViewRepData(repUser, "other@test.com") === false);
 
 // Default to rep when no role is set
 const noRoleUser = { publicMetadata: {} };
@@ -149,6 +161,7 @@ console.assert(isManager(noRoleUser) === false);
 ```
 
 **Acceptance Criteria:**
+
 - [ ] `isManager()` returns correct boolean
 - [ ] `isRep()` returns correct boolean
 - [ ] `canViewRepData()` enforces access rules
@@ -162,6 +175,7 @@ console.assert(isManager(noRoleUser) === false);
 **Objective:** Verify backend API enforces role-based access
 
 **Steps:**
+
 1. Sign in as rep
 2. Open browser DevTools Network tab
 3. Navigate to your own dashboard
@@ -171,12 +185,14 @@ console.assert(isManager(noRoleUser) === false);
 7. Verify backend returns 403 or filters data
 
 **Expected Results:**
+
 - Backend validates Clerk token
 - Rep can only fetch their own data via API
 - Manager can fetch any rep's data via API
 - 403 or empty response for unauthorized requests
 
 **Acceptance Criteria:**
+
 - [ ] API requests include Clerk auth token
 - [ ] Backend enforces role-based data access
 - [ ] Reps cannot access other reps' data via API
@@ -189,6 +205,7 @@ console.assert(isManager(noRoleUser) === false);
 **Objective:** Verify role changes take effect properly
 
 **Steps:**
+
 1. Sign in as rep
 2. Note current access level
 3. Have admin change role to "manager" in Clerk Dashboard
@@ -196,11 +213,13 @@ console.assert(isManager(noRoleUser) === false);
 5. Verify new manager access is active
 
 **Expected Results:**
+
 - Role change requires sign-out/sign-in to take effect
 - New role is immediately active after re-authentication
 - All manager features become accessible
 
 **Acceptance Criteria:**
+
 - [ ] Role changes require re-authentication
 - [ ] New role takes effect immediately after sign-in
 - [ ] No cached old role data
@@ -212,6 +231,7 @@ console.assert(isManager(noRoleUser) === false);
 **Objective:** Verify search results respect role-based access
 
 **Steps:**
+
 1. Sign in as manager
 2. Navigate to `/search`
 3. Verify "Rep Filter" dropdown is visible
@@ -222,11 +242,13 @@ console.assert(isManager(noRoleUser) === false);
 8. Verify search results only show your own calls
 
 **Expected Results:**
+
 - Managers see all reps' calls in search results
 - Reps only see their own calls
 - Rep filter is manager-only
 
 **Acceptance Criteria:**
+
 - [ ] Rep filter visible to managers
 - [ ] Rep filter hidden/disabled for reps
 - [ ] Search results filtered by role
@@ -240,31 +262,31 @@ For automated testing, use the following approach:
 
 ```typescript
 // __tests__/rbac/auth-utils.test.ts
-import { isManager, canViewRepData } from '@/lib/auth-utils';
+import { isManager, canViewRepData } from "@/lib/auth-utils";
 
-describe('RBAC Utilities', () => {
-  it('correctly identifies manager role', () => {
-    const manager = { publicMetadata: { role: 'manager' } };
+describe("RBAC Utilities", () => {
+  it("correctly identifies manager role", () => {
+    const manager = { publicMetadata: { role: "manager" } };
     expect(isManager(manager)).toBe(true);
   });
 
-  it('correctly identifies rep role', () => {
-    const rep = { publicMetadata: { role: 'rep' } };
+  it("correctly identifies rep role", () => {
+    const rep = { publicMetadata: { role: "rep" } };
     expect(isManager(rep)).toBe(false);
   });
 
-  it('managers can view all rep data', () => {
-    const manager = { publicMetadata: { role: 'manager' } };
-    expect(canViewRepData(manager, 'any@email.com')).toBe(true);
+  it("managers can view all rep data", () => {
+    const manager = { publicMetadata: { role: "manager" } };
+    expect(canViewRepData(manager, "any@email.com")).toBe(true);
   });
 
-  it('reps can only view own data', () => {
+  it("reps can only view own data", () => {
     const rep = {
-      publicMetadata: { role: 'rep' },
-      emailAddresses: [{ emailAddress: 'rep@test.com' }]
+      publicMetadata: { role: "rep" },
+      emailAddresses: [{ emailAddress: "rep@test.com" }],
     };
-    expect(canViewRepData(rep, 'rep@test.com')).toBe(true);
-    expect(canViewRepData(rep, 'other@test.com')).toBe(false);
+    expect(canViewRepData(rep, "rep@test.com")).toBe(true);
+    expect(canViewRepData(rep, "other@test.com")).toBe(false);
   });
 });
 ```
@@ -276,6 +298,7 @@ describe('RBAC Utilities', () => {
 ### Issue: Role not taking effect after assignment
 
 **Solution:**
+
 - Sign out completely
 - Clear browser cookies and localStorage
 - Sign back in
@@ -284,6 +307,7 @@ describe('RBAC Utilities', () => {
 ### Issue: 403 page not displaying
 
 **Solution:**
+
 - Check that `/app/403.tsx` exists
 - Verify redirect logic in page components
 - Check browser console for errors
@@ -291,6 +315,7 @@ describe('RBAC Utilities', () => {
 ### Issue: Manager sees rep view
 
 **Solution:**
+
 - Verify `publicMetadata.role = "manager"` in Clerk Dashboard
 - Check that role is exactly "manager" (lowercase)
 - Ensure no extra spaces in role value
@@ -298,6 +323,7 @@ describe('RBAC Utilities', () => {
 ### Issue: Rep can access other reps' data
 
 **Solution:**
+
 - Check that backend API enforces authorization
 - Verify `canViewRepData()` is being used
 - Review component-level access checks
@@ -332,6 +358,6 @@ Mark each test scenario as complete:
 - [ ] Test 7: Role changes take effect
 - [ ] Test 8: Search filtering respects roles
 
-**Testing completed by:** _______________
-**Date:** _______________
-**Verified by:** _______________
+**Testing completed by:** **\*\***\_\_\_**\*\***
+**Date:** **\*\***\_\_\_**\*\***
+**Verified by:** **\*\***\_\_\_**\*\***

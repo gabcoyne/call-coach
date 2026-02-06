@@ -55,17 +55,13 @@ interface OpportunityInsightsProps {
   opportunityId: string;
 }
 
-export function OpportunityInsights({
-  opportunityId,
-}: OpportunityInsightsProps) {
+export function OpportunityInsights({ opportunityId }: OpportunityInsightsProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [shouldFetch, setShouldFetch] = useState(false);
 
   // Only fetch when user expands for the first time
   const { data, error, isLoading } = useSWR<InsightsResponse>(
-    shouldFetch || isExpanded
-      ? `/api/opportunities/${opportunityId}/insights`
-      : null,
+    shouldFetch || isExpanded ? `/api/opportunities/${opportunityId}/insights` : null,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -96,17 +92,8 @@ export function OpportunityInsights({
             </div>
             AI Coaching Insights
           </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleExpanded}
-            className="ml-2"
-          >
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
+          <Button variant="ghost" size="sm" onClick={toggleExpanded} className="ml-2">
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </div>
         <p className="text-sm text-muted-foreground pl-12">
@@ -121,9 +108,7 @@ export function OpportunityInsights({
           ) : error ? (
             <div className="flex items-center gap-2 text-destructive pt-4">
               <AlertCircle className="h-4 w-4" />
-              <span className="text-sm">
-                Failed to load insights. Please try again.
-              </span>
+              <span className="text-sm">Failed to load insights. Please try again.</span>
             </div>
           ) : data ? (
             <div className="space-y-6 pt-4">
@@ -158,9 +143,7 @@ export function OpportunityInsights({
                         className="flex items-start justify-between p-3 rounded-lg bg-muted/50"
                       >
                         <div className="flex-1">
-                          <div className="font-medium text-sm">
-                            {obj.objection}
-                          </div>
+                          <div className="font-medium text-sm">{obj.objection}</div>
                           <div className="text-xs text-muted-foreground mt-1">
                             Mentioned {obj.frequency} time
                             {obj.frequency !== 1 ? "s" : ""}
@@ -171,8 +154,8 @@ export function OpportunityInsights({
                             obj.status === "resolved"
                               ? "success"
                               : obj.status === "partially_resolved"
-                              ? "warning"
-                              : "outline"
+                                ? "warning"
+                                : "outline"
                           }
                         >
                           {obj.status.replace("_", " ")}
@@ -194,9 +177,7 @@ export function OpportunityInsights({
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium">Score</span>
                       <Badge
-                        variant={getRelationshipColor(
-                          data.insights.relationship_strength.score
-                        )}
+                        variant={getRelationshipColor(data.insights.relationship_strength.score)}
                         className="text-base px-3"
                       >
                         {data.insights.relationship_strength.score}
@@ -204,9 +185,7 @@ export function OpportunityInsights({
                     </div>
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium">Trend</span>
-                      <Badge variant="outline">
-                        {data.insights.relationship_strength.trend}
-                      </Badge>
+                      <Badge variant="outline">{data.insights.relationship_strength.trend}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
                       {data.insights.relationship_strength.notes}
@@ -216,36 +195,29 @@ export function OpportunityInsights({
               )}
 
               {/* Recommendations */}
-              {data.insights.recommendations &&
-                data.insights.recommendations.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <Target className="h-4 w-4 text-blue-500" />
-                      <h3 className="font-semibold">
-                        Coaching Recommendations
-                      </h3>
-                    </div>
-                    <div className="space-y-2">
-                      {data.insights.recommendations.map(
-                        (recommendation, i) => (
-                          <div
-                            key={i}
-                            className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20"
-                          >
-                            <div className="flex-shrink-0 mt-0.5">
-                              <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
-                                {i + 1}
-                              </div>
-                            </div>
-                            <p className="text-sm text-foreground flex-1">
-                              {recommendation}
-                            </p>
-                          </div>
-                        )
-                      )}
-                    </div>
+              {data.insights.recommendations && data.insights.recommendations.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="h-4 w-4 text-blue-500" />
+                    <h3 className="font-semibold">Coaching Recommendations</h3>
                   </div>
-                )}
+                  <div className="space-y-2">
+                    {data.insights.recommendations.map((recommendation, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20"
+                      >
+                        <div className="flex-shrink-0 mt-0.5">
+                          <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
+                            {i + 1}
+                          </div>
+                        </div>
+                        <p className="text-sm text-foreground flex-1">{recommendation}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Generated timestamp */}
               <div className="text-xs text-muted-foreground pt-4 border-t">

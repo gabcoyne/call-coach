@@ -16,6 +16,7 @@ Quick reference for deploying Call Coach to Vercel.
 ### 2. Environment Variables
 
 Run verification:
+
 ```bash
 bash scripts/verify-deployment-config.sh
 ```
@@ -23,19 +24,22 @@ bash scripts/verify-deployment-config.sh
 Required variables (set in Vercel dashboard):
 
 #### Authentication
-- [ ] `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` (pk_live_*)
-- [ ] `CLERK_SECRET_KEY` (sk_live_*)
+
+- [ ] `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` (pk*live*\*)
+- [ ] `CLERK_SECRET_KEY` (sk*live*\*)
 - [ ] `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
 - [ ] `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
 - [ ] `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard`
 - [ ] `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard`
 
 #### Database
+
 - [ ] `DATABASE_URL` (Neon pooler endpoint)
 - [ ] `DATABASE_POOL_MIN_SIZE=2`
 - [ ] `DATABASE_POOL_MAX_SIZE=10`
 
 #### APIs
+
 - [ ] `GONG_API_KEY`
 - [ ] `GONG_API_SECRET`
 - [ ] `GONG_WEBHOOK_SECRET`
@@ -43,6 +47,7 @@ Required variables (set in Vercel dashboard):
 - [ ] `ANTHROPIC_API_KEY`
 
 #### Application
+
 - [ ] `NEXT_PUBLIC_APP_URL=https://coaching.prefect.io`
 - [ ] `CRON_SECRET` (generate with: `openssl rand -base64 32`)
 
@@ -152,15 +157,18 @@ Check logs in Vercel dashboard > Functions.
 ### Key Features
 
 1. **Build Configuration**
+
    - Builds frontend from root directory
    - Outputs to `frontend/.next`
    - Uses Next.js framework detection
 
 2. **Serverless Functions**
+
    - Standard API routes: 30s timeout, 1GB memory
    - Cron job: 300s timeout, 3GB memory (for large syncs)
 
 3. **Cron Jobs**
+
    - Daily sync at 6am UTC
    - Authenticated with `CRON_SECRET`
    - Syncs opportunities, calls, and emails
@@ -181,6 +189,7 @@ DATABASE_POOL_MAX_SIZE=10   # Matches Neon plan limits
 ```
 
 Why smaller pools?
+
 - Each serverless function gets its own pool
 - Many concurrent functions = many pools
 - Neon pooler handles connection management
@@ -244,6 +253,7 @@ npm run build
 ## Support
 
 For issues:
+
 1. Check Vercel build logs
 2. Review function runtime logs
 3. Verify environment variables

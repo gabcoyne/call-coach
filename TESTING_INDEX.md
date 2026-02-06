@@ -3,26 +3,31 @@
 ## Test Files (127+ Tests)
 
 ### Unit Tests - MCP Tools
+
 - `/tests/mcp/__init__.py` - Package marker
 - `/tests/mcp/test_analyze_call.py` - 7 tests for analyze_call_tool
 - `/tests/mcp/test_search_calls.py` - 10 tests for search_calls_tool
 - `/tests/mcp/test_get_rep_insights.py` - 10 tests for get_rep_insights_tool
 
 ### Unit Tests - Analysis Modules
+
 - `/tests/analysis/__init__.py` - Package marker
 - `/tests/analysis/test_chunking.py` - 8 tests for transcript chunking
 - `/tests/analysis/test_cache.py` - 10 tests for caching layer
 - `/tests/analysis/test_engine.py` - 7 tests for analysis engine
 
 ### API Tests
+
 - `/tests/api/__init__.py` - Package marker
 - `/tests/api/test_rest_api.py` - 25+ tests for FastAPI endpoints
 
 ### Fixtures and Configuration
+
 - `/tests/conftest.py` - Shared pytest fixtures (updated)
 - `/tests/fixtures.py` - 30+ reusable fixtures (NEW)
 
 ### End-to-End Tests (Playwright)
+
 - `/e2e/__init__.py` - Package marker
 - `/e2e/conftest.py` - E2E fixtures and browser setup
 - `/e2e/test_authentication.py` - 6 tests for auth flows
@@ -30,15 +35,19 @@
 - `/e2e/test_coaching.py` - 9 tests for coaching dashboard
 
 ### Load Testing
+
 - `/scripts/load_test.py` - Locust-based load testing framework
 
 ### Test Utilities
+
 - `/scripts/run_tests.sh` - Test runner shell script with multiple modes
 
 ## Documentation
 
 ### Primary Guides
+
 - `/TESTING.md` - Complete testing manual (600+ lines)
+
   - Quick start guide
   - Test organization
   - Writing tests
@@ -48,6 +57,7 @@
   - Advanced testing
 
 - `/tests/README.md` - Comprehensive testing reference (500+ lines)
+
   - Test structure overview
   - Running tests (all modes)
   - Test categories
@@ -66,7 +76,9 @@
 ## Configuration Files (Updated)
 
 ### Test Configuration
+
 - `/pytest.ini` - Updated with:
+
   - Coverage settings
   - asyncio mode
   - E2E markers
@@ -80,6 +92,7 @@
   - httpx>=0.27.0
 
 ### CI/CD Configuration
+
 - `/.github/workflows/tests.yml` - GitHub Actions workflow
   - Python tests (3.11, 3.12)
   - Frontend tests
@@ -89,6 +102,7 @@
 ## Quick Navigation
 
 ### Run Tests
+
 ```bash
 ./scripts/run_tests.sh           # Run unit tests
 ./scripts/run_tests.sh mcp       # Run MCP tests
@@ -101,6 +115,7 @@
 ```
 
 ### Read Documentation
+
 ```bash
 # Quick overview
 cat TEST_SUITE_SUMMARY.md
@@ -113,6 +128,7 @@ cat tests/README.md
 ```
 
 ### View Coverage
+
 ```bash
 pytest tests/ --cov --cov-report=html
 open htmlcov/index.html
@@ -120,27 +136,29 @@ open htmlcov/index.html
 
 ## Test Statistics
 
-| Metric | Value |
-|--------|-------|
-| Total Test Files | 11 |
-| Total Tests | 127+ |
-| Target Coverage | >70% |
-| Actual Coverage | 75%+ |
-| MCP Tool Tests | 27 |
-| Analysis Tests | 25 |
-| API Tests | 25+ |
-| E2E Tests | 25 |
+| Metric              | Value    |
+| ------------------- | -------- |
+| Total Test Files    | 11       |
+| Total Tests         | 127+     |
+| Target Coverage     | >70%     |
+| Actual Coverage     | 75%+     |
+| MCP Tool Tests      | 27       |
+| Analysis Tests      | 25       |
+| API Tests           | 25+      |
+| E2E Tests           | 25       |
 | Load Test Scenarios | Multiple |
-| Reusable Fixtures | 30+ |
+| Reusable Fixtures   | 30+      |
 
 ## Key Components
 
 ### Testing Frameworks
+
 - **pytest** - Unit and integration testing
 - **Playwright** - End-to-end UI testing
 - **Locust** - Load and performance testing
 
 ### Test Organization
+
 - Unit tests for isolated components
 - Integration tests for component interactions
 - API tests for endpoint validation
@@ -148,6 +166,7 @@ open htmlcov/index.html
 - Load tests for performance validation
 
 ### Coverage Areas
+
 - `analysis/` - Coaching analysis modules (75%+)
 - `coaching_mcp/tools/` - MCP tool implementations (80%+)
 - `api/` - REST API endpoints (85%+)
@@ -155,17 +174,20 @@ open htmlcov/index.html
 ## Setup Instructions
 
 1. Install test dependencies:
+
    ```bash
    pip install -e ".[dev]"
    playwright install
    ```
 
 2. Run tests:
+
    ```bash
    ./scripts/run_tests.sh
    ```
 
 3. Check coverage:
+
    ```bash
    pytest tests/ --cov --cov-report=html
    ```

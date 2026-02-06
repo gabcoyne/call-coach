@@ -15,30 +15,34 @@
 
 ## Core Philosophy: Durable Runtime vs Workflow Engine
 
-| Dimension | **Temporal (Durable Runtime)** | **Prefect (Workflow Engine)** |
-| --- | --- | --- |
-| **Primary Use Case** | Microservice orchestration, long-running stateful processes, financial transactions | Data pipelines, ML training, ETL/ELT, analytics workflows |
-| **Core Value** | **Durable execution** - workflows survive crashes, week-long delays, network partitions. Automatically capture state at every step. | **Dynamic workflows** - adapt to data at runtime, in-memory data passing, event-driven execution, observability-first. |
-| **Target Audience** | Backend engineers, distributed systems teams, fintech, e-commerce platforms | Data engineers, ML engineers, analytics teams, data platform teams |
-| **Language Support** | **Polyglot** - Python, Go, Java, TypeScript, PHP, .NET | **Python-native** (with TypeScript emerging) |
-| **Mental Model** | Workflows are **durable state machines** that can pause for weeks and resume exactly where they left off | Workflows are **dynamic Python** that execute, track results, and provide observability |
+| Dimension            | **Temporal (Durable Runtime)**                                                                                                      | **Prefect (Workflow Engine)**                                                                                          |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Primary Use Case** | Microservice orchestration, long-running stateful processes, financial transactions                                                 | Data pipelines, ML training, ETL/ELT, analytics workflows                                                              |
+| **Core Value**       | **Durable execution** - workflows survive crashes, week-long delays, network partitions. Automatically capture state at every step. | **Dynamic workflows** - adapt to data at runtime, in-memory data passing, event-driven execution, observability-first. |
+| **Target Audience**  | Backend engineers, distributed systems teams, fintech, e-commerce platforms                                                         | Data engineers, ML engineers, analytics teams, data platform teams                                                     |
+| **Language Support** | **Polyglot** - Python, Go, Java, TypeScript, PHP, .NET                                                                              | **Python-native** (with TypeScript emerging)                                                                           |
+| **Mental Model**     | Workflows are **durable state machines** that can pause for weeks and resume exactly where they left off                            | Workflows are **dynamic Python** that execute, track results, and provide observability                                |
 
 ---
 
 ## When Temporal Makes Sense
 
 **Strong Temporal Fit:**
+
 1. **Long-Running Stateful Processes**
+
    - Order fulfillment that spans days/weeks (payment → fulfillment → shipping → delivery)
    - Subscription lifecycle management (trial → paid → renewal → churn)
    - Complex approval workflows with human-in-the-loop (loan approvals, compliance reviews)
 
 2. **Mission-Critical Reliability Requirements**
+
    - Financial transactions requiring exactly-once execution
    - Healthcare workflows with strict compliance requirements
    - SaaS provisioning where partial completion is unacceptable
 
 3. **Microservice Orchestration**
+
    - Coordinating 10+ microservices in complex transaction flows
    - Saga patterns for distributed transactions
    - Compensation logic when downstream services fail
@@ -49,6 +53,7 @@
    - Existing microservices in non-Python languages
 
 **Discovery Questions to Qualify:**
+
 - "Are your workflows primarily data transformation or business process orchestration?"
 - "What's the longest a workflow needs to wait for an external event? Minutes? Hours? Days?"
 - "Do you have polyglot requirements, or is your team Python-native?"
@@ -61,16 +66,19 @@
 ### 1. **Data & ML Workloads (Not Business Process)**
 
 **The Reality:**
+
 - Temporal is built for long-running business processes (order fulfillment, payment processing)
 - Data pipelines are **different** - they're about transforming data, not maintaining state across weeks
 - ML training doesn't need "durable execution" - it needs retry logic, parallel execution, and observability
 
 **Prefect Advantage:**
+
 - **In-Memory Data Passing**: Pass DataFrames, tensors, models between tasks without serialization overhead
 - **Dynamic Execution**: Adapt to dataset size at runtime (process 10 files or 10,000 without changing code)
 - **Built for I/O**: Optimized for data-intensive workloads, not long-running state machines
 
 **Discovery Questions:**
+
 - "What percentage of your workflows are data transformation vs business process orchestration?"
 - "Do you need to pause workflows for days waiting for external events, or do they run continuously once started?"
 - "Are you moving data between tasks or coordinating microservices?"
@@ -78,11 +86,13 @@
 ### 2. **Simpler Infrastructure (No Temporal Server)**
 
 **Temporal's Infrastructure Requirement:**
+
 - Requires running **Temporal Server** (persistence layer + matching engine + history service)
 - Additional components: Worker processes, database (Cassandra, PostgreSQL, MySQL)
 - Complex deployment and operational overhead
 
 **Prefect's Hybrid Model:**
+
 - **Prefect Cloud**: Fully managed control plane, you only run Workers
 - **Workers**: Lightweight processes that poll for work and execute flows
 - **Scale-to-Zero**: No always-on infrastructure required
@@ -93,12 +103,14 @@
 ### 3. **Faster Time-to-Value (Pure Python)**
 
 **Temporal:**
+
 - Learn Temporal's activity/workflow concepts
 - Understand workflow determinism constraints
 - Set up Temporal Server infrastructure
 - Configure workers and task queues
 
 **Prefect:**
+
 - Decorate existing Python functions with `@flow` and `@task`
 - Run locally immediately
 - Deploy to Prefect Cloud in minutes
@@ -110,11 +122,13 @@
 ### 4. **Observability-First (Not After-the-Fact)**
 
 **Temporal:**
+
 - Observability via Temporal UI (workflow history, event sourcing)
 - Focused on **state transitions** and **event history**
 - Good for debugging "what happened in this long-running process"
 
 **Prefect:**
+
 - Observability built for **data pipelines** (logs, metrics, results, artifacts)
 - Unified view regardless of where tasks run (Spark, Kubernetes, Lambda)
 - Real-time monitoring optimized for fast-moving data workflows
@@ -125,11 +139,13 @@
 ### 5. **Predictable Pricing (Seat-Based vs Usage-Based)**
 
 **Temporal Cloud Pricing:**
+
 - Charged per **Actions** (workflow and activity executions)
 - Can become expensive for high-frequency workflows or large-scale data processing
 - Harder to predict costs for variable workloads
 
 **Prefect Cloud Pricing:**
+
 - **Seat-based pricing**: Pay per developer, not per execution
 - Unlimited workflows and executions within each tier
 - Predictable costs regardless of workload volume
@@ -141,15 +157,15 @@
 
 ## Technical Comparison
 
-| Feature | Temporal | Prefect | Implication |
-| --- | --- | --- | --- |
-| **Durable Execution** | Core feature - workflows survive crashes, resume after weeks | Task retry logic, but not designed for month-long pauses | Temporal wins for long-running business processes. Prefect wins for continuous data pipelines. |
-| **Data Passing** | Activities pass data via serialization (protobuf) | In-memory by default, optional persistence | Prefect is **much faster** for data-heavy workloads (no serialization overhead). |
-| **Dynamic Workflows** | Workflows must be deterministic (limited dynamism) | Fully dynamic Python (loops, conditionals, runtime logic) | Prefect handles variable data sizes naturally. Temporal requires workarounds. |
-| **Infrastructure** | Requires Temporal Server cluster + database | Managed cloud or lightweight Workers only | Prefect has **much lower operational overhead**. |
-| **Language Support** | Polyglot (Python, Go, Java, TypeScript, PHP, .NET) | Python-native (TypeScript emerging) | Temporal wins for polyglot teams. Prefect wins for Python-native teams. |
-| **Event-Driven** | Signals and queries for external events | Native webhooks, event triggers, automations | Both support event-driven, Prefect's is simpler for typical data use cases. |
-| **Observability** | Event sourcing, workflow history UI | Real-time logs, metrics, artifacts, unified across systems | Prefect's observability is **better for debugging data pipelines**. |
+| Feature               | Temporal                                                     | Prefect                                                    | Implication                                                                                    |
+| --------------------- | ------------------------------------------------------------ | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Durable Execution** | Core feature - workflows survive crashes, resume after weeks | Task retry logic, but not designed for month-long pauses   | Temporal wins for long-running business processes. Prefect wins for continuous data pipelines. |
+| **Data Passing**      | Activities pass data via serialization (protobuf)            | In-memory by default, optional persistence                 | Prefect is **much faster** for data-heavy workloads (no serialization overhead).               |
+| **Dynamic Workflows** | Workflows must be deterministic (limited dynamism)           | Fully dynamic Python (loops, conditionals, runtime logic)  | Prefect handles variable data sizes naturally. Temporal requires workarounds.                  |
+| **Infrastructure**    | Requires Temporal Server cluster + database                  | Managed cloud or lightweight Workers only                  | Prefect has **much lower operational overhead**.                                               |
+| **Language Support**  | Polyglot (Python, Go, Java, TypeScript, PHP, .NET)           | Python-native (TypeScript emerging)                        | Temporal wins for polyglot teams. Prefect wins for Python-native teams.                        |
+| **Event-Driven**      | Signals and queries for external events                      | Native webhooks, event triggers, automations               | Both support event-driven, Prefect's is simpler for typical data use cases.                    |
+| **Observability**     | Event sourcing, workflow history UI                          | Real-time logs, metrics, artifacts, unified across systems | Prefect's observability is **better for debugging data pipelines**.                            |
 
 ---
 
@@ -180,18 +196,22 @@
 **Ask These Questions:**
 
 1. **"What's the longest your workflows wait for external events?"**
+
    - If "hours to days" → Temporal makes sense
    - If "minutes or continuous execution" → Prefect is simpler
 
 2. **"Are you orchestrating microservices or data pipelines?"**
+
    - Microservices with saga patterns → Temporal
    - Data transformations and ML → Prefect
 
 3. **"What languages are your workflows written in?"**
+
    - Polyglot (Go, Java, TypeScript) → Temporal advantage
    - Python-native → Prefect advantage
 
 4. **"Do you have infrastructure/ops team bandwidth to manage Temporal Server?"**
+
    - Yes, and workflows justify it → Temporal feasible
    - No, or prefer managed solution → Prefect Cloud wins
 
@@ -215,6 +235,7 @@
 ## When to Acknowledge Temporal Is Better
 
 **Be Honest When:**
+
 - Customer is building complex microservice orchestration (10+ services in saga patterns)
 - Long-running workflows that genuinely pause for days/weeks (approval workflows, subscription management)
 - Polyglot requirements across Go, Java, and Python services
@@ -240,21 +261,22 @@
 
 ## Summary Table: When to Choose Which
 
-| Scenario | Temporal | Prefect | Reasoning |
-| --- | --- | --- | --- |
-| **Data Pipelines (ETL/ELT)** | ❌ | ✅ | Prefect's in-memory data passing and dynamic execution are purpose-built for data |
-| **ML Training Pipelines** | ❌ | ✅ | Dynamic workflows, artifact tracking, and Python-native are critical for ML |
-| **Order Fulfillment / E-commerce** | ✅ | ❌ | Multi-day processes with payment → fulfillment → shipping benefit from durable execution |
-| **Microservice Orchestration (Saga)** | ✅ | ❌ | Temporal's compensation logic and exactly-once semantics excel here |
-| **Real-Time Event Processing** | 🟡 | ✅ | Prefect's sub-second event triggers beat Temporal's workflow-based model |
-| **Polyglot Teams (Go/Java/Python)** | ✅ | 🟡 | Temporal's multi-language support is unmatched |
-| **Python-Native Data Teams** | 🟡 | ✅ | Prefect's pure Python model has zero friction |
-| **High-Frequency Workflows (1000s/day)** | 🟡 | ✅ | Prefect's seat-based pricing is more predictable |
-| **Subscription/Billing Workflows** | ✅ | ❌ | Month-long state management is Temporal's sweet spot |
+| Scenario                                 | Temporal | Prefect | Reasoning                                                                                |
+| ---------------------------------------- | -------- | ------- | ---------------------------------------------------------------------------------------- |
+| **Data Pipelines (ETL/ELT)**             | ❌       | ✅      | Prefect's in-memory data passing and dynamic execution are purpose-built for data        |
+| **ML Training Pipelines**                | ❌       | ✅      | Dynamic workflows, artifact tracking, and Python-native are critical for ML              |
+| **Order Fulfillment / E-commerce**       | ✅       | ❌      | Multi-day processes with payment → fulfillment → shipping benefit from durable execution |
+| **Microservice Orchestration (Saga)**    | ✅       | ❌      | Temporal's compensation logic and exactly-once semantics excel here                      |
+| **Real-Time Event Processing**           | 🟡       | ✅      | Prefect's sub-second event triggers beat Temporal's workflow-based model                 |
+| **Polyglot Teams (Go/Java/Python)**      | ✅       | 🟡      | Temporal's multi-language support is unmatched                                           |
+| **Python-Native Data Teams**             | 🟡       | ✅      | Prefect's pure Python model has zero friction                                            |
+| **High-Frequency Workflows (1000s/day)** | 🟡       | ✅      | Prefect's seat-based pricing is more predictable                                         |
+| **Subscription/Billing Workflows**       | ✅       | ❌      | Month-long state management is Temporal's sweet spot                                     |
 
 ---
 
 **Sources:**
+
 - [Temporal Alternatives for Enterprise Teams](https://akka.io/blog/temporal-alternatives)
 - [Workflow Platforms 2025 Comparison](https://procycons.com/en/blogs/workflow-orchestration-platforms-comparison-2025/)
 - [State of Workflow Orchestration 2025](https://www.pracdata.io/p/state-of-workflow-orchestration-ecosystem-2025)

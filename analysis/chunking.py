@@ -2,6 +2,7 @@
 Transcript chunking for handling long calls.
 Uses sliding window with overlap to maintain context across chunks.
 """
+
 import logging
 from typing import Any
 
@@ -123,9 +124,7 @@ def chunk_transcript(
     return chunks
 
 
-def reconstruct_full_transcript(
-    chunks: list[tuple[str, ChunkMetadata]]
-) -> str:
+def reconstruct_full_transcript(chunks: list[tuple[str, ChunkMetadata]]) -> str:
     """
     Reconstruct full transcript from chunks by removing overlaps.
 

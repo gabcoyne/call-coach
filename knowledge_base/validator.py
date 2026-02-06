@@ -2,14 +2,14 @@
 Validation utilities for ingested documentation.
 Checks links, structure, and completeness.
 """
+
 import asyncio
 import logging
 from datetime import datetime
 from typing import Any
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlparse
 
 import httpx
-from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,12 @@ class DocumentationValidator:
             }
 
         except httpx.ConnectError:
-            return {"url": url, "status": "broken", "http_status": 0, "message": "Connection failed"}
+            return {
+                "url": url,
+                "status": "broken",
+                "http_status": 0,
+                "message": "Connection failed",
+            }
         except httpx.TimeoutException:
             return {"url": url, "status": "timeout", "http_status": 0, "message": "Request timeout"}
         except Exception as e:
@@ -178,17 +183,13 @@ class DocumentationValidator:
             url = match.group(2)
 
             # Determine if internal link
-            is_internal = not url.startswith(("http://", "https://")) and not url.startswith(
-                "#"
-            )
+            is_internal = not url.startswith(("http://", "https://")) and not url.startswith("#")
 
             links.append({"url": url, "text": text, "is_internal": is_internal})
 
         return links
 
-    def compare_versions(
-        self, old_doc: dict[str, Any], new_doc: dict[str, Any]
-    ) -> dict[str, Any]:
+    def compare_versions(self, old_doc: dict[str, Any], new_doc: dict[str, Any]) -> dict[str, Any]:
         """
         Compare two versions of a document to detect changes.
 
@@ -201,8 +202,7 @@ class DocumentationValidator:
         """
         changes = {
             "title_changed": old_doc.get("title") != new_doc.get("title"),
-            "content_changed": old_doc.get("markdown_content")
-            != new_doc.get("markdown_content"),
+            "content_changed": old_doc.get("markdown_content") != new_doc.get("markdown_content"),
             "category_changed": old_doc.get("category") != new_doc.get("category"),
             "old_sections": len(old_doc.get("sections", [])),
             "new_sections": len(new_doc.get("sections", [])),

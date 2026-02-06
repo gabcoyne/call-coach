@@ -4,7 +4,7 @@
  * Provides type-safe interfaces and runtime validation for all coaching API endpoints.
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Zod Schemas for Request Validation
@@ -12,10 +12,10 @@ import { z } from 'zod';
 
 // Analyze Call Request
 export const analyzeCallRequestSchema = z.object({
-  call_id: z.string().min(1, 'Call ID is required'),
-  dimensions: z.array(
-    z.enum(['product_knowledge', 'discovery', 'objection_handling', 'engagement'])
-  ).optional(),
+  call_id: z.string().min(1, "Call ID is required"),
+  dimensions: z
+    .array(z.enum(["product_knowledge", "discovery", "objection_handling", "engagement"]))
+    .optional(),
   use_cache: z.boolean().optional().default(true),
   include_transcript_snippets: z.boolean().optional().default(true),
   force_reanalysis: z.boolean().optional().default(false),
@@ -25,15 +25,12 @@ export type AnalyzeCallRequest = z.infer<typeof analyzeCallRequestSchema>;
 
 // Rep Insights Request
 export const repInsightsRequestSchema = z.object({
-  rep_email: z.string().email('Valid email address required'),
-  time_period: z.enum([
-    'last_7_days',
-    'last_30_days',
-    'last_quarter',
-    'last_year',
-    'all_time'
-  ]).optional().default('last_30_days'),
-  product_filter: z.enum(['prefect', 'horizon', 'both']).optional(),
+  rep_email: z.string().email("Valid email address required"),
+  time_period: z
+    .enum(["last_7_days", "last_30_days", "last_quarter", "last_year", "all_time"])
+    .optional()
+    .default("last_30_days"),
+  product_filter: z.enum(["prefect", "horizon", "both"]).optional(),
 });
 
 export type RepInsightsRequest = z.infer<typeof repInsightsRequestSchema>;
@@ -41,15 +38,17 @@ export type RepInsightsRequest = z.infer<typeof repInsightsRequestSchema>;
 // Search Calls Request
 export const searchCallsRequestSchema = z.object({
   rep_email: z.string().email().optional(),
-  product: z.enum(['prefect', 'horizon', 'both']).optional(),
-  call_type: z.enum(['discovery', 'demo', 'technical_deep_dive', 'negotiation']).optional(),
-  date_range: z.object({
-    start: z.string().datetime(),
-    end: z.string().datetime(),
-  }).optional(),
+  product: z.enum(["prefect", "horizon", "both"]).optional(),
+  call_type: z.enum(["discovery", "demo", "technical_deep_dive", "negotiation"]).optional(),
+  date_range: z
+    .object({
+      start: z.string().datetime(),
+      end: z.string().datetime(),
+    })
+    .optional(),
   min_score: z.number().int().min(0).max(100).optional(),
   max_score: z.number().int().min(0).max(100).optional(),
-  has_objection_type: z.enum(['pricing', 'timing', 'technical', 'competitor']).optional(),
+  has_objection_type: z.enum(["pricing", "timing", "technical", "competitor"]).optional(),
   topics: z.array(z.string()).optional(),
   limit: z.number().int().min(1).max(100).optional().default(20),
 });
@@ -166,7 +165,7 @@ export interface SkillGap {
   target_score: number;
   gap: number;
   sample_size: number;
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
 }
 
 export interface ImprovementArea {
@@ -174,7 +173,7 @@ export interface ImprovementArea {
   recent_score: number;
   older_score: number;
   change: number;
-  trend: 'improving' | 'declining' | 'stable';
+  trend: "improving" | "declining" | "stable";
 }
 
 export interface RepInsightsResponse {
@@ -204,8 +203,8 @@ export type SearchCallsResponse = CallSearchResult[];
  * Feed Types
  */
 
-export type FeedItemType = 'call_analysis' | 'team_insight' | 'highlight' | 'milestone';
-export type FeedTimeFilter = 'today' | 'this_week' | 'this_month' | 'custom';
+export type FeedItemType = "call_analysis" | "team_insight" | "highlight" | "milestone";
+export type FeedTimeFilter = "today" | "this_week" | "this_month" | "custom";
 
 export interface FeedItem {
   id: string;
@@ -236,13 +235,13 @@ export interface FeedItemMetadata {
 
 export interface TeamInsight {
   id: string;
-  type: 'trend' | 'comparison' | 'achievement';
+  type: "trend" | "comparison" | "achievement";
   title: string;
   description: string;
   metric: string;
   value: number;
   change: number;
-  trend: 'up' | 'down' | 'stable';
+  trend: "up" | "down" | "stable";
   team_size: number;
   period: string;
 }
@@ -261,8 +260,14 @@ export interface CoachingHighlight {
   why_exemplary: string;
 }
 
-export const feedItemTypeFilterSchema = z.enum(['all', 'call_analysis', 'team_insight', 'highlight', 'milestone']);
-export const feedTimeFilterSchema = z.enum(['today', 'this_week', 'this_month', 'custom']);
+export const feedItemTypeFilterSchema = z.enum([
+  "all",
+  "call_analysis",
+  "team_insight",
+  "highlight",
+  "milestone",
+]);
+export const feedTimeFilterSchema = z.enum(["today", "this_week", "this_month", "custom"]);
 
 export const feedRequestSchema = z.object({
   type_filter: feedItemTypeFilterSchema.optional(),

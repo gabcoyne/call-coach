@@ -86,16 +86,17 @@ Navigate to **Project Settings** → **Environment Variables** and add:
 
 #### Clerk Authentication (Production)
 
-| Variable | Value | Environment |
-|----------|-------|-------------|
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | `pk_live_...` from Clerk production app | Production |
-| `CLERK_SECRET_KEY` | `sk_live_...` from Clerk production app | Production |
-| `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | `/sign-in` | Production |
-| `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | `/sign-up` | Production |
-| `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` | `/dashboard` | Production |
-| `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` | `/dashboard` | Production |
+| Variable                              | Value                                   | Environment |
+| ------------------------------------- | --------------------------------------- | ----------- |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`   | `pk_live_...` from Clerk production app | Production  |
+| `CLERK_SECRET_KEY`                    | `sk_live_...` from Clerk production app | Production  |
+| `NEXT_PUBLIC_CLERK_SIGN_IN_URL`       | `/sign-in`                              | Production  |
+| `NEXT_PUBLIC_CLERK_SIGN_UP_URL`       | `/sign-up`                              | Production  |
+| `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` | `/dashboard`                            | Production  |
+| `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` | `/dashboard`                            | Production  |
 
 **Get Clerk Keys:**
+
 1. Go to [dashboard.clerk.com](https://dashboard.clerk.com)
 2. Navigate to your production application
 3. Click "API Keys" in the sidebar
@@ -103,15 +104,15 @@ Navigate to **Project Settings** → **Environment Variables** and add:
 
 #### MCP Backend (Production)
 
-| Variable | Value | Environment |
-|----------|-------|-------------|
-| `NEXT_PUBLIC_MCP_BACKEND_URL` | `https://mcp.prefect.io` (or your production URL) | Production |
+| Variable                      | Value                                             | Environment |
+| ----------------------------- | ------------------------------------------------- | ----------- |
+| `NEXT_PUBLIC_MCP_BACKEND_URL` | `https://mcp.prefect.io` (or your production URL) | Production  |
 
 #### Application URLs
 
-| Variable | Value | Environment |
-|----------|-------|-------------|
-| `NEXT_PUBLIC_APP_URL` | `https://coaching.prefect.io` | Production |
+| Variable              | Value                         | Environment |
+| --------------------- | ----------------------------- | ----------- |
+| `NEXT_PUBLIC_APP_URL` | `https://coaching.prefect.io` | Production  |
 
 ### 3.2 Preview Environment Variables (Staging)
 
@@ -121,26 +122,26 @@ Navigate to **Project Settings** → **Environment Variables** and add with "Pre
 
 #### Clerk Authentication (Staging)
 
-| Variable | Value | Environment |
-|----------|-------|-------------|
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | `pk_test_...` from Clerk development app | Preview |
-| `CLERK_SECRET_KEY` | `sk_test_...` from Clerk development app | Preview |
-| `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | `/sign-in` | Preview |
-| `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | `/sign-up` | Preview |
-| `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` | `/dashboard` | Preview |
-| `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` | `/dashboard` | Preview |
+| Variable                              | Value                                    | Environment |
+| ------------------------------------- | ---------------------------------------- | ----------- |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`   | `pk_test_...` from Clerk development app | Preview     |
+| `CLERK_SECRET_KEY`                    | `sk_test_...` from Clerk development app | Preview     |
+| `NEXT_PUBLIC_CLERK_SIGN_IN_URL`       | `/sign-in`                               | Preview     |
+| `NEXT_PUBLIC_CLERK_SIGN_UP_URL`       | `/sign-up`                               | Preview     |
+| `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` | `/dashboard`                             | Preview     |
+| `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` | `/dashboard`                             | Preview     |
 
 #### MCP Backend (Staging)
 
-| Variable | Value | Environment |
-|----------|-------|-------------|
-| `NEXT_PUBLIC_MCP_BACKEND_URL` | `https://mcp-staging.prefect.io` | Preview |
+| Variable                      | Value                            | Environment |
+| ----------------------------- | -------------------------------- | ----------- |
+| `NEXT_PUBLIC_MCP_BACKEND_URL` | `https://mcp-staging.prefect.io` | Preview     |
 
 #### Application URLs
 
-| Variable | Value | Environment |
-|----------|-------|-------------|
-| `NEXT_PUBLIC_APP_URL` | Auto-populated by Vercel (`VERCEL_URL`) | Preview |
+| Variable              | Value                                   | Environment |
+| --------------------- | --------------------------------------- | ----------- |
+| `NEXT_PUBLIC_APP_URL` | Auto-populated by Vercel (`VERCEL_URL`) | Preview     |
 
 ### 3.3 Environment Variable Best Practices
 
@@ -165,7 +166,7 @@ Navigate to **Project Settings** → **Environment Variables** and add with "Pre
 
 Vercel will display DNS configuration instructions. You need to add a CNAME record:
 
-#### Using Cloudflare (or other DNS provider):
+#### Using Cloudflare (or other DNS provider)
 
 1. Log into your DNS provider (e.g., Cloudflare)
 2. Navigate to DNS settings for `prefect.io`
@@ -215,6 +216,7 @@ The `vercel.json` configuration includes security headers that enforce HTTPS:
 ```
 
 This header (HSTS):
+
 - Forces browsers to use HTTPS for 2 years (`max-age=63072000`)
 - Applies to all subdomains (`includeSubDomains`)
 - Eligible for browser HSTS preload lists (`preload`)
@@ -250,6 +252,7 @@ For maximum security, submit your domain to the HSTS preload list:
 3. Enable "Automatic Production Deployments on Branch Push"
 
 This ensures:
+
 - Pushing to `main` triggers production deployment
 - Opening a PR triggers preview deployment
 - Preview URL format: `call-coach-git-<branch>-<team>.vercel.app`
@@ -282,6 +285,7 @@ Protect the production branch to prevent accidental deployments:
 #### Configure Notification Events
 
 Enable notifications for:
+
 - ✅ Deployment Started
 - ✅ Deployment Ready (Success)
 - ✅ Deployment Failed
@@ -291,6 +295,7 @@ Enable notifications for:
 #### Notification Format
 
 Slack messages will include:
+
 - Deployment status (success/failure)
 - Environment (production/preview)
 - Branch and commit info
@@ -334,7 +339,7 @@ npm install @vercel/analytics
 And add to `app/layout.tsx`:
 
 ```tsx
-import { Analytics } from '@vercel/analytics/react';
+import { Analytics } from "@vercel/analytics/react";
 
 export default function RootLayout({ children }) {
   return (
@@ -363,7 +368,7 @@ npm install @vercel/speed-insights
 4. Add to `app/layout.tsx`:
 
 ```tsx
-import { SpeedInsights } from '@vercel/speed-insights/next';
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default function RootLayout({ children }) {
   return (
@@ -389,6 +394,7 @@ View Core Web Vitals in the Vercel dashboard:
    - **TTFB (Time to First Byte)**: Target < 600ms
 
 Set up alerts:
+
 1. Click "Configure Alerts"
 2. Set thresholds for each metric
 3. Configure notification channel (email/Slack)
@@ -410,49 +416,61 @@ The `vercel.json` configuration includes comprehensive security headers. Verify 
 ### 9.2 Security Header Breakdown
 
 #### Strict-Transport-Security (HSTS)
+
 ```
 max-age=63072000; includeSubDomains; preload
 ```
+
 - Forces HTTPS for 2 years
 - Applies to all subdomains
 - Prevents SSL stripping attacks
 
 #### X-Frame-Options
+
 ```
 SAMEORIGIN
 ```
+
 - Prevents clickjacking attacks
 - Only allows framing from same origin
 
 #### X-Content-Type-Options
+
 ```
 nosniff
 ```
+
 - Prevents MIME type sniffing
 - Forces browsers to respect Content-Type header
 
 #### Content-Security-Policy (CSP)
+
 ```
 default-src 'self';
 script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.prefect.io;
 connect-src 'self' https://api.clerk.com https://*.vercel-insights.com;
 ...
 ```
+
 - Restricts resource loading to trusted sources
 - Prevents XSS attacks
 - Allows Clerk authentication and Vercel analytics
 
 #### Referrer-Policy
+
 ```
 strict-origin-when-cross-origin
 ```
+
 - Controls referrer information sent with requests
 - Sends full URL for same-origin, origin only for cross-origin
 
 #### Permissions-Policy
+
 ```
 camera=(), microphone=(), geolocation=()
 ```
+
 - Disables camera, microphone, and geolocation APIs
 - Reduces attack surface for sensitive features
 
@@ -466,6 +484,7 @@ If you encounter CSP violations:
 4. Redeploy
 
 **Common additions:**
+
 - **External fonts**: Add to `font-src`
 - **External images**: Add to `img-src`
 - **External APIs**: Add to `connect-src`
@@ -534,6 +553,7 @@ Access logs for debugging:
 **Symptom**: Deployment fails during build phase
 
 **Solutions**:
+
 1. Check build logs in Vercel dashboard
 2. Verify `package.json` scripts are correct
 3. Ensure all dependencies are in `dependencies` (not `devDependencies`)
@@ -541,6 +561,7 @@ Access logs for debugging:
 5. Check for TypeScript errors: `npm run lint`
 
 **Common issues**:
+
 - Missing environment variables (check `.env.example`)
 - TypeScript strict mode errors
 - Clerk configuration issues
@@ -550,12 +571,14 @@ Access logs for debugging:
 **Symptom**: Application works locally but fails in production
 
 **Solutions**:
+
 1. Verify all environment variables are set in Vercel
 2. Check variable names (typos in `NEXT_PUBLIC_*`)
 3. Ensure Clerk keys are from production app (not development)
 4. Restart deployment after adding variables
 
 **Testing**:
+
 ```bash
 # In browser console on deployed app:
 console.log(process.env.NEXT_PUBLIC_MCP_BACKEND_URL)
@@ -566,6 +589,7 @@ console.log(process.env.NEXT_PUBLIC_MCP_BACKEND_URL)
 **Symptom**: Domain not resolving or SSL errors
 
 **Solutions**:
+
 1. Verify CNAME record points to `cname.vercel-dns.com`
 2. Check DNS propagation: `nslookup coaching.prefect.io`
 3. Wait 24 hours for DNS propagation
@@ -573,6 +597,7 @@ console.log(process.env.NEXT_PUBLIC_MCP_BACKEND_URL)
 5. Contact Vercel support if SSL provisioning fails
 
 **Check DNS**:
+
 ```bash
 # Should return Vercel IP addresses
 dig coaching.prefect.io
@@ -585,6 +610,7 @@ dig coaching.prefect.io
 **Symptom**: Sign in redirects fail or "Invalid publishable key"
 
 **Solutions**:
+
 1. Verify `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` matches production app
 2. Check `CLERK_SECRET_KEY` is from same Clerk app
 3. Ensure Clerk domain matches: `https://coaching.prefect.io`
@@ -596,17 +622,20 @@ dig coaching.prefect.io
 **Symptom**: Resources blocked by Content Security Policy
 
 **Solutions**:
+
 1. Open browser DevTools Console
 2. Note the blocked resource URL
 3. Update `vercel.json` CSP header to allow the source
 4. Redeploy
 
 **Example**:
+
 ```
 Refused to load script from 'https://example.com/script.js'
 ```
 
 Add `https://example.com` to `script-src` in CSP:
+
 ```json
 "script-src 'self' 'unsafe-inline' https://example.com"
 ```
@@ -616,7 +645,9 @@ Add `https://example.com` to `script-src` in CSP:
 **Symptom**: API routes return 504 Gateway Timeout
 
 **Solutions**:
+
 1. Increase function timeout in `vercel.json`:
+
 ```json
 "functions": {
   "app/api/**/*.ts": {
@@ -624,6 +655,7 @@ Add `https://example.com` to `script-src` in CSP:
   }
 }
 ```
+
 2. Optimize API route logic (reduce database queries)
 3. Implement caching (SWR on frontend)
 4. Consider upgrading Vercel plan (Hobby: 10s max, Pro: 60s max)
@@ -641,6 +673,7 @@ Add `https://example.com` to `script-src` in CSP:
 ## Summary
 
 This guide covered:
+
 1. ✅ Creating Vercel account and linking GitHub repository
 2. ✅ Configuring Next.js framework with monorepo root directory
 3. ✅ Setting up production and preview environment variables
@@ -653,6 +686,7 @@ This guide covered:
 Your Call Coach frontend is now production-ready on Vercel with enterprise-grade security, monitoring, and deployment automation.
 
 **Next Steps:**
+
 1. Complete the initial deployment following Section 1-3
 2. Test preview deployments with a pull request
 3. Monitor Core Web Vitals in Vercel Analytics

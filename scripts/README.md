@@ -30,6 +30,7 @@ uv run python scripts/load_transcripts.py
 ```
 
 **What it does:**
+
 - Queries database for calls without transcripts
 - Fetches call metadata and transcripts from Gong API
 - Stores transcript sentences in database
@@ -37,6 +38,7 @@ uv run python scripts/load_transcripts.py
 - Logs progress to `logs/load_transcripts.log`
 
 **Output:**
+
 ```
 Starting batch transcript loading from Gong
 ================================================================================
@@ -70,6 +72,7 @@ uv run python scripts/batch_analyze_calls.py
 ```
 
 **What it does:**
+
 - Queries database for calls without coaching sessions
 - For each call, analyzes across 4 dimensions:
   - `discovery` - Discovery methodology (SPICED, Challenger, Sandler)
@@ -81,6 +84,7 @@ uv run python scripts/batch_analyze_calls.py
 - Logs progress to `logs/batch_analyze.log`
 
 **Output:**
+
 ```
 Starting batch analysis of calls
 ================================================================================
@@ -120,11 +124,13 @@ Calls with coaching sessions: 98
 ### Caching
 
 The analysis engine uses intelligent caching based on:
+
 - Transcript hash (SHA256 of full transcript text)
 - Rubric version (semantic version of evaluation criteria)
 - Coaching dimension
 
 This means:
+
 - Identical transcripts analyzed with same rubric = instant cache hit
 - Updated rubrics automatically invalidate cache for new insights
 - Costs are minimized through cache reuse
@@ -132,11 +138,13 @@ This means:
 ### Performance
 
 Typical timings:
+
 - Load transcript: 40-60 seconds per call
 - Analyze one dimension: 6-10 seconds per call
 - Analyze all 4 dimensions: 25-35 seconds per call
 
 For 100 calls:
+
 - Transcript loading: ~80 minutes (sequential bottleneck is Gong API)
 - Coaching analysis: ~60 minutes (parallelized across 5 workers)
 - **Total: ~2.5 hours end-to-end**
@@ -146,6 +154,7 @@ For 100 calls:
 ### Logs
 
 All scripts write detailed logs to `logs/` directory:
+
 - `logs/load_transcripts.log` - Transcript loading progress and errors
 - `logs/batch_analyze.log` - Analysis progress and errors
 
@@ -189,6 +198,7 @@ If Gong doesn't return participant data, the script creates a default "Unknown R
 ### Failed transcript loads
 
 Common causes:
+
 - Gong API rate limits (429 errors) - script automatically retries with backoff
 - Call doesn't have transcript yet in Gong - skip and retry later
 - Network timeouts - increase timeout in `gong/client.py`
@@ -196,6 +206,7 @@ Common causes:
 ### Failed analyses
 
 Common causes:
+
 - No transcript for call - run `load_transcripts.py` first
 - No company rep found - check speaker creation logic
 - Claude API errors - check `ANTHROPIC_API_KEY` in `.env`
@@ -204,6 +215,7 @@ Common causes:
 ### JSONB serialization errors
 
 If you see `can't adapt type 'dict'` errors, make sure JSONB fields are being serialized:
+
 - Use `json.dumps()` for dict values
 - Cast to `::jsonb` in SQL query
 - Check `flows/process_new_call.py` and `analysis/cache.py` for examples
@@ -213,9 +225,11 @@ If you see `can't adapt type 'dict'` errors, make sure JSONB fields are being se
 For 100 calls with average transcript length:
 
 **Gong API:**
+
 - Free (included in Gong subscription)
 
 **Claude API (Sonnet 4.5):**
+
 - Input tokens: ~4000 per dimension
 - Output tokens: ~4500 per dimension
 - Cache creation: ~3000 tokens first analysis

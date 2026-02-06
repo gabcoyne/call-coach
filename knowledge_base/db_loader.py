@@ -2,9 +2,9 @@
 Database loader for storing and retrieving ingested documents.
 Integrates scraped content with the knowledge base table.
 """
+
 import json
 import logging
-from datetime import datetime
 from typing import Any
 from uuid import UUID
 
