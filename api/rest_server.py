@@ -47,6 +47,7 @@ from api.error_handlers import setup_error_handlers
 
 # Import versioned API routers
 from api.v1 import router as v1_router
+from api.monitoring import router as monitoring_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -145,6 +146,9 @@ setup_error_handlers(app)
 
 # Include versioned API routes
 app.include_router(v1_router)
+
+# Include monitoring routes
+app.include_router(monitoring_router)
 
 
 # Request/Response models for type safety
