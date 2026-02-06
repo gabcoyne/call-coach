@@ -106,16 +106,16 @@ repos:
   #       exclude: ^(\.venv|venv|node_modules|\.git)/
 
   # Python tests (run relevant tests based on changed files)
-  # NOTE: Temporarily disabled - need to fix existing test failures first
-  # - repo: local
-  #   hooks:
-  #     - id: pytest-quick
-  #       name: pytest-quick
-  #       entry: bash -c 'if git diff --cached --name-only | grep -qE "\.py$"; then uv run pytest tests/test_rubrics.py -m "not slow and not integration and not e2e" --maxfail=3 -q; fi'
-  #       language: system
-  #       pass_filenames: false
-  #       always_run: false
-  #       stages: [commit]
+  - repo: local
+    hooks:
+      - id: pytest-quick
+        name: pytest-quick
+        # Only run tests for files in analysis/rubrics/ to avoid existing failures in other tests
+        entry: bash -c 'if git diff --cached --name-only | grep -qE "analysis/rubrics/.*\.py$"; then uv run pytest tests/test_rubrics.py -v; fi'
+        language: system
+        pass_filenames: false
+        always_run: false
+        stages: [commit]
 
   # Frontend tests (run relevant tests based on changed files)
   - repo: local
