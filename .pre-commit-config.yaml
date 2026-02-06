@@ -101,6 +101,28 @@ repos:
   #       args: []
   #       exclude: ^(\.venv|venv|node_modules|\.git)/
 
+  # Python tests (run relevant tests based on changed files)
+  - repo: local
+    hooks:
+      - id: pytest-quick
+        name: pytest-quick
+        entry: bash -c 'if git diff --cached --name-only | grep -qE "\.py$"; then pytest tests/ -m "not slow and not integration and not e2e" --maxfail=3 -q; fi'
+        language: system
+        pass_filenames: false
+        always_run: false
+        stages: [commit]
+
+  # Frontend tests (run relevant tests based on changed files)
+  - repo: local
+    hooks:
+      - id: jest-quick
+        name: jest-quick
+        entry: bash -c 'if git diff --cached --name-only | grep -qE "frontend/.*\.(ts|tsx|js|jsx)$"; then cd frontend && npm test -- --bail --findRelatedTests --passWithNoTests; fi'
+        language: system
+        pass_filenames: false
+        always_run: false
+        stages: [commit]
+
 # Configuration
 default_language_version:
   python: python3.11
