@@ -23,29 +23,24 @@ logger = logging.getLogger(__name__)
 def _validate_environment() -> None:
     """
     Validate that all required environment variables are present.
+    Uses the settings object which automatically loads from .env file.
 
     Raises:
         SystemExit: If any required variable is missing
     """
-    required_vars = [
-        "GONG_API_KEY",
-        "GONG_API_SECRET",
-        "GONG_API_BASE_URL",
-        "ANTHROPIC_API_KEY",
-        "DATABASE_URL",
-    ]
-
-    missing = []
-    for var in required_vars:
-        if not os.getenv(var):
-            missing.append(var)
-
-    if missing:
-        logger.error(f"✗ Missing required environment variables: {', '.join(missing)}")
-        logger.error("Set these in Horizon UI or .env file before deployment")
+    try:
+        # Access settings attributes to trigger validation
+        # If any required field is missing, pydantic will raise ValidationError
+        _ = settings.gong_api_key
+        _ = settings.gong_api_secret
+        _ = settings.gong_api_base_url
+        _ = settings.anthropic_api_key
+        _ = settings.database_url
+        logger.info("✓ All required environment variables present")
+    except Exception as e:
+        logger.error(f"✗ Missing required environment variables: {e}")
+        logger.error("Set these in .env file before starting the server")
         sys.exit(1)
-
-    logger.info("✓ All required environment variables present")
 
 
 def _validate_database_connection() -> None:
