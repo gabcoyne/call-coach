@@ -51,3 +51,6 @@ export type {} from "./CoachingOverlay";
 
 export { ClipGenerator } from "./ClipGenerator";
 export type {} from "./ClipGenerator";
+
+export { default as FiveWinsScoreCard } from "./FiveWinsScoreCard";
+export type {} from "./FiveWinsScoreCard";
