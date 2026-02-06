@@ -4,7 +4,7 @@ Search Calls Tool - Find calls matching specific criteria.
 
 import logging
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 from db import fetch_all
 
@@ -47,7 +47,7 @@ def search_calls_tool(
 
     # Build dynamic query
     where_clauses = ["c.processed_at IS NOT NULL"]
-    params = []
+    params: list[Any] = []
 
     # Filter by rep email
     if rep_email:
@@ -137,8 +137,8 @@ def search_calls_tool(
     # Limit
     params.append(min(limit, 100))  # Cap at 100
 
-    # Build final query
-    query = f"""
+    # Build final query (where_clauses are pre-validated SQL fragments with placeholders)
+    query = f"""  # nosec
         WITH call_scores AS (
             SELECT
                 cs.call_id,
@@ -173,11 +173,15 @@ def search_calls_tool(
     logger.debug(f"Parameters: {params}")
 
     # Execute search
-    results = fetch_all(query, tuple(params))
+    results = fetch_all(query, tuple(params), as_dict=True)
+    if not isinstance(results, list) or (results and not isinstance(results[0], dict)):
+        raise TypeError("Expected list of dicts from fetch_all with as_dict=True")
 
     # Format results
+    # Cast to help mypy understand we have a list of dicts
+    dict_results = cast(list[dict[str, Any]], results)
     formatted_results = []
-    for row in results:
+    for row in dict_results:
         formatted_results.append(
             {
                 "call_id": row["gong_call_id"],

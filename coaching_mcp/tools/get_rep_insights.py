@@ -52,9 +52,10 @@ def get_rep_insights_tool(
         LIMIT 1
         """,
         (rep_email, date_filter, product_filter, product_filter),
+        as_dict=True,
     )
 
-    if not rep_info:
+    if not rep_info or not isinstance(rep_info, dict):
         return {
             "error": f"No calls found for {rep_email} in {time_period}",
             "suggestion": "Check email address and ensure calls have been processed.",
@@ -80,18 +81,22 @@ def get_rep_insights_tool(
         ORDER BY cs.coaching_dimension, week
         """,
         (rep_info["id"], date_filter, product_filter, product_filter),
+        as_dict=True,
     )
 
     # Format trends by dimension
-    trends_by_dimension = {}
-    for row in score_trends:
-        dim = row["coaching_dimension"]
-        if dim not in trends_by_dimension:
-            trends_by_dimension[dim] = {"dates": [], "scores": [], "call_counts": []}
+    trends_by_dimension: dict[str, dict[str, list[Any]]] = {}
+    if isinstance(score_trends, list):
+        for row in score_trends:
+            if not isinstance(row, dict):
+                continue
+            dim = row["coaching_dimension"]
+            if dim not in trends_by_dimension:
+                trends_by_dimension[dim] = {"dates": [], "scores": [], "call_counts": []}
 
-        trends_by_dimension[dim]["dates"].append(str(row["week"].date()))
-        trends_by_dimension[dim]["scores"].append(round(float(row["avg_score"]), 1))
-        trends_by_dimension[dim]["call_counts"].append(row["call_count"])
+            trends_by_dimension[dim]["dates"].append(str(row["week"].date()))
+            trends_by_dimension[dim]["scores"].append(round(float(row["avg_score"]), 1))
+            trends_by_dimension[dim]["call_counts"].append(row["call_count"])
 
     # Step 4: Identify skill gaps (role-aware comparison)
     # Get rep's role for fair comparison
@@ -139,6 +144,7 @@ def get_rep_insights_tool(
         ORDER BY (t.team_score - r.rep_score) DESC
         """,
         (rep_info["id"], date_filter, date_filter, rep_role),
+        as_dict=True,
     )
 
     # Step 5: Identify improvement areas (trending up/down/stable)
@@ -180,6 +186,7 @@ def get_rep_insights_tool(
         WHERE o.older_score IS NOT NULL
         """,
         (rep_info["id"], rep_info["id"]),
+        as_dict=True,
     )
 
     # Step 6: Get recent wins (high-scoring moments)
@@ -200,13 +207,18 @@ def get_rep_insights_tool(
         LIMIT 5
         """,
         (rep_info["id"], date_filter),
+        as_dict=True,
     )
 
-    wins_formatted = [
-        f"{w['coaching_dimension']}: {w['score']}/100 on '{w['title']}' - "
-        + ", ".join(w["top_strengths"] or [])
-        for w in recent_wins
-    ]
+    wins_formatted: list[str] = []
+    if isinstance(recent_wins, list):
+        for w in recent_wins:
+            if not isinstance(w, dict):
+                continue
+            wins_formatted.append(
+                f"{w['coaching_dimension']}: {w['score']}/100 on '{w['title']}' - "
+                + ", ".join(w["top_strengths"] or [])
+            )
 
     # Step 7: Generate coaching plan
     coaching_plan = generate_coaching_plan(skill_gaps, improvement_areas)
@@ -252,7 +264,7 @@ def parse_time_period(time_period: str) -> datetime:
         return now - timedelta(days=30)
 
 
-def generate_coaching_plan(skill_gaps: list[dict], improvement_areas: list[dict]) -> str:
+def generate_coaching_plan(skill_gaps: list[Any], improvement_areas: list[Any]) -> str:
     """
     Generate a personalized coaching plan based on gaps and trends.
 
@@ -266,7 +278,9 @@ def generate_coaching_plan(skill_gaps: list[dict], improvement_areas: list[dict]
     plan_parts = ["# Personalized Coaching Plan\n"]
 
     # Section 1: Priority Focus Areas
-    high_priority_gaps = [g for g in skill_gaps if g["priority"] == "high"]
+    high_priority_gaps = [
+        g for g in skill_gaps if isinstance(g, dict) and g.get("priority") == "high"
+    ]
     if high_priority_gaps:
         plan_parts.append("## 🎯 Priority Focus Areas (High Impact)\n")
         for gap in high_priority_gaps[:3]:  # Top 3
@@ -278,7 +292,9 @@ def generate_coaching_plan(skill_gaps: list[dict], improvement_areas: list[dict]
         plan_parts.append("\n")
 
     # Section 2: Quick Wins
-    medium_priority_gaps = [g for g in skill_gaps if g["priority"] == "medium"]
+    medium_priority_gaps = [
+        g for g in skill_gaps if isinstance(g, dict) and g.get("priority") == "medium"
+    ]
     if medium_priority_gaps:
         plan_parts.append("## ⚡ Quick Wins (Medium Impact)\n")
         for gap in medium_priority_gaps[:2]:
@@ -286,7 +302,9 @@ def generate_coaching_plan(skill_gaps: list[dict], improvement_areas: list[dict]
         plan_parts.append("\n")
 
     # Section 3: Celebrate Improvements
-    improving = [a for a in improvement_areas if a["trend"] == "improving"]
+    improving = [
+        a for a in improvement_areas if isinstance(a, dict) and a.get("trend") == "improving"
+    ]
     if improving:
         plan_parts.append("## 🚀 Improving Areas (Keep It Up!)\n")
         for area in improving:
@@ -297,7 +315,9 @@ def generate_coaching_plan(skill_gaps: list[dict], improvement_areas: list[dict]
         plan_parts.append("\n")
 
     # Section 4: Watch List
-    declining = [a for a in improvement_areas if a["trend"] == "declining"]
+    declining = [
+        a for a in improvement_areas if isinstance(a, dict) and a.get("trend") == "declining"
+    ]
     if declining:
         plan_parts.append("## ⚠️  Watch List (Needs Attention)\n")
         for area in declining:
