@@ -46,6 +46,7 @@ from coaching_mcp.tools.search_calls import search_calls_tool
 from db import queries
 from db.models import CoachingDimension, KnowledgeBaseCategory, Product
 from knowledge_base.loader import KnowledgeBaseManager
+from services.scheduler import get_scheduler, start_scheduler, stop_scheduler
 
 # Import middleware
 
@@ -59,6 +60,39 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+
+# ============================================================================
+# LIFECYCLE EVENTS
+# ============================================================================
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup."""
+    logger.info("Starting Call Coach REST API...")
+
+    # Start background scheduler for automated Gong imports
+    try:
+        start_scheduler()
+        logger.info("✓ Background scheduler started")
+    except Exception as e:
+        logger.error(f"Failed to start scheduler: {e}", exc_info=True)
+        # Don't fail startup if scheduler fails
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Clean up services on shutdown."""
+    logger.info("Shutting down Call Coach REST API...")
+
+    # Stop background scheduler gracefully
+    try:
+        stop_scheduler()
+        logger.info("✓ Background scheduler stopped")
+    except Exception as e:
+        logger.error(f"Error stopping scheduler: {e}", exc_info=True)
+
 
 # ============================================================================
 # MIDDLEWARE SETUP
@@ -214,6 +248,58 @@ kb_manager = KnowledgeBaseManager()
 async def health_check():
     """Health check endpoint for monitoring."""
     return {"status": "ok", "service": "call-coaching-api", "tools": 5}
+
+
+# Scheduler endpoints
+@app.get("/api/v1/scheduler/status")
+async def scheduler_status() -> dict[str, Any]:
+    """Get scheduler status and job information."""
+    try:
+        scheduler = get_scheduler()
+
+        # Check if scheduler is running
+        is_running = scheduler.scheduler.running
+
+        # Get job details
+        jobs = []
+        for job in scheduler.scheduler.get_jobs():
+            jobs.append(
+                {
+                    "id": job.id,
+                    "name": job.name,
+                    "next_run_time": job.next_run_time.isoformat() if job.next_run_time else None,
+                    "trigger": str(job.trigger),
+                }
+            )
+
+        return {
+            "status": "running" if is_running else "stopped",
+            "jobs": jobs,
+        }
+    except Exception as e:
+        logger.error(f"Error getting scheduler status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/scheduler/import-now")
+async def trigger_import_now() -> dict[str, Any]:
+    """Manually trigger a Gong import immediately."""
+    try:
+        scheduler = get_scheduler()
+
+        # Check if scheduler is running
+        if not scheduler.scheduler.running:
+            raise HTTPException(status_code=503, detail="Scheduler is not running")
+
+        # Trigger the import job immediately
+        result = scheduler.import_recent_calls()
+
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error triggering manual import: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # Tool endpoints

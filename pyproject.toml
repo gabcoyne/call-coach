@@ -38,6 +38,7 @@ dependencies = [
     "beautifulsoup4>=4.12.0",
     # YAML parsing for competitive analysis
     "pyyaml>=6.0",
+    "apscheduler>=3.11.2",
 ]
 
 [project.scripts]
