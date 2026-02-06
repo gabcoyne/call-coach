@@ -124,50 +124,69 @@ def aggregate_five_wins(results: dict[str, dict[str, Any]]) -> dict[str, Any]:
             continue
 
         five_wins = analysis.get("five_wins_coverage", {})
-        if not five_wins:
+        if not five_wins or not isinstance(five_wins, dict):
+            logger.debug(f"Dimension {dim_name} missing or malformed five_wins_coverage")
             continue
 
         # For each win, take the highest score across dimensions
         for win_name in wins.keys():
-            win_data = five_wins.get(win_name, {})
-            if not win_data:
+            try:
+                win_data = five_wins.get(win_name, {})
+                if not win_data or not isinstance(win_data, dict):
+                    continue
+
+                win_score = win_data.get("score", 0) or 0
+
+                # Validate score is numeric
+                if not isinstance(win_score, int | float):
+                    logger.warning(
+                        f"Invalid score type for {win_name} in {dim_name}: {type(win_score)}"
+                    )
+                    continue
+
+                # Update if this dimension has higher score for this win
+                if win_score > wins[win_name]["score"]:
+                    wins[win_name]["score"] = int(win_score)
+
+                    # Update status based on score
+                    if win_score >= 90:
+                        wins[win_name]["status"] = "met"
+                    elif win_score >= 50:
+                        wins[win_name]["status"] = "partial"
+                    else:
+                        wins[win_name]["status"] = "missed"
+            except Exception as e:
+                logger.error(f"Error processing {win_name} for {dim_name}: {e}")
                 continue
-
-            win_score = win_data.get("score", 0) or 0
-
-            # Update if this dimension has higher score for this win
-            if win_score > wins[win_name]["score"]:
-                wins[win_name]["score"] = win_score
-
-                # Update status based on score
-                if win_score >= 90:
-                    wins[win_name]["status"] = "met"
-                elif win_score >= 50:
-                    wins[win_name]["status"] = "partial"
-                else:
-                    wins[win_name]["status"] = "missed"
 
             # Collect evidence from this dimension (limit to avoid bloat)
             # Evidence format from prompts: discovery criteria with covered/notes
-            discovery_data = (
-                win_data.get("business_discovery")
-                or win_data.get("technical_discovery")
-                or win_data.get("infosec_discovery")
-                or win_data.get("scoping_discovery")
-                or win_data.get("legal_discovery")
-            )
+            try:
+                discovery_data = (
+                    win_data.get("business_discovery")
+                    or win_data.get("technical_discovery")
+                    or win_data.get("infosec_discovery")
+                    or win_data.get("scoping_discovery")
+                    or win_data.get("legal_discovery")
+                )
 
-            if discovery_data and len(wins[win_name]["evidence"]) < 5:
-                # Convert discovery notes to evidence format
-                for criterion, details in discovery_data.items():
-                    if isinstance(details, dict) and details.get("covered"):
-                        wins[win_name]["evidence"].append(
-                            {
-                                "criterion": criterion,
-                                "dimension": dim_name,
-                                "notes": details.get("notes", ""),
-                            }
-                        )
+                if (
+                    discovery_data
+                    and isinstance(discovery_data, dict)
+                    and len(wins[win_name]["evidence"]) < 5
+                ):
+                    # Convert discovery notes to evidence format
+                    for criterion, details in discovery_data.items():
+                        if isinstance(details, dict) and details.get("covered"):
+                            wins[win_name]["evidence"].append(
+                                {
+                                    "criterion": criterion,
+                                    "dimension": dim_name,
+                                    "notes": details.get("notes", ""),
+                                }
+                            )
+            except Exception as e:
+                logger.debug(f"Error collecting evidence for {win_name} from {dim_name}: {e}")
 
     # Compute overall metrics
     wins_secured = sum(1 for win in wins.values() if win["score"] > 50)
@@ -396,10 +415,23 @@ def analyze_call_tool(
                 all_examples["needs_work"].extend(examples.get("needs_work", []))
 
     # Step 7b: Aggregate Five Wins evaluation across dimensions
-    five_wins_evaluation = aggregate_five_wins(results)
-
-    # Validate Five Wins scoring integrity
-    validate_five_wins_scores(five_wins_evaluation)
+    try:
+        five_wins_evaluation = aggregate_five_wins(results)
+        # Validate Five Wins scoring integrity
+        validate_five_wins_scores(five_wins_evaluation)
+    except Exception as e:
+        # If Five Wins aggregation fails, provide fallback structure
+        logger.error(f"Five Wins aggregation failed: {e}", exc_info=True)
+        five_wins_evaluation = {
+            "business_win": {"score": 0, "max_score": 35, "status": "missed", "evidence": []},
+            "technical_win": {"score": 0, "max_score": 25, "status": "missed", "evidence": []},
+            "security_win": {"score": 0, "max_score": 15, "status": "missed", "evidence": []},
+            "commercial_win": {"score": 0, "max_score": 15, "status": "missed", "evidence": []},
+            "legal_win": {"score": 0, "max_score": 10, "status": "missed", "evidence": []},
+            "wins_secured": 0,
+            "overall_score": 0,
+            "error": f"Aggregation failed: {str(e)}",
+        }
 
     # Step 8: Build response
     # Extract gong_url from metadata if available
