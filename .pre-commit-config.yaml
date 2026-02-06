@@ -117,7 +117,7 @@ repos:
     hooks:
       - id: jest-quick
         name: jest-quick
-        entry: bash -c 'if git diff --cached --name-only | grep -qE "frontend/.*\.(ts|tsx|js|jsx)$"; then cd frontend && npm test -- --bail --findRelatedTests --passWithNoTests; fi'
+        entry: bash -c 'FILES=$(git diff --cached --name-only --relative=frontend | grep -E "\.(ts|tsx|js|jsx)$" | xargs); if [ -n "$FILES" ]; then cd frontend && npm test -- --bail --findRelatedTests --passWithNoTests $FILES; fi'
         language: system
         pass_filenames: false
         always_run: false

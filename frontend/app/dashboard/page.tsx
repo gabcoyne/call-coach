@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,10 +24,11 @@ export default function DashboardPage() {
   const currentUserEmail = user?.emailAddresses[0]?.emailAddress;
 
   // For non-managers, redirect to their own dashboard
-  if (isLoaded && !isManager && currentUserEmail) {
-    router.push(`/dashboard/${encodeURIComponent(currentUserEmail)}`);
-    return null;
-  }
+  useEffect(() => {
+    if (isLoaded && !isManager && currentUserEmail) {
+      router.push(`/dashboard/${encodeURIComponent(currentUserEmail)}`);
+    }
+  }, [isLoaded, isManager, currentUserEmail, router]);
 
   // Fetch all calls to aggregate rep data (for manager view)
   const { data: calls, isLoading, error } = useSearchCalls(isManager ? { limit: 500 } : null);
