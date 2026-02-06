@@ -54,3 +54,7 @@ export type {} from "./ClipGenerator";
 
 export { default as FiveWinsScoreCard } from "./FiveWinsScoreCard";
 export type {} from "./FiveWinsScoreCard";
+
+export { default as WinBreakdown } from "./WinBreakdown";
+export { WIN_DESCRIPTIONS } from "./WinBreakdown";
+export type {} from "./WinBreakdown";
