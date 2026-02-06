@@ -48,23 +48,23 @@
 
 ## 6. Learning Insights Role Filtering
 
-- [ ] 6.1 Update analysis/learning_insights.py to accept rep_role parameter
-- [ ] 6.2 Modify find_similar_won_opportunities() to filter by opportunity owner role
-- [ ] 6.3 Modify aggregate_coaching_patterns() to only compare within same role
-- [ ] 6.4 Update get_learning_insights() to detect rep role and pass to comparison functions
-- [ ] 6.5 Add role context to generated insights (e.g., "Comparing to top-performing Sales Engineers")
-- [ ] 6.6 Test that SE insights only show examples from other SEs, not AEs
+- [x] 6.1 Update analysis/learning_insights.py to accept rep_role parameter
+- [x] 6.2 Modify find_similar_won_opportunities() to filter by opportunity owner role
+- [x] 6.3 Modify aggregate_coaching_patterns() to only compare within same role
+- [x] 6.4 Update get_learning_insights() to detect rep role and pass to comparison functions
+- [x] 6.5 Add role context to generated insights (e.g., "Comparing to top-performing Sales Engineers")
+- [x] 6.6 Test that SE insights only show examples from other SEs, not AEs
 
 ## 7. Backend API for Role Assignment
 
-- [ ] 7.1 Create app/api/settings/roles/route.ts with GET handler listing all staff with roles
-- [ ] 7.2 Add middleware checking user is manager (Clerk publicMetadata.role === 'manager')
-- [ ] 7.3 Return 403 error if non-manager attempts to access
-- [ ] 7.4 Query db.get_prefect_staff() and db.list_all_staff_roles(), merge results
-- [ ] 7.5 Create app/api/settings/roles/[email]/route.ts with PUT handler for updating role
-- [ ] 7.6 Validate email ends in '@prefect.io' in PUT handler, return 400 if not
-- [ ] 7.7 Call db.upsert_staff_role() with role, manager email, current timestamp
-- [ ] 7.8 Add DELETE handler to remove role assignment
+- [x] 7.1 Create app/api/settings/roles/route.ts with GET handler listing all staff with roles
+- [x] 7.2 Add middleware checking user is manager (Clerk publicMetadata.role === 'manager')
+- [x] 7.3 Return 403 error if non-manager attempts to access
+- [x] 7.4 Query db.get_prefect_staff() and db.list_all_staff_roles(), merge results
+- [x] 7.5 Create app/api/settings/roles/[email]/route.ts with PUT handler for updating role
+- [x] 7.6 Validate email ends in '@prefect.io' in PUT handler, return 400 if not
+- [x] 7.7 Call db.upsert_staff_role() with role, manager email, current timestamp
+- [x] 7.8 Add DELETE handler to remove role assignment
 - [ ] 7.9 Test API endpoints with curl/Postman for CRUD operations
 
 ## 8. Frontend Role Assignment UI
