@@ -104,6 +104,11 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # Next.js dev server
         "http://localhost:3001",  # Alternative port
+        "http://localhost:3002",  # Alternative port
+        "http://localhost:3003",  # Alternative port
+        "http://localhost:3004",  # Alternative port
+        "http://localhost:3005",  # Alternative port
+        "http://localhost:3006",  # Alternative port
         "https://*.vercel.app",  # Vercel preview deployments
     ],
     allow_credentials=True,
