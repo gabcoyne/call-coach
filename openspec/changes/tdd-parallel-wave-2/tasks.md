@@ -84,33 +84,50 @@
 
 ## 8. Frontend Unit Tests - Components
 
-- [ ] 8.1 Write test for ScoreTrendChart renders with data (ScoreTrendChart.test.tsx::test_renders_with_props)
-- [ ] 8.2 Write test for SkillGapRadar user interaction (SkillGapRadar.test.tsx::test_user_interaction)
-- [ ] 8.3 Write test for TeamComparisonBar async data loading (TeamComparisonBar.test.tsx::test_async_loading)
-- [ ] 8.4 Write test for ActivityTimeline component (ActivityTimeline.test.tsx::test_activity_timeline)
-- [ ] 8.5 Write test for ObjectionBreakdown component (ObjectionBreakdown.test.tsx::test_objection_breakdown)
-- [ ] 8.6 Write test for CallAnalysisViewer component (CallAnalysisViewer.test.tsx::test_call_analysis_viewer)
+- [x] 8.1 Write test for ScoreTrendChart renders with data
+      (ScoreTrendChart.test.tsx::test_renders_with_props)
+- [x] 8.2 Write test for SkillGapRadar user interaction
+      (SkillGapRadar.test.tsx::test_user_interaction)
+- [x] 8.3 Write test for TeamComparisonBar async data loading
+      (TeamComparisonBar.test.tsx::test_async_loading)
+- [x] 8.4 Write test for ActivityTimeline component
+      (ActivityTimeline.test.tsx::test_activity_timeline)
+- [x] 8.5 Write test for ObjectionBreakdown component
+      (ObjectionBreakdown.test.tsx::test_objection_breakdown)
+- [x] 8.6 Write test for CallAnalysisViewer component
+      (CallAnalysisViewer.test.tsx::test_call_analysis_viewer)
 
 ## 9. Frontend Unit Tests - Hooks
 
-- [ ] 9.1 Write test for useRepInsights hook initial state (useRepInsights.test.tsx::test_initial_state)
-- [ ] 9.2 Write test for useRepInsights hook updates (useRepInsights.test.tsx::test_state_updates)
-- [ ] 9.3 Write test for useCallAnalysis hook (useCallAnalysis.test.tsx::test_call_analysis_hook)
-- [ ] 9.4 Write test for custom hooks error handling (useRepInsights.test.tsx::test_error_handling)
+- [x] 9.1 Write test for useRepInsights hook initial state
+      (useRepInsights.test.tsx::test_initial_state)
+- [x] 9.2 Write test for useRepInsights hook updates
+      (useRepInsights.test.tsx::test_state_updates)
+- [x] 9.3 Write test for useCallAnalysis hook
+      (useCallAnalysis.test.tsx::test_call_analysis_hook)
+- [x] 9.4 Write test for custom hooks error handling
+      (useRepInsights.test.tsx::test_error_handling)
 
 ## 10. Frontend Unit Tests - Utilities
 
-- [ ] 10.1 Write test for utility functions with valid input (utils.test.ts::test_utils_valid_input)
-- [ ] 10.2 Write test for utility functions with edge cases (utils.test.ts::test_utils_edge_cases)
-- [ ] 10.3 Write test for auth utilities (auth.test.ts::test_auth_utilities)
+- [x] 10.1 Write test for utility functions with valid input
+      (utils.test.ts::test_utils_valid_input)
+- [x] 10.2 Write test for utility functions with edge cases
+      (utils.test.ts::test_utils_edge_cases)
+- [x] 10.3 Write test for auth utilities (auth.test.ts::test_auth_utilities)
 
 ## 11. Frontend Integration Tests
 
-- [ ] 11.1 Write integration test for API route handler success (api-routes.test.ts::test_route_handler_success)
-- [ ] 11.2 Write integration test for API route validation error (api-routes.test.ts::test_route_validation_error)
-- [ ] 11.3 Write integration test for API route DB interaction (api-routes.test.ts::test_route_database_query)
-- [ ] 11.4 Write integration test for login to dashboard workflow (user-workflows.test.tsx::test_login_dashboard)
-- [ ] 11.5 Write integration test for create coaching session workflow (user-workflows.test.tsx::test_create_session)
+- [x] 11.1 Write integration test for API route handler success
+      (api-routes.test.ts::test_route_handler_success)
+- [x] 11.2 Write integration test for API route validation error
+      (api-routes.test.ts::test_route_validation_error)
+- [x] 11.3 Write integration test for API route DB interaction
+      (api-routes.test.ts::test_route_database_query)
+- [x] 11.4 Write integration test for login to dashboard workflow
+      (user-workflows.test.tsx::test_login_dashboard)
+- [x] 11.5 Write integration test for create coaching session workflow
+      (user-workflows.test.tsx::test_create_session)
 
 ## 12. End-to-End API Tests
 
