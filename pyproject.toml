@@ -50,14 +50,15 @@ dev = [
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.12.0",
 
+    # Performance testing
+    "pytest-benchmark>=4.0.0",
+    "locust>=2.17.0",
+
     # API Testing
     "httpx>=0.27.0",
 
     # E2E Testing with Playwright
     "playwright>=1.40.0",
-
-    # Load Testing
-    "locust>=2.17.0",
 
     # Code quality
     "black>=24.0.0",
@@ -93,6 +94,7 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "asyncio: marks tests as async (deselect with '-m \"not asyncio\"')",
     "e2e: marks tests as end-to-end tests (deselect with '-m \"not e2e\"')",
+    "performance: marks tests as performance tests (deselect with '-m \"not performance\"')",
 ]
 
 [tool.mypy]
