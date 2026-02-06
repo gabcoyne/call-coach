@@ -263,6 +263,13 @@ export function CallAnalysisViewer({
         />
       </div>
 
+      {/* Rubric Badge - Show which role-specific rubric was used for evaluation */}
+      {analysis.rep_analyzed?.evaluated_as_role && (
+        <div className="flex justify-center">
+          <RubricBadge role={analysis.rep_analyzed.evaluated_as_role} />
+        </div>
+      )}
+
       {/* Task 4.6: Display dimension scores using ScoreCard components */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">Performance Scores</h2>

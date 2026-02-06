@@ -3,8 +3,18 @@ REST API Bridge for FastMCP Tools
 
 Exposes FastMCP coaching tools as REST HTTP endpoints for the Next.js frontend.
 This bridge allows the React app to call MCP tools via standard HTTP POST requests.
+
+Production Features:
+- Rate limiting per-user and per-endpoint
+- Response compression (gzip)
+- API versioning (/api/v1/)
+- Standardized error handling
+- Request/response logging
+- Performance monitoring
 """
 import logging
+import time
+import uuid
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request
@@ -28,16 +38,32 @@ from db import queries
 from knowledge_base.loader import KnowledgeBaseManager
 from db.models import Product, KnowledgeBaseCategory, CoachingDimension
 
+# Import middleware
+from middleware.rate_limit import RateLimitMiddleware
+from middleware.compression import CompressionMiddleware
+
+# Import error handlers
+from api.error_handlers import setup_error_handlers
+
+# Import versioned API routers
+from api.v1 import router as v1_router
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Call Coaching API",
-    description="REST API bridge for FastMCP coaching tools",
-    version="1.0.0"
+    description="REST API bridge for FastMCP coaching tools with production features",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
-# Configure CORS for Next.js frontend
+# ============================================================================
+# MIDDLEWARE SETUP
+# ============================================================================
+
+# CORS middleware (must be first)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -48,7 +74,77 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=[
+        "X-RateLimit-Limit",
+        "X-RateLimit-Remaining",
+        "X-RateLimit-Reset",
+        "X-Request-ID",
+        "X-Response-Time",
+    ],
 )
+
+# Rate limiting middleware
+app.add_middleware(
+    RateLimitMiddleware,
+    default_rate_limit=100,  # 100 requests per minute
+    default_burst=150,
+    expensive_rate_limit=20,  # 20 requests per minute for expensive ops
+    expensive_burst=30,
+)
+
+# Compression middleware
+app.add_middleware(
+    CompressionMiddleware,
+    minimum_size=500,  # Only compress responses > 500 bytes
+    compression_level=6,
+)
+
+
+# Request ID and timing middleware
+@app.middleware("http")
+async def add_request_context(request: Request, call_next):
+    """Add request ID and timing to all requests."""
+    # Generate request ID
+    request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
+
+    # Time request
+    start_time = time.time()
+
+    # Process request
+    response = await call_next(request)
+
+    # Add headers
+    response.headers["X-Request-ID"] = request_id
+    response.headers["X-Response-Time"] = f"{(time.time() - start_time) * 1000:.2f}ms"
+
+    # Log request
+    logger.info(
+        f"{request.method} {request.url.path} - {response.status_code} - "
+        f"{response.headers['X-Response-Time']}",
+        extra={
+            "request_id": request_id,
+            "method": request.method,
+            "path": request.url.path,
+            "status_code": response.status_code,
+            "duration_ms": float(response.headers["X-Response-Time"].rstrip("ms")),
+        }
+    )
+
+    return response
+
+
+# ============================================================================
+# ERROR HANDLERS
+# ============================================================================
+
+setup_error_handlers(app)
+
+# ============================================================================
+# API ROUTERS
+# ============================================================================
+
+# Include versioned API routes
+app.include_router(v1_router)
 
 
 # Request/Response models for type safety

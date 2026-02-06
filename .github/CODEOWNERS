@@ -1,0 +1,23 @@
+# CODEOWNERS file for call-coach project
+# This file specifies who should review changes to various parts of the codebase
+
+# All Python code
+/analysis/**/*.py @gabcoyne
+/coaching_mcp/**/*.py @gabcoyne
+/api/**/*.py @gabcoyne
+/db/**/*.py @gabcoyne
+/flows/**/*.py @gabcoyne
+
+# Database code and migrations
+/db/** @gabcoyne
+
+# CI/CD configuration
+.github/ @gabcoyne
+scripts/ci/ @gabcoyne
+
+# Project configuration
+pyproject.toml @gabcoyne
+docker-compose.yml @gabcoyne
+Dockerfile* @gabcoyne
+.env.example @gabcoyne
+.env.production.example @gabcoyne
