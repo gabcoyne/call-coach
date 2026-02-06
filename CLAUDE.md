@@ -2,6 +2,25 @@
 
 FastMCP server for AI-powered sales call coaching. This guide covers local development, testing, and deployment.
 
+## Development Rules
+
+### CRITICAL: Never skip tests of any kind
+
+- **NO SKIPPING**: Never use `SKIP=jest-quick`, `SKIP=pytest-quick`, or any
+  other mechanism to skip tests during commits
+- **ALL TESTS MUST PASS**: If tests fail, fix them - don't skip them
+- **FIX THE ROOT CAUSE**: When tests fail, fix the underlying issue, not just
+  the test
+- **PRE-EXISTING FAILURES**: If tests were failing before your changes, fix
+  them as part of your work
+- **TEST INFRASTRUCTURE**: If test infrastructure is broken (mocks, setup,
+  etc.), fix it properly
+- **NO EXCEPTIONS**: This rule applies to all test types: unit tests,
+  integration tests, E2E tests, linting, type checking
+
+Tests are the safety net that prevents bugs from reaching production.
+Skipping them is never acceptable.
+
 ## Quick Start
 
 Get the backend running locally in under 5 minutes.
