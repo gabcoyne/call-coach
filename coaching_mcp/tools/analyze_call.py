@@ -38,7 +38,7 @@ def analyze_call_tool(
     call = fetch_one(
         """
         SELECT c.id, c.gong_call_id, c.title, c.scheduled_at,
-               c.duration_seconds, c.call_type, c.product
+               c.duration_seconds, c.call_type, c.product, c.metadata
         FROM calls c
         WHERE c.gong_call_id = %s OR c.id::text = %s
         """,
@@ -116,7 +116,29 @@ def analyze_call_tool(
         overall_score = round(overall_score / valid_scores)
     scores["overall"] = overall_score
 
-    # Step 6: Aggregate insights across dimensions
+    # Step 6: Fetch transcript segments
+    transcript_segments = []
+    if include_transcript_snippets:
+        transcript_rows = fetch_all(
+            """
+            SELECT s.name, t.timestamp_seconds, t.text
+            FROM transcripts t
+            LEFT JOIN speakers s ON t.speaker_id = s.id
+            WHERE t.call_id = %s
+            ORDER BY t.sequence_number ASC
+            """,
+            (str(db_call_id),),
+        )
+        transcript_segments = [
+            {
+                "speaker": row["name"] or "Unknown",
+                "timestamp_seconds": row["timestamp_seconds"] or 0,
+                "text": row["text"],
+            }
+            for row in transcript_rows
+        ]
+
+    # Step 7: Aggregate insights across dimensions
     all_strengths = []
     all_improvements = []
     all_action_items = []
@@ -133,7 +155,11 @@ def analyze_call_tool(
                 all_examples["good"].extend(examples.get("good", []))
                 all_examples["needs_work"].extend(examples.get("needs_work", []))
 
-    # Step 7: Build response
+    # Step 8: Build response
+    # Extract gong_url from metadata if available
+    metadata = call.get("metadata") or {}
+    gong_url = metadata.get("gong_url") or f"https://app.gong.io/call?id={call['gong_call_id']}"
+
     response = {
         "call_metadata": {
             "id": call["gong_call_id"],
@@ -142,6 +168,8 @@ def analyze_call_tool(
             "duration_seconds": call["duration_seconds"],
             "call_type": call["call_type"],
             "product": call["product"],
+            "gong_url": gong_url,
+            "recording_url": metadata.get("recording_url"),
             "participants": [
                 {
                     "name": s["name"],
@@ -165,6 +193,7 @@ def analyze_call_tool(
         "action_items": all_action_items,
         "dimension_details": results,
         "comparison_to_average": calculate_comparison_to_average(scores, call["product"]),
+        "transcript": transcript_segments if include_transcript_snippets else None,
     }
 
     logger.info(f"Analysis complete. Overall score: {overall_score}/100")

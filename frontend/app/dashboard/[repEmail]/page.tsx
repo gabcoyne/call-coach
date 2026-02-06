@@ -10,6 +10,7 @@ import { SkillGapChart, SkillGapData } from "@/components/coaching/SkillGapChart
 import { TeamComparisonChart, ComparisonData } from "@/components/coaching/TeamComparisonChart";
 import { DimensionBreakdownChart, DimensionData } from "@/components/coaching/DimensionBreakdownChart";
 import { RecentActivityFeed, ActivityItem } from "@/components/coaching/RecentActivityFeed";
+import { FeedbackStats } from "@/components/coaching/FeedbackStats";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -511,6 +512,15 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
         <RecentActivityFeed
           activities={recentCalls}
           limit={10}
+        />
+      </section>
+
+      {/* Coaching Quality Metrics */}
+      <section>
+        <h2 className="text-2xl font-bold mb-4">Coaching Quality Metrics</h2>
+        <FeedbackStats
+          repEmail={repEmail}
+          timePeriod={timeRange as "last_7_days" | "last_30_days" | "last_90_days" | "all_time"}
         />
       </section>
     </div>

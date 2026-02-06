@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Coaching Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #1e40af;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            color: #475569;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .summary-box {
+            background-color: #eff6ff;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #2563eb;
+        }
+        .summary-box p {
+            margin: 8px 0;
+        }
+        .score-card {
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #64748b;
+        }
+        .score-card.high {
+            border-left-color: #16a34a;
+            background-color: #f0fdf4;
+        }
+        .score-card.medium {
+            border-left-color: #eab308;
+            background-color: #fefce8;
+        }
+        .score-card.low {
+            border-left-color: #dc2626;
+            background-color: #fef2f2;
+        }
+        .trend-up {
+            color: #16a34a;
+            font-weight: bold;
+        }
+        .trend-down {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        .trend-stable {
+            color: #64748b;
+        }
+        .objection-item {
+            background-color: #fef3c7;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border-left: 3px solid #f59e0b;
+        }
+        .call-list {
+            list-style: none;
+            padding: 0;
+        }
+        .call-list li {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8fafc;
+            border-radius: 4px;
+            border-left: 3px solid #94a3b8;
+        }
+        .action-items {
+            background-color: #fef2f2;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #ef4444;
+        }
+        .action-items ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        .action-items li {
+            margin: 8px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+        }
+        blockquote {
+            border-left: 3px solid #cbd5e1;
+            padding-left: 15px;
+            margin: 10px 0;
+            color: #475569;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weekly Coaching Report - {{ rep_name }}</h1>
+        <p><strong>Week of {{ week_start }}</strong></p>
+
+        <div class="summary-box">
+            <h2>Summary</h2>
+            <p><strong>Total Calls:</strong> {{ total_calls }}</p>
+            <p><strong>Coaching Sessions:</strong> {{ total_sessions }}</p>
+            {% if overall_avg %}
+            <p><strong>Overall Score:</strong> {{ overall_avg }}/100
+                {% if overall_trend %}
+                    {% if overall_trend.direction == "up" %}
+                        <span class="trend-up">📈 +{{ overall_trend.change }}</span>
+                    {% elif overall_trend.direction == "down" %}
+                        <span class="trend-down">📉 {{ overall_trend.change }}</span>
+                    {% else %}
+                        <span class="trend-stable">➡️ No change</span>
+                    {% endif %}
+                {% endif %}
+            </p>
+            {% endif %}
+        </div>
+
+        <h2>Score Breakdown by Dimension</h2>
+        {% for dimension in dimensions %}
+        <div class="score-card {{ dimension.css_class }}">
+            <h3>{{ dimension.label }}: {{ dimension.avg_score }}/100
+                {% if dimension.trend %}
+                    {% if dimension.trend.direction == "up" %}
+                        <span class="trend-up">📈 +{{ dimension.trend.change }}</span>
+                    {% elif dimension.trend.direction == "down" %}
+                        <span class="trend-down">📉 {{ dimension.trend.change }}</span>
+                    {% endif %}
+                {% endif %}
+            </h3>
+            <p><strong>Range:</strong> {{ dimension.min_score }}-{{ dimension.max_score }} | <strong>Sessions:</strong> {{ dimension.session_count }}</p>
+        </div>
+        {% endfor %}
+
+        {% if objections %}
+        <h2>Recurring Themes & Objections</h2>
+        {% for obj in objections %}
+        <div class="objection-item">
+            <h3>{{ obj.type }} ({{ obj.count }} occurrences)</h3>
+            {% if obj.examples %}
+                <p><strong>Examples:</strong></p>
+                {% for ex in obj.examples %}
+                <div style="margin: 10px 0;">
+                    <em>{{ ex.call_title }}</em>
+                    <blockquote>{{ ex.quote }}</blockquote>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <h2>Calls This Week</h2>
+        <ul class="call-list">
+        {% for call in calls %}
+            <li><strong>{{ call.title }}</strong> ({{ call.call_type }}) - {{ call.date }}</li>
+        {% endfor %}
+        </ul>
+
+        {% if action_items %}
+        <div class="action-items">
+            <h2>Recommended Focus Areas</h2>
+            <ol>
+            {% for item in action_items %}
+                <li>{{ item }}</li>
+            {% endfor %}
+            </ol>
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            <p>Report generated: {{ generated_at }}</p>
+            <p>🤖 Generated by Gong Call Coaching Agent</p>
+        </div>
+    </div>
+</body>
+</html>

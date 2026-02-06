@@ -11,6 +11,8 @@ import { CallRecordingPlayer } from "@/components/coaching/CallRecordingPlayer";
 import { TranscriptSearch } from "@/components/coaching/TranscriptSearch";
 import { ExportCoachingReport } from "@/components/coaching/ExportCoachingReport";
 import { ShareLink } from "@/components/coaching/ShareLink";
+import { FeedbackButton } from "@/components/coaching/FeedbackButton";
+import { CoachingSessionFeedback } from "@/components/coaching/CoachingSessionFeedback";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface CallAnalysisViewerProps {
@@ -356,6 +358,9 @@ export function CallAnalysisViewer({
           </div>
         </div>
       )}
+
+      {/* Coaching Session Feedback */}
+      <CoachingSessionFeedback callId={callId} />
     </div>
   );
 }

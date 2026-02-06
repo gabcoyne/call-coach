@@ -21,10 +21,25 @@ def analyze_objection_handling_prompt(
     Returns:
         List of message dicts for Claude API (with cache control)
     """
+    # Extract role-specific context if available
+    role_context = ""
+    if "role_rubric" in rubric and "evaluated_as_role" in rubric:
+        role_name = rubric["role_rubric"].get("role_name", "Account Executive")
+        role_desc = rubric["role_rubric"].get("description", "")
+        role_context = f"""
+## ROLE-SPECIFIC EVALUATION CONTEXT
+
+This call is being evaluated using the **{role_name}** rubric.
+
+{role_desc}
+
+The evaluation criteria and scoring have been tailored to reflect the responsibilities and success metrics specific to this role.
+"""
+
     system_prompt = f"""You are an expert sales coach analyzing a call for objection handling quality.
 
 Your task is to evaluate how well the sales representative handles customer objections based on the rubric below.
-
+{role_context}
 ## OBJECTION HANDLING RUBRIC v{rubric['version']}
 
 {_format_rubric(rubric)}

@@ -99,8 +99,37 @@ def load_transcript_for_call(call: dict[str, Any]) -> dict[str, Any]:
         # Store speakers
         logger.info(f"  Storing speakers...")
         participants = gong_call_data.get("participants", [])
-        speaker_mapping = store_speakers(call_id, participants)
-        result["speakers"] = len(speaker_mapping)
+
+        # If no participants from Gong API, create a default rep speaker for analysis
+        if not participants:
+            logger.warning(f"  No participants from Gong API - creating default rep speaker")
+            from uuid import uuid4
+            from db import execute_query
+
+            default_speaker_id = uuid4()
+            execute_query(
+                """
+                INSERT INTO speakers (
+                    id, call_id, name, email, role, company_side,
+                    talk_time_seconds, talk_time_percentage
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    str(default_speaker_id),
+                    str(call_id),
+                    "Unknown Rep",
+                    None,
+                    "ae",  # Default to AE role
+                    True,  # company_side = true
+                    None,
+                    None,
+                ),
+            )
+            speaker_mapping = {}
+            result["speakers"] = 1
+        else:
+            speaker_mapping = store_speakers(call_id, participants)
+            result["speakers"] = len(speaker_mapping)
 
         # Store transcript
         logger.info(f"  Storing transcript...")

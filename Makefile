@@ -1,6 +1,6 @@
 # Makefile for Gong Call Coaching Agent
 
-.PHONY: help install test lint format clean docker-up docker-down db-migrate sync
+.PHONY: help install test lint format clean docker-up docker-down db-migrate sync fixtures fixtures-demo
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -86,3 +86,12 @@ dev-full: ## Start both REST API and frontend
 	@sleep 3
 	@echo "Starting Next.js frontend..."
 	@make frontend
+
+fixtures: ## Generate sample data fixtures (20 calls)
+	uv run python scripts/generate_fixtures.py
+
+fixtures-demo: ## Generate demo dataset (50 calls, 6 months)
+	uv run python scripts/generate_fixtures.py --demo-account
+
+fixtures-custom: ## Generate custom fixtures (use NUM_CALLS=50 DAYS_BACK=180)
+	uv run python scripts/generate_fixtures.py --num-calls $(NUM_CALLS) --days-back $(DAYS_BACK)

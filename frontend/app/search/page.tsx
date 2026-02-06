@@ -28,6 +28,8 @@ import { SortingOptions, SortField, SortDirection } from "@/components/search/so
 import { ScoreThresholdFilters } from "@/components/search/score-threshold-filters";
 import { TopicKeywordFilter } from "@/components/search/topic-keyword-filter";
 import { ObjectionTypeFilter } from "@/components/search/objection-type-filter";
+import { AdvancedFilterBuilder } from "@/components/search/advanced-filter-builder";
+import { BulkActions } from "@/components/search/bulk-actions";
 
 // Storage key for recent searches
 const RECENT_SEARCHES_KEY = "coaching-recent-searches";
@@ -55,6 +57,10 @@ export default function CallSearchPage() {
 
   // Show advanced filters state
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [showAdvancedBuilder, setShowAdvancedBuilder] = useState(false);
+
+  // Bulk actions state
+  const [useBulkActionsView, setUseBulkActionsView] = useState(false);
 
   // Load recent searches on mount
   useEffect(() => {
@@ -260,14 +266,21 @@ export default function CallSearchPage() {
           }}
         />
 
-        {/* Toggle Advanced Filters */}
-        <div className="flex justify-center">
+        {/* Toggle Advanced Filters and Advanced Builder */}
+        <div className="flex justify-center gap-2 flex-wrap">
           <Button
             variant="outline"
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
             className="gap-2"
           >
             {showAdvancedFilters ? "Hide" : "Show"} Advanced Filters
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setShowAdvancedBuilder(!showAdvancedBuilder)}
+            className="gap-2"
+          >
+            {showAdvancedBuilder ? "Hide" : "Show"} Filter Builder
           </Button>
         </div>
 
@@ -288,6 +301,14 @@ export default function CallSearchPage() {
             />
           </div>
         )}
+
+        {/* Advanced Filter Builder */}
+        {showAdvancedBuilder && (
+          <AdvancedFilterBuilder
+            onApplyFilters={handleFiltersChange}
+            onClose={() => setShowAdvancedBuilder(false)}
+          />
+        )}
       </div>
 
       {/* Results Section */}
@@ -307,6 +328,13 @@ export default function CallSearchPage() {
                 </CardTitle>
               </div>
               <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant={useBulkActionsView ? "default" : "outline"}
+                  onClick={() => setUseBulkActionsView(!useBulkActionsView)}
+                  size="sm"
+                >
+                  {useBulkActionsView ? "Normal View" : "Bulk Actions"}
+                </Button>
                 <SaveSearchButton
                   filters={filters}
                   onSave={handleSaveSearch}
@@ -372,7 +400,27 @@ export default function CallSearchPage() {
             {/* Results Display */}
             {!isLoading && !error && totalResults > 0 && (
               <>
-                <SearchResults results={paginatedResults} />
+                {useBulkActionsView ? (
+                  <BulkActions
+                    results={paginatedResults}
+                    selectedCount={0}
+                    onSelectAll={() => {}}
+                    onBulkAnalyze={(callIds) => {
+                      toast({
+                        title: "Bulk Analysis",
+                        description: `Analyzing ${callIds.length} calls...`,
+                      });
+                    }}
+                    onBulkExport={(results) => {
+                      toast({
+                        title: "Export Started",
+                        description: `Exporting ${results.length} calls...`,
+                      });
+                    }}
+                  />
+                ) : (
+                  <SearchResults results={paginatedResults} />
+                )}
 
                 {/* Pagination Controls */}
                 {totalPages > 1 && (

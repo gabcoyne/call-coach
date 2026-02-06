@@ -285,6 +285,61 @@ export interface FeedResponse {
 }
 
 /**
+ * Feedback Types
+ */
+export type FeedbackType =
+  | "accurate"
+  | "inaccurate"
+  | "missing_context"
+  | "helpful"
+  | "not_helpful";
+
+export interface SubmitFeedbackRequest {
+  feedback_type: FeedbackType;
+  feedback_text?: string | null;
+}
+
+export interface CoachingFeedback {
+  id: string;
+  coaching_session_id: string;
+  rep_id: string;
+  feedback_type: FeedbackType;
+  feedback_text: string | null;
+  created_at: string;
+}
+
+export interface FeedbackStats {
+  total_feedback: number;
+  accurate_count: number;
+  inaccurate_count: number;
+  missing_context_count: number;
+  helpful_count: number;
+  not_helpful_count: number;
+  accuracy_rate: number;
+  helpfulness_rate: number;
+}
+
+export interface QualityIssue {
+  type: string;
+  severity: "high" | "medium" | "low";
+  message: string;
+  metric: number;
+  affected_count: number;
+}
+
+export interface FeedbackStatsResponse {
+  overall_stats: FeedbackStats;
+  dimension_stats: Array<{
+    dimension: string;
+    total_feedback: number;
+    accuracy_rate: number;
+    helpfulness_rate: number;
+  }>;
+  quality_issues: QualityIssue[];
+  time_period: string;
+}
+
+/**
  * Error Response
  */
 export interface APIErrorResponse {

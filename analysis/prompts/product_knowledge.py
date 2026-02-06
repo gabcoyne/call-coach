@@ -23,11 +23,26 @@ def analyze_product_knowledge_prompt(
     Returns:
         List of message dicts for Claude API (with cache control)
     """
+    # Extract role-specific context if available
+    role_context = ""
+    if "role_rubric" in rubric and "evaluated_as_role" in rubric:
+        role_name = rubric["role_rubric"].get("role_name", "Account Executive")
+        role_desc = rubric["role_rubric"].get("description", "")
+        role_context = f"""
+## ROLE-SPECIFIC EVALUATION CONTEXT
+
+This call is being evaluated using the **{role_name}** rubric.
+
+{role_desc}
+
+The evaluation criteria and scoring have been tailored to reflect the responsibilities and success metrics specific to this role.
+"""
+
     # System prompt with rubric (cacheable)
     system_prompt = f"""You are an expert sales coach analyzing a call for product knowledge quality.
 
 Your task is to evaluate how well the sales representative demonstrates product knowledge based on the rubric below.
-
+{role_context}
 ## PRODUCT KNOWLEDGE RUBRIC v{rubric['version']}
 
 {_format_rubric(rubric)}

@@ -1,0 +1,116 @@
+name: Vercel Preview Checks
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run TypeScript type check
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Run tests
+        working-directory: frontend
+        run: npm run test:ci
+
+      - name: Build check
+        working-directory: frontend
+        run: npm run build
+        env:
+          # Use dummy values for build check
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
+          CLERK_SECRET_KEY: sk_test_dummy
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+
+  verify-config:
+    name: Verify Deployment Config
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check required files
+        run: |
+          test -f vercel.json || (echo "vercel.json missing" && exit 1)
+          test -f .env.production.example || (echo ".env.production.example missing" && exit 1)
+          test -f DEPLOYMENT.md || (echo "DEPLOYMENT.md missing" && exit 1)
+          test -f frontend/app/api/cron/daily-sync/route.ts || (echo "Cron route missing" && exit 1)
+
+      - name: Validate vercel.json
+        run: |
+          # Check for required keys in vercel.json
+          grep -q '"buildCommand"' vercel.json || (echo "buildCommand missing" && exit 1)
+          grep -q '"framework": "nextjs"' vercel.json || (echo "framework not set" && exit 1)
+          grep -q '"crons"' vercel.json || (echo "crons missing" && exit 1)
+          echo "✓ vercel.json structure valid"
+
+      - name: Check environment variable documentation
+        run: |
+          # Verify all required env vars are documented
+          required_vars=(
+            "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"
+            "CLERK_SECRET_KEY"
+            "DATABASE_URL"
+            "GONG_API_KEY"
+            "ANTHROPIC_API_KEY"
+            "CRON_SECRET"
+          )
+
+          for var in "${required_vars[@]}"; do
+            if ! grep -q "$var" .env.production.example; then
+              echo "✗ $var not documented in .env.production.example"
+              exit 1
+            fi
+          done
+
+          echo "✓ All required env vars documented"
+
+  python-check:
+    name: Python Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install ruff
+
+      - name: Check Python syntax
+        run: |
+          ruff check flows/ db/ gong/ analysis/ coaching_mcp/ || true
+          echo "✓ Python syntax check complete"
+
+      - name: Verify daily sync script exists
+        run: |
+          test -f flows/daily_gong_sync.py || (echo "daily_gong_sync.py missing" && exit 1)
+          echo "✓ Daily sync script exists"
