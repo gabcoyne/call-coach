@@ -62,7 +62,10 @@ def detect_speaker_role(call_id: str) -> str:
     prefect_speakers = [
         s
         for s in speakers
-        if s.get("company_side") and s.get("email") and s["email"].endswith("@prefect.io")
+        if isinstance(s, dict)
+        and s.get("company_side")
+        and s.get("email")
+        and s["email"].endswith("@prefect.io")
     ]
 
     if not prefect_speakers:
@@ -72,6 +75,10 @@ def detect_speaker_role(call_id: str) -> str:
     # Select primary speaker (highest talk time)
     primary_speaker = max(prefect_speakers, key=lambda s: s.get("talk_time_percentage", 0) or 0)
 
+    if not isinstance(primary_speaker, dict) or "email" not in primary_speaker:
+        logger.warning(f"Invalid primary speaker data for call {call_id}, defaulting to AE rubric")
+        return "ae"
+
     speaker_email = primary_speaker["email"]
     logger.info(
         f"Primary Prefect speaker on call {call_id}: {speaker_email} "
@@ -79,10 +86,12 @@ def detect_speaker_role(call_id: str) -> str:
     )
 
     # Look up role assignment
-    role_result = fetch_one("SELECT role FROM staff_roles WHERE email = %s", (speaker_email,))
+    role_result = fetch_one(
+        "SELECT role FROM staff_roles WHERE email = %s", (speaker_email,), as_dict=True
+    )
 
-    if role_result:
-        role = role_result["role"]
+    if role_result and isinstance(role_result, dict) and "role" in role_result:
+        role = str(role_result["role"])
         logger.info(f"Speaker {speaker_email} has assigned role: {role}")
     else:
         logger.info(f"No role assigned for {speaker_email}, defaulting to 'ae'")
@@ -146,7 +155,14 @@ def get_or_create_coaching_session(
     logger.info(f"Running new analysis for call {call_id}, dimension={dimension.value}")
 
     # Get call metadata for context
-    call_metadata = fetch_one("SELECT * FROM calls WHERE id = %s", (str(call_id),))
+    call_metadata_result = fetch_one(
+        "SELECT * FROM calls WHERE id = %s", (str(call_id),), as_dict=True
+    )
+    call_metadata = (
+        call_metadata_result
+        if call_metadata_result and isinstance(call_metadata_result, dict)
+        else None
+    )
 
     # Run actual Claude API analysis with role-aware rubric
     analysis_result = _run_claude_analysis(
@@ -171,7 +187,11 @@ def get_or_create_coaching_session(
     session = fetch_one(
         "SELECT * FROM coaching_sessions WHERE id = %s",
         (session_id,),
+        as_dict=True,
     )
+
+    if not session or not isinstance(session, dict):
+        raise ValueError(f"Failed to retrieve coaching session {session_id}")
 
     return session
 
@@ -203,8 +223,8 @@ def analyze_call(
     )
 
     # Get call and transcript
-    call = fetch_one("SELECT * FROM calls WHERE id = %s", (str(call_id),))
-    if not call:
+    call = fetch_one("SELECT * FROM calls WHERE id = %s", (str(call_id),), as_dict=True)
+    if not call or not isinstance(call, dict):
         raise ValueError(f"Call {call_id} not found")
 
     # Get transcript segments
@@ -215,9 +235,10 @@ def analyze_call(
         WHERE call_id = %s
         """,
         (str(call_id),),
+        as_dict=True,
     )
 
-    if not segments or not segments.get("full_transcript"):
+    if not segments or not isinstance(segments, dict) or not segments.get("full_transcript"):
         raise ValueError(f"No transcript found for call {call_id}")
 
     transcript = segments["full_transcript"]
@@ -232,9 +253,10 @@ def analyze_call(
         LIMIT 1
         """,
         (str(call_id),),
+        as_dict=True,
     )
 
-    if not rep:
+    if not rep or not isinstance(rep, dict) or "id" not in rep:
         raise ValueError(f"No company rep found for call {call_id}")
 
     rep_id = rep["id"]
@@ -304,9 +326,10 @@ def _run_claude_analysis(
         LIMIT 1
         """,
         (dimension.value,),
+        as_dict=True,
     )
 
-    if not rubric_row:
+    if not rubric_row or not isinstance(rubric_row, dict):
         raise ValueError(f"No active rubric found for dimension: {dimension.value}")
 
     rubric = {
@@ -336,6 +359,10 @@ def _run_claude_analysis(
                 [
                     f"## {row['product'].upper()} - {row['category'].title()}\n{row['content']}"
                     for row in kb_rows
+                    if isinstance(row, dict)
+                    and "product" in row
+                    and "category" in row
+                    and "content" in row
                 ]
             )
         else:
@@ -356,7 +383,7 @@ def _run_claude_analysis(
             model="claude-sonnet-4-5-20250929",
             max_tokens=8000,  # Increased for complex discovery analysis with SPICED/Challenger/Sandler
             temperature=0.3,
-            messages=messages,
+            messages=messages,  # type: ignore[arg-type]
         )
 
         # Extract usage statistics
@@ -372,7 +399,10 @@ def _run_claude_analysis(
         )
 
         # Parse response content
-        response_text = response.content[0].text
+        content_block = response.content[0]
+        if not hasattr(content_block, "text"):
+            raise ValueError(f"Expected TextBlock but got {type(content_block)}")
+        response_text = content_block.text
 
         # Try to parse as JSON (structured output)
         try:
@@ -389,13 +419,13 @@ def _run_claude_analysis(
                     logger.error(f"Failed to parse extracted JSON: {str(e2)}")
                     logger.error(f"Response preview: {response_text[:1000]}...")
                     logger.error(f"Response end: ...{response_text[-500:]}")
-                    raise ValueError(f"Claude response JSON is malformed: {str(e2)}")
+                    raise ValueError(f"Claude response JSON is malformed: {str(e2)}") from e2
             else:
                 logger.error(
                     f"No JSON code block found. Response preview: {response_text[:1000]}..."
                 )
                 logger.error(f"Response end: ...{response_text[-500:]}")
-                raise ValueError(f"Claude response is not valid JSON: {str(e)}")
+                raise ValueError(f"Claude response is not valid JSON: {str(e)}") from e
 
         # Add metadata including role used for evaluation
         analysis_data["metadata"] = {
@@ -411,11 +441,11 @@ def _run_claude_analysis(
             ),  # Track which role rubric was used
         }
 
-        return analysis_data
+        return dict(analysis_data)
 
     except Exception as e:
         logger.error(f"Claude API call failed: {e}")
-        raise
+        raise RuntimeError(f"Claude API call failed: {e}") from e
 
 
 def _generate_prompt_for_dimension(

@@ -63,10 +63,10 @@ def validate_rubric(rubric_dict: dict[str, Any]) -> None:
         try:
             weight = float(dim["weight"])
             total_weight += weight
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
             raise RubricValidationError(
                 f"Dimension {dim['id']}: weight must be numeric, got {dim['weight']}"
-            )
+            ) from e
 
         # Validate criteria is array
         if not isinstance(dim["criteria"], list) or len(dim["criteria"]) == 0:
@@ -127,16 +127,16 @@ def load_rubric(role: str) -> dict[str, Any]:
 
     try:
         with open(rubric_file) as f:
-            rubric_dict = json.load(f)
+            rubric_dict: dict[str, Any] = json.load(f)
     except json.JSONDecodeError as e:
-        raise RubricValidationError(f"Failed to parse rubric JSON for role '{role}': {e}")
+        raise RubricValidationError(f"Failed to parse rubric JSON for role '{role}': {e}") from e
 
     # Validate structure
     try:
         validate_rubric(rubric_dict)
     except RubricValidationError as e:
         logger.error(f"Rubric validation failed for role '{role}': {e}")
-        raise
+        raise RuntimeError(f"Rubric validation failed for role '{role}'") from e
 
     # Cache and return
     _rubric_cache[role] = rubric_dict
@@ -164,8 +164,8 @@ def reload_rubrics() -> None:
     for role in roles:
         try:
             load_rubric(role)
-        except Exception as e:
-            logger.error(f"Failed to reload rubric for role '{role}': {e}")
+        except Exception:
+            logger.exception(f"Failed to reload rubric for role '{role}'")
 
     logger.info(f"Rubric cache reloaded: {len(_rubric_cache)} rubrics loaded")
 

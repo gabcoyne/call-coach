@@ -99,9 +99,10 @@ def get_cached_analysis(
         LIMIT 1
         """,
         (cache_key, transcript_hash, rubric_version, dimension.value, cache_cutoff),
+        as_dict=True,
     )
 
-    if cached:
+    if cached and isinstance(cached, dict):
         logger.info(
             f"Cache HIT for call {call_id}, dimension={dimension.value}, "
             f"rubric_version={rubric_version}"
@@ -142,9 +143,10 @@ def invalidate_cache_for_rubric(dimension: CoachingDimension, old_version: str) 
         AND rubric_version = %s
         """,
         (dimension.value, old_version),
+        as_dict=True,
     )
 
-    count = result["count"] if result else 0
+    count = int(result["count"]) if result and isinstance(result, dict) else 0
 
     logger.info(f"Found {count} cached analyses that will be bypassed due to rubric update")
 
@@ -175,9 +177,10 @@ def get_cache_statistics(days: int = 30) -> dict[str, Any]:
         WHERE created_at > %s
         """,
         (cutoff,),
+        as_dict=True,
     )
 
-    if not stats or stats["total_analyses"] == 0:
+    if not stats or not isinstance(stats, dict) or stats["total_analyses"] == 0:
         return {
             "days_analyzed": days,
             "total_analyses": 0,
@@ -227,12 +230,13 @@ def get_active_rubric_version(dimension: CoachingDimension) -> str:
         LIMIT 1
         """,
         (dimension.value,),
+        as_dict=True,
     )
 
-    if not rubric:
+    if not rubric or not isinstance(rubric, dict):
         raise ValueError(f"No active rubric found for dimension {dimension.value}")
 
-    return rubric["version"]
+    return str(rubric["version"])
 
 
 def store_analysis_with_cache(
@@ -311,6 +315,7 @@ def store_analysis_with_cache(
         LIMIT 1
         """,
         (cache_key,),
+        as_dict=True,
     )
 
     logger.info(
@@ -319,4 +324,4 @@ def store_analysis_with_cache(
         f"cache_key={cache_key[:16]}..."
     )
 
-    return str(session["id"]) if session else None
+    return str(session["id"]) if session and isinstance(session, dict) else None

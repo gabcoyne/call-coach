@@ -34,8 +34,7 @@ repos:
       - id: mypy
         additional_dependencies: [types-requests, types-PyYAML]
         args: [--ignore-missing-imports, --no-strict-optional]
-        # Exclude tests and files with pre-existing type issues
-        exclude: ^(tests/|\.venv|venv|build|dist|analysis/rubric_loader\.py|analysis/cache\.py)/
+        exclude: ^(tests/|\.venv|venv|build|dist)/
 
   # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
