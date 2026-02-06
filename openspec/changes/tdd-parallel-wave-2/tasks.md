@@ -37,23 +37,35 @@
 
 ## 5. Backend Unit Tests - MCP Tools
 
-- [ ] 5.1 Write test for analyze_call with valid parameters (test_mcp_tools.py::test_analyze_call_valid)
-- [ ] 5.2 Write test for get_rep_insights with time filtering (test_mcp_tools.py::test_rep_insights_time_filter)
-- [ ] 5.3 Write test for search_calls with complex filters (test_mcp_tools.py::test_search_calls_complex_filters)
-- [ ] 5.4 Write test for tool parameter validation (test_mcp_tools.py::test_tool_validation_error)
+- [x] 5.1 Write test for analyze_call with valid parameters
+      (test_mcp_tools.py::test_analyze_call_valid)
+- [x] 5.2 Write test for get_rep_insights with time filtering
+      (test_mcp_tools.py::test_rep_insights_time_filter)
+- [x] 5.3 Write test for search_calls with complex filters
+      (test_mcp_tools.py::test_search_calls_complex_filters)
+- [x] 5.4 Write test for tool parameter validation
+      (test_mcp_tools.py::test_tool_validation_error)
 
 ## 6. Middleware Fixes and Tests
 
-- [ ] 6.1 Refactor RateLimitMiddleware to use FastAPI dependency injection
-- [ ] 6.2 Write test for rate limit enforcement (test_rate_limit.py::test_rate_limit_enforced)
-- [ ] 6.3 Write test for rate limit headers (test_rate_limit.py::test_rate_limit_headers)
-- [ ] 6.4 Write test for per-endpoint rate limits (test_rate_limit.py::test_per_endpoint_limits)
-- [ ] 6.5 Write test for per-user rate limiting (test_rate_limit.py::test_per_user_limits)
-- [ ] 6.6 Write test for rate limit reset (test_rate_limit.py::test_rate_limit_reset)
-- [ ] 6.7 Refactor CompressionMiddleware to use dependency injection
-- [ ] 6.8 Write test for compression above threshold (test_compression.py::test_large_response_compressed)
-- [ ] 6.9 Write test for no compression below threshold (test_compression.py::test_small_response_not_compressed)
-- [ ] 6.10 Write test for compression with client support check (test_compression.py::test_client_without_gzip)
+- [x] 6.1 Refactor RateLimitMiddleware to use FastAPI dependency injection
+- [x] 6.2 Write test for rate limit enforcement
+      (test_rate_limit.py::test_rate_limit_enforced)
+- [x] 6.3 Write test for rate limit headers
+      (test_rate_limit.py::test_rate_limit_headers)
+- [x] 6.4 Write test for per-endpoint rate limits
+      (test_rate_limit.py::test_per_endpoint_limits)
+- [x] 6.5 Write test for per-user rate limiting
+      (test_rate_limit.py::test_per_user_limits)
+- [x] 6.6 Write test for rate limit reset
+      (test_rate_limit.py::test_rate_limit_reset)
+- [x] 6.7 Refactor CompressionMiddleware to use dependency injection
+- [x] 6.8 Write test for compression above threshold
+      (test_compression.py::test_large_response_compressed)
+- [x] 6.9 Write test for no compression below threshold
+      (test_compression.py::test_small_response_not_compressed)
+- [x] 6.10 Write test for compression with client support check
+      (test_compression.py::test_client_without_gzip)
 
 ## 7. Backend Integration Tests
 
