@@ -4,7 +4,7 @@ FastMCP server for AI-powered sales call coaching. This guide covers local devel
 
 ## Quick Start
 
-Get the backend server running locally in under 5 minutes.
+Get the backend running locally in under 5 minutes.
 
 ### Prerequisites
 
@@ -33,52 +33,98 @@ Get the backend server running locally in under 5 minutes.
    # Required: GONG_API_KEY, GONG_API_SECRET, ANTHROPIC_API_KEY, DATABASE_URL
    ```
 
-3. **Run the server**:
+3. **Start the REST API server** (Required for frontend):
 
    ```bash
-   # Development mode (fast startup, relaxed validation)
-   uv run mcp-server-dev
+   # Terminal 1: Start REST API server
+   uv run python api/rest_server.py
 
    # You should see:
-   # ============================================================
-   # Starting Gong Call Coaching MCP Server
-   # 🏗️  Dev mode: skipping expensive validations
-   # ============================================================
-   #
-   # 🔍 Running pre-flight validation checks...
-   # ✓ All required environment variables present
-   # ✓ Database connection successful (dev mode - schema not validated)
-   # ✓ Gong API validation skipped (dev mode)
-   # ✓ Anthropic API key validated
-   #
-   # ✅ All validation checks passed!
-   # ============================================================
-   # 🚀 MCP server ready - 3 tools registered
-   # ============================================================
+   # INFO: Started server process [xxxxx]
+   # INFO: Application startup complete
+   # INFO: Uvicorn running on http://0.0.0.0:8000
    ```
 
 4. **Verify health check**:
 
    ```bash
    curl http://localhost:8000/health
-   # {"status":"ok","tools":3}
+   # {"status":"ok","service":"call-coaching-api","tools":5}
    ```
+
+### Optional: MCP Server for Claude Desktop
+
+If you want to use the tools directly from Claude Desktop (not required for web app):
+
+```bash
+# Terminal 2: Start MCP server (stdio protocol)
+uv run python -m coaching_mcp.server --dev
+
+# You should see:
+# ============================================================
+# Starting Gong Call Coaching MCP Server
+# 🏗️  Dev mode: skipping expensive validations
+# ============================================================
+#
+# 🔍 Running pre-flight validation checks...
+# ✓ All required environment variables present
+# ✓ Database connection successful (dev mode - schema not validated)
+# ✓ Gong API validation skipped (dev mode)
+# ✓ Anthropic API key validated
+#
+# ✅ All validation checks passed!
+# ============================================================
+# 🚀 MCP server ready - 5 tools registered
+# ============================================================
+```
 
 ## Architecture
 
-### FastMCP Server Structure
+### Two-Tier Backend Architecture
 
-The MCP backend is built with [FastMCP](https://github.com/jlowin/fastmcp), providing three on-demand coaching tools accessible via the Model Context Protocol.
+The application has two backend components:
 
 ```
-coaching_mcp/
-├── server.py           # FastMCP server and tool registration
-├── shared/
-│   └── config.py       # Pydantic Settings for environment configuration
-└── tools/
-    ├── analyze_call.py       # Deep-dive analysis of specific calls
-    ├── get_rep_insights.py   # Performance trends for sales reps
-    └── search_calls.py       # Search calls by filters
+Frontend (Next.js :3000)
+    ↓ HTTP POST
+REST API Server (:8000)     ← api/rest_server.py
+    ↓ Function Calls
+MCP Server (stdio)          ← coaching_mcp/server.py
+    ↓ SQL Queries
+Database (Neon PostgreSQL)
+```
+
+**Why two servers?**
+
+- **REST API Server**: Bridges HTTP ↔ MCP tools for the Next.js frontend
+- **MCP Server**: FastMCP stdio server for Claude Desktop integration
+- Frontend requires HTTP, MCP uses stdio protocol
+- REST API adds middleware (rate limiting, compression, auth)
+
+### Project Structure
+
+```
+call-coach/
+├── api/
+│   ├── rest_server.py           # FastAPI HTTP bridge (port 8000)
+│   ├── v1/                      # Versioned API routes
+│   └── middleware/              # Rate limiting, compression
+├── coaching_mcp/
+│   ├── server.py                # FastMCP stdio server
+│   ├── shared/
+│   │   └── config.py            # Environment configuration
+│   └── tools/
+│       ├── analyze_call.py      # Call analysis tool
+│       ├── get_rep_insights.py  # Rep performance tool
+│       └── search_calls.py      # Call search tool
+├── db/
+│   ├── connection.py            # Database connection pool
+│   ├── queries.py               # SQL queries
+│   └── models.py                # Pydantic models
+└── frontend/
+    ├── app/                     # Next.js 14 app router
+    └── lib/
+        └── mcp-client.ts        # HTTP client for REST API
 ```
 
 ### Tools Overview
@@ -99,12 +145,18 @@ The backend uses Neon Postgres with the following key tables:
 - **coaching_sessions**: Analysis results and coaching feedback
 - **coaching_dimensions**: Dimension-specific scores and insights
 
-### Integration Flow
+### Integration Flows
+
+**Web Application Flow:**
 
 ```
-Claude Desktop → MCP Protocol → FastMCP Server → Tools
-                                      ↓
-                            Gong API ← → Neon Database ← → Anthropic API
+Frontend → HTTP POST → REST API → MCP Tools → Database/APIs
+```
+
+**Claude Desktop Flow:**
+
+```
+Claude Desktop → MCP Protocol (stdio) → MCP Server → Database/APIs
 ```
 
 ## Development Workflow
@@ -503,15 +555,15 @@ How to run the complete application stack locally for integration testing.
 
 ### Three-Terminal Setup
 
-**Terminal 1: Backend Server**
+**Terminal 1: REST API Server** (Required)
 
 ```bash
 cd /Users/gcoyne/src/prefect/call-coach
 
-# Start FastMCP server on port 8000
-uv run mcp-server-dev
+# Start REST API server on port 8000
+uv run python api/rest_server.py
 
-# Wait for: "🚀 MCP server ready - 3 tools registered"
+# Wait for: "INFO: Uvicorn running on http://0.0.0.0:8000"
 ```
 
 **Terminal 2: Frontend Application**
@@ -536,11 +588,14 @@ npm run dev
 # - Checking logs
 # - Testing API endpoints
 curl http://localhost:8000/health
+
+# Optional: Start MCP server for Claude Desktop integration
+uv run python -m coaching_mcp.server --dev
 ```
 
 ### Frontend-Backend Connection
 
-The frontend connects to the backend via the `NEXT_PUBLIC_MCP_BACKEND_URL` environment variable:
+The frontend connects to the REST API server via the `NEXT_PUBLIC_MCP_BACKEND_URL` environment variable:
 
 **Configure in `frontend/.env.local`**:
 
@@ -552,35 +607,48 @@ NEXT_PUBLIC_MCP_BACKEND_URL=http://localhost:8000
 
 1. Open browser to <http://localhost:3000>
 2. Open DevTools Network tab
-3. Navigate to any page that uses MCP tools
-4. Verify requests go to `http://localhost:8000/...`
+3. Navigate to any page that uses coaching tools
+4. Verify requests go to `http://localhost:8000/tools/...`
 
 **Example API Request**:
 
 ```bash
-# From frontend to backend
-curl http://localhost:8000/tools/analyze_call \
+# Test REST API directly
+curl http://localhost:8000/tools/get_rep_insights \
   -H "Content-Type: application/json" \
-  -d '{"call_id": "1464927526043145564"}'
+  -d '{"rep_email": "george@prefect.io", "time_period": "last_30_days"}'
 ```
 
 ### Common Integration Issues
 
-**Frontend shows "Backend not available"**:
+**Frontend shows "MCP backend request failed" or connection errors**:
 
-- Check backend is running: `curl http://localhost:8000/health`
-- Verify `NEXT_PUBLIC_MCP_BACKEND_URL` in `frontend/.env.local`
-- Check browser console for CORS errors
+- **Check REST API is running**: `curl http://localhost:8000/health`
+- **Verify correct server**: You need `api/rest_server.py`, NOT `coaching_mcp/server.py`
+- **Check `.env` file exists**: Must be in project root with DATABASE_URL, API keys
+- **Verify port**: REST API should be on port 8000
+
+**"Missing required environment variables" error on startup**:
+
+- Ensure `.env` file is in `/Users/gcoyne/src/prefect/call-coach/` (project root)
+- Check all required variables are set: `GONG_API_KEY`, `GONG_API_SECRET`, `ANTHROPIC_API_KEY`, `DATABASE_URL`
+- Test loading: `uv run python -c "from coaching_mcp.shared import settings; print('OK')"`
 
 **API calls return 404**:
 
-- Verify endpoint path matches FastMCP routes
-- Check backend logs for request handling
-- Ensure MCP protocol is being used correctly
+- Verify endpoint exists in `api/rest_server.py` or `api/v1/`
+- Check REST API logs for request handling
+- Ensure you're calling `/tools/*` endpoints not `/mcp/*`
 
-**Slow response times**:
+**Database connection errors**:
 
-- Use dev mode to skip expensive validations
+- Verify `DATABASE_URL` includes `?sslmode=require` for Neon
+- Test connection: `psql $DATABASE_URL -c "SELECT 1"`
+- Use dev mode to skip schema validation: `uv run python -m coaching_mcp.server --dev`
+
+**Slow response times or empty data**:
+
+- Database might be empty - check if calls/coaching sessions exist
 - Enable caching for repeated analyses
 - Check database query performance in logs
 
