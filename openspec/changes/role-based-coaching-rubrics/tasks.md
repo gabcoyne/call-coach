@@ -40,11 +40,11 @@
 - [x] 5.1 Update analysis/opportunity_coaching.py to import rubric_loader
 - [x] 5.2 Implement detect_speaker_role(call_id: str) function that finds Prefect speaker and looks up role
 - [x] 5.3 Add fallback to 'ae' role if speaker not found in staff_roles table
-- [ ] 5.4 Update analyze_call_dimension() to call detect_speaker_role() and load appropriate rubric
-- [ ] 5.5 Pass role-specific rubric to Claude API in analysis prompt
-- [ ] 5.6 Store rubric_role in coaching_sessions.metadata JSON field
-- [ ] 5.7 Add logging for speaker detection and rubric selection (info level)
-- [ ] 5.8 Test analysis with calls from speakers with different assigned roles
+- [x] 5.4 Update analyze_call_dimension() to call detect_speaker_role() and load appropriate rubric
+- [x] 5.5 Pass role-specific rubric to Claude API in analysis prompt
+- [x] 5.6 Store rubric_role in coaching_sessions.metadata JSON field
+- [x] 5.7 Add logging for speaker detection and rubric selection (info level)
+- [x] 5.8 Test analysis with calls from speakers with different assigned roles
 
 ## 6. Learning Insights Role Filtering
 
