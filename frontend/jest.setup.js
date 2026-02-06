@@ -7,11 +7,17 @@ global.TextDecoder = TextDecoder;
 if (typeof global.Request === "undefined") {
   global.Request = class Request {
     constructor(input, init) {
-      this.url = typeof input === "string" ? input : input.url;
-      this.method = init?.method || "GET";
-      this.headers = new Map(Object.entries(init?.headers || {}));
-      this._body = init?.body;
-      this.nextUrl = { pathname: this.url };
+      const url = typeof input === "string" ? input : input.url;
+      const method = init?.method || "GET";
+      const headers = new Map(Object.entries(init?.headers || {}));
+      const body = init?.body;
+
+      // Use Object.defineProperty for read-only properties
+      Object.defineProperty(this, "url", { value: url, writable: false });
+      Object.defineProperty(this, "method", { value: method, writable: false });
+      Object.defineProperty(this, "headers", { value: headers, writable: false });
+      Object.defineProperty(this, "_body", { value: body, writable: false });
+      Object.defineProperty(this, "nextUrl", { value: { pathname: url }, writable: false });
     }
     async json() {
       return JSON.parse(this._body);
@@ -35,6 +41,15 @@ if (typeof global.Response === "undefined") {
     }
     async text() {
       return typeof this.body === "string" ? this.body : JSON.stringify(this.body);
+    }
+    static json(data, init) {
+      return new Response(JSON.stringify(data), {
+        ...init,
+        headers: {
+          "Content-Type": "application/json",
+          ...(init?.headers || {}),
+        },
+      });
     }
   };
 }

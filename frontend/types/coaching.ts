@@ -5,6 +5,7 @@
  */
 
 import { z } from "zod";
+import type { FiveWinsEvaluation, SupplementaryFrameworks } from "./rubric";
 
 /**
  * Zod Schemas for Request Validation
@@ -125,6 +126,18 @@ export interface AnalyzeCallResponse {
   dimension_details: Record<string, DimensionAnalysis>;
   comparison_to_average: ComparisonToAverage[];
   transcript?: TranscriptSegment[] | null;
+
+  /**
+   * Five Wins Evaluation - Primary coaching framework
+   * Evaluates Business, Technical, Security, Commercial, and Legal wins
+   */
+  five_wins_evaluation?: FiveWinsEvaluation;
+
+  /**
+   * Supplementary Frameworks - Additional coaching insights
+   * SPICED, Challenger, Sandler frameworks from dimension-specific analysis
+   */
+  supplementary_frameworks?: SupplementaryFrameworks;
 }
 
 export interface DimensionAnalysis {

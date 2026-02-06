@@ -4,15 +4,16 @@ import { mcpClient } from "@/lib/mcp-client";
 
 // Mock dependencies
 jest.mock("@/lib/mcp-client");
-jest.mock("@/lib/auth-middleware", () => ({
-  withAuth: (handler: any) => handler,
-  apiError: (message: string, status: number) => ({
-    json: jest.fn(),
-    status,
-    message,
-  }),
-  canAccessRepData: jest.fn(() => true),
-}));
+jest.mock("@/lib/auth-middleware", () => {
+  const { NextResponse } = require("next/server");
+  return {
+    withAuth: (handler: any) => handler,
+    apiError: (message: string, status: number, details?: any) => {
+      return NextResponse.json({ error: message, ...(details && { details }) }, { status });
+    },
+    canAccessRepData: jest.fn(() => true),
+  };
+});
 jest.mock("@/lib/rate-limit", () => ({
   checkRateLimit: jest.fn(() => ({
     allowed: true,
@@ -71,7 +72,7 @@ describe("POST /api/coaching/analyze-call", () => {
       method: "POST",
       body: JSON.stringify({
         call_id: "call-123",
-        dimensions: ["Discovery", "Value Proposition"],
+        dimensions: ["discovery", "product_knowledge"],
       }),
     });
 
@@ -82,7 +83,10 @@ describe("POST /api/coaching/analyze-call", () => {
     expect(data).toEqual(mockAnalysisResponse);
     expect(mockMcpClient.analyzeCall).toHaveBeenCalledWith({
       call_id: "call-123",
-      dimensions: ["Discovery", "Value Proposition"],
+      dimensions: ["discovery", "product_knowledge"],
+      use_cache: true,
+      include_transcript_snippets: true,
+      force_reanalysis: false,
     });
   });
 
