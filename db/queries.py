@@ -302,6 +302,53 @@ def bulk_update_speaker_roles(
                 raise
 
 
+def get_speaker_role_history(
+    speaker_id: UUID, limit: int = 50
+) -> list[dict[str, Any]]:
+    """
+    Get role change history for a speaker.
+
+    Args:
+        speaker_id: UUID of the speaker
+        limit: Maximum number of history entries to return (default: 50)
+
+    Returns:
+        List of history entries, ordered by most recent first.
+        Each entry contains:
+        - id: UUID of the history entry
+        - speaker_id: UUID of the speaker
+        - old_role: Previous role (None if first assignment)
+        - new_role: New role after change (None if role removed)
+        - changed_by: Email of user who made the change
+        - changed_at: Timestamp of the change
+        - change_reason: Description of the change (e.g., "Role changed", "Initial role assignment")
+        - metadata: Additional context as JSONB
+
+    Example:
+        >>> history = get_speaker_role_history(UUID('...'))
+        >>> for entry in history:
+        ...     print(f"{entry['changed_at']}: {entry['old_role']} → {entry['new_role']} by {entry['changed_by']}")
+    """
+    return fetch_all(
+        """
+        SELECT
+            id,
+            speaker_id,
+            old_role,
+            new_role,
+            changed_by,
+            changed_at,
+            change_reason,
+            metadata
+        FROM speaker_role_history
+        WHERE speaker_id = %s
+        ORDER BY changed_at DESC
+        LIMIT %s
+        """,
+        (str(speaker_id), limit),
+    )
+
+
 def get_rep_by_email(email: str) -> dict[str, Any] | None:
     """Get rep by email address."""
     return fetch_one(
