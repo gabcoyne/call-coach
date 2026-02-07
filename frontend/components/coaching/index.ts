@@ -61,3 +61,6 @@ export type {} from "./WinBreakdown";
 
 export { default as ExchangeEvidenceCard } from "./ExchangeEvidenceCard";
 export type {} from "./ExchangeEvidenceCard";
+
+export { default as SupplementaryFrameworksPanel } from "./SupplementaryFrameworksPanel";
+export type {} from "./SupplementaryFrameworksPanel";
