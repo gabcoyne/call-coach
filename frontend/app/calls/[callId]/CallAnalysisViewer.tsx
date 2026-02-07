@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { ArrowLeft, RefreshCw, Calendar, Clock, Users, Video } from "lucide-react";
 import Link from "next/link";
 import { useCallAnalysis } from "@/lib/hooks";
@@ -17,14 +18,28 @@ import { FeedbackButton } from "@/components/coaching/FeedbackButton";
 import { CoachingSessionFeedback } from "@/components/coaching/CoachingSessionFeedback";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RubricBadge } from "@/components/RubricBadge";
+import { SupplementaryFrameworksPanel } from "@/components/coaching";
+import type { AnalyzeCallResponse } from "@/types/coaching";
 
 interface CallAnalysisViewerProps {
   callId: string;
   userRole: string;
 }
 
+/**
+ * Type guard to check if response has Five Wins evaluation
+ */
+function hasFiveWinsEvaluation(response: AnalyzeCallResponse): response is AnalyzeCallResponse & {
+  five_wins_evaluation: NonNullable<AnalyzeCallResponse["five_wins_evaluation"]>;
+} {
+  return (
+    !!response.five_wins_evaluation && response.five_wins_evaluation.overall_score !== undefined
+  );
+}
+
 export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps) {
   const { data: analysis, error, isLoading, mutate } = useCallAnalysis(callId);
+  const [showSupplementaryFrameworks, setShowSupplementaryFrameworks] = useState(false);
 
   const handleTimestampClick = (timestamp: number) => {
     // This would be used to sync with audio player if available
@@ -274,10 +289,23 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">Performance Scores</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Overall Score with optional Five Wins breakdown */}
           <ScoreCard
             score={scores.overall}
             title="Overall Score"
-            subtitle="Aggregate performance"
+            subtitle={
+              hasFiveWinsEvaluation(analysis)
+                ? `${analysis.five_wins_evaluation.wins_secured} of 5 Wins Secured`
+                : "Aggregate performance"
+            }
+            fiveWinsEvaluation={
+              hasFiveWinsEvaluation(analysis) ? analysis.five_wins_evaluation : undefined
+            }
+            onShowAllFrameworks={
+              analysis.supplementary_frameworks
+                ? () => setShowSupplementaryFrameworks(true)
+                : undefined
+            }
           />
           {scores.product_knowledge !== null && scores.product_knowledge !== undefined && (
             <ScoreCard score={scores.product_knowledge} title="Product Knowledge" />
@@ -293,6 +321,11 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
           )}
         </div>
       </div>
+
+      {/* Supplementary Frameworks Panel - Shows SPICED, Challenger, Sandler when available */}
+      {analysis.supplementary_frameworks && showSupplementaryFrameworks && (
+        <SupplementaryFrameworksPanel frameworks={analysis.supplementary_frameworks} />
+      )}
 
       {/* Task 4.7: Display strengths and improvement areas using InsightCard components */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

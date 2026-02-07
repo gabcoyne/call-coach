@@ -17,10 +17,11 @@ jest.mock("@/components/ui/button", () => ({
 }));
 
 jest.mock("@/components/coaching/ScoreCard", () => ({
-  ScoreCard: ({ score, title, subtitle }: any) => (
+  ScoreCard: ({ score, title, subtitle, fiveWinsEvaluation }: any) => (
     <div data-testid="score-card">
       {title}: {score}
       {subtitle && ` - ${subtitle}`}
+      {fiveWinsEvaluation && " (Five Wins Available)"}
     </div>
   ),
 }));
@@ -71,6 +72,12 @@ jest.mock("@/components/coaching/CoachingSessionFeedback", () => ({
 
 jest.mock("@/components/RubricBadge", () => ({
   RubricBadge: ({ role }: any) => <div>Rubric: {role}</div>,
+}));
+
+jest.mock("@/components/coaching", () => ({
+  SupplementaryFrameworksPanel: ({ frameworks }: any) => (
+    <div data-testid="supplementary-frameworks">Additional Coaching Frameworks</div>
+  ),
 }));
 
 describe("CallAnalysisViewer", () => {
@@ -685,6 +692,83 @@ describe("CallAnalysisViewer", () => {
       expect(screen.getByText("10 people")).toBeInTheDocument();
       expect(screen.getByText("Person 1")).toBeInTheDocument();
       expect(screen.getByText("Person 10")).toBeInTheDocument();
+    });
+  });
+
+  describe("Five Wins Integration", () => {
+    it("should pass five_wins_evaluation to ScoreCard when available", () => {
+      const analysisWithFiveWins = {
+        ...mockAnalysis,
+        five_wins_evaluation: {
+          business_win: { score: 30, max_score: 35, status: "met", evidence: [] },
+          technical_win: { score: 20, max_score: 25, status: "met", evidence: [] },
+          security_win: { score: 10, max_score: 15, status: "partial", evidence: [] },
+          commercial_win: { score: 15, max_score: 15, status: "met", evidence: [] },
+          legal_win: { score: 10, max_score: 10, status: "met", evidence: [] },
+          wins_secured: 4,
+          overall_score: 85,
+        },
+      };
+
+      (hooks.useCallAnalysis as jest.Mock).mockReturnValue({
+        data: analysisWithFiveWins,
+        error: undefined,
+        isLoading: false,
+        mutate: jest.fn(),
+      });
+
+      render(<CallAnalysisViewer callId={mockCallId} userRole={mockUserRole} />);
+      // ScoreCard should show wins secured in subtitle
+      expect(screen.getByText(/4 of 5 Wins Secured/)).toBeInTheDocument();
+    });
+
+    it("should use fallback subtitle when five_wins_evaluation not available", () => {
+      const analysisWithoutFiveWins = {
+        ...mockAnalysis,
+        five_wins_evaluation: undefined,
+      };
+
+      (hooks.useCallAnalysis as jest.Mock).mockReturnValue({
+        data: analysisWithoutFiveWins,
+        error: undefined,
+        isLoading: false,
+        mutate: jest.fn(),
+      });
+
+      render(<CallAnalysisViewer callId={mockCallId} userRole={mockUserRole} />);
+      // ScoreCard should be rendered with score
+      expect(screen.getByText(/Overall Score.*85/)).toBeInTheDocument();
+      // Should not show Five Wins indicator
+      expect(screen.queryByText(/Five Wins Available/)).not.toBeInTheDocument();
+    });
+
+    it("should show supplementary frameworks panel when requested", () => {
+      const analysisWithSupplementary = {
+        ...mockAnalysis,
+        supplementary_frameworks: {
+          discovery_rubric: {
+            overall_score: 80,
+            max_score: 100,
+            criteria: [],
+          },
+        },
+      };
+
+      (hooks.useCallAnalysis as jest.Mock).mockReturnValue({
+        data: analysisWithSupplementary,
+        error: undefined,
+        isLoading: false,
+        mutate: jest.fn(),
+      });
+
+      render(<CallAnalysisViewer callId={mockCallId} userRole={mockUserRole} />);
+      // Initially supplementary frameworks should not be shown
+      expect(screen.queryByText(/Additional Coaching Frameworks/)).not.toBeInTheDocument();
+    });
+
+    it("should not render supplementary frameworks when not available", () => {
+      render(<CallAnalysisViewer callId={mockCallId} userRole={mockUserRole} />);
+      expect(screen.queryByText(/Additional Coaching Frameworks/)).not.toBeInTheDocument();
     });
   });
 });
