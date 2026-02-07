@@ -108,6 +108,82 @@ def get_speaker_role(speaker_id: UUID) -> dict[str, Any] | None:
     )
 
 
+def update_speaker_role(
+    speaker_id: UUID, role: str | None, changed_by: str
+) -> dict[str, Any] | None:
+    """
+    Update speaker role and log the change to speaker_role_history.
+
+    Args:
+        speaker_id: UUID of the speaker to update
+        role: New role ('ae', 'se', 'csm', 'support', or None to remove role)
+        changed_by: Email of user making the change (for audit trail)
+
+    Returns:
+        Updated speaker record with new role, or None if speaker not found
+
+    Raises:
+        ValueError: If role is not a valid speaker_role value
+
+    Note:
+        The change is automatically logged to speaker_role_history via database trigger.
+        The trigger uses app.current_user session variable to track changed_by.
+    """
+    # Validate role value
+    valid_roles = ["ae", "se", "csm", "support", None]
+    if role not in valid_roles:
+        raise ValueError(
+            f"Invalid role '{role}'. Must be one of: ae, se, csm, support, or None"
+        )
+
+    # Use a transaction to set session variable and update role
+    # The session variable is used by the trigger to track changed_by
+    from .connection import get_db_connection
+    from psycopg2.extras import RealDictCursor
+
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            try:
+                # Set session variable for audit trail
+                cur.execute(
+                    "SELECT set_config('app.current_user', %s, false)", (changed_by,)
+                )
+
+                # Update speaker role
+                cur.execute(
+                    """
+                    UPDATE speakers
+                    SET role = %s::speaker_role
+                    WHERE id = %s
+                    RETURNING
+                        id,
+                        email,
+                        name,
+                        role,
+                        company_side,
+                        call_id,
+                        talk_time_seconds,
+                        talk_time_percentage,
+                        speaker_id as gong_speaker_id,
+                        manager_id
+                    """,
+                    (role, str(speaker_id)),
+                )
+
+                result = cur.fetchone()
+                conn.commit()
+
+                return dict(result) if result else None
+
+            except Exception as e:
+                conn.rollback()
+                logger.error(
+                    f"Failed to update speaker role: {e}\n"
+                    f"speaker_id={speaker_id}, role={role}, changed_by={changed_by}"
+                )
+                raise
+
+
 def get_rep_by_email(email: str) -> dict[str, Any] | None:
     """Get rep by email address."""
     return fetch_one(
