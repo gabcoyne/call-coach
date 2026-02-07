@@ -184,6 +184,124 @@ def update_speaker_role(
                 raise
 
 
+def bulk_update_speaker_roles(
+    updates: list[tuple[UUID, str | None]], changed_by: str
+) -> dict[str, Any]:
+    """
+    Update multiple speaker roles in a single transaction.
+
+    Args:
+        updates: List of (speaker_id, role) tuples to update
+        changed_by: Email of user making the changes (for audit trail)
+
+    Returns:
+        Dictionary with results:
+        {
+            "updated": int,  # Number of speakers successfully updated
+            "failed": list[str],  # List of speaker_ids that failed (if any)
+            "speakers": list[dict]  # Updated speaker records
+        }
+
+    Raises:
+        ValueError: If any role is not a valid speaker_role value
+
+    Example:
+        >>> updates = [
+        ...     (UUID('...'), 'ae'),
+        ...     (UUID('...'), 'se'),
+        ...     (UUID('...'), None)
+        ... ]
+        >>> result = bulk_update_speaker_roles(updates, 'manager@prefect.io')
+        >>> print(f"Updated {result['updated']} speakers")
+
+    Note:
+        All updates are performed in a single transaction. If any update fails,
+        all changes are rolled back. Each change is logged to speaker_role_history.
+    """
+    # Validate all role values before starting
+    valid_roles = ["ae", "se", "csm", "support", None]
+    for speaker_id, role in updates:
+        if role not in valid_roles:
+            raise ValueError(
+                f"Invalid role '{role}' for speaker {speaker_id}. "
+                f"Must be one of: ae, se, csm, support, or None"
+            )
+
+    from .connection import get_db_connection
+    from psycopg2.extras import RealDictCursor
+
+    updated_speakers = []
+    failed_ids = []
+
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            try:
+                # Set session variable for audit trail
+                cur.execute(
+                    "SELECT set_config('app.current_user', %s, false)", (changed_by,)
+                )
+
+                # Update each speaker
+                for speaker_id, role in updates:
+                    try:
+                        cur.execute(
+                            """
+                            UPDATE speakers
+                            SET role = %s::speaker_role
+                            WHERE id = %s
+                            RETURNING
+                                id,
+                                email,
+                                name,
+                                role,
+                                company_side,
+                                call_id,
+                                talk_time_seconds,
+                                talk_time_percentage,
+                                speaker_id as gong_speaker_id,
+                                manager_id
+                            """,
+                            (role, str(speaker_id)),
+                        )
+
+                        result = cur.fetchone()
+                        if result:
+                            updated_speakers.append(dict(result))
+                        else:
+                            # Speaker not found
+                            failed_ids.append(str(speaker_id))
+                            logger.warning(f"Speaker not found: {speaker_id}")
+
+                    except Exception as e:
+                        failed_ids.append(str(speaker_id))
+                        logger.error(
+                            f"Failed to update speaker {speaker_id}: {e}"
+                        )
+
+                # Commit all changes if no failures, otherwise rollback
+                if failed_ids:
+                    conn.rollback()
+                    logger.warning(
+                        f"Bulk update rolled back due to {len(failed_ids)} failures"
+                    )
+                else:
+                    conn.commit()
+                    logger.info(
+                        f"Successfully updated {len(updated_speakers)} speaker roles"
+                    )
+
+                return {
+                    "updated": len(updated_speakers),
+                    "failed": failed_ids,
+                    "speakers": updated_speakers,
+                }
+
+            except Exception as e:
+                conn.rollback()
+                logger.error(f"Bulk update failed: {e}")
+                raise
+
+
 def get_rep_by_email(email: str) -> dict[str, Any] | None:
     """Get rep by email address."""
     return fetch_one(
