@@ -20,6 +20,7 @@ import {
   formatWinName,
 } from "@/lib/rubric-utils";
 import { ChevronDown, ChevronRight, AlertTriangle } from "lucide-react";
+import ExchangeEvidenceCard from "./ExchangeEvidenceCard";
 
 interface FiveWinsScoreCardProps {
   evaluation: FiveWinsEvaluation;
@@ -156,18 +157,7 @@ export default function FiveWinsScoreCard({
                         Evidence ({data.evidence.length})
                       </h4>
                       {data.evidence.map((evidence, idx) => (
-                        <div key={idx} className="bg-white border rounded-lg p-3">
-                          <div className="text-xs font-mono text-gray-500 mb-2">
-                            {Math.floor(evidence.timestamp_start / 60)}:
-                            {(evidence.timestamp_start % 60).toString().padStart(2, "0")} -{" "}
-                            {Math.floor(evidence.timestamp_end / 60)}:
-                            {(evidence.timestamp_end % 60).toString().padStart(2, "0")}
-                          </div>
-                          <p className="text-sm text-gray-700 mb-2">{evidence.exchange_summary}</p>
-                          <div className={`text-sm ${colors.text} font-medium`}>
-                            Impact: {evidence.impact}
-                          </div>
-                        </div>
+                        <ExchangeEvidenceCard key={idx} evidence={evidence} />
                       ))}
                     </div>
                   ) : (

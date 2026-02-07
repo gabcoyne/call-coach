@@ -58,3 +58,6 @@ export type {} from "./FiveWinsScoreCard";
 export { default as WinBreakdown } from "./WinBreakdown";
 export { WIN_DESCRIPTIONS } from "./WinBreakdown";
 export type {} from "./WinBreakdown";
+
+export { default as ExchangeEvidenceCard } from "./ExchangeEvidenceCard";
+export type {} from "./ExchangeEvidenceCard";
