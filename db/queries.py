@@ -9,7 +9,7 @@ from typing import Any
 from uuid import UUID
 
 from .connection import execute_query, fetch_all, fetch_one
-from .models import CoachingDimension, UserRole
+from .models import CoachingDimension
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +74,37 @@ def get_speakers_for_call(call_id: UUID) -> list[dict[str, Any]]:
     return fetch_all(
         "SELECT * FROM speakers WHERE call_id = %s ORDER BY talk_time_seconds DESC NULLS LAST",
         (str(call_id),),
+    )
+
+
+def get_speaker_role(speaker_id: UUID) -> dict[str, Any] | None:
+    """
+    Get speaker with role information by speaker_id.
+
+    Args:
+        speaker_id: UUID of the speaker
+
+    Returns:
+        Dictionary with speaker details including role, or None if not found
+        Fields: id, email, name, role, company_side, call_id, talk_time_seconds, etc.
+    """
+    return fetch_one(
+        """
+        SELECT
+            id,
+            email,
+            name,
+            role,
+            company_side,
+            call_id,
+            talk_time_seconds,
+            talk_time_percentage,
+            speaker_id as gong_speaker_id,
+            manager_id
+        FROM speakers
+        WHERE id = %s
+        """,
+        (str(speaker_id),),
     )
 
 
