@@ -378,6 +378,80 @@ def get_reps_list() -> list[dict[str, Any]]:
 
 
 # ============================================================================
+# RUBRIC QUERIES
+# ============================================================================
+
+
+def get_rubric_criteria(role: str, dimension: str | None = None) -> list[dict[str, Any]]:
+    """
+    Get rubric criteria filtered by role and optionally by dimension.
+
+    Args:
+        role: Speaker role ('ae', 'se', 'csm', 'support')
+        dimension: Optional dimension filter ('discovery', 'engagement', 'product_knowledge',
+                   'objection_handling', 'five_wins'). If None, returns all dimensions for role.
+
+    Returns:
+        List of rubric criteria ordered by display_order.
+        Each criterion contains:
+        - id: UUID of the criterion
+        - role: Speaker role
+        - dimension: Coaching dimension
+        - criterion_name: Short name
+        - description: Detailed description
+        - weight: Percentage weight within dimension
+        - max_score: Maximum score
+        - display_order: Display order
+        - created_at, updated_at: Timestamps
+
+    Example:
+        >>> criteria = get_rubric_criteria('ae', 'discovery')
+        >>> for criterion in criteria:
+        ...     print(f"{criterion['criterion_name']}: {criterion['weight']}%")
+    """
+    if dimension:
+        return fetch_all(
+            """
+            SELECT
+                id,
+                role,
+                dimension,
+                criterion_name,
+                description,
+                weight,
+                max_score,
+                display_order,
+                created_at,
+                updated_at
+            FROM rubric_criteria
+            WHERE role = %s AND dimension = %s
+            ORDER BY display_order ASC
+            """,
+            (role, dimension),
+        )
+    else:
+        return fetch_all(
+            """
+            SELECT
+                id,
+                role,
+                dimension,
+                criterion_name,
+                description,
+                weight,
+                max_score,
+                display_order,
+                created_at,
+                updated_at
+            FROM rubric_criteria
+            WHERE role = %s
+            ORDER BY dimension ASC, display_order ASC
+            """,
+            (role,),
+        )
+
+
+# ============================================================================
 # TRANSCRIPT QUERIES
 # ============================================================================
 
