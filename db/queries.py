@@ -568,6 +568,112 @@ def update_rubric_criterion(
                 raise
 
 
+def create_rubric_criterion(
+    role: str,
+    dimension: str,
+    criterion_name: str,
+    description: str,
+    weight: int,
+    max_score: int,
+    display_order: int = 0,
+    changed_by: str | None = None,
+) -> dict[str, Any]:
+    """
+    Create a new rubric criterion.
+
+    Args:
+        role: Speaker role ('ae', 'se', 'csm', 'support')
+        dimension: Coaching dimension ('discovery', 'engagement', 'product_knowledge',
+                   'objection_handling', 'five_wins')
+        criterion_name: Short name for the criterion (max 100 chars)
+        description: Detailed description (10-500 chars)
+        weight: Percentage weight within dimension (0-100)
+        max_score: Maximum score for criterion (1-100)
+        display_order: Display order (default: 0)
+        changed_by: Email of user creating the criterion (for audit trail, optional)
+
+    Returns:
+        Newly created criterion record
+
+    Raises:
+        ValueError: If validation constraints are violated
+        psycopg2.IntegrityError: If criterion_name already exists for this role-dimension
+
+    Note:
+        Creation is automatically logged to rubric_change_log via database trigger.
+        The unique constraint ensures no duplicate criterion names per role-dimension.
+    """
+    # Validate inputs
+    if not criterion_name or len(criterion_name) > 100:
+        raise ValueError("Criterion name must be 1-100 characters")
+
+    if not (10 <= len(description) <= 500):
+        raise ValueError("Description must be between 10 and 500 characters")
+
+    if not (0 <= weight <= 100):
+        raise ValueError("Weight must be between 0 and 100")
+
+    if not (1 <= max_score <= 100):
+        raise ValueError("Max score must be between 1 and 100")
+
+    from .connection import get_db_connection
+    from psycopg2.extras import RealDictCursor
+
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            try:
+                # Set session variable for audit trail if changed_by provided
+                if changed_by:
+                    cur.execute(
+                        "SELECT set_config('app.current_user', %s, false)",
+                        (changed_by,),
+                    )
+
+                # Insert new criterion
+                cur.execute(
+                    """
+                    INSERT INTO rubric_criteria (
+                        role,
+                        dimension,
+                        criterion_name,
+                        description,
+                        weight,
+                        max_score,
+                        display_order
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    RETURNING
+                        id,
+                        role,
+                        dimension,
+                        criterion_name,
+                        description,
+                        weight,
+                        max_score,
+                        display_order,
+                        created_at,
+                        updated_at
+                    """,
+                    (role, dimension, criterion_name, description, weight, max_score, display_order),
+                )
+
+                result = cur.fetchone()
+                conn.commit()
+
+                logger.info(
+                    f"Created rubric criterion: {criterion_name} for {role}/{dimension}"
+                )
+
+                return dict(result)
+
+            except Exception as e:
+                conn.rollback()
+                logger.error(
+                    f"Failed to create rubric criterion: {e}\n"
+                    f"role={role}, dimension={dimension}, criterion_name={criterion_name}"
+                )
+                raise
+
+
 # ============================================================================
 # TRANSCRIPT QUERIES
 # ============================================================================
