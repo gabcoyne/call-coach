@@ -451,6 +451,123 @@ def get_rubric_criteria(role: str, dimension: str | None = None) -> list[dict[st
         )
 
 
+def update_rubric_criterion(
+    criterion_id: UUID,
+    description: str | None = None,
+    weight: int | None = None,
+    max_score: int | None = None,
+    display_order: int | None = None,
+    changed_by: str | None = None,
+) -> dict[str, Any] | None:
+    """
+    Update a rubric criterion with field-level change tracking.
+
+    Args:
+        criterion_id: UUID of the criterion to update
+        description: New description (10-500 chars, optional)
+        weight: New weight percentage (0-100, optional)
+        max_score: New max score (1-100, optional)
+        display_order: New display order (optional)
+        changed_by: Email of user making the change (for audit trail, optional)
+
+    Returns:
+        Updated criterion record, or None if not found
+
+    Raises:
+        ValueError: If validation constraints are violated
+
+    Note:
+        Changes are automatically logged to rubric_change_log via database trigger.
+        The trigger uses app.current_user session variable for changed_by tracking.
+        Only provided fields are updated (partial update support).
+    """
+    # Validate inputs
+    if description is not None and not (10 <= len(description) <= 500):
+        raise ValueError("Description must be between 10 and 500 characters")
+
+    if weight is not None and not (0 <= weight <= 100):
+        raise ValueError("Weight must be between 0 and 100")
+
+    if max_score is not None and not (1 <= max_score <= 100):
+        raise ValueError("Max score must be between 1 and 100")
+
+    # Build dynamic UPDATE query based on provided fields
+    updates = []
+    params = []
+
+    if description is not None:
+        updates.append("description = %s")
+        params.append(description)
+
+    if weight is not None:
+        updates.append("weight = %s")
+        params.append(weight)
+
+    if max_score is not None:
+        updates.append("max_score = %s")
+        params.append(max_score)
+
+    if display_order is not None:
+        updates.append("display_order = %s")
+        params.append(display_order)
+
+    # If no updates provided, return current record
+    if not updates:
+        return fetch_one(
+            "SELECT * FROM rubric_criteria WHERE id = %s",
+            (str(criterion_id),),
+        )
+
+    # Add criterion_id to params
+    params.append(str(criterion_id))
+
+    from .connection import get_db_connection
+    from psycopg2.extras import RealDictCursor
+
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            try:
+                # Set session variable for audit trail if changed_by provided
+                if changed_by:
+                    cur.execute(
+                        "SELECT set_config('app.current_user', %s, false)",
+                        (changed_by,),
+                    )
+
+                # Build and execute UPDATE query
+                update_clause = ", ".join(updates)
+                query = f"""
+                    UPDATE rubric_criteria
+                    SET {update_clause}
+                    WHERE id = %s
+                    RETURNING
+                        id,
+                        role,
+                        dimension,
+                        criterion_name,
+                        description,
+                        weight,
+                        max_score,
+                        display_order,
+                        created_at,
+                        updated_at
+                """
+
+                cur.execute(query, params)
+                result = cur.fetchone()
+                conn.commit()
+
+                return dict(result) if result else None
+
+            except Exception as e:
+                conn.rollback()
+                logger.error(
+                    f"Failed to update rubric criterion: {e}\n"
+                    f"criterion_id={criterion_id}, updates={updates}"
+                )
+                raise
+
+
 # ============================================================================
 # TRANSCRIPT QUERIES
 # ============================================================================
