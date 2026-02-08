@@ -674,6 +674,66 @@ def create_rubric_criterion(
                 raise
 
 
+def delete_rubric_criterion(
+    criterion_id: UUID,
+    changed_by: str | None = None,
+) -> bool:
+    """
+    Delete a rubric criterion.
+
+    Args:
+        criterion_id: UUID of the criterion to delete
+        changed_by: Email of user deleting the criterion (for audit trail, optional)
+
+    Returns:
+        True if criterion was deleted, False if not found
+
+    Note:
+        Deletion is automatically logged to rubric_change_log via database trigger.
+        The trigger uses app.current_user session variable for changed_by tracking.
+        After deletion, the change log entry will have criterion_id set to NULL
+        (due to ON DELETE SET NULL constraint) but the snapshot is preserved.
+    """
+    from .connection import get_db_connection
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                # Set session variable for audit trail if changed_by provided
+                if changed_by:
+                    cur.execute(
+                        "SELECT set_config('app.current_user', %s, false)",
+                        (changed_by,),
+                    )
+
+                # Delete the criterion
+                cur.execute(
+                    """
+                    DELETE FROM rubric_criteria
+                    WHERE id = %s
+                    """,
+                    (str(criterion_id),),
+                )
+
+                deleted = cur.rowcount > 0
+                conn.commit()
+
+                if deleted:
+                    logger.info(f"Deleted rubric criterion: {criterion_id}")
+                else:
+                    logger.warning(f"Criterion not found for deletion: {criterion_id}")
+
+                return deleted
+
+            except Exception as e:
+                conn.rollback()
+                logger.error(
+                    f"Failed to delete rubric criterion: {e}\n"
+                    f"criterion_id={criterion_id}"
+                )
+                raise
+
+
 # ============================================================================
 # TRANSCRIPT QUERIES
 # ============================================================================
