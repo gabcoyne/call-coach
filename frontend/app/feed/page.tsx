@@ -143,12 +143,40 @@ export default function FeedPage() {
           {error && (
             <Card>
               <CardContent className="py-12">
-                <div className="text-center text-destructive">
-                  <p className="text-lg font-medium">Error loading feed</p>
-                  <p className="mt-2 text-sm">{error.message}</p>
-                  <Button onClick={() => mutate()} className="mt-4" variant="outline">
-                    Try Again
-                  </Button>
+                <div className="flex flex-col items-center justify-center text-center max-w-md mx-auto">
+                  <Inbox className="h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-lg font-medium text-foreground mb-2">
+                    Coaching Feed Coming Soon
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    This page will display personalized coaching insights, team performance
+                    patterns, and high-impact moments from your calls. The backend endpoint is
+                    currently being developed.
+                  </p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+                    <p className="text-sm font-medium text-blue-900 mb-2">In the meantime:</p>
+                    <ul className="text-sm text-blue-800 space-y-1">
+                      <li>
+                        • Browse all calls at{" "}
+                        <a href="/calls" className="underline font-medium">
+                          /calls
+                        </a>
+                      </li>
+                      <li>• Click any call to view detailed coaching analysis</li>
+                      <li>• Search and filter calls by type, date, and participants</li>
+                    </ul>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-4">
+                    Tracked in:{" "}
+                    <a
+                      href="https://github.com/gabcoyne/call-coach/issues/1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-foreground"
+                    >
+                      GitHub Issue #1
+                    </a>
+                  </p>
                 </div>
               </CardContent>
             </Card>
