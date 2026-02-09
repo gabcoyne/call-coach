@@ -37,20 +37,20 @@
 
 ## 5. Fix Server Component Integration
 
-- [ ] 5.1 Review page.tsx server component for authentication passing
-- [ ] 5.2 Ensure callId is correctly passed as prop to client component
-- [ ] 5.3 Verify no SSR/CSR hydration mismatches
+- [x] 5.1 Review page.tsx server component for authentication passing
+- [x] 5.2 Ensure callId is correctly passed as prop to client component
+- [x] 5.3 Verify no SSR/CSR hydration mismatches
 - [ ] 5.4 Add error boundaries around client component
-- [ ] 5.5 Test page load with Chrome DevTools monitoring
+- [x] 5.5 Test page load with Chrome DevTools monitoring
 
 ## 6. Fix UUID Type Issue in Coaching Sessions
 
-- [ ] 6.1 Review coaching_sessions table schema for call_id column type
-- [ ] 6.2 Create database migration to change call_id from UUID to TEXT or BIGINT
-- [ ] 6.3 Update TypeScript types in db/models.py to match schema change
-- [ ] 6.4 Modify coaching-sessions API route to remove UUID casting
-- [ ] 6.5 Test endpoint with numeric Gong call ID (e.g., "1545043197760013510")
-- [ ] 6.6 Verify query returns results without type errors
+- [x] 6.1 Review coaching_sessions table schema for call_id column type
+- [x] 6.2 Create database migration to change call_id from UUID to TEXT or BIGINT (not needed - fixed via lookup)
+- [x] 6.3 Update TypeScript types in db/models.py to match schema change (not needed)
+- [x] 6.4 Modify coaching-sessions API route to remove UUID casting (added gong_call_id lookup)
+- [x] 6.5 Test endpoint with numeric Gong call ID (e.g., "1545043197760013510")
+- [x] 6.6 Verify query returns results without type errors
 
 ## 7. Add Comprehensive Error States
 
