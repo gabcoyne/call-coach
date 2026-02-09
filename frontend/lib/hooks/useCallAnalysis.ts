@@ -42,21 +42,18 @@ export function useCallAnalysis(
     enabled = true,
   } = options;
 
-  // Build API URL with query parameters
-  const url =
-    callId && enabled
-      ? buildApiUrl("/api/coaching/analyze-call", {
-          call_id: callId,
-          dimensions: dimensions?.join(","),
-          use_cache: String(use_cache),
-          include_transcript_snippets: String(include_transcript_snippets),
-          force_reanalysis: String(force_reanalysis),
-        })
-      : null;
-
+  // Use array key pattern (matches use-current-user.ts)
   const { data, error, isValidating, mutate } = useSWR<AnalyzeCallResponse>(
-    url,
-    async (url) => {
+    callId && enabled ? ["analyze-call", callId] : null,
+    async () => {
+      const url = buildApiUrl("/api/coaching/analyze-call", {
+        call_id: callId!,
+        dimensions: dimensions?.join(","),
+        use_cache: String(use_cache),
+        include_transcript_snippets: String(include_transcript_snippets),
+        force_reanalysis: String(force_reanalysis),
+      });
+
       const response = await fetch(url, {
         credentials: "include",
         headers: {
@@ -80,18 +77,13 @@ export function useCallAnalysis(
       }
 
       return response.json();
-    },
-    {
-      revalidateOnFocus: true,
-      revalidateOnMount: force_reanalysis,
-      keepPreviousData: true,
     }
   );
 
   return {
     data,
     error,
-    isLoading: !data && !error && enabled && !!url,
+    isLoading: !data && !error && enabled && !!callId,
     isValidating,
     mutate,
   };
