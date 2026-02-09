@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
 import { CallAnalysisViewer } from "./CallAnalysisViewer";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface PageProps {
   params: Promise<{
@@ -20,7 +21,9 @@ export default async function CallDetailPage({ params }: PageProps) {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
-      <CallAnalysisViewer callId={callId} userRole={userRole} />
+      <ErrorBoundary>
+        <CallAnalysisViewer callId={callId} userRole={userRole} />
+      </ErrorBoundary>
     </div>
   );
 }
