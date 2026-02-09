@@ -1,10 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, RefreshCw, Calendar, Clock, Users, Video } from "lucide-react";
+import { ArrowLeft, RefreshCw, Calendar, Clock, Users, Video, ChevronDown, Check } from "lucide-react";
 import Link from "next/link";
 import { useCallAnalysis } from "@/lib/hooks";
+import { useUser } from "@/lib/hooks/useUser";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ScoreCard } from "@/components/coaching/ScoreCard";
 import { InsightCard } from "@/components/coaching/InsightCard";
 import { ActionItem } from "@/components/coaching/ActionItem";
@@ -20,11 +27,33 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { RubricBadge } from "@/components/RubricBadge";
 import { SupplementaryFrameworksPanel } from "@/components/coaching";
 import type { AnalyzeCallResponse } from "@/types/coaching";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CallAnalysisViewerProps {
   callId: string;
   userRole: string;
 }
+
+const ROLE_LABELS: Record<string, string> = {
+  ae: 'AE',
+  se: 'SE',
+  csm: 'CSM',
+  support: 'Support',
+};
+
+const ROLE_FULL_LABELS: Record<string, string> = {
+  ae: 'Account Executive',
+  se: 'Sales Engineer',
+  csm: 'Customer Success Manager',
+  support: 'Support Engineer',
+};
+
+const ROLE_COLORS: Record<string, string> = {
+  ae: 'bg-blue-100 text-blue-800 border-blue-200',
+  se: 'bg-purple-100 text-purple-800 border-purple-200',
+  csm: 'bg-green-100 text-green-800 border-green-200',
+  support: 'bg-orange-100 text-orange-800 border-orange-200',
+};
 
 /**
  * Type guard to check if response has Five Wins evaluation
@@ -39,7 +68,10 @@ function hasFiveWinsEvaluation(response: AnalyzeCallResponse): response is Analy
 
 export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps) {
   const { data: analysis, error, isLoading, mutate } = useCallAnalysis(callId);
+  const { currentUser, isManager } = useUser();
+  const { toast } = useToast();
   const [showSupplementaryFrameworks, setShowSupplementaryFrameworks] = useState(false);
+  const [updatingParticipantEmail, setUpdatingParticipantEmail] = useState<string | null>(null);
 
   const handleTimestampClick = (timestamp: number) => {
     // This would be used to sync with audio player if available
@@ -47,6 +79,72 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
     if (audioElement) {
       audioElement.currentTime = timestamp;
       audioElement.play();
+    }
+  };
+
+  const updateParticipantRole = async (participantEmail: string, newRole: string | null) => {
+    // Find speaker ID by email from the analysis data
+    const participant = analysis?.call_metadata.participants.find(p => p.email === participantEmail);
+    if (!participant) return;
+
+    try {
+      setUpdatingParticipantEmail(participantEmail);
+
+      // We need to get the speaker_id from the backend
+      // For now, we'll use the email to find and update the speaker
+      const speakersResponse = await fetch(`/api/v1/speakers?company_side_only=true`, {
+        headers: {
+          'X-User-Email': currentUser?.email || '',
+        },
+      });
+
+      if (!speakersResponse.ok) {
+        throw new Error('Failed to fetch speakers');
+      }
+
+      const speakers = await speakersResponse.json();
+      const speaker = speakers.find((s: any) => s.email === participantEmail);
+
+      if (!speaker) {
+        throw new Error('Speaker not found');
+      }
+
+      const response = await fetch(`/api/v1/speakers/${speaker.id}/role`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Email': currentUser?.email || '',
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to update role');
+      }
+
+      // Refresh the analysis to get updated participant data
+      await mutate();
+
+      // Show success toast
+      const roleName = newRole ? ROLE_FULL_LABELS[newRole] : 'None';
+      toast({
+        title: 'Role Updated',
+        description: `${participant.name} assigned to ${roleName}`,
+        variant: 'success',
+      });
+    } catch (err) {
+      console.error('Error updating participant role:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update role';
+
+      // Show error toast
+      toast({
+        title: 'Update Failed',
+        description: errorMessage,
+        variant: 'error',
+      });
+    } finally {
+      setUpdatingParticipantEmail(null);
     }
   };
 
@@ -251,14 +349,82 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
         {metadata.participants.length > 0 && (
           <div className="mt-4 pt-4 border-t">
             <h3 className="text-sm font-medium text-gray-700 mb-2">Call Participants</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {metadata.participants.map((participant, index) => (
-                <div key={index} className="text-sm text-gray-600">
-                  <span className="font-medium">{participant.name}</span>
-                  {participant.email && (
-                    <span className="text-gray-500"> ({participant.email})</span>
+                <div key={index} className="flex items-center justify-between text-sm">
+                  <div className="flex-1">
+                    <span className="font-medium text-gray-900">{participant.name}</span>
+                    {participant.email && (
+                      <span className="text-gray-500 text-xs ml-1">({participant.email})</span>
+                    )}
+                    <span className="text-gray-500 ml-2">- {participant.role}</span>
+                  </div>
+                  {participant.is_internal && (
+                    <div className="ml-2 flex-shrink-0">
+                      {isManager ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              disabled={updatingParticipantEmail === participant.email}
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border transition-colors ${
+                                participant.business_role
+                                  ? ROLE_COLORS[participant.business_role]
+                                  : 'bg-amber-100 text-amber-800 border-amber-200'
+                              } ${
+                                updatingParticipantEmail === participant.email
+                                  ? 'opacity-50 cursor-not-allowed'
+                                  : 'hover:opacity-80 cursor-pointer'
+                              }`}
+                            >
+                              {updatingParticipantEmail === participant.email ? (
+                                <span className="animate-spin">⏳</span>
+                              ) : (
+                                <>
+                                  {participant.business_role
+                                    ? ROLE_LABELS[participant.business_role]
+                                    : 'Role Not Assigned'}
+                                  <ChevronDown className="h-3 w-3" />
+                                </>
+                              )}
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-56">
+                            {Object.entries(ROLE_FULL_LABELS).map(([key, label]) => (
+                              <DropdownMenuItem
+                                key={key}
+                                onClick={() => updateParticipantRole(participant.email, key)}
+                                className="flex items-center justify-between"
+                              >
+                                <span>{label}</span>
+                                {participant.business_role === key && <Check className="h-4 w-4" />}
+                              </DropdownMenuItem>
+                            ))}
+                            {participant.business_role && (
+                              <>
+                                <div className="my-1 h-px bg-gray-200" />
+                                <DropdownMenuItem
+                                  onClick={() => updateParticipantRole(participant.email, null)}
+                                  className="text-gray-500"
+                                >
+                                  Remove Role
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border ${
+                          participant.business_role
+                            ? ROLE_COLORS[participant.business_role]
+                            : 'bg-amber-100 text-amber-800 border-amber-200'
+                        }`}>
+                          {participant.business_role
+                            ? ROLE_LABELS[participant.business_role]
+                            : 'Role Not Assigned'}
+                        </span>
+                      )}
+                    </div>
                   )}
-                  <span className="text-gray-500"> - {participant.role}</span>
                 </div>
               ))}
             </div>

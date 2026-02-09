@@ -75,7 +75,8 @@ export interface CallMetadata {
 export interface CallParticipant {
   name: string;
   email: string;
-  role: string;
+  role: string;  // Display role: "Internal" or "External"
+  business_role: string | null;  // Business role: "ae", "se", "csm", "support", or null
   is_internal: boolean;
   talk_time_seconds: number;
 }

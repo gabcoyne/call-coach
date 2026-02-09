@@ -77,6 +77,65 @@ def get_speakers_for_call(call_id: UUID) -> list[dict[str, Any]]:
     )
 
 
+def get_all_speakers(
+    company_side_only: bool = True,
+    role_filter: str | None = None,
+    include_unassigned: bool = True,
+) -> list[dict[str, Any]]:
+    """
+    Get all speakers, optionally filtered by company_side and role.
+
+    Args:
+        company_side_only: If True, only return Prefect staff (company_side=true)
+        role_filter: Optional role to filter by ('ae', 'se', 'csm', 'support')
+        include_unassigned: If False, exclude speakers with role=NULL
+
+    Returns:
+        List of speaker dictionaries with unique speakers (distinct by email)
+        Fields: id, email, name, role, company_side, last_call_date, total_calls
+    """
+    where_clauses = []
+    params: list[Any] = []
+
+    if company_side_only:
+        where_clauses.append("company_side = true")
+
+    if role_filter:
+        where_clauses.append("role = %s")
+        params.append(role_filter)
+
+    if not include_unassigned:
+        where_clauses.append("role IS NOT NULL")
+
+    where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+
+    # Get unique speakers with aggregated stats
+    query = f"""
+        SELECT DISTINCT ON (email)
+            id,
+            email,
+            name,
+            role,
+            company_side,
+            (SELECT MIN(c.scheduled_at)
+             FROM calls c
+             JOIN speakers s2 ON s2.call_id = c.id
+             WHERE s2.email = speakers.email) as first_seen,
+            (SELECT MAX(c.scheduled_at)
+             FROM calls c
+             JOIN speakers s2 ON s2.call_id = c.id
+             WHERE s2.email = speakers.email) as last_call_date,
+            (SELECT COUNT(DISTINCT s3.call_id)
+             FROM speakers s3
+             WHERE s3.email = speakers.email) as total_calls
+        FROM speakers
+        {where_sql}
+        ORDER BY email, id DESC
+    """
+
+    return fetch_all(query, tuple(params))
+
+
 def get_speaker_role(speaker_id: UUID) -> dict[str, Any] | None:
     """
     Get speaker with role information by speaker_id.
@@ -132,22 +191,19 @@ def update_speaker_role(
     # Validate role value
     valid_roles = ["ae", "se", "csm", "support", None]
     if role not in valid_roles:
-        raise ValueError(
-            f"Invalid role '{role}'. Must be one of: ae, se, csm, support, or None"
-        )
+        raise ValueError(f"Invalid role '{role}'. Must be one of: ae, se, csm, support, or None")
 
     # Use a transaction to set session variable and update role
     # The session variable is used by the trigger to track changed_by
-    from .connection import get_db_connection
     from psycopg2.extras import RealDictCursor
+
+    from .connection import get_db_connection
 
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             try:
                 # Set session variable for audit trail
-                cur.execute(
-                    "SELECT set_config('app.current_user', %s, false)", (changed_by,)
-                )
+                cur.execute("SELECT set_config('app.current_user', %s, false)", (changed_by,))
 
                 # Update speaker role
                 cur.execute(
@@ -227,8 +283,9 @@ def bulk_update_speaker_roles(
                 f"Must be one of: ae, se, csm, support, or None"
             )
 
-    from .connection import get_db_connection
     from psycopg2.extras import RealDictCursor
+
+    from .connection import get_db_connection
 
     updated_speakers = []
     failed_ids = []
@@ -237,9 +294,7 @@ def bulk_update_speaker_roles(
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             try:
                 # Set session variable for audit trail
-                cur.execute(
-                    "SELECT set_config('app.current_user', %s, false)", (changed_by,)
-                )
+                cur.execute("SELECT set_config('app.current_user', %s, false)", (changed_by,))
 
                 # Update each speaker
                 for speaker_id, role in updates:
@@ -274,21 +329,15 @@ def bulk_update_speaker_roles(
 
                     except Exception as e:
                         failed_ids.append(str(speaker_id))
-                        logger.error(
-                            f"Failed to update speaker {speaker_id}: {e}"
-                        )
+                        logger.error(f"Failed to update speaker {speaker_id}: {e}")
 
                 # Commit all changes if no failures, otherwise rollback
                 if failed_ids:
                     conn.rollback()
-                    logger.warning(
-                        f"Bulk update rolled back due to {len(failed_ids)} failures"
-                    )
+                    logger.warning(f"Bulk update rolled back due to {len(failed_ids)} failures")
                 else:
                     conn.commit()
-                    logger.info(
-                        f"Successfully updated {len(updated_speakers)} speaker roles"
-                    )
+                    logger.info(f"Successfully updated {len(updated_speakers)} speaker roles")
 
                 return {
                     "updated": len(updated_speakers),
@@ -302,9 +351,7 @@ def bulk_update_speaker_roles(
                 raise
 
 
-def get_speaker_role_history(
-    speaker_id: UUID, limit: int = 50
-) -> list[dict[str, Any]]:
+def get_speaker_role_history(speaker_id: UUID, limit: int = 50) -> list[dict[str, Any]]:
     """
     Get role change history for a speaker.
 
@@ -521,8 +568,9 @@ def update_rubric_criterion(
     # Add criterion_id to params
     params.append(str(criterion_id))
 
-    from .connection import get_db_connection
     from psycopg2.extras import RealDictCursor
+
+    from .connection import get_db_connection
 
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -616,8 +664,9 @@ def create_rubric_criterion(
     if not (1 <= max_score <= 100):
         raise ValueError("Max score must be between 1 and 100")
 
-    from .connection import get_db_connection
     from psycopg2.extras import RealDictCursor
+
+    from .connection import get_db_connection
 
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -653,15 +702,21 @@ def create_rubric_criterion(
                         created_at,
                         updated_at
                     """,
-                    (role, dimension, criterion_name, description, weight, max_score, display_order),
+                    (
+                        role,
+                        dimension,
+                        criterion_name,
+                        description,
+                        weight,
+                        max_score,
+                        display_order,
+                    ),
                 )
 
                 result = cur.fetchone()
                 conn.commit()
 
-                logger.info(
-                    f"Created rubric criterion: {criterion_name} for {role}/{dimension}"
-                )
+                logger.info(f"Created rubric criterion: {criterion_name} for {role}/{dimension}")
 
                 return dict(result)
 
@@ -728,8 +783,7 @@ def delete_rubric_criterion(
             except Exception as e:
                 conn.rollback()
                 logger.error(
-                    f"Failed to delete rubric criterion: {e}\n"
-                    f"criterion_id={criterion_id}"
+                    f"Failed to delete rubric criterion: {e}\n" f"criterion_id={criterion_id}"
                 )
                 raise
 

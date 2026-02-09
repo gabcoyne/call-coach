@@ -38,6 +38,59 @@ class BulkUpdateRequest(BaseModel):
 
 
 # Endpoints
+@router.get("/")
+async def list_speakers(
+    company_side_only: bool = True,
+    role: str | None = None,
+    include_unassigned: bool = True,
+    user: dict[str, Any] = Depends(get_current_user),
+) -> list[dict[str, Any]]:
+    """
+    List all speakers with optional filtering.
+
+    Only accessible to managers and admins.
+
+    Headers:
+        X-User-Email: User email for authentication
+
+    Query Parameters:
+        company_side_only: If true, only return Prefect staff (default: true)
+        role: Optional role filter ('ae', 'se', 'csm', 'support')
+        include_unassigned: If false, exclude speakers with no role (default: true)
+
+    Returns:
+        List of unique speakers (one per email) with aggregated call stats
+
+    Raises:
+        HTTPException: 403 if user is not a manager or admin
+    """
+    if user["role"] not in ["manager", "admin"]:
+        raise HTTPException(status_code=403, detail="Managers and admins only")
+
+    speakers = queries.get_all_speakers(
+        company_side_only=company_side_only,
+        role_filter=role,
+        include_unassigned=include_unassigned,
+    )
+
+    # Convert UUIDs and timestamps to strings
+    return [
+        {
+            **speaker,
+            "id": str(speaker["id"]),
+            "first_seen": (
+                speaker["first_seen"].isoformat() if speaker.get("first_seen") else None
+            ),
+            "last_call_date": (
+                speaker["last_call_date"].isoformat()
+                if speaker.get("last_call_date")
+                else None
+            ),
+        }
+        for speaker in speakers
+    ]
+
+
 @router.get("/{speaker_id}")
 async def get_speaker(
     speaker_id: UUID,

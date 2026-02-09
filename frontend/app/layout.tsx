@@ -5,6 +5,7 @@ import { MobileNav } from "@/components/navigation/mobile-nav";
 import { UserNav } from "@/components/navigation/user-nav";
 import { Breadcrumb } from "@/components/navigation/breadcrumb";
 import { WebVitals } from "@/components/analytics/WebVitals";
+import { ToastProvider } from "@/components/providers/toast-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -43,6 +44,7 @@ export default function RootLayout({
               <main className="flex-1 overflow-y-auto bg-background">{children}</main>
             </div>
           </div>
+          <ToastProvider />
         </body>
       </html>
     </ClerkProvider>

@@ -452,7 +452,8 @@ def analyze_call_tool(
                 {
                     "name": s["name"],
                     "email": s["email"],
-                    "role": s["role"],
+                    "role": "Internal" if s["company_side"] else "External",  # Display role
+                    "business_role": s["role"],  # ae, se, csm, support, or None
                     "is_internal": s["company_side"],
                     "talk_time_seconds": s["talk_time_seconds"],
                 }

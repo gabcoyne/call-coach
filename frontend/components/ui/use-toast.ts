@@ -1,10 +1,58 @@
-// Simple toast hook placeholder
-// In a full implementation, this would use a toast library like sonner or react-hot-toast
+'use client';
+
+import { useState, useCallback } from 'react';
+import type { Toast } from './toaster';
+
+let toastCounter = 0;
+let listeners: ((toasts: Toast[]) => void)[] = [];
+let toastsState: Toast[] = [];
+
+function generateId() {
+  return `toast-${++toastCounter}`;
+}
+
+function notifyListeners() {
+  listeners.forEach((listener) => listener(toastsState));
+}
 
 export function useToast() {
+  const [toasts, setToasts] = useState<Toast[]>(toastsState);
+
+  // Subscribe to global toast state
+  useState(() => {
+    const listener = (newToasts: Toast[]) => {
+      setToasts(newToasts);
+    };
+    listeners.push(listener);
+    return () => {
+      listeners = listeners.filter((l) => l !== listener);
+    };
+  });
+
+  const toast = useCallback((options: {
+    title?: string;
+    description?: string;
+    variant?: 'default' | 'success' | 'error' | 'warning' | 'info';
+    duration?: number;
+  }) => {
+    const id = generateId();
+    const newToast: Toast = {
+      id,
+      ...options,
+    };
+    toastsState = [...toastsState, newToast];
+    notifyListeners();
+    return id;
+  }, []);
+
+  const dismiss = useCallback((id: string) => {
+    toastsState = toastsState.filter((t) => t.id !== id);
+    notifyListeners();
+  }, []);
+
   return {
-    toast: (options: { title?: string; description?: string; variant?: string }) => {
-      console.log("Toast:", options);
-    },
+    toasts,
+    toast,
+    dismiss,
   };
 }
