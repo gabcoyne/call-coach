@@ -481,7 +481,31 @@ def analyze_call_tool(
         "transcript": transcript_segments if include_transcript_snippets else None,
     }
 
+    # Post-processing: Add thematic grouping, key moments, and filtered action items
+    # This preserves prompt caching by transforming results after analysis completes
+    from analysis.action_filter import filter_actionable_items
+    from analysis.moment_extractor import extract_key_moments
+    from analysis.thematic_grouper import group_insights_by_theme
+
+    # Thematic grouping of insights
+    response["thematic_insights"] = group_insights_by_theme(
+        all_strengths, all_improvements, results
+    )
+
+    # Extract top 10 key moments
+    response["key_moments"] = extract_key_moments(results, limit=10)
+
+    # Filter action items to concrete, actionable ones (max 7)
+    response["action_items_filtered"] = filter_actionable_items(
+        all_action_items, min_score=60, max_items=7
+    )
+
     logger.info(f"Analysis complete. Overall score: {overall_score}/100")
+    logger.info(
+        f"Post-processing: {len(response['thematic_insights'])} themes, "
+        f"{len(response['key_moments'])} key moments, "
+        f"{len(response['action_items_filtered'])} filtered actions"
+    )
     return response
 
 

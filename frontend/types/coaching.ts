@@ -75,8 +75,8 @@ export interface CallMetadata {
 export interface CallParticipant {
   name: string;
   email: string;
-  role: string;  // Display role: "Internal" or "External"
-  business_role: string | null;  // Business role: "ae", "se", "csm", "support", or null
+  role: string; // Display role: "Internal" or "External"
+  business_role: string | null; // Business role: "ae", "se", "csm", "support", or null
   is_internal: boolean;
   talk_time_seconds: number;
 }
@@ -116,6 +116,20 @@ export interface TranscriptSegment {
   text: string;
 }
 
+export interface KeyMoment {
+  timestamp: number;
+  moment_type: "strength" | "improvement";
+  summary: string;
+  dimension: string;
+}
+
+export interface ThematicInsight {
+  strengths: string[];
+  improvements: string[];
+  count: number;
+  priority: number;
+}
+
 export interface AnalyzeCallResponse {
   call_metadata: CallMetadata;
   rep_analyzed: RepAnalyzed | null;
@@ -139,6 +153,24 @@ export interface AnalyzeCallResponse {
    * SPICED, Challenger, Sandler frameworks from dimension-specific analysis
    */
   supplementary_frameworks?: SupplementaryFrameworks;
+
+  /**
+   * Thematic Insights - Insights grouped by theme instead of dimension
+   * Reduces overwhelming granularity by organizing around common themes
+   */
+  thematic_insights?: Record<string, ThematicInsight>;
+
+  /**
+   * Key Moments - Top 10 most impactful moments from the call
+   * Concise timestamps with summaries, replacing verbose specific examples
+   */
+  key_moments?: KeyMoment[];
+
+  /**
+   * Filtered Action Items - Concrete, actionable next steps only
+   * Filtered to remove vague recommendations like "build repository"
+   */
+  action_items_filtered?: string[];
 }
 
 export interface DimensionAnalysis {

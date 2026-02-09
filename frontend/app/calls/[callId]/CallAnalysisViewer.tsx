@@ -1,7 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, RefreshCw, Calendar, Clock, Users, Video, ChevronDown, Check } from "lucide-react";
+import {
+  ArrowLeft,
+  RefreshCw,
+  Calendar,
+  Clock,
+  Users,
+  Video,
+  ChevronDown,
+  Check,
+} from "lucide-react";
 import Link from "next/link";
 import { useCallAnalysis } from "@/lib/hooks";
 import { useUser } from "@/lib/hooks/useUser";
@@ -35,24 +44,24 @@ interface CallAnalysisViewerProps {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  ae: 'AE',
-  se: 'SE',
-  csm: 'CSM',
-  support: 'Support',
+  ae: "AE",
+  se: "SE",
+  csm: "CSM",
+  support: "Support",
 };
 
 const ROLE_FULL_LABELS: Record<string, string> = {
-  ae: 'Account Executive',
-  se: 'Sales Engineer',
-  csm: 'Customer Success Manager',
-  support: 'Support Engineer',
+  ae: "Account Executive",
+  se: "Sales Engineer",
+  csm: "Customer Success Manager",
+  support: "Support Engineer",
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  ae: 'bg-blue-100 text-blue-800 border-blue-200',
-  se: 'bg-purple-100 text-purple-800 border-purple-200',
-  csm: 'bg-green-100 text-green-800 border-green-200',
-  support: 'bg-orange-100 text-orange-800 border-orange-200',
+  ae: "bg-blue-100 text-blue-800 border-blue-200",
+  se: "bg-purple-100 text-purple-800 border-purple-200",
+  csm: "bg-green-100 text-green-800 border-green-200",
+  support: "bg-orange-100 text-orange-800 border-orange-200",
 };
 
 /**
@@ -84,7 +93,9 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
 
   const updateParticipantRole = async (participantEmail: string, newRole: string | null) => {
     // Find speaker ID by email from the analysis data
-    const participant = analysis?.call_metadata.participants.find(p => p.email === participantEmail);
+    const participant = analysis?.call_metadata.participants.find(
+      (p) => p.email === participantEmail
+    );
     if (!participant) return;
 
     try {
@@ -94,54 +105,54 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
       // For now, we'll use the email to find and update the speaker
       const speakersResponse = await fetch(`/api/v1/speakers?company_side_only=true`, {
         headers: {
-          'X-User-Email': currentUser?.email || '',
+          "X-User-Email": currentUser?.email || "",
         },
       });
 
       if (!speakersResponse.ok) {
-        throw new Error('Failed to fetch speakers');
+        throw new Error("Failed to fetch speakers");
       }
 
       const speakers = await speakersResponse.json();
       const speaker = speakers.find((s: any) => s.email === participantEmail);
 
       if (!speaker) {
-        throw new Error('Speaker not found');
+        throw new Error("Speaker not found");
       }
 
       const response = await fetch(`/api/v1/speakers/${speaker.id}/role`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'X-User-Email': currentUser?.email || '',
+          "Content-Type": "application/json",
+          "X-User-Email": currentUser?.email || "",
         },
         body: JSON.stringify({ role: newRole }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to update role');
+        throw new Error(errorData.detail || "Failed to update role");
       }
 
       // Refresh the analysis to get updated participant data
       await mutate();
 
       // Show success toast
-      const roleName = newRole ? ROLE_FULL_LABELS[newRole] : 'None';
+      const roleName = newRole ? ROLE_FULL_LABELS[newRole] : "None";
       toast({
-        title: 'Role Updated',
+        title: "Role Updated",
         description: `${participant.name} assigned to ${roleName}`,
-        variant: 'success',
+        variant: "success",
       });
     } catch (err) {
-      console.error('Error updating participant role:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update role';
+      console.error("Error updating participant role:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to update role";
 
       // Show error toast
       toast({
-        title: 'Update Failed',
+        title: "Update Failed",
         description: errorMessage,
-        variant: 'error',
+        variant: "error",
       });
     } finally {
       setUpdatingParticipantEmail(null);
@@ -369,11 +380,11 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
                               className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border transition-colors ${
                                 participant.business_role
                                   ? ROLE_COLORS[participant.business_role]
-                                  : 'bg-amber-100 text-amber-800 border-amber-200'
+                                  : "bg-amber-100 text-amber-800 border-amber-200"
                               } ${
                                 updatingParticipantEmail === participant.email
-                                  ? 'opacity-50 cursor-not-allowed'
-                                  : 'hover:opacity-80 cursor-pointer'
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : "hover:opacity-80 cursor-pointer"
                               }`}
                             >
                               {updatingParticipantEmail === participant.email ? (
@@ -382,7 +393,7 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
                                 <>
                                   {participant.business_role
                                     ? ROLE_LABELS[participant.business_role]
-                                    : 'Role Not Assigned'}
+                                    : "Role Not Assigned"}
                                   <ChevronDown className="h-3 w-3" />
                                 </>
                               )}
@@ -413,14 +424,16 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
                           </DropdownMenuContent>
                         </DropdownMenu>
                       ) : (
-                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border ${
-                          participant.business_role
-                            ? ROLE_COLORS[participant.business_role]
-                            : 'bg-amber-100 text-amber-800 border-amber-200'
-                        }`}>
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border ${
+                            participant.business_role
+                              ? ROLE_COLORS[participant.business_role]
+                              : "bg-amber-100 text-amber-800 border-amber-200"
+                          }`}
+                        >
                           {participant.business_role
                             ? ROLE_LABELS[participant.business_role]
-                            : 'Role Not Assigned'}
+                            : "Role Not Assigned"}
                         </span>
                       )}
                     </div>
@@ -493,31 +506,85 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
         <SupplementaryFrameworksPanel frameworks={analysis.supplementary_frameworks} />
       )}
 
-      {/* Task 4.7: Display strengths and improvement areas using InsightCard components */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <InsightCard title="Strengths" strengths={analysis.strengths} defaultOpen={true} />
-        <InsightCard
-          title="Areas for Improvement"
-          improvements={analysis.areas_for_improvement}
-          defaultOpen={true}
-        />
-      </div>
-
-      {/* Task 4.5: Coaching insights section organized by dimension */}
-      {analysis.dimension_details && Object.keys(analysis.dimension_details).length > 0 && (
+      {/* Thematic Insights - Grouped by theme instead of dimension to reduce overwhelm */}
+      {analysis.thematic_insights && Object.keys(analysis.thematic_insights).length > 0 ? (
         <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Dimension Details</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Performance Analysis</h2>
           <div className="space-y-4">
-            {Object.entries(analysis.dimension_details).map(
-              ([dimension, details]: [string, any]) => (
+            {Object.entries(analysis.thematic_insights).map(
+              ([themeName, themeData]: [string, any]) => (
                 <InsightCard
-                  key={dimension}
-                  title={dimension.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                  strengths={details?.strengths || []}
-                  improvements={details?.improvements || []}
+                  key={themeName}
+                  title={themeName}
+                  strengths={themeData?.strengths || []}
+                  improvements={themeData?.improvements || []}
+                  defaultOpen={false}
                 />
               )
             )}
+          </div>
+        </div>
+      ) : (
+        // Fallback to old format if thematic_insights not available
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InsightCard title="Strengths" strengths={analysis.strengths} defaultOpen={true} />
+            <InsightCard
+              title="Areas for Improvement"
+              improvements={analysis.areas_for_improvement}
+              defaultOpen={true}
+            />
+          </div>
+
+          {/* Task 4.5: Coaching insights section organized by dimension */}
+          {analysis.dimension_details && Object.keys(analysis.dimension_details).length > 0 && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Dimension Details</h2>
+              <div className="space-y-4">
+                {Object.entries(analysis.dimension_details).map(
+                  ([dimension, details]: [string, any]) => (
+                    <InsightCard
+                      key={dimension}
+                      title={dimension.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                      strengths={details?.strengths || []}
+                      improvements={details?.improvements || []}
+                    />
+                  )
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Key Moments - Top 10 impactful moments with timestamps */}
+      {analysis.key_moments && analysis.key_moments.length > 0 && (
+        <div className="border rounded-lg p-6 bg-white shadow-sm">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Key Moments</h2>
+          <div className="space-y-3">
+            {analysis.key_moments.map((moment, index) => {
+              const minutes = Math.floor(moment.timestamp / 60);
+              const seconds = moment.timestamp % 60;
+              const timeStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+              return (
+                <div
+                  key={index}
+                  className={`p-3 rounded-lg border ${
+                    moment.moment_type === "strength"
+                      ? "bg-green-50 border-green-200"
+                      : "bg-amber-50 border-amber-200"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="font-mono text-sm font-medium text-gray-600 flex-shrink-0">
+                      {timeStr}
+                    </span>
+                    <p className="text-sm text-gray-700">{moment.summary}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -572,12 +639,13 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
         )}
       </div>
 
-      {/* Task 4.8: Display action items using ActionItem components */}
-      {analysis.action_items && analysis.action_items.length > 0 && (
+      {/* Task 4.8: Display action items - use filtered items if available */}
+      {((analysis.action_items_filtered && analysis.action_items_filtered.length > 0) ||
+        (analysis.action_items && analysis.action_items.length > 0)) && (
         <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Action Items</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Next Steps</h2>
           <div className="space-y-3">
-            {analysis.action_items.map((item, index) => {
+            {(analysis.action_items_filtered || analysis.action_items).map((item, index) => {
               // Determine priority based on keywords or position
               const priority: "high" | "medium" | "low" =
                 item.toLowerCase().includes("critical") || item.toLowerCase().includes("urgent")

@@ -446,7 +446,7 @@ describe("CallAnalysisViewer", () => {
 
     it("should render action items section", () => {
       render(<CallAnalysisViewer callId={mockCallId} userRole={mockUserRole} />);
-      expect(screen.getByText("Action Items")).toBeInTheDocument();
+      expect(screen.getByText("Next Steps")).toBeInTheDocument();
     });
 
     it("should render all action items", () => {
@@ -471,7 +471,7 @@ describe("CallAnalysisViewer", () => {
       });
 
       render(<CallAnalysisViewer callId={mockCallId} userRole={mockUserRole} />);
-      expect(screen.queryByText("Action Items")).not.toBeInTheDocument();
+      expect(screen.queryByText("Next Steps")).not.toBeInTheDocument();
     });
   });
 
