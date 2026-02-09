@@ -8,7 +8,7 @@
  * - Error handling utilities
  */
 
-import { SWRConfiguration } from 'swr';
+import { SWRConfiguration } from "swr";
 
 /**
  * Default fetcher function with authentication
@@ -16,14 +16,14 @@ import { SWRConfiguration } from 'swr';
  */
 async function fetcher<T>(url: string): Promise<T> {
   const response = await fetch(url, {
-    credentials: 'include', // Include cookies for Clerk session
+    credentials: "include", // Include cookies for Clerk session
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   });
 
   if (!response.ok) {
-    const error: any = new Error('An error occurred while fetching the data.');
+    const error: any = new Error("An error occurred while fetching the data.");
     error.status = response.status;
 
     try {
@@ -95,7 +95,9 @@ export function buildApiUrl(
   endpoint: string,
   params?: Record<string, string | number | boolean | undefined>
 ): string {
-  const url = new URL(endpoint, window.location.origin);
+  // Use window.location.origin on client, fallback to relative URL on server
+  const base = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+  const url = new URL(endpoint, base);
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
@@ -120,10 +122,10 @@ export interface SWRError {
 
 export function isSWRError(error: unknown): error is SWRError {
   return (
-    typeof error === 'object' &&
+    typeof error === "object" &&
     error !== null &&
-    'message' in error &&
-    typeof (error as any).message === 'string'
+    "message" in error &&
+    typeof (error as any).message === "string"
   );
 }
 
@@ -134,7 +136,7 @@ export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
-  return 'An unknown error occurred';
+  return "An unknown error occurred";
 }
 
 export function isAuthError(error: unknown): boolean {
@@ -177,6 +179,8 @@ export function hasData<T>(state: LoadingState<T>): state is LoadingState<T> & {
   return state.data !== undefined;
 }
 
-export function hasError<T>(state: LoadingState<T>): state is LoadingState<T> & { error: SWRError } {
+export function hasError<T>(
+  state: LoadingState<T>
+): state is LoadingState<T> & { error: SWRError } {
   return state.error !== undefined;
 }

@@ -13,6 +13,81 @@ import { withAuth, apiError, canAccessRepData } from "@/lib/auth-middleware";
 import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
 import { logRequest, logResponse, logError } from "@/lib/api-logger";
 
+/**
+ * GET handler for fetching cached analysis results
+ * Accepts query parameters instead of request body
+ */
+export const GET = withAuth(async (req: NextRequest, authContext) => {
+  const startTime = Date.now();
+
+  try {
+    // Log request
+    logRequest(req, authContext.userId);
+
+    // Check rate limit
+    const rateLimit = checkRateLimit(authContext.userId, "/api/coaching/analyze-call");
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded" },
+        {
+          status: 429,
+          headers: rateLimitHeaders(rateLimit.limit, rateLimit.remaining, rateLimit.reset),
+        }
+      );
+    }
+
+    // Parse query parameters
+    const searchParams = req.nextUrl.searchParams;
+    const params: any = {
+      call_id: searchParams.get("call_id") || undefined,
+      dimensions: searchParams.get("dimensions")?.split(",") || undefined,
+      use_cache: searchParams.get("use_cache") === "true",
+      include_transcript_snippets: searchParams.get("include_transcript_snippets") !== "false",
+      force_reanalysis: searchParams.get("force_reanalysis") === "true",
+    };
+
+    // Validate parameters
+    const validationResult = analyzeCallRequestSchema.safeParse(params);
+
+    if (!validationResult.success) {
+      return apiError("Invalid request parameters", 400, validationResult.error.format());
+    }
+
+    const validatedParams = validationResult.data;
+
+    // Call MCP backend
+    const result = await mcpClient.analyzeCall(validatedParams);
+
+    // RBAC check: Verify user can access this rep's data
+    if (result.rep_analyzed?.email) {
+      if (!canAccessRepData(authContext, result.rep_analyzed.email)) {
+        return apiError("Forbidden: You can only access your own call analyses", 403);
+      }
+    }
+
+    // Log successful response
+    const duration = Date.now() - startTime;
+    const response = NextResponse.json(result, {
+      headers: rateLimitHeaders(rateLimit.limit, rateLimit.remaining, rateLimit.reset),
+    });
+
+    logResponse(req, response, authContext.userId, duration, {
+      call_id: validatedParams.call_id,
+      overall_score: result.scores.overall,
+    });
+
+    return response;
+  } catch (error) {
+    logError(req, error, authContext.userId);
+
+    if (error instanceof Error) {
+      return apiError(error.message, 500);
+    }
+
+    return apiError("Internal server error", 500);
+  }
+});
+
 export const POST = withAuth(async (req: NextRequest, authContext) => {
   const startTime = Date.now();
 
