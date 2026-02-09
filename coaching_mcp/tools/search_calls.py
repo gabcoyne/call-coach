@@ -138,7 +138,8 @@ def search_calls_tool(
     params.append(min(limit, 100))  # Cap at 100
 
     # Build final query (where_clauses are pre-validated SQL fragments with placeholders)
-    query = f"""  # nosec
+    # nosec - Dynamic query building with parameterized values (SQL injection safe)
+    query = f"""
         WITH call_scores AS (
             SELECT
                 cs.call_id,
