@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { X, Clock, User, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState } from "react";
+import { X, Clock, User, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface RoleHistoryEntry {
   id: string;
@@ -33,17 +33,17 @@ interface RoleHistoryModalProps {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  ae: 'Account Executive',
-  se: 'Sales Engineer',
-  csm: 'Customer Success Manager',
-  support: 'Support Engineer',
+  ae: "Account Executive",
+  se: "Sales Engineer",
+  csm: "Customer Success Manager",
+  support: "Support Engineer",
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  ae: 'bg-blue-100 text-blue-800 border-blue-200',
-  se: 'bg-purple-100 text-purple-800 border-purple-200',
-  csm: 'bg-green-100 text-green-800 border-green-200',
-  support: 'bg-orange-100 text-orange-800 border-orange-200',
+  ae: "bg-blue-100 text-blue-800 border-blue-200",
+  se: "bg-purple-100 text-purple-800 border-purple-200",
+  csm: "bg-green-100 text-green-800 border-green-200",
+  support: "bg-orange-100 text-orange-800 border-orange-200",
 };
 
 export function RoleHistoryModal({
@@ -69,22 +69,26 @@ export function RoleHistoryModal({
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/v1/speakers/${speakerId}/history?limit=50`, {
-        headers: {
-          'X-User-Email': userEmail,
-        },
-      });
+      const MCP_BACKEND_URL = process.env.NEXT_PUBLIC_MCP_BACKEND_URL || "http://localhost:8000";
+      const response = await fetch(
+        `${MCP_BACKEND_URL}/api/v1/speakers/${speakerId}/history?limit=50`,
+        {
+          headers: {
+            "X-User-Email": userEmail,
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to fetch history');
+        throw new Error(errorData.detail || "Failed to fetch history");
       }
 
       const data = await response.json();
       setHistory(data);
     } catch (err) {
-      console.error('Error fetching role history:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load history');
+      console.error("Error fetching role history:", err);
+      setError(err instanceof Error ? err.message : "Failed to load history");
     } finally {
       setLoading(false);
     }
@@ -92,12 +96,12 @@ export function RoleHistoryModal({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
     }).format(date);
   };
 
@@ -111,7 +115,7 @@ export function RoleHistoryModal({
     }
 
     return (
-      <Badge variant="outline" className={ROLE_COLORS[role] || 'bg-gray-100 text-gray-600'}>
+      <Badge variant="outline" className={ROLE_COLORS[role] || "bg-gray-100 text-gray-600"}>
         {ROLE_LABELS[role] || role.toUpperCase()}
       </Badge>
     );
@@ -124,9 +128,7 @@ export function RoleHistoryModal({
           <DialogTitle>Role Change History</DialogTitle>
           <DialogDescription>
             {speakerName || speakerEmail}
-            {speakerName && (
-              <span className="text-xs text-gray-500 ml-2">({speakerEmail})</span>
-            )}
+            {speakerName && <span className="text-xs text-gray-500 ml-2">({speakerEmail})</span>}
           </DialogDescription>
         </DialogHeader>
 
