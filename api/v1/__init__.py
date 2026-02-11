@@ -10,6 +10,7 @@ Version 1 of the Call Coaching API with:
 from fastapi import APIRouter
 
 from .calls import router as calls_router
+from .opportunities import router as opportunities_router
 from .rubrics import router as rubrics_router
 from .speakers import router as speakers_router
 from .team import router as team_router
@@ -24,6 +25,7 @@ router.include_router(tools_router, prefix="/tools", tags=["tools"])
 router.include_router(users_router)
 router.include_router(team_router)
 router.include_router(calls_router)
+router.include_router(opportunities_router)
 router.include_router(speakers_router)
 router.include_router(rubrics_router)
 
