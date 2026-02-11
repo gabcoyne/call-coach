@@ -41,6 +41,7 @@ from api.v1 import router as v1_router
 
 # Import MCP tool implementations
 from coaching_mcp.tools.analyze_call import analyze_call_tool
+from coaching_mcp.tools.get_coaching_feed import get_coaching_feed_tool
 from coaching_mcp.tools.get_rep_insights import get_rep_insights_tool
 from coaching_mcp.tools.search_calls import search_calls_tool
 from db import queries
@@ -228,6 +229,18 @@ class LearningInsightsRequest(BaseModel):
     focus_area: str = Field("discovery", description="Area to focus on")
 
 
+class CoachingFeedRequest(BaseModel):
+    type_filter: str | None = Field(None, description="Filter by type")
+    time_filter: str | None = Field(None, description="Time range filter")
+    start_date: str | None = Field(None, description="Custom start date (ISO format)")
+    end_date: str | None = Field(None, description="Custom end date (ISO format)")
+    limit: int = Field(20, description="Maximum number of items to return")
+    offset: int = Field(0, description="Pagination offset")
+    include_dismissed: bool = Field(False, description="Include dismissed items")
+    include_team_insights: bool = Field(False, description="Include team-wide insights")
+    rep_email: str | None = Field(None, description="Filter to specific rep")
+
+
 class KnowledgeEntryRequest(BaseModel):
     product: str = Field(..., description="Product: prefect or horizon")
     category: str = Field(..., description="Category: feature, use_case, competitor, etc.")
@@ -252,7 +265,7 @@ kb_manager = KnowledgeBaseManager()
 @app.get("/health")
 async def health_check():
     """Health check endpoint for monitoring."""
-    return {"status": "ok", "service": "call-coaching-api", "tools": 5}
+    return {"status": "ok", "service": "call-coaching-api", "tools": 6}
 
 
 # Scheduler endpoints
@@ -372,6 +385,31 @@ async def search_calls_endpoint(request: SearchCallsRequest) -> list[dict[str, A
     except Exception as e:
         logger.error(f"Error searching calls: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/coaching/feed")
+async def coaching_feed_endpoint(request: CoachingFeedRequest) -> dict[str, Any]:
+    """
+    Get personalized coaching feed with recent insights and recommendations.
+
+    Returns feed items, team insights, highlights, and pagination metadata.
+    """
+    try:
+        result = get_coaching_feed_tool(
+            type_filter=request.type_filter,
+            time_filter=request.time_filter,
+            start_date=request.start_date,
+            end_date=request.end_date,
+            limit=request.limit,
+            offset=request.offset,
+            include_dismissed=request.include_dismissed,
+            include_team_insights=request.include_team_insights,
+            rep_email=request.rep_email,
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error generating coaching feed: {e}")
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/tools/analyze_opportunity")

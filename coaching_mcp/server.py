@@ -13,6 +13,7 @@ from fastmcp import FastMCP
 
 from coaching_mcp.shared import settings
 from coaching_mcp.tools.analyze_call import analyze_call_tool
+from coaching_mcp.tools.get_coaching_feed import get_coaching_feed_tool
 from coaching_mcp.tools.get_rep_insights import get_rep_insights_tool
 from coaching_mcp.tools.search_calls import search_calls_tool
 
@@ -360,6 +361,60 @@ def get_learning_insights(rep_email: str, focus_area: str = "discovery") -> dict
     from analysis.learning_insights import get_learning_insights as _get_learning_insights
 
     return _get_learning_insights(rep_email, focus_area)
+
+
+@mcp.tool()
+def get_coaching_feed(
+    type_filter: str | None = None,
+    time_filter: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    limit: int = 20,
+    offset: int = 0,
+    include_dismissed: bool = False,
+    include_team_insights: bool = False,
+    rep_email: str | None = None,
+) -> dict[str, Any]:
+    """
+    Get personalized coaching feed with recent insights and recommendations.
+
+    Generates feed items from:
+    - Recent coaching sessions (last 7 days by default)
+    - High-impact moments (significant score improvements/declines)
+    - Team-wide patterns (for managers)
+    - Milestone achievements
+
+    Args:
+        type_filter: Filter by type (call_analysis, team_insight, highlight, milestone)
+        time_filter: Time range (today, this_week, this_month, custom)
+        start_date: Custom start date (ISO format)
+        end_date: Custom end date (ISO format)
+        limit: Maximum number of items to return
+        offset: Pagination offset
+        include_dismissed: Include dismissed items
+        include_team_insights: Include team-wide insights (managers only)
+        rep_email: Filter to specific rep (None = current user)
+
+    Returns:
+        dict with:
+            - items: List of feed items
+            - team_insights: Team-wide insights (managers only)
+            - highlights: Notable moments
+            - total_count: Total available items
+            - has_more: Whether more items available
+            - new_items_count: Count of unread items
+    """
+    return get_coaching_feed_tool(
+        type_filter=type_filter,
+        time_filter=time_filter,
+        start_date=start_date,
+        end_date=end_date,
+        limit=limit,
+        offset=offset,
+        include_dismissed=include_dismissed,
+        include_team_insights=include_team_insights,
+        rep_email=rep_email,
+    )
 
 
 @mcp.tool()
