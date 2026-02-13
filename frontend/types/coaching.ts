@@ -112,7 +112,7 @@ export interface ComparisonToAverage {
 
 export interface TranscriptSegment {
   speaker: string;
-  timestamp_seconds: number;
+  start_time_ms: number;
   text: string;
 }
 
@@ -171,6 +171,61 @@ export interface AnalyzeCallResponse {
    * Filtered to remove vague recommendations like "build repository"
    */
   action_items_filtered?: string[];
+
+  /**
+   * Narrative Summary - 2-3 sentence coaching summary (Five Wins Unified)
+   * Replaces verbose lists with concise, actionable narrative
+   */
+  narrative?: string;
+
+  /**
+   * Wins Addressed - Map of win name to what was accomplished
+   * Part of Five Wins Unified output
+   */
+  wins_addressed?: Record<string, string>;
+
+  /**
+   * Wins Missed - Map of win name to what needs work
+   * Part of Five Wins Unified output
+   */
+  wins_missed?: Record<string, string>;
+
+  /**
+   * Primary Action - The ONE most important action for the rep
+   * Part of Five Wins Unified output
+   */
+  primary_action?: PrimaryAction;
+}
+
+/**
+ * Primary Action - The single most important next step for the rep
+ */
+export interface PrimaryAction {
+  /** Which win this action relates to */
+  win: "business" | "technical" | "security" | "commercial" | "legal";
+
+  /** Specific, actionable instruction */
+  action: string;
+
+  /** Why this matters, linked to call context */
+  context: string;
+
+  /** Call moment that makes this action important */
+  related_moment?: CallMoment | null;
+}
+
+/**
+ * Call Moment - A specific moment in the call to reference
+ */
+export interface CallMoment {
+  /** Timestamp in seconds from call start */
+  timestamp_seconds: number;
+
+  /** Who was speaking */
+  speaker: string;
+
+  /** Brief summary of what happened */
+  summary: string;
 }
 
 export interface DimensionAnalysis {

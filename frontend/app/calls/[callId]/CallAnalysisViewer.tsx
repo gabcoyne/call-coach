@@ -35,6 +35,8 @@ import { CoachingSessionFeedback } from "@/components/coaching/CoachingSessionFe
 import { Skeleton } from "@/components/ui/skeleton";
 import { RubricBadge } from "@/components/RubricBadge";
 import { SupplementaryFrameworksPanel } from "@/components/coaching";
+import NarrativeSummary from "@/components/coaching/NarrativeSummary";
+import PrimaryActionCard from "@/components/coaching/PrimaryActionCard";
 import type { AnalyzeCallResponse } from "@/types/coaching";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -73,6 +75,16 @@ function hasFiveWinsEvaluation(response: AnalyzeCallResponse): response is Analy
   return (
     !!response.five_wins_evaluation && response.five_wins_evaluation.overall_score !== undefined
   );
+}
+
+/**
+ * Type guard to check if response has Five Wins Unified output (narrative + primary action)
+ */
+function hasFiveWinsUnified(response: AnalyzeCallResponse): response is AnalyzeCallResponse & {
+  narrative: string;
+  primary_action: NonNullable<AnalyzeCallResponse["primary_action"]>;
+} {
+  return !!response.narrative && !!response.primary_action;
 }
 
 export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps) {
@@ -461,6 +473,27 @@ export function CallAnalysisViewer({ callId, userRole }: CallAnalysisViewerProps
       {analysis.rep_analyzed?.evaluated_as_role && (
         <div className="flex justify-center">
           <RubricBadge role={analysis.rep_analyzed.evaluated_as_role} />
+        </div>
+      )}
+
+      {/* Five Wins Unified Output: Narrative Summary + Primary Action */}
+      {hasFiveWinsUnified(analysis) && (
+        <div className="space-y-6">
+          {/* Narrative Summary - 2-3 sentence coaching summary at top */}
+          <NarrativeSummary
+            narrative={analysis.narrative}
+            winsAddressed={analysis.wins_addressed}
+            winsMissed={analysis.wins_missed}
+          />
+
+          {/* Primary Action - The ONE thing to do before next call */}
+          <PrimaryActionCard
+            win={analysis.primary_action.win}
+            action={analysis.primary_action.action}
+            context={analysis.primary_action.context}
+            relatedMoment={analysis.primary_action.related_moment}
+            onTimestampClick={handleTimestampClick}
+          />
         </div>
       )}
 

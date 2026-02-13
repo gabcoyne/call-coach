@@ -375,7 +375,7 @@ def analyze_call_tool(
     if include_transcript_snippets:
         transcript_rows = fetch_all(
             """
-            SELECT s.name, t.timestamp_seconds, t.text
+            SELECT s.name, t.start_time_ms, t.text
             FROM transcripts t
             LEFT JOIN speakers s ON t.speaker_id = s.id
             WHERE t.call_id = %s
@@ -390,7 +390,7 @@ def analyze_call_tool(
             transcript_segments = [
                 {
                     "speaker": row.get("name") or "Unknown",
-                    "timestamp_seconds": row.get("timestamp_seconds") or 0,
+                    "start_time_ms": row.get("start_time_ms") or 0,
                     "text": row.get("text", ""),
                 }
                 for row in transcript_rows
@@ -500,6 +500,58 @@ def analyze_call_tool(
         all_action_items, min_score=60, max_items=7
     )
 
+    # Five Wins Unified Pipeline - Add narrative and primary action when enabled
+    from coaching_mcp.shared import settings
+
+    if settings.use_five_wins_unified:
+        logger.info("Five Wins Unified pipeline enabled - adding narrative and primary action")
+        try:
+            from analysis.engine import run_five_wins_unified_analysis
+
+            # Get call type for primary win determination
+            call_type = call.get("call_type") or "discovery"
+
+            # Fetch transcript for unified analysis
+            transcript_data = fetch_one(
+                """
+                SELECT STRING_AGG(text, ' ' ORDER BY sequence_number) as full_transcript
+                FROM transcripts
+                WHERE call_id = %s
+                """,
+                (str(db_call_id),),
+                as_dict=True,
+            )
+            transcript_text = ""
+            if transcript_data and isinstance(transcript_data, dict):
+                transcript_text = str(transcript_data.get("full_transcript", ""))
+
+            # Run unified analysis
+            unified_result = run_five_wins_unified_analysis(
+                call_id=call_id,
+                transcript=transcript_text,
+                call_type=call_type,
+                call_metadata=call,
+            )
+
+            # Add Five Wins Unified fields to response
+            response["narrative"] = unified_result.get("narrative")
+            response["wins_addressed"] = unified_result.get("wins_addressed", {})
+            response["wins_missed"] = unified_result.get("wins_missed", {})
+            response["primary_action"] = unified_result.get("primary_action")
+
+            # Update five_wins_evaluation if unified analysis has better data
+            if "five_wins_evaluation" in unified_result:
+                response["five_wins_evaluation"] = unified_result["five_wins_evaluation"]
+
+            logger.info(
+                f"Five Wins Unified: narrative={bool(response.get('narrative'))}, "
+                f"primary_action={bool(response.get('primary_action'))}"
+            )
+        except Exception as e:
+            logger.warning(f"Five Wins Unified pipeline failed, using fallback: {e}")
+            # Fallback: use consolidation layer on existing results
+            _add_fallback_unified_output(response, call.get("call_type") or "discovery")
+
     logger.info(f"Analysis complete. Overall score: {overall_score}/100")
     logger.info(
         f"Post-processing: {len(response['thematic_insights'])} themes, "
@@ -507,6 +559,44 @@ def analyze_call_tool(
         f"{len(response['action_items_filtered'])} filtered actions"
     )
     return response
+
+
+def _add_fallback_unified_output(response: dict, call_type: str) -> None:
+    """
+    Add Five Wins Unified output using consolidation layer on existing results.
+
+    This is a fallback when the full unified pipeline fails.
+    """
+    from analysis.consolidation import generate_narrative, select_primary_action
+
+    five_wins_eval = response.get("five_wins_evaluation", {})
+
+    # Generate narrative
+    response["narrative"] = generate_narrative(five_wins_eval, call_type)
+
+    # Generate wins_addressed and wins_missed
+    wins_addressed = {}
+    wins_missed = {}
+
+    for win_key in ["business", "technical", "security", "commercial", "legal"]:
+        # Try both key formats
+        win_data = five_wins_eval.get(win_key, {}) or five_wins_eval.get(f"{win_key}_win", {})
+        score = win_data.get("score", 0)
+        evidence = win_data.get("evidence", [])
+
+        if score >= 60:
+            wins_addressed[win_key] = evidence[0] if evidence else f"Score: {score}"
+        elif score < 40:
+            blockers = win_data.get("blockers", [])
+            wins_missed[win_key] = blockers[0] if blockers else f"Score: {score}"
+
+    response["wins_addressed"] = wins_addressed
+    response["wins_missed"] = wins_missed
+
+    # Select primary action
+    key_moments = response.get("key_moments", [])
+    primary_action = select_primary_action(five_wins_eval, call_type, key_moments)
+    response["primary_action"] = primary_action.model_dump()
 
 
 def calculate_comparison_to_average(

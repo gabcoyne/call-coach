@@ -61,6 +61,12 @@ class Settings(BaseSettings):
         default=20, description="Overlap between chunks as percentage"
     )
 
+    # Five Wins Unified Pipeline
+    use_five_wins_unified: bool = Field(
+        default=False,
+        description="Enable unified Five Wins pipeline (replaces methodology-specific prompts)",
+    )
+
     # Prefect/Horizon
     prefect_api_url: str | None = Field(default=None, description="Prefect Cloud API URL")
     prefect_api_key: str | None = Field(default=None, description="Prefect Cloud API key")

@@ -26,6 +26,7 @@ from .prompts import (
     analyze_objection_handling_prompt,
     analyze_product_knowledge_prompt,
 )
+from .prompts.five_wins_prompt import analyze_five_wins_prompt
 from .rubric_loader import load_rubric
 
 logger = logging.getLogger(__name__)
@@ -497,3 +498,159 @@ def _generate_prompt_for_dimension(
         )
     else:
         raise ValueError(f"Unsupported dimension: {dimension.value}")
+
+
+def run_five_wins_unified_analysis(
+    call_id: str,
+    transcript: str,
+    call_type: str = "discovery",
+    call_metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """
+    Run unified Five Wins analysis using the new methodology-free prompt.
+
+    This is the new analysis pipeline that:
+    1. Uses a single prompt that evaluates all five wins
+    2. Generates a 2-3 sentence narrative summary
+    3. Selects ONE primary action item
+    4. Links actions to specific call moments
+
+    Args:
+        call_id: Call UUID for logging
+        transcript: Full call transcript
+        call_type: Type of call (discovery, demo, etc.)
+        call_metadata: Optional call metadata
+
+    Returns:
+        Five Wins evaluation with narrative and primary action
+    """
+    logger.info(f"Running Five Wins Unified analysis for call {call_id}")
+
+    # Generate the unified prompt
+    messages = analyze_five_wins_prompt(
+        transcript=transcript,
+        call_type=call_type,
+        call_metadata=call_metadata,
+    )
+
+    # Call Claude API
+    try:
+        response = anthropic_client.messages.create(
+            model="claude-sonnet-4-5-20250929",
+            max_tokens=8000,
+            temperature=0.3,
+            messages=messages,  # type: ignore[arg-type]
+        )
+
+        # Extract usage statistics
+        usage = response.usage
+        tokens_used = usage.input_tokens + usage.output_tokens
+        cache_creation_tokens = getattr(usage, "cache_creation_input_tokens", 0)
+        cache_read_tokens = getattr(usage, "cache_read_input_tokens", 0)
+
+        logger.info(
+            f"Five Wins Unified API call successful: "
+            f"input={usage.input_tokens}, output={usage.output_tokens}, "
+            f"cache_creation={cache_creation_tokens}, cache_read={cache_read_tokens}"
+        )
+
+        # Parse response content
+        content_block = response.content[0]
+        if not hasattr(content_block, "text"):
+            raise ValueError(f"Expected TextBlock but got {type(content_block)}")
+        response_text = content_block.text
+
+        # Try to parse as JSON
+        try:
+            analysis_data = json.loads(response_text)
+        except json.JSONDecodeError as e:
+            # Fallback: extract JSON from markdown code blocks
+            if "```json" in response_text:
+                json_start = response_text.find("```json") + 7
+                json_end = response_text.find("```", json_start)
+                json_str = response_text[json_start:json_end].strip()
+                try:
+                    analysis_data = json.loads(json_str)
+                except json.JSONDecodeError as e2:
+                    logger.error(f"Failed to parse Five Wins JSON: {str(e2)}")
+                    logger.error(f"Response preview: {response_text[:1000]}...")
+                    raise ValueError(f"Five Wins response JSON is malformed: {str(e2)}") from e2
+            else:
+                logger.error(f"No JSON in Five Wins response: {response_text[:1000]}...")
+                raise ValueError(f"Five Wins response is not valid JSON: {str(e)}") from e
+
+        # Add metadata
+        analysis_data["metadata"] = {
+            "model": "claude-sonnet-4-5-20250929",
+            "tokens_used": tokens_used,
+            "input_tokens": usage.input_tokens,
+            "output_tokens": usage.output_tokens,
+            "cache_creation_tokens": cache_creation_tokens,
+            "cache_read_tokens": cache_read_tokens,
+            "pipeline": "five_wins_unified",
+            "call_type": call_type,
+        }
+
+        # Run consolidation layer if LLM didn't generate narrative/action
+        if "narrative" not in analysis_data or "primary_action" not in analysis_data:
+            logger.info("Running consolidation layer for Five Wins output")
+            analysis_data = _apply_consolidation_layer(analysis_data, call_type)
+
+        return dict(analysis_data)
+
+    except Exception as e:
+        logger.error(f"Five Wins Unified API call failed: {e}")
+        raise RuntimeError(f"Five Wins Unified analysis failed: {e}") from e
+
+
+def _apply_consolidation_layer(
+    analysis_data: dict[str, Any],
+    call_type: str,
+) -> dict[str, Any]:
+    """
+    Apply consolidation layer to generate narrative and select primary action.
+
+    This is a fallback if the LLM didn't produce the expected output format.
+
+    Args:
+        analysis_data: Raw analysis data from LLM
+        call_type: Type of call
+
+    Returns:
+        Analysis data with narrative and primary_action added
+    """
+    from .consolidation import generate_narrative, select_primary_action
+
+    # Extract Five Wins evaluation
+    five_wins_eval = analysis_data.get("five_wins_evaluation", {})
+
+    # Generate narrative if missing
+    if "narrative" not in analysis_data:
+        analysis_data["narrative"] = generate_narrative(five_wins_eval, call_type)
+
+    # Generate wins_addressed and wins_missed if missing
+    if "wins_addressed" not in analysis_data:
+        wins_addressed = {}
+        wins_missed = {}
+
+        for win_key in ["business", "technical", "security", "commercial", "legal"]:
+            win_data = five_wins_eval.get(win_key, {})
+            score = win_data.get("score", 0)
+            evidence = win_data.get("evidence", [])
+
+            if score >= 60:
+                wins_addressed[win_key] = evidence[0] if evidence else f"Score: {score}"
+            elif score < 40:
+                blockers = win_data.get("blockers", [])
+                wins_missed[win_key] = blockers[0] if blockers else f"Score: {score}"
+
+        analysis_data["wins_addressed"] = wins_addressed
+        analysis_data["wins_missed"] = wins_missed
+
+    # Select primary action if missing
+    if "primary_action" not in analysis_data:
+        key_moments = analysis_data.get("key_moments", [])
+        primary_action = select_primary_action(five_wins_eval, call_type, key_moments)
+        analysis_data["primary_action"] = primary_action.model_dump()
+
+    return analysis_data
