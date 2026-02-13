@@ -34,6 +34,44 @@ export interface ObjectionBreakdownProps {
   className?: string;
 }
 
+type ViewMode = "pie" | "details";
+
+/**
+ * Toggle buttons for switching between pie and details view
+ */
+function ViewToggle({
+  viewMode,
+  setViewMode,
+}: {
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
+}) {
+  return (
+    <div className="flex justify-end mb-4 gap-2">
+      <button
+        onClick={() => setViewMode("pie")}
+        className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
+          viewMode === "pie"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        }`}
+      >
+        Distribution
+      </button>
+      <button
+        onClick={() => setViewMode("details")}
+        className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
+          viewMode === "details"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        }`}
+      >
+        Details
+      </button>
+    </div>
+  );
+}
+
 /**
  * ObjectionBreakdown Component
  *
@@ -47,7 +85,7 @@ export function ObjectionBreakdown({
   height = 350,
   className = "",
 }: ObjectionBreakdownProps) {
-  const [viewMode, setViewMode] = useState<"pie" | "details">(showDetails ? "details" : "pie");
+  const [viewMode, setViewMode] = useState<ViewMode>(showDetails ? "details" : "pie");
 
   if (!data || data.length === 0) {
     return (
@@ -109,28 +147,7 @@ export function ObjectionBreakdown({
   if (viewMode === "pie") {
     return (
       <div className={className}>
-        <div className="flex justify-end mb-4 gap-2">
-          <button
-            onClick={() => setViewMode("pie")}
-            className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-              viewMode === "pie"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Distribution
-          </button>
-          <button
-            onClick={() => setViewMode("details")}
-            className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-              viewMode === "details"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Details
-          </button>
-        </div>
+        <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
 
         <ResponsiveContainer width="100%" height={height}>
           <PieChart>
@@ -164,28 +181,7 @@ export function ObjectionBreakdown({
   if (detailsData.length === 0) {
     return (
       <div className={className}>
-        <div className="flex justify-end mb-4 gap-2">
-          <button
-            onClick={() => setViewMode("pie")}
-            className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-              viewMode === "pie"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Distribution
-          </button>
-          <button
-            onClick={() => setViewMode("details")}
-            className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-              viewMode === "details"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Details
-          </button>
-        </div>
+        <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
 
         <div
           className="flex items-center justify-center border rounded-lg bg-gray-50"
@@ -201,28 +197,7 @@ export function ObjectionBreakdown({
 
   return (
     <div className={className}>
-      <div className="flex justify-end mb-4 gap-2">
-        <button
-          onClick={() => setViewMode("pie")}
-          className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-            viewMode === "pie"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
-        >
-          Distribution
-        </button>
-        <button
-          onClick={() => setViewMode("details")}
-          className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-            viewMode === "details"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
-        >
-          Details
-        </button>
-      </div>
+      <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
 
       <ResponsiveContainer width="100%" height={height}>
         <BarChart data={detailsData} margin={{ top: 5, right: 30, left: 0, bottom: 80 }}>

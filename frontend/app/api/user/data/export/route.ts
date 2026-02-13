@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
         email: user?.emailAddresses?.[0]?.emailAddress,
         firstName: user?.firstName,
         lastName: user?.lastName,
-        createdAt: user?.createdAt?.toISOString(),
+        createdAt: user?.createdAt ? new Date(user.createdAt).toISOString() : undefined,
       },
       sessions: mockCoachingData.sessions,
       ...(includeTranscripts && { transcripts: mockCoachingData.transcripts }),

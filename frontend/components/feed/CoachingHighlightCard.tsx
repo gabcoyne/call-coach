@@ -38,7 +38,7 @@ export function CoachingHighlightCard({ highlight }: CoachingHighlightCardProps)
               >
                 Exemplary Moment
               </Badge>
-              <ScoreBadge score={highlight.score} size="sm" />
+              <ScoreBadge score={highlight.score} className="text-xs" />
             </div>
             <CardTitle className="text-base">
               {highlight.dimension.replace("_", " ").charAt(0).toUpperCase() +

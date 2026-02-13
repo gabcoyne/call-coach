@@ -69,4 +69,4 @@ async function handlePost(req: NextRequest) {
   }
 }
 
-export const POST = withRateLimit(withAuthMiddleware(handlePost), 60, "dismiss");
+export const POST = withRateLimit(withAuthMiddleware(handlePost));

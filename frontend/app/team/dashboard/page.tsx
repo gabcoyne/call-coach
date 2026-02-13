@@ -352,7 +352,7 @@ export default function TeamManagementPage() {
                           </SelectContent>
                         </Select>
                       ) : (
-                        <RoleBadge role={member.role} />
+                        <RoleBadge role={member.role as "rep" | "manager" | "admin"} />
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">

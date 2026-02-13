@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import type { Toast } from './toaster';
+import { useState, useCallback } from "react";
+import type { Toast } from "./toaster";
 
 let toastCounter = 0;
 let listeners: ((toasts: Toast[]) => void)[] = [];
@@ -29,21 +29,29 @@ export function useToast() {
     };
   });
 
-  const toast = useCallback((options: {
-    title?: string;
-    description?: string;
-    variant?: 'default' | 'success' | 'error' | 'warning' | 'info';
-    duration?: number;
-  }) => {
-    const id = generateId();
-    const newToast: Toast = {
-      id,
-      ...options,
-    };
-    toastsState = [...toastsState, newToast];
-    notifyListeners();
-    return id;
-  }, []);
+  const toast = useCallback(
+    (options: {
+      title?: string;
+      description?: string;
+      variant?: "default" | "success" | "error" | "warning" | "info" | "destructive";
+      duration?: number;
+    }) => {
+      // Map 'destructive' to 'error' for shadcn/ui compatibility
+      const mappedOptions = {
+        ...options,
+        variant: options.variant === "destructive" ? "error" : options.variant,
+      };
+      const id = generateId();
+      const newToast: Toast = {
+        id,
+        ...mappedOptions,
+      };
+      toastsState = [...toastsState, newToast];
+      notifyListeners();
+      return id;
+    },
+    []
+  );
 
   const dismiss = useCallback((id: string) => {
     toastsState = toastsState.filter((t) => t.id !== id);

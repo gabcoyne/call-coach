@@ -11,10 +11,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getOpportunityTimeline } from "@/lib/db/opportunities";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
-    const searchParams = request.nextUrl.searchParams;
+  const { id } = await params;
+  const searchParams = request.nextUrl.searchParams;
 
+  try {
     // Parse pagination
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);

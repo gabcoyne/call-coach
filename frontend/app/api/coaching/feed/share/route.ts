@@ -69,4 +69,4 @@ async function handlePost(req: NextRequest) {
   }
 }
 
-export const POST = withRateLimit(withAuthMiddleware(handlePost), 60, "share");
+export const POST = withRateLimit(withAuthMiddleware(handlePost));

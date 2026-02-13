@@ -83,7 +83,7 @@ async function checkRedis(): Promise<HealthCheck> {
     // This is a placeholder check
     const response = await fetch(redisUrl, {
       method: "HEAD",
-      timeout: 5000,
+      signal: AbortSignal.timeout(5000),
     }).catch(() => null);
 
     const latency = Date.now() - startTime;

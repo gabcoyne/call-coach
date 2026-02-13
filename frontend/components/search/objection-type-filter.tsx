@@ -37,7 +37,10 @@ export function ObjectionTypeFilter({ filters, onFiltersChange }: ObjectionTypeF
             onValueChange={(value) =>
               onFiltersChange({
                 ...filters,
-                has_objection_type: value === "all" ? undefined : value,
+                has_objection_type:
+                  value === "all"
+                    ? undefined
+                    : (value as "pricing" | "timing" | "technical" | "competitor"),
               })
             }
           >

@@ -30,6 +30,8 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ email: string }> }
 ) {
+  const { email } = await params;
+
   try {
     // Check authentication
     const { userId } = await auth();
@@ -103,6 +105,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ email: string }> }
 ) {
+  const { email } = await params;
+
   try {
     // Check authentication
     const { userId } = await auth();

@@ -94,8 +94,4 @@ async function handleGet(req: NextRequest) {
 }
 
 // Apply middleware
-export const GET = withRateLimit(
-  withAuthMiddleware(handleGet),
-  100, // Max 100 requests per minute
-  "feed"
-);
+export const GET = withRateLimit(withAuthMiddleware(handleGet));

@@ -86,7 +86,7 @@ function CardView({ results }: { results: CallSearchResult[] }) {
             <div className="flex items-start justify-between gap-2">
               <CardTitle className="text-base line-clamp-2">{result.title}</CardTitle>
               {result.overall_score !== null && (
-                <ScoreBadge score={result.overall_score} size="sm" />
+                <ScoreBadge score={result.overall_score} className="text-xs" />
               )}
             </div>
           </CardHeader>
@@ -188,7 +188,7 @@ function TableView({ results }: { results: CallSearchResult[] }) {
                   </td>
                   <td className="p-3">
                     {result.overall_score !== null ? (
-                      <ScoreBadge score={result.overall_score} size="sm" />
+                      <ScoreBadge score={result.overall_score} className="text-xs" />
                     ) : (
                       "—"
                     )}

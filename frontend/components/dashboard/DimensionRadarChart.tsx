@@ -2,15 +2,16 @@
 
 import { Card } from "@/components/ui/card";
 import { ScoreTrends } from "@/types/coaching";
-// Optimized imports: import only specific components from recharts
-import { RadarChart } from "recharts/lib/chart/RadarChart";
-import { Radar } from "recharts/lib/polar/Radar";
-import { PolarGrid } from "recharts/lib/polar/PolarGrid";
-import { PolarAngleAxis } from "recharts/lib/polar/PolarAngleAxis";
-import { PolarRadiusAxis } from "recharts/lib/polar/PolarRadiusAxis";
-import { ResponsiveContainer } from "recharts/lib/component/ResponsiveContainer";
-import { Legend } from "recharts/lib/component/Legend";
-import { Tooltip } from "recharts/lib/component/Tooltip";
+import {
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
 
 interface DimensionRadarChartProps {
   scoreTrends: ScoreTrends;

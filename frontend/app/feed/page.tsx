@@ -94,7 +94,10 @@ export default function FeedPage() {
   const itemCounts = allItems.reduce(
     (acc, item) => {
       acc.all++;
-      acc[item.type]++;
+      const type = item.type as keyof typeof acc;
+      if (type in acc) {
+        acc[type]++;
+      }
       return acc;
     },
     {
@@ -103,7 +106,7 @@ export default function FeedPage() {
       team_insight: 0,
       highlight: 0,
       milestone: 0,
-    } as Record<string, number>
+    }
   );
 
   return (

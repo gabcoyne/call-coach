@@ -7,9 +7,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
+  const { id } = await params;
 
+  try {
     // Call the MCP tool via Python backend
     // This is a placeholder - in production, this would call the actual MCP server
     // For now, return mock insights to demonstrate the UI
