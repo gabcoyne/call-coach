@@ -21,28 +21,28 @@
 
 ## 3. Email Source Implementation
 
-- [ ] 3.1 Create `dlt_pipeline/sources/emails.py` with DLT resource decorators
-- [ ] 3.2 Implement BigQuery query joining `gongio_ft.email`, `email_sender`, and `email_recipient` tables
-- [ ] 3.3 Add recipient aggregation logic to create Postgres array field from multiple recipient rows
-- [ ] 3.4 Implement body snippet extraction (truncate to 500 characters for `body_snippet` field)
-- [ ] 3.5 Add opportunity linkage logic using Gong metadata to populate `opportunity_id` foreign key
-- [ ] 3.6 Map email metadata to JSONB field (full body, headers, thread info)
-- [ ] 3.7 Add incremental loading using `_fivetran_synced` cursor and `sync_status` table
-- [ ] 3.8 Add deduplication logic using `gong_email_id` as merge key
-- [ ] 3.9 Test email source locally with small dataset (limit 50 emails)
+- [x] 3.1 Create `dlt_pipeline/sources/emails.py` with DLT resource decorators
+- [x] 3.2 Implement BigQuery query joining `gongio_ft.email`, `email_sender`, and `email_recipient` tables
+- [x] 3.3 Add recipient aggregation logic to create Postgres array field from multiple recipient rows
+- [x] 3.4 Implement body snippet extraction (truncate to 500 characters for `body_snippet` field)
+- [x] 3.5 Add opportunity linkage logic using Gong metadata to populate `opportunity_id` foreign key
+- [x] 3.6 Map email metadata to JSONB field (full body, headers, thread info)
+- [x] 3.7 Add incremental loading using `_fivetran_synced` cursor and `sync_status` table
+- [x] 3.8 Add deduplication logic using `gong_email_id` as merge key
+- [x] 3.9 Test email source locally with small dataset (limit 50 emails)
 
 ## 4. Opportunity Source Implementation
 
-- [ ] 4.1 Create `dlt_pipeline/sources/opportunities.py` with DLT resource decorators
-- [ ] 4.2 Implement BigQuery query for Salesforce opportunity table (`salesforce.opportunity` or fallback to `gongio_ft.opportunity`)
-- [ ] 4.3 Add account join to resolve `account_name` from `salesforce.account` table
-- [ ] 4.4 Add owner email resolution from Salesforce user table
-- [ ] 4.5 Map Salesforce fields to Postgres schema (Id→gong_opportunity_id, Name→name, StageName→stage, CloseDate→close_date, Amount→amount)
-- [ ] 4.6 Add health_score sync from Gong if available, handle NULL if not present
-- [ ] 4.7 Implement call-opportunity linkage by creating `call_opportunities` junction records
-- [ ] 4.8 Add incremental loading using `LastModifiedDate` cursor and `sync_status` table
-- [ ] 4.9 Add upsert logic for existing opportunities (update on duplicate `gong_opportunity_id`)
-- [ ] 4.10 Test opportunity source locally with small dataset (limit 20 opportunities)
+- [x] 4.1 Create `dlt_pipeline/sources/opportunities.py` with DLT resource decorators
+- [x] 4.2 Implement BigQuery query for Salesforce opportunity table (`salesforce.opportunity` or fallback to `gongio_ft.opportunity`)
+- [x] 4.3 Add account join to resolve `account_name` from `salesforce.account` table
+- [x] 4.4 Add owner email resolution from Salesforce user table
+- [x] 4.5 Map Salesforce fields to Postgres schema (Id→gong_opportunity_id, Name→name, StageName→stage, CloseDate→close_date, Amount→amount)
+- [x] 4.6 Add health_score sync from Gong if available, handle NULL if not present
+- [x] 4.7 Implement call-opportunity linkage by creating `call_opportunities` junction records
+- [x] 4.8 Add incremental loading using `LastModifiedDate` cursor and `sync_status` table
+- [x] 4.9 Add upsert logic for existing opportunities (update on duplicate `gong_opportunity_id`)
+- [x] 4.10 Test opportunity source locally with small dataset (limit 20 opportunities)
 
 ## 5. Main Pipeline Assembly
 
