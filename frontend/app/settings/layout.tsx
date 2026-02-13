@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/hooks/use-auth";
 import { SettingsNav } from "@/components/settings/settings-nav";
 import { Card } from "@/components/ui/card";
 

@@ -1,4 +1,8 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+
+// Bypass auth entirely in development when BYPASS_AUTH is set
+const bypassAuth = process.env.NODE_ENV === "development" && process.env.BYPASS_AUTH === "true";
 
 // Define public routes that don't require authentication
 const isPublicRoute = createRouteMatcher([
@@ -8,6 +12,11 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+  // In dev mode with BYPASS_AUTH, skip all auth checks
+  if (bypassAuth) {
+    return NextResponse.next();
+  }
+
   // Protect all routes except public ones
   if (!isPublicRoute(request)) {
     await auth.protect();

@@ -1,6 +1,7 @@
 "use client";
 
-import { UserButton, useUser } from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
+import { useUser } from "@/lib/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RoleBadge } from "@/components/ui/role-badge";
 import { useCurrentUser } from "@/lib/hooks/use-current-user";

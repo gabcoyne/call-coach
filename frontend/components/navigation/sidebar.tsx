@@ -2,9 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/hooks/use-auth";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Search, Rss, User, Phone, Target, Settings, Shield, Users } from "lucide-react";
+import {
+  LayoutDashboard,
+  Search,
+  Rss,
+  User,
+  Phone,
+  Target,
+  Settings,
+  Shield,
+  Users,
+} from "lucide-react";
 import { useCurrentUser } from "@/lib/hooks/use-current-user";
 import { isManager } from "@/lib/rbac";
 

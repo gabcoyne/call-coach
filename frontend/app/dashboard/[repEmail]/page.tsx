@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { useRepInsights } from "@/lib/hooks/use-rep-insights";
 import { useCurrentUser } from "@/lib/hooks/use-current-user";

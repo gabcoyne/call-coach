@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/hooks/use-auth";
 import { useSearchCalls, SearchFilters } from "@/lib/hooks/use-search-calls-new";
 import { CallSearchResult, SearchCallsRequest } from "@/types/coaching";
 import Link from "next/link";

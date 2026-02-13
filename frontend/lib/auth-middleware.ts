@@ -2,15 +2,16 @@
  * Authentication Middleware for API Routes
  *
  * Provides session verification and RBAC enforcement using Clerk.
+ * Supports dev mode bypass with BYPASS_AUTH=true.
  */
 
-import { auth, currentUser } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
 
 /**
  * User role types
  */
-export type UserRole = 'manager' | 'rep';
+export type UserRole = "manager" | "rep";
 
 /**
  * Authenticated user context
@@ -23,35 +24,53 @@ export interface AuthContext {
 }
 
 /**
+ * Dev mode bypass check
+ */
+const bypassAuth = process.env.NODE_ENV === "development" && process.env.BYPASS_AUTH === "true";
+
+/**
+ * Mock user for dev mode
+ */
+const DEV_AUTH_CONTEXT: AuthContext = {
+  userId: "dev_user_george",
+  email: "george@prefect.io",
+  role: "manager",
+  name: "George Coyne",
+};
+
+/**
  * Verify Clerk session and extract user context
  *
  * @throws {Error} If user is not authenticated
  */
 export async function getAuthContext(): Promise<AuthContext> {
+  // Dev mode bypass
+  if (bypassAuth) {
+    return DEV_AUTH_CONTEXT;
+  }
+
   const { userId } = await auth();
 
   if (!userId) {
-    throw new Error('Unauthorized: No valid session');
+    throw new Error("Unauthorized: No valid session");
   }
 
   const user = await currentUser();
 
   if (!user) {
-    throw new Error('Unauthorized: User not found');
+    throw new Error("Unauthorized: User not found");
   }
 
   // Get primary email
-  const email = user.emailAddresses.find(
-    (e) => e.id === user.primaryEmailAddressId
-  )?.emailAddress;
+  const email = user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)?.emailAddress;
 
   if (!email) {
-    throw new Error('Unauthorized: No email address found');
+    throw new Error("Unauthorized: No email address found");
   }
 
   // Extract role from Clerk metadata
   // In Clerk, you can store custom metadata in publicMetadata or privateMetadata
-  const role = (user.publicMetadata?.role as UserRole) || 'rep';
+  const role = (user.publicMetadata?.role as UserRole) || "rep";
 
   return {
     userId,
@@ -72,7 +91,7 @@ export function hasRole(context: AuthContext, allowedRoles: UserRole[]): boolean
  * Check if user can access rep data (managers can access all, reps only their own)
  */
 export function canAccessRepData(context: AuthContext, repEmail: string): boolean {
-  if (context.role === 'manager') {
+  if (context.role === "manager") {
     return true;
   }
   return context.email === repEmail;
@@ -81,11 +100,7 @@ export function canAccessRepData(context: AuthContext, repEmail: string): boolea
 /**
  * API Error Response Helper
  */
-export function apiError(
-  message: string,
-  status: number = 400,
-  details?: unknown
-): NextResponse {
+export function apiError(message: string, status: number = 400, details?: unknown): NextResponse {
   return NextResponse.json(
     {
       error: message,
@@ -110,7 +125,7 @@ export function withAuth(
       // Check role if specified
       if (options.allowedRoles && !hasRole(authContext, options.allowedRoles)) {
         return apiError(
-          `Forbidden: Requires one of roles: ${options.allowedRoles.join(', ')}`,
+          `Forbidden: Requires one of roles: ${options.allowedRoles.join(", ")}`,
           403
         );
       }
@@ -118,12 +133,12 @@ export function withAuth(
       // Call the actual handler
       return await handler(req, authContext);
     } catch (error) {
-      if (error instanceof Error && error.message.startsWith('Unauthorized')) {
+      if (error instanceof Error && error.message.startsWith("Unauthorized")) {
         return apiError(error.message, 401);
       }
 
-      console.error('Auth middleware error:', error);
-      return apiError('Internal server error', 500, error);
+      console.error("Auth middleware error:", error);
+      return apiError("Internal server error", 500, error);
     }
   };
 }
