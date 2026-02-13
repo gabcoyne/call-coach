@@ -63,7 +63,7 @@ class Settings(BaseSettings):
 
     # Five Wins Unified Pipeline
     use_five_wins_unified: bool = Field(
-        default=False,
+        default=True,
         description="Enable unified Five Wins pipeline (replaces methodology-specific prompts)",
     )
 
