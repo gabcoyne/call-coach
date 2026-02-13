@@ -39,6 +39,8 @@ dependencies = [
     # YAML parsing for competitive analysis
     "pyyaml>=6.0",
     "apscheduler>=3.11.2",
+    "dlt[bigquery,postgres]>=1.21",
+    "setuptools<70",
 ]
 
 [project.scripts]

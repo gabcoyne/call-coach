@@ -10,14 +10,14 @@
 
 ## 2. Calls Source Implementation
 
-- [ ] 2.1 Create `dlt_pipeline/sources/calls.py` with DLT resource decorators
-- [ ] 2.2 Implement BigQuery query for `gongio_ft.call` with incremental loading using `_fivetran_synced` cursor
-- [ ] 2.3 Implement BigQuery query for `gongio_ft.transcript` with foreign key mapping to calls
-- [ ] 2.4 Implement BigQuery query for `gongio_ft.call_speaker` joined with `users` table for speaker metadata
-- [ ] 2.5 Add schema hints for critical columns (timestamp_seconds→INT, sentiment→VARCHAR, topics→VARCHAR[])
-- [ ] 2.6 Map BigQuery results to Postgres schema (gong_call_id, title, scheduled_at, duration_seconds, etc.)
-- [ ] 2.7 Add deduplication logic using `gong_call_id` as merge key
-- [ ] 2.8 Test calls source locally with small dataset (limit 100 rows)
+- [x] 2.1 Create `dlt_pipeline/sources/calls.py` with DLT resource decorators
+- [x] 2.2 Implement BigQuery query for `gongio_ft.call` with incremental loading using `_fivetran_synced` cursor
+- [x] 2.3 Implement BigQuery query for `gongio_ft.transcript` with foreign key mapping to calls
+- [x] 2.4 Implement BigQuery query for `gongio_ft.call_speaker` joined with `users` table for speaker metadata
+- [x] 2.5 Add schema hints for critical columns (timestamp_seconds→INT, sentiment→VARCHAR, topics→VARCHAR[])
+- [x] 2.6 Map BigQuery results to Postgres schema (gong_call_id, title, scheduled_at, duration_seconds, etc.)
+- [x] 2.7 Add deduplication logic using `gong_call_id` as merge key
+- [x] 2.8 Test calls source locally with small dataset (limit 100 rows)
 
 ## 3. Email Source Implementation
 
