@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = process.env.PORT || 3100;
+const PORT = process.env.PLAYWRIGHT_PORT || 3000;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -21,10 +21,13 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: {
-    command: `npm run dev -- -p ${PORT}`,
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  },
+  /* Web server config - only used when no server is running on PORT */
+  webServer: process.env.CI
+    ? {
+        command: `npm run dev -- -p ${PORT}`,
+        url: `http://localhost:${PORT}`,
+        reuseExistingServer: false,
+        timeout: 120000,
+      }
+    : undefined,
 });
