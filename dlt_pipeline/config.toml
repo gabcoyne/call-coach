@@ -1,0 +1,27 @@
+# DLT Pipeline Configuration
+# https://dlthub.com/docs/reference/configuration
+
+[sources.bigquery]
+# BigQuery credentials are loaded from environment via:
+# - Application Default Credentials (ADC) via gcloud auth
+# - GOOGLE_APPLICATION_CREDENTIALS env var pointing to service account JSON
+# - GCP_PROJECT environment variable for project ID
+project_id = "prefect-data-warehouse"
+
+[destinations.postgres]
+# Postgres connection loaded from DATABASE_URL environment variable
+# Format: postgresql://user:password@host:port/database?sslmode=require
+
+[runtime]
+# DLT runtime configuration
+log_level = "INFO"
+# State backend: filesystem (default)
+# State directory: .dlt/ (created automatically)
+
+[normalize]
+# Schema normalization settings
+naming_convention = "snake_case"
+
+[extract]
+# Extraction settings
+workers = 4  # Parallel workers for table extraction

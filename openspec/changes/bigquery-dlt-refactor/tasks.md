@@ -2,11 +2,11 @@
 
 ## 1. DLT Setup and Infrastructure
 
-- [ ] 1.1 Install DLT with BigQuery and Postgres extras (`uv pip install "dlt[postgres,bigquery]==0.4.*"`)
-- [ ] 1.2 Create `dlt_pipeline/` directory structure with `__init__.py`, `bigquery_to_postgres.py`, `sources/` subdirectory
-- [ ] 1.3 Create DLT config file (`dlt_pipeline/config.toml`) with BigQuery and Postgres credentials
-- [ ] 1.4 Initialize DLT state directory (`.dlt/`) and add to git tracking
-- [ ] 1.5 Add `.dlt/state.json` to .gitignore if state should not be committed (or keep it for audit trail)
+- [x] 1.1 Install DLT with BigQuery and Postgres extras (`uv pip install "dlt[postgres,bigquery]==0.4.*"`)
+- [x] 1.2 Create `dlt_pipeline/` directory structure with `__init__.py`, `bigquery_to_postgres.py`, `sources/` subdirectory
+- [x] 1.3 Create DLT config file (`dlt_pipeline/config.toml`) with BigQuery and Postgres credentials
+- [x] 1.4 Initialize DLT state directory (`.dlt/`) and add to git tracking
+- [x] 1.5 Add `.dlt/state.json` to .gitignore if state should not be committed (or keep it for audit trail)
 
 ## 2. Calls Source Implementation
 
