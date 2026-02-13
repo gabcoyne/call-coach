@@ -31,7 +31,7 @@ export default function DashboardPage() {
   }, [isLoaded, isManager, currentUserEmail, router]);
 
   // Fetch all calls to aggregate rep data (for manager view)
-  const { data: calls, isLoading, error } = useSearchCalls(isManager ? { limit: 500 } : null);
+  const { data: calls, isLoading, error } = useSearchCalls(isManager ? { limit: 100 } : null);
 
   if (!isLoaded || isLoading) {
     return (
