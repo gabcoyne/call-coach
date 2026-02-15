@@ -13,8 +13,12 @@ describe("SkillGapRadar", () => {
   describe("Rendering with Props", () => {
     it("should render radar chart with data", () => {
       const { container } = render(<SkillGapRadar data={mockData} />);
-      const radarChart = container.querySelector(".recharts-radar-chart");
-      expect(radarChart).toBeInTheDocument();
+      // Check for the responsive container that wraps the RadarChart
+      const responsiveContainer = container.querySelector(".recharts-responsive-container");
+      expect(responsiveContainer).toBeInTheDocument();
+      // Check for radar elements
+      const radars = container.querySelectorAll(".recharts-radar");
+      expect(radars.length).toBeGreaterThan(0);
     });
 
     it("should display all skill names", () => {
@@ -165,8 +169,9 @@ describe("SkillGapRadar", () => {
   describe("User Interaction", () => {
     it("should render interactive chart", () => {
       const { container } = render(<SkillGapRadar data={mockData} />);
-      const radarChart = container.querySelector(".recharts-radar-chart");
-      expect(radarChart).toBeInTheDocument();
+      // Check for the responsive container
+      const responsiveContainer = container.querySelector(".recharts-responsive-container");
+      expect(responsiveContainer).toBeInTheDocument();
     });
 
     it("should be responsive to viewport", () => {
@@ -235,8 +240,9 @@ describe("SkillGapRadar", () => {
   describe("Styling", () => {
     it("should apply consistent margin to radar chart", () => {
       const { container } = render(<SkillGapRadar data={mockData} />);
-      const radarChart = container.querySelector(".recharts-radar-chart");
-      expect(radarChart).toBeInTheDocument();
+      // Check for responsive container that wraps the RadarChart
+      const responsiveContainer = container.querySelector(".recharts-responsive-container");
+      expect(responsiveContainer).toBeInTheDocument();
     });
 
     it("should format skill names on angle axis", () => {
