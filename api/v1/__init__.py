@@ -13,6 +13,7 @@ from .calls import router as calls_router
 from .opportunities import router as opportunities_router
 from .rubrics import router as rubrics_router
 from .speakers import router as speakers_router
+from .sync import router as sync_router
 from .team import router as team_router
 from .tools import router as tools_router
 from .users import router as users_router
@@ -28,5 +29,6 @@ router.include_router(calls_router)
 router.include_router(opportunities_router)
 router.include_router(speakers_router)
 router.include_router(rubrics_router)
+router.include_router(sync_router)
 
 __all__ = ["router"]
