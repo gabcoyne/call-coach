@@ -1,28 +1,37 @@
+#!/usr/bin/env python3
 """
-BigQuery Data Sync Flow
+BigQuery Data Sync Script
 
 Incrementally syncs data from BigQuery (Salesforce/Gong) to Neon PostgreSQL.
-Designed to run on a schedule (e.g., every 6 hours) via Prefect.
+Can be run as a background task or cron job.
 
 Data sources:
 - Opportunities: salesforce_ft.opportunity (with account and user joins)
 - Calls: gongio_ft.call (with speakers and transcripts)
 
 Usage:
-    # Local execution
-    uv run python -m flows.sync_bigquery_data
+    # Incremental sync (default)
+    uv run python scripts/sync_bigquery_data.py
 
-    # With Prefect
-    prefect deployment run 'sync-bigquery-data/scheduled'
+    # Full sync (ignore last sync timestamp)
+    uv run python scripts/sync_bigquery_data.py --full-sync
+
+    # Sync only opportunities or calls
+    uv run python scripts/sync_bigquery_data.py --opportunities-only
+    uv run python scripts/sync_bigquery_data.py --calls-only
 """
 
+import argparse
+import json
 import logging
 from datetime import UTC, datetime
 from typing import Any
 
 import psycopg2
+import psycopg2.extras
 from google.cloud import bigquery
-from prefect import flow, task
+
+from coaching_mcp.shared import settings
 
 logger = logging.getLogger(__name__)
 
@@ -47,16 +56,9 @@ def get_bigquery_client() -> bigquery.Client:
 
 def get_db_connection():
     """Get database connection from settings."""
-    from coaching_mcp.shared import settings
-
     return psycopg2.connect(settings.database_url)
 
 
-@task(
-    name="get-last-sync-timestamp",
-    description="Get the last sync timestamp for an entity type",
-    retries=2,
-)
 def get_last_sync_timestamp(entity_type: str) -> datetime | None:
     """Get last sync timestamp from sync_status table."""
     with get_db_connection() as conn:
@@ -71,16 +73,12 @@ def get_last_sync_timestamp(entity_type: str) -> datetime | None:
             return None
 
 
-@task(
-    name="update-sync-status",
-    description="Update sync status after completion",
-)
 def update_sync_status(
     entity_type: str,
     status: str,
     items_synced: int,
     errors_count: int = 0,
-):
+) -> None:
     """Update sync_status table after sync completes."""
     with get_db_connection() as conn:
         with conn.cursor() as cursor:
@@ -108,12 +106,6 @@ def update_sync_status(
             conn.commit()
 
 
-@task(
-    name="sync-opportunities-from-bigquery",
-    description="Sync opportunities from BigQuery Salesforce tables",
-    retries=2,
-    retry_delay_seconds=60,
-)
 def sync_opportunities(last_sync: datetime | None = None) -> dict[str, int]:
     """
     Incrementally sync opportunities from BigQuery.
@@ -164,7 +156,6 @@ def sync_opportunities(last_sync: datetime | None = None) -> dict[str, int]:
             with conn.cursor() as cursor:
                 for _, row in opps_df.iterrows():
                     try:
-                        # Check if exists
                         cursor.execute(
                             "SELECT id FROM opportunities WHERE gong_opportunity_id = %s",
                             (row["gong_opportunity_id"],),
@@ -225,12 +216,6 @@ def sync_opportunities(last_sync: datetime | None = None) -> dict[str, int]:
     return stats
 
 
-@task(
-    name="sync-calls-from-bigquery",
-    description="Sync calls from BigQuery Gong tables",
-    retries=2,
-    retry_delay_seconds=60,
-)
 def sync_calls(last_sync: datetime | None = None) -> dict[str, int]:
     """
     Incrementally sync calls from BigQuery.
@@ -336,19 +321,13 @@ def sync_calls(last_sync: datetime | None = None) -> dict[str, int]:
     return stats
 
 
-@flow(
-    name="sync-bigquery-data",
-    description="Incrementally sync opportunities and calls from BigQuery to Postgres",
-    retries=1,
-    retry_delay_seconds=300,
-)
 def sync_bigquery_data(
     sync_opportunities_flag: bool = True,
     sync_calls_flag: bool = True,
     full_sync: bool = False,
 ) -> dict[str, Any]:
     """
-    Main flow: Sync data from BigQuery to Postgres.
+    Main sync function: Sync data from BigQuery to Postgres.
 
     Args:
         sync_opportunities_flag: Whether to sync opportunities
@@ -362,7 +341,7 @@ def sync_bigquery_data(
     logger.info(f"BigQuery sync started at {start_time.isoformat()}")
     logger.info(f"Full sync: {full_sync}")
 
-    results = {
+    results: dict[str, Any] = {
         "start_time": start_time.isoformat(),
         "full_sync": full_sync,
         "opportunities": None,
@@ -402,10 +381,31 @@ def sync_bigquery_data(
     return results
 
 
-# Deployment configuration for scheduled runs
-if __name__ == "__main__":
-    import sys
+def main() -> None:
+    """CLI entry point."""
+    parser = argparse.ArgumentParser(description="Sync data from BigQuery to Postgres")
+    parser.add_argument("--full-sync", action="store_true", help="Ignore last sync timestamp")
+    parser.add_argument("--opportunities-only", action="store_true", help="Only sync opportunities")
+    parser.add_argument("--calls-only", action="store_true", help="Only sync calls")
+    args = parser.parse_args()
 
+    # Determine what to sync
+    sync_opps = not args.calls_only
+    sync_calls_flag = not args.opportunities_only
+
+    result = sync_bigquery_data(
+        sync_opportunities_flag=sync_opps,
+        sync_calls_flag=sync_calls_flag,
+        full_sync=args.full_sync,
+    )
+
+    print("\n" + "=" * 60)
+    print("BIGQUERY SYNC RESULTS")
+    print("=" * 60)
+    print(json.dumps(result, indent=2, default=str))
+
+
+if __name__ == "__main__":
     from dotenv import load_dotenv
 
     load_dotenv()
@@ -415,15 +415,4 @@ if __name__ == "__main__":
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
-    # Check for --full-sync flag
-    full_sync = "--full-sync" in sys.argv
-
-    # Run the flow
-    result = sync_bigquery_data(full_sync=full_sync)
-
-    print("\n" + "=" * 60)
-    print("BIGQUERY SYNC RESULTS")
-    print("=" * 60)
-    import json
-
-    print(json.dumps(result, indent=2, default=str))
+    main()
