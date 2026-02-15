@@ -834,7 +834,7 @@ def search_transcripts(
         SELECT
             t.call_id,
             t.text,
-            t.timestamp_seconds,
+            t.start_time_ms,
             c.title as call_title,
             c.scheduled_at,
             s.name as speaker_name

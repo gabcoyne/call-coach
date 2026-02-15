@@ -56,40 +56,40 @@ describe("Button", () => {
     expect(button).toHaveClass("border");
   });
 
-  it("should apply prefect variant classes", () => {
-    render(<Button variant="prefect">Prefect</Button>);
+  it("should apply secondary variant classes", () => {
+    render(<Button variant="secondary">Secondary</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("bg-prefect-pink");
+    expect(button).toHaveClass("bg-secondary");
   });
 
-  it("should apply sunrise variant classes", () => {
-    render(<Button variant="sunrise">Sunrise</Button>);
+  it("should apply ghost variant classes", () => {
+    render(<Button variant="ghost">Ghost</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("bg-prefect-sunrise1");
+    expect(button).toHaveClass("hover:bg-accent");
   });
 
-  it("should apply gradient variant classes", () => {
-    render(<Button variant="gradient">Gradient</Button>);
+  it("should apply link variant classes", () => {
+    render(<Button variant="link">Link</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("bg-gradient-to-r");
+    expect(button).toHaveClass("underline-offset-4");
   });
 
   it("should apply small size classes", () => {
     render(<Button size="sm">Small</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("h-9");
+    expect(button).toHaveClass("h-8");
   });
 
   it("should apply large size classes", () => {
     render(<Button size="lg">Large</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("h-11");
+    expect(button).toHaveClass("h-10");
   });
 
   it("should apply icon size classes", () => {
     render(<Button size="icon">Icon</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("h-10", "w-10");
+    expect(button).toHaveClass("h-9", "w-9");
   });
 
   it("should apply custom className", () => {

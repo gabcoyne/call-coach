@@ -20,7 +20,7 @@ export function ScoreBadge({
   // Determine color based on score percentage
   const getVariant = (percent: number) => {
     if (percent >= 90) return "success";
-    if (percent >= 75) return "info";
+    if (percent >= 75) return "default"; // Primary blue
     if (percent >= 60) return "warning";
     return "destructive";
   };
@@ -69,8 +69,8 @@ export function DimensionScoreCard({
             className={cn(
               "h-full transition-all duration-300",
               percentage >= 90 && "bg-green-500",
-              percentage >= 75 && percentage < 90 && "bg-prefect-blue-500",
-              percentage >= 60 && percentage < 75 && "bg-prefect-sunrise1",
+              percentage >= 75 && percentage < 90 && "bg-primary",
+              percentage >= 60 && percentage < 75 && "bg-warning",
               percentage < 60 && "bg-red-500"
             )}
             style={{ width: `${percentage}%` }}

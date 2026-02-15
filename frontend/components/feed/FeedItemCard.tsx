@@ -59,15 +59,15 @@ export function FeedItemCard({ item, onAction }: FeedItemCardProps) {
   const getTypeColor = () => {
     switch (item.type) {
       case "call_analysis":
-        return "text-prefect-blue-600 bg-prefect-blue-50";
+        return "text-primary bg-primary/10";
       case "team_insight":
-        return "text-prefect-purple-600 bg-prefect-purple-50";
+        return "text-accent bg-accent/10";
       case "highlight":
-        return "text-prefect-sunrise1 bg-orange-50";
+        return "text-warning bg-warning/10";
       case "milestone":
-        return "text-green-600 bg-green-50";
+        return "text-success bg-success/10";
       default:
-        return "text-gray-600 bg-gray-50";
+        return "text-muted-foreground bg-muted";
     }
   };
 

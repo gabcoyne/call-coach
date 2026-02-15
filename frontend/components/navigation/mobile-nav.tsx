@@ -6,7 +6,18 @@ import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Search, Rss, User, Phone, Menu, X, Target, Users, Shield } from "lucide-react";
+import {
+  LayoutDashboard,
+  Search,
+  Rss,
+  User,
+  Phone,
+  Menu,
+  X,
+  Target,
+  Users,
+  Shield,
+} from "lucide-react";
 import { useCurrentUser } from "@/lib/hooks/use-current-user";
 import { isManager, isAdmin } from "@/lib/rbac";
 
@@ -71,7 +82,7 @@ export function MobileNav() {
       {/* Mobile header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 bg-gradient-to-r from-prefect-pink to-prefect-sunrise1 rounded-lg flex items-center justify-center">
+          <div className="h-8 w-8 bg-gradient-to-r bg-prefect-gradient rounded-lg flex items-center justify-center">
             <Phone className="h-5 w-5 text-white" />
           </div>
           <div>
@@ -104,7 +115,7 @@ export function MobileNav() {
           <div className="fixed inset-y-0 right-0 w-full max-w-sm border-l border-border bg-card">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 bg-gradient-to-r from-prefect-pink to-prefect-sunrise1 rounded-lg flex items-center justify-center">
+                <div className="h-8 w-8 bg-gradient-to-r bg-prefect-gradient rounded-lg flex items-center justify-center">
                   <Phone className="h-5 w-5 text-white" />
                 </div>
                 <div>
@@ -154,7 +165,8 @@ export function MobileNav() {
                 <>
                   <div className="py-2 border-t border-border" />
                   {managerNavigation.map((item) => {
-                    const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+                    const isActive =
+                      pathname === item.href || pathname?.startsWith(`${item.href}/`);
                     return (
                       <Link
                         key={item.name}
@@ -186,7 +198,8 @@ export function MobileNav() {
               {userIsAdmin && (
                 <>
                   {adminNavigation.map((item) => {
-                    const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+                    const isActive =
+                      pathname === item.href || pathname?.startsWith(`${item.href}/`);
                     return (
                       <Link
                         key={item.name}

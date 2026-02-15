@@ -91,7 +91,8 @@ describe("DimensionScoreCard", () => {
     it("should render dimension name and score", () => {
       render(<DimensionScoreCard dimension="Discovery" score={85} />);
       expect(screen.getByText("Discovery")).toBeInTheDocument();
-      expect(screen.getByText("85%")).toBeInTheDocument();
+      // Score percentage appears in badge and progress text
+      expect(screen.getAllByText("85%").length).toBeGreaterThan(0);
     });
 
     it("should render description when provided", () => {
@@ -107,7 +108,8 @@ describe("DimensionScoreCard", () => {
 
     it("should not render description when not provided", () => {
       const { container } = render(<DimensionScoreCard dimension="Discovery" score={85} />);
-      expect(container.querySelector(".text-muted-foreground")).not.toBeInTheDocument();
+      // Description is a p.text-sm.text-muted-foreground, but progress text also has text-muted-foreground
+      expect(container.querySelector("p.text-sm.text-muted-foreground")).not.toBeInTheDocument();
     });
   });
 
@@ -116,8 +118,8 @@ describe("DimensionScoreCard", () => {
       render(<DimensionScoreCard dimension="Discovery" score={85} />);
       // Progress label
       expect(screen.getByText("Progress")).toBeInTheDocument();
-      // Percentage value
-      expect(screen.getByText("85%")).toBeInTheDocument();
+      // Percentage value appears in badge and progress text
+      expect(screen.getAllByText("85%").length).toBeGreaterThan(0);
     });
 
     it("should render progress bar with correct width", () => {
@@ -134,13 +136,13 @@ describe("DimensionScoreCard", () => {
 
     it("should apply blue color for scores 75-89%", () => {
       const { container } = render(<DimensionScoreCard dimension="Discovery" score={80} />);
-      const progressBar = container.querySelector(".bg-prefect-blue-500");
+      const progressBar = container.querySelector(".bg-primary");
       expect(progressBar).toBeInTheDocument();
     });
 
     it("should apply orange color for scores 60-74%", () => {
       const { container } = render(<DimensionScoreCard dimension="Discovery" score={65} />);
-      const progressBar = container.querySelector(".bg-prefect-sunrise1");
+      const progressBar = container.querySelector(".bg-warning");
       expect(progressBar).toBeInTheDocument();
     });
 
@@ -180,7 +182,8 @@ describe("DimensionScoreCard", () => {
 
     it("should handle custom maxScore", () => {
       render(<DimensionScoreCard dimension="Discovery" score={50} maxScore={50} />);
-      expect(screen.getByText("100%")).toBeInTheDocument();
+      // Multiple elements show 100% (badge and progress text)
+      expect(screen.getAllByText("100%").length).toBeGreaterThan(0);
     });
   });
 });

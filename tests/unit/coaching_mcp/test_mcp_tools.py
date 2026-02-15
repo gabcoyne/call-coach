@@ -143,12 +143,12 @@ class TestAnalyzeCallValid:
         transcript_rows = [
             {
                 "name": "Sarah Johnson",
-                "timestamp_seconds": 0,
+                "start_time_ms": 0,
                 "text": "Hi, thanks for joining today.",
             },
             {
                 "name": "John Smith",
-                "timestamp_seconds": 5,
+                "start_time_ms": 5000,
                 "text": "Happy to be here.",
             },
         ]

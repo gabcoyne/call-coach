@@ -78,11 +78,10 @@ export function TranscriptSearch({
 
   // Auto-scroll to current playback segment
   useEffect(() => {
-    const currentSegmentIndex = transcript.findIndex(
-      (seg) =>
-        seg.timestamp_seconds <= currentPlaybackTime &&
-        seg.timestamp_seconds + 5 > currentPlaybackTime // Assume ~5 second segments
-    );
+    const currentSegmentIndex = transcript.findIndex((seg) => {
+      const segTimeSeconds = seg.start_time_ms / 1000;
+      return segTimeSeconds <= currentPlaybackTime && segTimeSeconds + 5 > currentPlaybackTime; // Assume ~5 second segments
+    });
 
     if (currentSegmentIndex !== -1 && currentSegmentIndex !== autoScrollIndex) {
       setAutoScrollIndex(currentSegmentIndex);
@@ -181,11 +180,11 @@ export function TranscriptSearch({
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onTimestampClick?.(segment.timestamp_seconds);
+                          onTimestampClick?.(segment.start_time_ms / 1000);
                         }}
                         className="text-xs text-blue-600 hover:text-blue-700 h-auto p-1"
                       >
-                        {formatTime(segment.timestamp_seconds)}
+                        {formatTime(segment.start_time_ms / 1000)}
                       </Button>
                     </div>
 

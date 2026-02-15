@@ -2,6 +2,34 @@
 
 FastMCP server for AI-powered sales call coaching. This guide covers local development, testing, and deployment.
 
+## Coaching Framework: Five Wins
+
+All coaching analysis uses the **Five Wins** framework - a unified approach that replaces methodology-specific rubrics (SPICED, Challenger, Sandler, MEDDIC).
+
+### The Five Wins
+
+| Win            | Weight | Exit Criteria                                        |
+| -------------- | ------ | ---------------------------------------------------- |
+| **Business**   | 35%    | Budget and resources allocated to evaluate/implement |
+| **Technical**  | 25%    | "Vendor of choice" from technical evaluators         |
+| **Security**   | 15%    | InfoSec/Architecture formal approval                 |
+| **Commercial** | 15%    | Exec sponsor approval on scope and commercials       |
+| **Legal**      | 10%    | Contract signed                                      |
+
+### Key Principles
+
+- **No methodology jargon** in coaching output (no SPICED, Challenger, etc.)
+- **One actionable recommendation** per call
+- **Feedback tied to specific call moments** with timestamps
+- **Call type determines primary win focus** (discovery→Business, demo→Technical, etc.)
+
+### Configuration
+
+- Feature flag: `USE_FIVE_WINS_UNIFIED` (default: `True`)
+- Rubric: `analysis/rubrics/five_wins_unified.py`
+- Models: `analysis/models/five_wins.py`
+- Prompts: `analysis/prompts/five_wins_prompt.py`
+
 ## Development Rules
 
 ### CRITICAL: Never skip tests of any kind
@@ -127,7 +155,21 @@ call-coach/
 ├── api/
 │   ├── rest_server.py           # FastAPI HTTP bridge (port 8000)
 │   ├── v1/                      # Versioned API routes
+│   │   ├── calls.py             # Call CRUD endpoints
+│   │   ├── opportunities.py     # Opportunity endpoints
+│   │   ├── sync.py              # BigQuery sync trigger endpoint
+│   │   └── tools.py             # MCP tool endpoints
 │   └── middleware/              # Rate limiting, compression
+├── analysis/
+│   ├── engine.py                # Core analysis engine
+│   ├── rubrics/
+│   │   └── five_wins_unified.py # Five Wins rubric definitions
+│   ├── models/
+│   │   └── five_wins.py         # Pydantic models for coaching output
+│   ├── prompts/
+│   │   └── five_wins_prompt.py  # LLM prompts for Five Wins analysis
+│   ├── consolidation/           # Post-processing (narrative, action selection)
+│   └── ab_testing.py            # A/B test infrastructure
 ├── coaching_mcp/
 │   ├── server.py                # FastMCP stdio server
 │   ├── shared/
@@ -136,23 +178,35 @@ call-coach/
 │       ├── analyze_call.py      # Call analysis tool
 │       ├── get_rep_insights.py  # Rep performance tool
 │       └── search_calls.py      # Call search tool
+├── scripts/
+│   ├── sync_bigquery_data.py    # BigQuery → Postgres sync
+│   └── migrate_to_five_wins.py  # Five Wins migration CLI
 ├── db/
 │   ├── connection.py            # Database connection pool
 │   ├── queries.py               # SQL queries
 │   └── models.py                # Pydantic models
 └── frontend/
-    ├── app/                     # Next.js 14 app router
+    ├── app/
+    │   ├── api/cron/            # Vercel cron handlers
+    │   │   └── bigquery-sync/   # Scheduled data sync
+    │   └── ...                  # Next.js 14 app router pages
+    ├── components/coaching/
+    │   ├── NarrativeSummary.tsx     # Call narrative display
+    │   ├── PrimaryActionCard.tsx    # Single action recommendation
+    │   └── FiveWinsScoreCard.tsx    # Win progress visualization
     └── lib/
         └── mcp-client.ts        # HTTP client for REST API
 ```
 
 ### Tools Overview
 
-| Tool               | Purpose                                           | Key Features                                                        |
-| ------------------ | ------------------------------------------------- | ------------------------------------------------------------------- |
-| `analyze_call`     | Deep-dive coaching analysis of a specific call    | Multi-dimensional scoring, transcript snippets, actionable feedback |
-| `get_rep_insights` | Performance trends and coaching history for a rep | Score trends, skill gaps, improvement tracking                      |
-| `search_calls`     | Find calls matching specific criteria             | Complex filters, date ranges, objection types                       |
+| Tool                    | Purpose                                           | Key Features                                                |
+| ----------------------- | ------------------------------------------------- | ----------------------------------------------------------- |
+| `analyze_call`          | Deep-dive coaching analysis of a specific call    | Five Wins scoring, narrative summary, single primary action |
+| `get_rep_insights`      | Performance trends and coaching history for a rep | Score trends, skill gaps, improvement tracking              |
+| `search_calls`          | Find calls matching specific criteria             | Complex filters, date ranges, objection types               |
+| `get_coaching_feed`     | Coaching highlights across team                   | Recent insights, win progress, team patterns                |
+| `get_learning_insights` | Learning recommendations for reps                 | Personalized skill development, resource suggestions        |
 
 ### Database Schema
 
@@ -163,6 +217,9 @@ The backend uses Neon Postgres with the following key tables:
 - **transcripts**: Call transcripts with timestamps
 - **coaching_sessions**: Analysis results and coaching feedback
 - **coaching_dimensions**: Dimension-specific scores and insights
+- **opportunities**: Salesforce opportunities (synced from BigQuery)
+- **sync_status**: Tracks last sync timestamp for incremental updates
+- **ab_test_results**: A/B test metrics for pipeline comparison
 
 ### Integration Flows
 
@@ -541,12 +598,14 @@ mcp call-tool http://localhost:8000 analyze_call '{
 
 **Optional:**
 
-| Variable          | Description                 | Default |
-| ----------------- | --------------------------- | ------- |
-| `LOG_LEVEL`       | Logging verbosity           | `INFO`  |
-| `ENABLE_CACHING`  | Enable intelligent caching  | `true`  |
-| `CACHE_TTL_DAYS`  | Cache expiration in days    | `90`    |
-| `SKIP_VALIDATION` | Skip all startup validation | `false` |
+| Variable                | Description                     | Default |
+| ----------------------- | ------------------------------- | ------- |
+| `LOG_LEVEL`             | Logging verbosity               | `INFO`  |
+| `ENABLE_CACHING`        | Enable intelligent caching      | `true`  |
+| `CACHE_TTL_DAYS`        | Cache expiration in days        | `90`    |
+| `SKIP_VALIDATION`       | Skip all startup validation     | `false` |
+| `USE_FIVE_WINS_UNIFIED` | Use Five Wins coaching pipeline | `true`  |
+| `CRON_SECRET`           | Auth token for Vercel cron jobs | -       |
 
 ### Getting API Keys
 
@@ -720,6 +779,68 @@ LIMIT 10;
 time curl -X POST http://localhost:8000/tools/analyze_call \
   -H "Content-Type: application/json" \
   -d '{"call_id": "1464927526043145564"}'
+```
+
+## Data Sync
+
+### BigQuery to Postgres Sync
+
+Data from Salesforce (opportunities) and Gong (calls) flows through BigQuery and is synced to Neon Postgres.
+
+**Automatic sync (Vercel Cron):**
+
+- Schedule: Every 6 hours (`0 */6 * * *`)
+- Endpoint: `POST /api/cron/bigquery-sync`
+- Config: `frontend/vercel.json`
+
+**Manual sync:**
+
+```bash
+# Incremental sync (only new/modified records)
+uv run python scripts/sync_bigquery_data.py
+
+# Full sync (re-sync all records)
+uv run python scripts/sync_bigquery_data.py --full-sync
+
+# Sync only opportunities
+uv run python scripts/sync_bigquery_data.py --opportunities-only
+
+# Sync only calls
+uv run python scripts/sync_bigquery_data.py --calls-only
+```
+
+**Via REST API:**
+
+```bash
+# Trigger sync from backend
+curl -X POST http://localhost:8000/api/v1/sync/bigquery \
+  -H "Content-Type: application/json" \
+  -d '{"full_sync": false, "sync_opportunities": true, "sync_calls": true}'
+
+# Check sync status
+curl http://localhost:8000/api/v1/sync/status
+```
+
+### Data Sources
+
+| Entity        | BigQuery Table              | Sync Frequency |
+| ------------- | --------------------------- | -------------- |
+| Opportunities | `salesforce_ft.opportunity` | Every 6 hours  |
+| Calls         | `gongio_ft.call`            | Every 6 hours  |
+
+## Five Wins Migration
+
+To enable/disable the Five Wins pipeline:
+
+```bash
+# Enable Five Wins (default)
+uv run python scripts/migrate_to_five_wins.py enable
+
+# Rollback to legacy pipeline
+uv run python scripts/migrate_to_five_wins.py rollback
+
+# Validate pipeline before deployment
+uv run python scripts/migrate_to_five_wins.py validate
 ```
 
 ## Additional Resources

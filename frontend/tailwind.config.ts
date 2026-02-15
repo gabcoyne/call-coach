@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: ["class"],
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,52 +10,59 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Prefect Brand Colors
+        // Prefect Brand Colors - Updated 2024
         prefect: {
-          // Primary brand colors
-          pink: "#FF4BBD", // Highlight Pink
-          sunrise1: "#FE9655", // Sunrise 1 (Orange)
-          sunrise2: "#FEB255", // Sunrise 2 (Yellow)
-
-          // Extended palette
+          // Primary brand blue
           blue: {
-            50: "#EBF5FF",
-            100: "#D6EBFF",
-            200: "#ADDCFF",
-            300: "#7FC5FF",
-            400: "#4DADFF",
-            500: "#1A94FF",
-            600: "#0077E6",
-            700: "#005BB8",
-            800: "#003E7A",
-            900: "#002142",
+            DEFAULT: "#0052FF",
+            50: "#E6EEFF",
+            100: "#CCE0FF",
+            200: "#99C2FF",
+            300: "#66A3FF",
+            400: "#3385FF",
+            500: "#0052FF",
+            600: "#0047E6",
+            700: "#003DCC",
+            800: "#0033B3",
+            900: "#002999",
+            950: "#001F80",
           },
-          purple: {
-            50: "#F5F0FF",
-            100: "#EBE0FF",
-            200: "#D6C1FF",
-            300: "#BF9CFF",
-            400: "#A874FF",
-            500: "#8F47FF",
-            600: "#7019FF",
-            700: "#5500D6",
-            800: "#3A009E",
-            900: "#1F0052",
+          // Accent pink (marketing/highlight color)
+          pink: {
+            DEFAULT: "#FF4BBD",
+            50: "#FFF0F9",
+            100: "#FFE0F3",
+            200: "#FFC2E7",
+            300: "#FF94D6",
+            400: "#FF66C5",
+            500: "#FF4BBD",
+            600: "#E63AAA",
+            700: "#CC2997",
+            800: "#B31884",
+            900: "#990771",
           },
-          gray: {
-            50: "#F9FAFB",
-            100: "#F3F4F6",
-            200: "#E5E7EB",
-            300: "#D1D5DB",
-            400: "#9CA3AF",
-            500: "#6B7280",
-            600: "#4B5563",
-            700: "#374151",
-            800: "#1F2937",
-            900: "#111827",
+          // Sunrise gradient colors
+          sunrise: {
+            orange: "#FE9655",
+            yellow: "#FEB255",
+          },
+          // Dark theme background
+          navy: {
+            DEFAULT: "#090422",
+            50: "#E8E6F0",
+            100: "#D1CDE1",
+            200: "#A39BC3",
+            300: "#7569A5",
+            400: "#473787",
+            500: "#1A0569",
+            600: "#150454",
+            700: "#10033F",
+            800: "#0B022A",
+            900: "#090422",
+            950: "#050211",
           },
         },
-        // Shadcn/ui compatible colors
+        // Shadcn/ui compatible semantic colors
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -72,6 +80,14 @@ const config: Config = {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
@@ -88,15 +104,25 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Chart colors
+        chart: {
+          1: "hsl(var(--chart-1))",
+          2: "hsl(var(--chart-2))",
+          3: "hsl(var(--chart-3))",
+          4: "hsl(var(--chart-4))",
+          5: "hsl(var(--chart-5))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 4px)",
+        "2xl": "calc(var(--radius) + 8px)",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "monospace"],
+        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+        mono: ["JetBrains Mono", "Fira Code", "monospace"],
       },
       fontSize: {
         xs: ["0.75rem", { lineHeight: "1rem" }],
@@ -107,13 +133,13 @@ const config: Config = {
         "2xl": ["1.5rem", { lineHeight: "2rem" }],
         "3xl": ["1.875rem", { lineHeight: "2.25rem" }],
         "4xl": ["2.25rem", { lineHeight: "2.5rem" }],
-        "5xl": ["3rem", { lineHeight: "1" }],
-        "6xl": ["3.75rem", { lineHeight: "1" }],
-        "7xl": ["4.5rem", { lineHeight: "1" }],
-        "8xl": ["6rem", { lineHeight: "1" }],
-        "9xl": ["8rem", { lineHeight: "1" }],
+        "5xl": ["3rem", { lineHeight: "1.1" }],
+        "6xl": ["3.75rem", { lineHeight: "1.1" }],
+        "7xl": ["4.5rem", { lineHeight: "1.1" }],
       },
       spacing: {
+        18: "4.5rem",
+        88: "22rem",
         128: "32rem",
         144: "36rem",
       },
@@ -124,6 +150,41 @@ const config: Config = {
         lg: "1024px",
         xl: "1280px",
         "2xl": "1536px",
+      },
+      boxShadow: {
+        "glow-sm": "0 0 10px -3px hsl(var(--primary) / 0.3)",
+        glow: "0 0 20px -5px hsl(var(--primary) / 0.3)",
+        "glow-lg": "0 0 30px -5px hsl(var(--primary) / 0.4)",
+      },
+      animation: {
+        "fade-in": "fadeIn 0.5s ease-out",
+        "slide-up": "slideUp 0.5s ease-out",
+        "slide-down": "slideDown 0.3s ease-out",
+        shimmer: "shimmer 2s linear infinite",
+      },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        slideUp: {
+          "0%": { transform: "translateY(10px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        slideDown: {
+          "0%": { transform: "translateY(-10px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "prefect-gradient": "linear-gradient(135deg, #0052FF 0%, #FF4BBD 100%)",
+        "prefect-gradient-subtle":
+          "linear-gradient(135deg, hsl(var(--primary) / 0.1) 0%, hsl(var(--accent) / 0.1) 100%)",
       },
     },
   },

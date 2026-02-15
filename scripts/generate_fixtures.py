@@ -443,7 +443,7 @@ class FixturesGenerator:
                     "call_id": call["id"],
                     "speaker_id": speaker_id,
                     "sequence_number": sequence_num,
-                    "timestamp_seconds": timestamp,
+                    "start_time_ms": timestamp * 1000,  # Convert seconds to milliseconds
                     "text": text,
                     "sentiment": random.choice(["positive", "neutral", "negative"]),
                     "topics": random.sample(
@@ -995,7 +995,7 @@ class FixturesGenerator:
                         t["call_id"],
                         t["speaker_id"],
                         t["sequence_number"],
-                        t["timestamp_seconds"],
+                        t["start_time_ms"],
                         t["text"],
                         t["sentiment"],
                         str(t["topics"]),
@@ -1005,7 +1005,7 @@ class FixturesGenerator:
                 execute_many(
                     """
                     INSERT INTO transcripts (id, call_id, speaker_id, sequence_number,
-                                           timestamp_seconds, text, sentiment, topics)
+                                           start_time_ms, text, sentiment, topics)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s::varchar[])
                     ON CONFLICT (id) DO NOTHING
                     """,

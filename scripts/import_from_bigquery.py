@@ -283,7 +283,7 @@ def import_calls(
                     call_internal_id,
                     speaker_internal_id,
                     row["index"],
-                    None,  # timestamp_seconds (not available in this data)
+                    None,  # start_time_ms (not available in this data)
                     row["sentence"],
                 )
             )
@@ -295,7 +295,7 @@ def import_calls(
                 """
                 INSERT INTO transcripts (
                     call_id, speaker_id, sequence_number,
-                    timestamp_seconds, text
+                    start_time_ms, text
                 ) VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT DO NOTHING
                 """,

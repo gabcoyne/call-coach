@@ -117,9 +117,9 @@ def import_call_with_transcript(client: GongClient, call: Any) -> bool:
                         speaker_id_map[speaker.speaker_id] = result["id"]
 
             # Store transcript from monologues
-            # Note: Gong API returns times in milliseconds, convert to seconds for timestamp_seconds column
+            # Note: Gong API returns times in milliseconds
             insert_transcript_query = """
-                INSERT INTO transcripts (call_id, speaker_id, sequence_number, timestamp_seconds, text)
+                INSERT INTO transcripts (call_id, speaker_id, sequence_number, start_time_ms, text)
                 VALUES (%s, %s, %s, %s, %s)
             """
 
@@ -135,11 +135,11 @@ def import_call_with_transcript(client: GongClient, call: Any) -> bool:
                         continue
 
                     for sentence in monologue.sentences:
-                        # Convert milliseconds to seconds
-                        timestamp_seconds = sentence.start / 1000.0
+                        # Store start time in milliseconds
+                        start_time_ms = sentence.start
                         cur.execute(
                             insert_transcript_query,
-                            (call_id, db_speaker_id, sequence, timestamp_seconds, sentence.text),
+                            (call_id, db_speaker_id, sequence, start_time_ms, sentence.text),
                         )
                         sequence += 1
 

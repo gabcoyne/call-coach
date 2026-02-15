@@ -8,6 +8,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 
+// Check if auth bypass is enabled (for development)
+const bypassAuth = process.env.BYPASS_AUTH === "true";
+
 function getRandomStatus(): "healthy" | "warning" | "critical" {
   const rand = Math.random();
   if (rand > 0.8) return "warning";
@@ -17,18 +20,21 @@ function getRandomStatus(): "healthy" | "warning" | "critical" {
 
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
-    }
+    // In bypass mode, skip auth checks
+    if (!bypassAuth) {
+      // Check authentication
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
+      }
 
-    // Check manager authorization
-    const user = await currentUser();
-    const userRole = user?.publicMetadata?.role;
+      // Check manager authorization
+      const user = await currentUser();
+      const userRole = user?.publicMetadata?.role;
 
-    if (userRole !== "manager") {
-      return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
+      if (userRole !== "manager" && userRole !== "admin") {
+        return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
+      }
     }
 
     // Database Health

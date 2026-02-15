@@ -13,13 +13,13 @@ const badgeVariants = cva(
           "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-        // Prefect custom variants
-        success: "border-transparent bg-green-500 text-white hover:bg-green-600",
-        warning: "border-transparent bg-yellow-500 text-white hover:bg-yellow-600",
-        info: "border-transparent bg-prefect-blue-500 text-white hover:bg-prefect-blue-600",
-        prefect: "border-transparent bg-prefect-pink text-white hover:bg-prefect-pink/80",
-        sunrise: "border-transparent bg-prefect-sunrise1 text-white hover:bg-prefect-sunrise1/80",
+        outline: "text-foreground border-border",
+        // Semantic variants using CSS variables
+        success: "border-transparent bg-success text-success-foreground hover:bg-success/80",
+        warning: "border-transparent bg-warning text-warning-foreground hover:bg-warning/80",
+        // Prefect brand variants
+        accent: "border-transparent bg-accent text-accent-foreground hover:bg-accent/80",
+        muted: "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
       },
     },
     defaultVariants: {

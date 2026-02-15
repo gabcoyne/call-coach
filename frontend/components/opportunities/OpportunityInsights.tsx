@@ -83,12 +83,12 @@ export function OpportunityInsights({ opportunityId }: OpportunityInsightsProps)
   };
 
   return (
-    <Card className="border-2 border-prefect-pink/20">
+    <Card className="border-2 border-accent/20">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <div className="p-2 rounded-full bg-prefect-pink/10">
-              <Lightbulb className="h-5 w-5 text-prefect-pink" />
+            <div className="p-2 rounded-full bg-accent/10">
+              <Lightbulb className="h-5 w-5 text-accent" />
             </div>
             AI Coaching Insights
           </CardTitle>
@@ -116,12 +116,12 @@ export function OpportunityInsights({ opportunityId }: OpportunityInsightsProps)
               {data.insights.themes && data.insights.themes.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <MessageSquare className="h-4 w-4 text-prefect-pink" />
+                    <MessageSquare className="h-4 w-4 text-accent" />
                     <h3 className="font-semibold">Recurring Themes</h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {data.insights.themes.map((theme, i) => (
-                      <Badge key={i} variant="prefect">
+                      <Badge key={i} variant="accent">
                         {theme}
                       </Badge>
                     ))}

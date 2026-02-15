@@ -24,18 +24,15 @@ export function CoachingHighlightCard({ highlight }: CoachingHighlightCardProps)
   };
 
   return (
-    <Card className="border-l-4 border-l-prefect-sunrise1 hover:shadow-md transition-shadow">
+    <Card className="border-l-4 border-l-warning hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-orange-50 text-prefect-sunrise1">
+          <div className="p-2 rounded-lg bg-warning/10 text-warning">
             <Award className="h-5 w-5" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Badge
-                variant="outline"
-                className="text-xs bg-orange-50 text-prefect-sunrise1 border-prefect-sunrise1"
-              >
+              <Badge variant="warning" className="text-xs">
                 Exemplary Moment
               </Badge>
               <ScoreBadge score={highlight.score} className="text-xs" />
@@ -60,7 +57,7 @@ export function CoachingHighlightCard({ highlight }: CoachingHighlightCardProps)
         </div>
 
         {/* Highlight Snippet */}
-        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-4 border border-prefect-sunrise1/20">
+        <div className="bg-warning/5 rounded-lg p-4 border border-warning/20">
           <p className="text-sm italic text-foreground leading-relaxed">"{highlight.snippet}"</p>
         </div>
 

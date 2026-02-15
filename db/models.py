@@ -171,7 +171,7 @@ class Transcript(BaseModel):
     call_id: UUID
     speaker_id: UUID | None = None
     sequence_number: int
-    timestamp_seconds: int | None = None
+    start_time_ms: int | None = None
     text: str
     sentiment: str | None = None  # positive, neutral, negative
     topics: list[str] | None = None

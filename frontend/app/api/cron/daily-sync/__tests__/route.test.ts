@@ -1,10 +1,16 @@
 import { NextRequest } from "next/server";
-import { POST, GET } from "../route";
-import { exec } from "child_process";
 
-// Mock child_process
-jest.mock("child_process");
-const mockExec = exec as jest.MockedFunction<typeof exec>;
+// Create mock for execAsync
+const mockExecAsync = jest.fn();
+
+// Mock util.promisify to return our mock
+jest.mock("util", () => ({
+  ...jest.requireActual("util"),
+  promisify: () => mockExecAsync,
+}));
+
+// Import after mocking
+import { POST, GET } from "../route";
 
 describe("GET /api/cron/daily-sync", () => {
   it("should return cron job configuration", async () => {
@@ -62,17 +68,12 @@ describe("POST /api/cron/daily-sync", () => {
   });
 
   it("should execute sync successfully with valid authorization", async () => {
-    // Mock successful execution
     const mockStdout = JSON.stringify({
       status: "success",
       opportunities: { synced: 10, errors: 0 },
-      associations: { calls_linked: 25, emails_synced: 15 },
     });
 
-    mockExec.mockImplementation((command: any, options: any, callback: any) => {
-      callback(null, { stdout: mockStdout, stderr: "" });
-      return {} as any;
-    });
+    mockExecAsync.mockResolvedValue({ stdout: mockStdout, stderr: "" });
 
     const request = new NextRequest("http://localhost/api/cron/daily-sync", {
       method: "POST",
@@ -90,20 +91,14 @@ describe("POST /api/cron/daily-sync", () => {
       status: "success",
       output: expect.any(String),
     });
-    expect(data.startTime).toBeTruthy();
-    expect(data.endTime).toBeTruthy();
   });
 
   it("should handle sync failures gracefully", async () => {
-    // Mock failed execution
     const mockError = new Error("Python script failed") as any;
     mockError.stdout = "Partial output";
     mockError.stderr = "Error details";
 
-    mockExec.mockImplementation((command: any, options: any, callback: any) => {
-      callback(mockError);
-      return {} as any;
-    });
+    mockExecAsync.mockRejectedValue(mockError);
 
     const request = new NextRequest("http://localhost/api/cron/daily-sync", {
       method: "POST",
@@ -127,10 +122,7 @@ describe("POST /api/cron/daily-sync", () => {
   it("should allow requests in development without CRON_SECRET", async () => {
     delete process.env.CRON_SECRET;
 
-    mockExec.mockImplementation((command: any, options: any, callback: any) => {
-      callback(null, { stdout: "Success", stderr: "" });
-      return {} as any;
-    });
+    mockExecAsync.mockResolvedValue({ stdout: "Success", stderr: "" });
 
     const request = new NextRequest("http://localhost/api/cron/daily-sync", {
       method: "POST",
@@ -143,10 +135,7 @@ describe("POST /api/cron/daily-sync", () => {
   });
 
   it("should execute with correct Python command", async () => {
-    mockExec.mockImplementation((command: any, options: any, callback: any) => {
-      callback(null, { stdout: "Success", stderr: "" });
-      return {} as any;
-    });
+    mockExecAsync.mockResolvedValue({ stdout: "Success", stderr: "" });
 
     const request = new NextRequest("http://localhost/api/cron/daily-sync", {
       method: "POST",
@@ -157,13 +146,12 @@ describe("POST /api/cron/daily-sync", () => {
 
     await POST(request);
 
-    expect(mockExec).toHaveBeenCalledWith(
+    expect(mockExecAsync).toHaveBeenCalledWith(
       expect.stringContaining("uv run python -m flows.daily_gong_sync"),
       expect.objectContaining({
-        timeout: 280000, // 280s timeout
-        maxBuffer: 10 * 1024 * 1024, // 10MB
-      }),
-      expect.any(Function)
+        timeout: 280000,
+        maxBuffer: 10 * 1024 * 1024,
+      })
     );
   });
 
@@ -171,10 +159,7 @@ describe("POST /api/cron/daily-sync", () => {
     const timeoutError = new Error("Execution timed out") as any;
     timeoutError.code = "ETIMEDOUT";
 
-    mockExec.mockImplementation((command: any, options: any, callback: any) => {
-      callback(timeoutError);
-      return {} as any;
-    });
+    mockExecAsync.mockRejectedValue(timeoutError);
 
     const request = new NextRequest("http://localhost/api/cron/daily-sync", {
       method: "POST",

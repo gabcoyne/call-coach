@@ -83,7 +83,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex items-center flex-shrink-0 px-6 py-5 border-b border-border">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 bg-gradient-to-r from-prefect-pink to-prefect-sunrise1 rounded-lg flex items-center justify-center">
+          <div className="h-8 w-8 bg-prefect-gradient rounded-lg flex items-center justify-center shadow-sm">
             <Phone className="h-5 w-5 text-white" />
           </div>
           <div>

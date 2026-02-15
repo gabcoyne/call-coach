@@ -92,7 +92,9 @@ export default function AdminSystemPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const isManager = user?.publicMetadata?.role === "manager";
+  // Check authorization - support both manager and admin roles
+  const userRole = (user?.publicMetadata as { role?: string } | undefined)?.role;
+  const isManager = userRole === "manager" || userRole === "admin";
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -103,7 +105,8 @@ export default function AdminSystemPage() {
     }
 
     fetchSystemData();
-  }, [isLoaded, isManager, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, isManager]);
 
   const fetchSystemData = async () => {
     try {
