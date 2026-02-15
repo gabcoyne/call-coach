@@ -273,13 +273,13 @@ def sync_calls(last_sync: datetime | None = None) -> dict[str, int]:
                                 """
                                 UPDATE calls SET
                                     title = %s, scheduled_at = %s, duration_seconds = %s,
-                                    call_type = %s, updated_at = NOW()
+                                    call_type = %s
                                 WHERE gong_call_id = %s
                                 """,
                                 (
                                     row["title"],
                                     row["scheduled"],
-                                    row["duration"],
+                                    int(row["duration"]) if row["duration"] else None,
                                     row["purpose"],
                                     row["id"],
                                 ),
@@ -298,7 +298,7 @@ def sync_calls(last_sync: datetime | None = None) -> dict[str, int]:
                                     row["id"],
                                     row["title"],
                                     row["scheduled"],
-                                    row["duration"],
+                                    int(row["duration"]) if row["duration"] else None,
                                     row["purpose"],
                                     row["scheduled"].date() if row["scheduled"] else None,
                                     row["scheduled"],
@@ -306,12 +306,12 @@ def sync_calls(last_sync: datetime | None = None) -> dict[str, int]:
                                 ),
                             )
                             stats["inserted"] += 1
+                        conn.commit()
 
                     except Exception as e:
+                        conn.rollback()
                         stats["errors"] += 1
                         logger.error(f"Error syncing call {row['id']}: {e}")
-
-                conn.commit()
 
     except Exception as e:
         logger.error(f"BigQuery query failed: {e}")
