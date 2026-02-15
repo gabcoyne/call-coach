@@ -642,7 +642,7 @@ class TestCacheMissTriggersApiCall:
         }
 
         # Set up fetch_one to return different values for different calls
-        def fetch_side_effect(query, params):
+        def fetch_side_effect(query, params, as_dict=True):
             if "coaching_sessions" in query and "id = %s" in query:
                 return stored_session
             return {"id": sample_call_id, "title": "Discovery Call"}
@@ -706,7 +706,7 @@ class TestCacheMissTriggersApiCall:
         mock_store.return_value = "forced-session-123"
 
         # Mock final fetch
-        def fetch_side_effect(query, params):
+        def fetch_side_effect(query, params, as_dict=True):
             if "coaching_sessions" in query and "id = %s" in query:
                 return {"id": "forced-session-123", "score": 85}
             return {"id": sample_call_id, "title": "Discovery Call"}
@@ -780,7 +780,7 @@ class TestMalformedResponseError:
         mock_anthropic.messages.create.return_value = mock_response
 
         # Execute and verify error
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(RuntimeError) as exc_info:
             _run_claude_analysis(
                 call_id=sample_call_id,
                 dimension=CoachingDimension.DISCOVERY,
@@ -829,7 +829,7 @@ class TestMalformedResponseError:
         mock_anthropic.messages.create.return_value = mock_response
 
         # Execute and verify error
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(RuntimeError) as exc_info:
             _run_claude_analysis(
                 call_id=sample_call_id,
                 dimension=CoachingDimension.DISCOVERY,
@@ -884,7 +884,7 @@ Hope that helps!"""
         mock_anthropic.messages.create.return_value = mock_response
 
         # Execute and verify error
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(RuntimeError) as exc_info:
             _run_claude_analysis(
                 call_id=sample_call_id,
                 dimension=CoachingDimension.DISCOVERY,
