@@ -76,7 +76,9 @@ class WebhookHandler:
 
         if existing:
             logger.info(f"Webhook {gong_webhook_id} already processed (idempotency)")
-            return WebhookEvent(**existing)
+            if isinstance(existing, dict):
+                return WebhookEvent(**existing)
+            raise ValueError("fetch_one returned unexpected type")
 
         # Insert new event
         execute_query(
@@ -101,7 +103,9 @@ class WebhookHandler:
         )
 
         logger.info(f"Stored webhook event {gong_webhook_id}: {event_type}")
-        return WebhookEvent(**event)
+        if isinstance(event, dict):
+            return WebhookEvent(**event)
+        raise ValueError("fetch_one returned unexpected type")
 
     @staticmethod
     def update_webhook_status(
@@ -182,11 +186,11 @@ async def receive_gong_webhook(request: Request) -> dict[str, str]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid payload: {e}",
-        )
+        ) from e
 
     # Store webhook event (idempotent)
     try:
-        webhook_event = WebhookHandler.store_webhook_event(
+        WebhookHandler.store_webhook_event(
             gong_webhook_id=webhook_id,
             event_type=webhook_payload.event,
             payload=payload,
@@ -197,7 +201,7 @@ async def receive_gong_webhook(request: Request) -> dict[str, str]:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to store event",
-        )
+        ) from e
 
     # TODO: Trigger Prefect flow asynchronously (Phase 1 completion)
     # from flows.process_new_call import trigger_process_new_call

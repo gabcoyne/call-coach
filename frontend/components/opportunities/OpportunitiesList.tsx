@@ -30,6 +30,8 @@ import {
   ChevronRight,
   TrendingDown,
   Clock,
+  Target,
+  RefreshCw,
 } from "lucide-react";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 
@@ -284,10 +286,30 @@ export function OpportunitiesList() {
                   <tbody>
                     {data.opportunities.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center">
-                          <p className="text-muted-foreground">
-                            No opportunities found. Try adjusting your filters.
-                          </p>
+                        <td colSpan={7} className="px-4 py-12 text-center">
+                          <div className="flex flex-col items-center gap-3">
+                            <Target className="h-12 w-12 text-muted-foreground" />
+                            <div>
+                              <p className="text-lg font-semibold">No opportunities found</p>
+                              <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+                                Opportunities are synced from your CRM. If you expect to see data
+                                here, contact your admin to verify the data sync is configured
+                                correctly.
+                              </p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="mt-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.location.reload();
+                              }}
+                            >
+                              <RefreshCw className="h-4 w-4 mr-2" />
+                              Refresh
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ) : (
@@ -318,22 +340,30 @@ export function OpportunitiesList() {
                             <Badge variant="outline">{opp.stage}</Badge>
                           </td>
                           <td className="px-4 py-3">
-                            {new Date(opp.close_date).toLocaleDateString()}
+                            {opp.close_date ? new Date(opp.close_date).toLocaleDateString() : "—"}
                           </td>
-                          <td className="px-4 py-3">${opp.amount.toLocaleString()}</td>
+                          <td className="px-4 py-3">
+                            {opp.amount ? `$${opp.amount.toLocaleString()}` : "—"}
+                          </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
-                              <Badge variant={getHealthColor(opp.health_score)}>
-                                {opp.health_score}
-                              </Badge>
-                              {opp.health_score < 50 && (
-                                <TrendingDown className="h-4 w-4 text-destructive" />
+                              {opp.health_score != null ? (
+                                <>
+                                  <Badge variant={getHealthColor(opp.health_score)}>
+                                    {opp.health_score}
+                                  </Badge>
+                                  {opp.health_score < 50 && (
+                                    <TrendingDown className="h-4 w-4 text-destructive" />
+                                  )}
+                                </>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">—</span>
                               )}
                             </div>
                           </td>
                           <td className="px-4 py-3">
                             <div className="text-sm text-muted-foreground">
-                              {opp.call_count} calls, {opp.email_count} emails
+                              {opp.call_count ?? 0} calls, {opp.email_count ?? 0} emails
                             </div>
                           </td>
                         </tr>
@@ -349,10 +379,26 @@ export function OpportunitiesList() {
           <div className="md:hidden space-y-4">
             {data.opportunities.length === 0 ? (
               <Card>
-                <CardContent className="pt-6 text-center">
-                  <p className="text-muted-foreground">
-                    No opportunities found. Try adjusting your filters.
-                  </p>
+                <CardContent className="pt-8 pb-8 text-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <Target className="h-12 w-12 text-muted-foreground" />
+                    <div>
+                      <p className="text-lg font-semibold">No opportunities found</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Opportunities are synced from your CRM. Contact your admin if you expect to
+                        see data.
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => window.location.reload()}
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Refresh
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ) : (
@@ -376,26 +422,34 @@ export function OpportunitiesList() {
                         </CardTitle>
                         <div className="text-sm text-muted-foreground mt-1">{opp.account_name}</div>
                       </div>
-                      <Badge variant={getHealthColor(opp.health_score)}>{opp.health_score}</Badge>
+                      {opp.health_score != null ? (
+                        <Badge variant={getHealthColor(opp.health_score)}>{opp.health_score}</Badge>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">—</span>
+                      )}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Stage:</span>
-                      <Badge variant="outline">{opp.stage}</Badge>
+                      <Badge variant="outline">{opp.stage || "—"}</Badge>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Close Date:</span>
-                      <span>{new Date(opp.close_date).toLocaleDateString()}</span>
+                      <span>
+                        {opp.close_date ? new Date(opp.close_date).toLocaleDateString() : "—"}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Amount:</span>
-                      <span className="font-medium">${opp.amount.toLocaleString()}</span>
+                      <span className="font-medium">
+                        {opp.amount ? `$${opp.amount.toLocaleString()}` : "—"}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Activity:</span>
                       <span>
-                        {opp.call_count} calls, {opp.email_count} emails
+                        {opp.call_count ?? 0} calls, {opp.email_count ?? 0} emails
                       </span>
                     </div>
                     <div className="text-xs text-muted-foreground pt-2 border-t">

@@ -38,7 +38,8 @@ def fetch_call_from_gong(call_id: str) -> dict[str, Any]:
     with GongClient() as client:
         gong_call = client.get_call(call_id)
 
-    return gong_call.model_dump()
+    result: dict[str, Any] = gong_call.model_dump()
+    return result
 
 
 @task(name="fetch_transcript_from_gong", retries=3, retry_delay_seconds=5)
@@ -65,7 +66,8 @@ def fetch_transcript_from_gong(
 
         transcript = client.get_transcript(call_id, call_metadata=call_obj)
 
-    return transcript.model_dump()
+    result: dict[str, Any] = transcript.model_dump()
+    return result
 
 
 @task(name="store_call_metadata")
@@ -89,7 +91,9 @@ def store_call_metadata(gong_call: dict[str, Any]) -> UUID:
 
     if existing:
         logger.info(f"Call {gong_call['id']} already exists in database")
-        return UUID(existing["id"])
+        if isinstance(existing, dict):
+            return UUID(existing["id"])
+        raise ValueError("fetch_one returned unexpected type")
 
     # Infer call type and product from title/metadata
     title = gong_call.get("title", "").lower()
@@ -247,12 +251,11 @@ def store_transcript(
         logger.info("Transcript exceeds max size, will chunk during analysis")
 
     # Store individual sentences
-    # Note: timestamp_seconds field stores the START time in milliseconds (schema needs updating)
     for idx, sentence in enumerate(all_sentences):
         speaker_id = speaker_mapping.get(sentence["speaker_id"])
 
         # Store topic in topics array field (JSONB or VARCHAR[])
-        # Store both start and end times in metadata until schema updated
+        # Store both start and end times in metadata
         chunk_metadata_json = json.dumps(
             {
                 "start_ms": sentence["start_ms"],
@@ -264,7 +267,7 @@ def store_transcript(
         execute_query(
             """
             INSERT INTO transcripts (
-                call_id, speaker_id, sequence_number, timestamp_seconds,
+                call_id, speaker_id, sequence_number, start_time_ms,
                 text, topics, chunk_metadata
             ) VALUES (%s, %s, %s, %s, %s, %s, %s::jsonb)
             """,
@@ -272,7 +275,7 @@ def store_transcript(
                 str(call_id),
                 str(speaker_id) if speaker_id else None,
                 idx,
-                sentence["start_ms"],  # Note: Field name is misleading, stores milliseconds
+                sentence["start_ms"],
                 sentence["text"],
                 [sentence["topic"]] if sentence["topic"] else [],
                 chunk_metadata_json,

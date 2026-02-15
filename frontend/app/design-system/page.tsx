@@ -63,9 +63,6 @@ export default function DesignSystemPage() {
           <Button variant="outline">Outline</Button>
           <Button variant="ghost">Ghost</Button>
           <Button variant="link">Link</Button>
-          <Button variant="prefect">Prefect</Button>
-          <Button variant="sunrise">Sunrise</Button>
-          <Button variant="gradient">Gradient</Button>
         </div>
         <div className="flex flex-wrap gap-4 mt-4">
           <Button size="sm">Small</Button>
@@ -85,9 +82,8 @@ export default function DesignSystemPage() {
           <Badge variant="outline">Outline</Badge>
           <Badge variant="success">Success</Badge>
           <Badge variant="warning">Warning</Badge>
-          <Badge variant="info">Info</Badge>
-          <Badge variant="prefect">Prefect</Badge>
-          <Badge variant="sunrise">Sunrise</Badge>
+          <Badge variant="accent">Accent</Badge>
+          <Badge variant="muted">Muted</Badge>
         </div>
       </section>
 
@@ -106,7 +102,7 @@ export default function DesignSystemPage() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="prefect">View Details</Button>
+              <Button>View Details</Button>
             </CardFooter>
           </Card>
 
@@ -123,7 +119,7 @@ export default function DesignSystemPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm">Calls This Week</span>
-                  <Badge variant="info">12</Badge>
+                  <Badge variant="secondary">12</Badge>
                 </div>
               </div>
             </CardContent>
@@ -163,9 +159,7 @@ export default function DesignSystemPage() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button variant="gradient" className="w-full">
-              Submit
-            </Button>
+            <Button className="w-full">Submit</Button>
           </CardFooter>
         </Card>
       </section>

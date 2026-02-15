@@ -108,7 +108,8 @@ class GongClient:
                     json=json_data,
                 )
                 response.raise_for_status()
-                return response.json()
+                result: dict[str, Any] = response.json()
+                return result
 
             except HTTPStatusError as e:
                 # Handle rate limiting (HTTP 429)
