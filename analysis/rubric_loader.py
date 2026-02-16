@@ -120,7 +120,7 @@ def load_rubric(role: str) -> dict[str, Any]:
 
     if not rubric_file.exists():
         raise FileNotFoundError(
-            f"Rubric file not found: {rubric_file}. " f"Valid roles: ae, se, csm"
+            f"Rubric file not found: {rubric_file}. " f"Valid roles: ae, se, csm, support"
         )
 
     logger.info(f"Loading rubric for role '{role}' from {rubric_file}")
@@ -160,7 +160,7 @@ def reload_rubrics() -> None:
     _rubric_cache.clear()
 
     # Pre-load all known rubrics
-    roles = ["ae", "se", "csm"]
+    roles = ["ae", "se", "csm", "support"]
     for role in roles:
         try:
             load_rubric(role)
@@ -175,9 +175,9 @@ def get_available_roles() -> list[str]:
     Get list of available role identifiers.
 
     Returns:
-        List of role identifiers (e.g., ['ae', 'se', 'csm'])
+        List of role identifiers (e.g., ['ae', 'se', 'csm', 'support'])
     """
-    return ["ae", "se", "csm"]
+    return ["ae", "se", "csm", "support"]
 
 
 def get_rubric_info(role: str) -> dict[str, Any]:

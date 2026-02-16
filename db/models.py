@@ -48,6 +48,7 @@ class Role(str, Enum):
     AE = "ae"  # Account Executive
     SE = "se"  # Sales Engineer
     CSM = "csm"  # Customer Success Manager
+    SUPPORT = "support"  # Technical Support Engineer (post-sales)
     PROSPECT = "prospect"
     CUSTOMER = "customer"
     PARTNER = "partner"
@@ -149,6 +150,7 @@ class Speaker(BaseModel):
     manager_id: UUID | None = None  # References user.id of manager
 
     @field_validator("talk_time_percentage")
+    @classmethod
     def validate_talk_time_percentage(cls, v: float | None) -> float | None:
         if v is not None and not 0 <= v <= 100:
             raise ValueError("talk_time_percentage must be between 0 and 100")
@@ -239,6 +241,7 @@ class CoachingSession(BaseModel):
     metadata: dict[str, Any] | None = None
 
     @field_validator("score")
+    @classmethod
     def validate_score(cls, v: int | None) -> int | None:
         if v is not None and not 0 <= v <= 100:
             raise ValueError("score must be between 0 and 100")

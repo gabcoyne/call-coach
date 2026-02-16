@@ -1,0 +1,97 @@
+{
+  "role": "support",
+  "role_name": "Technical Support Engineer",
+  "description": "Coaching rubric for Technical Support Engineers focusing on issue resolution, customer experience, and knowledge transfer during post-sales support interactions",
+  "dimensions": [
+    {
+      "id": "issue_diagnosis",
+      "name": "Issue Diagnosis & Understanding",
+      "weight": 0.3,
+      "criteria": [
+        "Asks clarifying questions to fully understand the reported issue",
+        "Gathers relevant context: environment, configuration, recent changes",
+        "Reproduces or confirms the issue before jumping to solutions",
+        "Identifies root cause vs symptoms",
+        "Documents the issue clearly for tracking and knowledge base"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Methodical diagnosis with targeted questions. Gathers complete context including environment details and recent changes. Confirms issue reproduction before troubleshooting. Accurately identifies root cause. Clear documentation.",
+        "70-89": "Good: Asks relevant clarifying questions. Gathers most important context. Attempts to reproduce issue. Usually identifies root cause. Adequate documentation.",
+        "50-69": "Needs Improvement: Incomplete questioning, misses key context. Jumps to solutions without confirming issue. Sometimes treats symptoms instead of root cause. Minimal documentation.",
+        "0-49": "Poor: No clarifying questions. Assumes understanding without verification. Doesn't attempt to reproduce. Misdiagnoses issues. No documentation."
+      }
+    },
+    {
+      "id": "resolution_effectiveness",
+      "name": "Resolution Effectiveness",
+      "weight": 0.25,
+      "criteria": [
+        "Provides accurate, working solutions to customer issues",
+        "Explains the fix clearly so customer understands what was done",
+        "Offers workarounds when immediate fix isn't available",
+        "Sets appropriate expectations on resolution timeline",
+        "Follows up to confirm issue is fully resolved"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Solutions are accurate and complete. Clear explanations of what was done and why. Provides effective workarounds when needed. Sets realistic timelines. Proactively follows up to confirm resolution.",
+        "70-89": "Good: Solutions usually work. Explains fixes adequately. Offers workarounds. Reasonable timeline expectations. Follows up when asked.",
+        "50-69": "Needs Improvement: Solutions sometimes incomplete or incorrect. Vague explanations. Limited workaround options. Unrealistic timelines. Inconsistent follow-up.",
+        "0-49": "Poor: Incorrect or ineffective solutions. No explanation of fixes. No workarounds offered. No timeline communication. Never follows up."
+      }
+    },
+    {
+      "id": "customer_experience",
+      "name": "Customer Experience & Communication",
+      "weight": 0.2,
+      "criteria": [
+        "Shows empathy for customer frustration and business impact",
+        "Communicates clearly without excessive jargon",
+        "Keeps customer informed of progress during troubleshooting",
+        "Manages expectations appropriately when issues are complex",
+        "Leaves customer feeling confident and supported"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Genuine empathy for customer situation. Clear, jargon-free communication. Proactive progress updates. Excellent expectation management. Customer feels valued and confident in support.",
+        "70-89": "Good: Shows appropriate empathy. Mostly clear communication. Provides updates when prompted. Sets reasonable expectations. Customer feels adequately supported.",
+        "50-69": "Needs Improvement: Limited empathy shown. Uses too much jargon. Infrequent updates. Poor expectation management. Customer feels uncertain.",
+        "0-49": "Poor: No empathy, dismissive of concerns. Confusing communication. No progress updates. Sets unrealistic expectations. Customer feels frustrated and unsupported."
+      }
+    },
+    {
+      "id": "knowledge_transfer",
+      "name": "Knowledge Transfer & Enablement",
+      "weight": 0.15,
+      "criteria": [
+        "Educates customer on how to prevent similar issues",
+        "Points to relevant documentation, best practices, or training",
+        "Explains the 'why' behind recommendations, not just the 'what'",
+        "Identifies gaps in customer's understanding of the product",
+        "Empowers customer to self-serve for common issues"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Proactively teaches prevention strategies. Shares relevant docs and resources. Explains reasoning behind recommendations. Identifies and addresses knowledge gaps. Customer is more self-sufficient after interaction.",
+        "70-89": "Good: Provides some prevention guidance. Shares some documentation. Explains recommendations. Notices obvious knowledge gaps. Customer learns something.",
+        "50-69": "Needs Improvement: Focuses only on immediate fix, no prevention. Rarely shares resources. No explanation of reasoning. Misses knowledge gaps. Customer doesn't learn.",
+        "0-49": "Poor: No knowledge transfer. No documentation shared. No explanations. Ignores knowledge gaps. Customer as dependent as before."
+      }
+    },
+    {
+      "id": "escalation_judgment",
+      "name": "Escalation & Collaboration",
+      "weight": 0.1,
+      "criteria": [
+        "Recognizes when to escalate vs continue troubleshooting",
+        "Provides complete context when escalating to engineering",
+        "Collaborates effectively with other team members",
+        "Knows product boundaries and when issues require engineering fixes",
+        "Balances customer urgency with appropriate escalation paths"
+      ],
+      "scoring": {
+        "90-100": "Excellent: Perfect judgment on when to escalate. Escalations include complete context and reproduction steps. Seamless collaboration with team. Clear understanding of product boundaries. Balances urgency appropriately.",
+        "70-89": "Good: Usually escalates appropriately. Provides adequate context. Works well with team. Understands most product boundaries. Generally balances urgency well.",
+        "50-69": "Needs Improvement: Escalates too early or too late. Incomplete escalation context. Limited collaboration. Unclear on product boundaries. Struggles with urgency balance.",
+        "0-49": "Poor: Wrong escalation decisions. No context provided. Doesn't collaborate. Doesn't understand product boundaries. Ignores urgency or over-reacts."
+      }
+    }
+  ]
+}
