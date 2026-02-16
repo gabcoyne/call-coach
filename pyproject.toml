@@ -117,7 +117,7 @@ namespace_packages = false
 
 [tool.bandit]
 exclude_dirs = ["tests"]
-skips = ["B101", "B608"]  # Skip assert_used and hardcoded_sql_expressions
+skips = ["B101"]  # Skip assert_used (B608 removed - not recognized)
 
 [dependency-groups]
 dev = [

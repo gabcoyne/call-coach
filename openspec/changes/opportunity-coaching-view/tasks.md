@@ -1,3 +1,5 @@
+# Opportunity Coaching View Tasks
+
 ## 1. Database Schema for Opportunities and Emails
 
 - [x] 1.1 Add opportunities table to db/schema.sql with columns: id, gong_opportunity_id (unique), name, account_name, owner_email, stage, close_date, amount, health_score, metadata (JSONB), created_at, updated_at
@@ -116,7 +118,7 @@
 - [x] 11.4 Implement analyze_objection_progression() tracking objections across timeline
 - [x] 11.5 Implement assess_relationship_strength() based on engagement metrics over time
 - [x] 11.6 Implement generate_coaching_recommendations() for next steps based on patterns
-- [ ] 11.7 Add caching for opportunity-level analysis (cache_key includes all call IDs)
+- [x] 11.7 Add caching for opportunity-level analysis (cache_key includes all call IDs)
 - [ ] 11.8 Test analysis functions with sample opportunities
 
 ## 12. Learning Insights from Top Performers
