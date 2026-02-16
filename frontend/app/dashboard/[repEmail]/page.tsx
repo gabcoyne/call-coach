@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import { useUser } from "@/lib/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { useRepInsights } from "@/lib/hooks/use-rep-insights";
+import { useRepInsights } from "@/lib/hooks";
 import { useCurrentUser } from "@/lib/hooks/use-current-user";
 import { isManager, canViewRep } from "@/lib/rbac";
 import { ScoreCard } from "@/components/coaching/ScoreCard";
