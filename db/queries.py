@@ -1,12 +1,6 @@
-# mypy: ignore-errors
 """
 Helper functions for common database queries.
 Provides high-level abstractions over raw SQL.
-
-Note: mypy is disabled for this file due to pervasive type issues with
-fetch_one/fetch_all return types. The helper functions in db/connection.py
-return Union[dict, tuple, None] but most functions here declare narrower types.
-Fixing this properly requires updating all 100+ functions in this file.
 """
 
 import logging
@@ -545,8 +539,8 @@ def update_rubric_criterion(
         raise ValueError("Max score must be between 1 and 100")
 
     # Build dynamic UPDATE query based on provided fields
-    updates = []
-    params = []
+    updates: list[str] = []
+    params: list[str | int] = []
 
     if description is not None:
         updates.append("description = %s")
@@ -776,7 +770,7 @@ def delete_rubric_criterion(
                     (str(criterion_id),),
                 )
 
-                deleted = cur.rowcount > 0
+                deleted: bool = cur.rowcount > 0
                 conn.commit()
 
                 if deleted:
@@ -809,7 +803,7 @@ def get_full_transcript(call_id: UUID) -> str:
         """,
         (str(call_id),),
     )
-    return result["full_transcript"] if result else ""
+    return str(result["full_transcript"]) if result else ""
 
 
 def get_transcript_segments(call_id: UUID) -> list[dict[str, Any]]:
@@ -1065,7 +1059,7 @@ def upsert_opportunity(opp_data: dict[str, Any]) -> str:
         "SELECT id FROM opportunities WHERE gong_opportunity_id = %s",
         (opp_data["gong_opportunity_id"],),
     )
-    return result["id"] if result else None
+    return str(result["id"]) if result else None
 
 
 def upsert_email(email_data: dict[str, Any]) -> str:
@@ -1103,7 +1097,7 @@ def upsert_email(email_data: dict[str, Any]) -> str:
         "SELECT id FROM emails WHERE gong_email_id = %s",
         (email_data["gong_email_id"],),
     )
-    return result["id"] if result else None
+    return str(result["id"]) if result else None
 
 
 def link_call_to_opportunity(call_id: str, opp_id: str) -> None:
@@ -1371,7 +1365,7 @@ def get_staff_role(email: str) -> str | None:
         "SELECT role FROM staff_roles WHERE email = %s",
         (email,),
     )
-    return result["role"] if result else None
+    return str(result["role"]) if result else None
 
 
 def upsert_staff_role(email: str, role: str, assigned_by: str) -> None:
@@ -1494,7 +1488,7 @@ def submit_feedback(
         """,
         (coaching_session_id, rep_id, feedback_type, feedback_text),
     )
-    return result["id"] if result else None
+    return str(result["id"]) if result else None
 
 
 def get_feedback_stats(

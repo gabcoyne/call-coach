@@ -6,7 +6,7 @@ Uses psycopg2 for synchronous operations (Prefect flows, MCP tools).
 import logging
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any
+from typing import Any, Literal, overload
 
 import psycopg2
 from psycopg2 import pool
@@ -140,11 +140,27 @@ def execute_many(
                 raise
 
 
+@overload
+def fetch_one(
+    query: str,
+    params: tuple | dict | None = ...,
+    as_dict: Literal[True] = ...,
+) -> dict[str, Any] | None: ...
+
+
+@overload
+def fetch_one(
+    query: str,
+    params: tuple | dict | None,
+    as_dict: Literal[False],
+) -> tuple[Any, ...] | None: ...
+
+
 def fetch_one(
     query: str,
     params: tuple | dict | None = None,
     as_dict: bool = True,
-) -> dict[str, Any] | tuple | None:
+) -> dict[str, Any] | tuple[Any, ...] | None:
     """
     Fetch a single row from the database.
 
@@ -164,11 +180,27 @@ def fetch_one(
             return dict(result) if result and as_dict else result
 
 
+@overload
+def fetch_all(
+    query: str,
+    params: tuple | dict | None = ...,
+    as_dict: Literal[True] = ...,
+) -> list[dict[str, Any]]: ...
+
+
+@overload
+def fetch_all(
+    query: str,
+    params: tuple | dict | None,
+    as_dict: Literal[False],
+) -> list[tuple[Any, ...]]: ...
+
+
 def fetch_all(
     query: str,
     params: tuple | dict | None = None,
     as_dict: bool = True,
-) -> list[dict[str, Any]] | list[tuple]:
+) -> list[dict[str, Any]] | list[tuple[Any, ...]]:
     """
     Fetch all rows from the database.
 

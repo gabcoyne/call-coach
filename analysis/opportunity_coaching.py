@@ -17,6 +17,7 @@ import json
 import logging
 from datetime import datetime, timedelta
 from typing import Any
+from uuid import UUID
 
 import anthropic
 
@@ -125,7 +126,7 @@ def detect_speaker_role(call_id: str) -> str:
         Role identifier ('ae', 'se', 'csm'). Defaults to 'ae' if no role assigned.
     """
     # Get all speakers for the call
-    speakers = queries.get_speakers_for_call(call_id)  # type: ignore[arg-type]
+    speakers = queries.get_speakers_for_call(UUID(call_id))
 
     # Filter to Prefect speakers (company_side=true and @prefect.io email)
     prefect_speakers = [
