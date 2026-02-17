@@ -654,6 +654,24 @@ Cloud Run Jobs (DLT Sync) → BigQuery → Neon Postgres
 | API      | FastAPI REST server  | `call-coach-api-*.run.app`      |
 | DLT Sync | Hourly data sync job | Cloud Run Job (scheduled)       |
 
+### Accessing the Application
+
+Due to GCP org policies, the services require IAM authentication. Use `gcloud run services proxy` to access:
+
+```bash
+# Access the frontend (opens http://localhost:3000)
+gcloud run services proxy call-coach-frontend \
+  --project=prefect-sbx-sales-engineering \
+  --region=us-central1 \
+  --port=3000
+
+# In a separate terminal, proxy the API (opens http://localhost:8000)
+gcloud run services proxy call-coach-api \
+  --project=prefect-sbx-sales-engineering \
+  --region=us-central1 \
+  --port=8000
+```
+
 ### Quick Commands
 
 ```bash
