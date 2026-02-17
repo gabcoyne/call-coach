@@ -1,0 +1,26 @@
+# Example Terraform variables
+# Copy this to terraform.tfvars and customize as needed
+
+project_id        = "prefect-sbx-sales-engineering"
+region            = "us-central1"
+github_owner      = "prefect"
+github_repository = "call-coach"
+
+# Cloud Run API configuration
+api_min_instances = 1  # Keep 1 instance warm to avoid cold starts
+api_max_instances = 10
+api_memory        = "1Gi"
+api_cpu           = "1"
+
+# Cloud Run Frontend configuration
+frontend_min_instances = 0  # Scale to zero when not in use
+frontend_max_instances = 10
+frontend_memory        = "512Mi"
+frontend_cpu           = "1"
+
+# DLT Sync Job configuration
+dlt_memory            = "2Gi"
+dlt_cpu               = "2"
+dlt_timeout           = 1800  # 30 minutes
+dlt_schedule          = "0 * * * *"  # Every hour
+dlt_schedule_timezone = "America/Los_Angeles"

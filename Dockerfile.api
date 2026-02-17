@@ -1,0 +1,83 @@
+# syntax=docker/dockerfile:1.4
+#
+# Dockerfile for Call Coach REST API
+# Multi-stage build using uv for fast dependency installation
+#
+
+# =============================================================================
+# Build stage: Install dependencies
+# =============================================================================
+FROM python:3.11-slim AS builder
+
+# Install uv for fast package management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+WORKDIR /app
+
+# Copy dependency files first for better caching
+COPY pyproject.toml ./
+COPY uv.lock* ./
+
+# Install dependencies (production only, no dev dependencies)
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --no-install-project
+
+# Copy application code (all Python packages needed by the API)
+COPY api/ api/
+COPY coaching_mcp/ coaching_mcp/
+COPY db/ db/
+COPY analysis/ analysis/
+COPY knowledge/ knowledge/
+COPY knowledge_base/ knowledge_base/
+COPY reports/ reports/
+COPY scripts/ scripts/
+COPY services/ services/
+
+# =============================================================================
+# Runtime stage: Minimal image for production
+# =============================================================================
+FROM python:3.11-slim AS runtime
+
+# Install runtime dependencies (for psycopg2)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Create non-root user for security
+RUN groupadd --gid 1000 appuser && \
+    useradd --uid 1000 --gid 1000 --shell /bin/bash appuser
+
+# Copy virtual environment and application from builder
+COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /app/api /app/api
+COPY --from=builder /app/coaching_mcp /app/coaching_mcp
+COPY --from=builder /app/db /app/db
+COPY --from=builder /app/analysis /app/analysis
+COPY --from=builder /app/knowledge /app/knowledge
+COPY --from=builder /app/knowledge_base /app/knowledge_base
+COPY --from=builder /app/reports /app/reports
+COPY --from=builder /app/scripts /app/scripts
+COPY --from=builder /app/services /app/services
+
+# Set ownership
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Set up environment
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Expose API port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "import httpx; httpx.get('http://localhost:8000/health', timeout=5).raise_for_status()" || exit 1
+
+# Run the API server
+CMD ["uvicorn", "api.rest_server:app", "--host", "0.0.0.0", "--port", "8000"]

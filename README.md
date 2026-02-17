@@ -633,8 +633,51 @@ Key optimizations:
 2. Prompt caching (50% input token reduction)
 3. Parallel execution (4x faster, same cost)
 
+## GCP Deployment
+
+The application is deployed to Google Cloud Platform using Cloud Run services.
+
+### Deployment Architecture
+
+```
+Cloud Run (Frontend) → Cloud Run (API) → Neon Postgres
+                              ↓
+                       Secret Manager
+Cloud Run Jobs (DLT Sync) → BigQuery → Neon Postgres
+```
+
+### Services
+
+| Service  | Description          | URL Pattern                     |
+| -------- | -------------------- | ------------------------------- |
+| Frontend | Next.js web app      | `call-coach-frontend-*.run.app` |
+| API      | FastAPI REST server  | `call-coach-api-*.run.app`      |
+| DLT Sync | Hourly data sync job | Cloud Run Job (scheduled)       |
+
+### Quick Commands
+
+```bash
+# View service status
+gcloud run services list --region=us-central1
+
+# View logs
+gcloud run services logs read call-coach-api --region=us-central1 --limit=50
+
+# Trigger DLT sync manually
+gcloud run jobs execute call-coach-dlt-sync --region=us-central1
+```
+
+### CI/CD
+
+- **Push to main**: Automatic deployment to production
+- **Pull requests**: Preview environments with tagged URLs
+- **Infrastructure**: Terraform-managed, auto-applied on merge
+
+For detailed deployment documentation, see [docs/deployment.md](docs/deployment.md).
+
 ## Documentation
 
+- [Deployment Guide](docs/deployment.md)
 - [Implementation Plan](docs/IMPLEMENTATION_PLAN.md)
 - [Database Schema](docs/DATABASE_SCHEMA.md)
 - [MCP Tools Reference](docs/MCP_TOOLS.md)

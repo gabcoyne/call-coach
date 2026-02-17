@@ -1,0 +1,227 @@
+name: Preview Environment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    paths-ignore:
+      - 'infra/**'
+      - '*.md'
+      - 'docs/**'
+      - 'openspec/**'
+
+concurrency:
+  group: preview-${{ github.event.number }}
+  cancel-in-progress: true
+
+env:
+  REGION: us-central1
+  PROJECT_ID: prefect-sbx-sales-engineering
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  # ==========================================================================
+  # Build preview images
+  # ==========================================================================
+  build-preview:
+    name: Build Preview
+    runs-on: ubuntu-latest
+    if: github.event.action != 'closed'
+    outputs:
+      api_image: ${{ steps.images.outputs.api }}
+      frontend_image: ${{ steps.images.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.api
+          push: true
+          tags: ${{ vars.ARTIFACT_REGISTRY_URL }}/api:pr-${{ github.event.number }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.frontend
+          push: true
+          tags: ${{ vars.ARTIFACT_REGISTRY_URL }}/frontend:pr-${{ github.event.number }}
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://call-coach-api-pr-${{ github.event.number }}-${{ env.PROJECT_ID }}.run.app
+            NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Output images
+        id: images
+        run: |
+          echo "api=${{ vars.ARTIFACT_REGISTRY_URL }}/api:pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
+          echo "frontend=${{ vars.ARTIFACT_REGISTRY_URL }}/frontend:pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
+
+  # ==========================================================================
+  # Deploy preview environment
+  # ==========================================================================
+  deploy-preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    needs: [build-preview]
+    if: github.event.action != 'closed'
+    outputs:
+      api_url: ${{ steps.deploy-api.outputs.url }}
+      frontend_url: ${{ steps.deploy-frontend.outputs.url }}
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy API preview
+        id: deploy-api
+        run: |
+          # Deploy with a unique revision tag for this PR
+          gcloud run deploy ${{ vars.API_SERVICE_NAME }} \
+            --image=${{ needs.build-preview.outputs.api_image }} \
+            --region=${{ env.REGION }} \
+            --platform=managed \
+            --tag=pr-${{ github.event.number }} \
+            --no-traffic \
+            --quiet
+
+          # Get the tagged URL
+          URL=$(gcloud run services describe ${{ vars.API_SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --format='value(status.traffic[?tag=="pr-${{ github.event.number }}"].url)' | head -1)
+
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "API Preview URL: $URL"
+
+      - name: Deploy Frontend preview
+        id: deploy-frontend
+        run: |
+          gcloud run deploy ${{ vars.FRONTEND_SERVICE_NAME }} \
+            --image=${{ needs.build-preview.outputs.frontend_image }} \
+            --region=${{ env.REGION }} \
+            --platform=managed \
+            --tag=pr-${{ github.event.number }} \
+            --no-traffic \
+            --quiet
+
+          URL=$(gcloud run services describe ${{ vars.FRONTEND_SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --format='value(status.traffic[?tag=="pr-${{ github.event.number }}"].url)' | head -1)
+
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "Frontend Preview URL: $URL"
+
+  # ==========================================================================
+  # Comment on PR with preview URLs
+  # ==========================================================================
+  comment:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    needs: [deploy-preview]
+    if: github.event.action != 'closed'
+    steps:
+      - name: Find existing comment
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- preview-comment -->'
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.number }}
+          edit-mode: replace
+          body: |
+            <!-- preview-comment -->
+            ## 🚀 Preview Environment Ready
+
+            | Service | URL |
+            |---------|-----|
+            | Frontend | ${{ needs.deploy-preview.outputs.frontend_url }} |
+            | API | ${{ needs.deploy-preview.outputs.api_url }} |
+
+            **Commit:** ${{ github.sha }}
+
+            > Preview environments are automatically cleaned up when this PR is closed.
+
+  # ==========================================================================
+  # Cleanup on PR close
+  # ==========================================================================
+  cleanup:
+    name: Cleanup Preview
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Remove API preview tag
+        run: |
+          gcloud run services update-traffic ${{ vars.API_SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --remove-tags=pr-${{ github.event.number }} \
+            --quiet || true
+
+      - name: Remove Frontend preview tag
+        run: |
+          gcloud run services update-traffic ${{ vars.FRONTEND_SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --remove-tags=pr-${{ github.event.number }} \
+            --quiet || true
+
+      - name: Delete preview images
+        run: |
+          # Delete API preview image
+          gcloud artifacts docker images delete \
+            ${{ vars.ARTIFACT_REGISTRY_URL }}/api:pr-${{ github.event.number }} \
+            --quiet --delete-tags || true
+
+          # Delete Frontend preview image
+          gcloud artifacts docker images delete \
+            ${{ vars.ARTIFACT_REGISTRY_URL }}/frontend:pr-${{ github.event.number }} \
+            --quiet --delete-tags || true
+
+      - name: Comment cleanup complete
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.number }}
+          body: |
+            <!-- preview-cleanup -->
+            🧹 Preview environment cleaned up.

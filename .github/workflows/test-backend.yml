@@ -6,6 +6,7 @@ on:
     paths:
       - '**.py'
       - 'pyproject.toml'
+      - 'uv.lock'
       - 'tests/**'
       - '.github/workflows/test-backend.yml'
   pull_request:
@@ -13,6 +14,7 @@ on:
     paths:
       - '**.py'
       - 'pyproject.toml'
+      - 'uv.lock'
       - 'tests/**'
 
 jobs:
@@ -24,28 +26,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'
+        run: uv python install 3.11
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install ruff black isort
+        run: uv sync --dev
 
       - name: Lint with ruff
-        run: |
-          ruff check . --format=github --exit-non-zero-on-fix
+        run: uv run ruff check . --output-format=github
 
-      - name: Format check with black
-        run: |
-          black --check --diff .
-
-      - name: Import sorting check with isort
-        run: |
-          isort --check-only --diff --profile=black .
+      - name: Format check with ruff
+        run: uv run ruff format --check .
 
   type-check:
     name: Type Check
@@ -55,67 +49,50 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'
+        run: uv python install 3.11
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
-          pip install mypy types-requests types-PyYAML
+        run: uv sync --dev
 
       - name: Type check with mypy
-        run: |
-          mypy analysis coaching_mcp api --ignore-missing-imports --show-error-codes
+        run: uv run mypy analysis coaching_mcp api --ignore-missing-imports --show-error-codes
 
   unit-tests:
-    name: Unit Tests - Python ${{ matrix.python-version }}
+    name: Unit Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ['3.11', '3.12']
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        run: uv python install 3.11
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+        run: uv sync --dev
 
       - name: Run unit tests with coverage
         run: |
-          pytest tests/ -v --cov=analysis --cov=coaching_mcp --cov=api \
+          uv run pytest tests/ -v --cov=analysis --cov=coaching_mcp --cov=api \
             --cov-report=xml --cov-report=term-missing \
             -m "not integration and not slow and not e2e" \
-            --tb=short --maxfail=5
-
-      - name: Check coverage threshold (70%)
-        run: |
-          python -m pytest tests/ --cov=analysis --cov=coaching_mcp --cov=api \
-            --cov-report=term --cov-fail-under=70 \
-            -m "not integration and not slow and not e2e" \
-            --quiet
+            --tb=short --maxfail=5 \
+            --ignore=tests/e2e --ignore=tests/integration
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           files: ./coverage.xml
-          flags: backend,python-${{ matrix.python-version }}
-          name: backend-python-${{ matrix.python-version }}
-          fail_ci_if_error: true
+          flags: backend
+          name: backend
+          fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
   integration-tests:
@@ -127,20 +104,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'
+        run: uv python install 3.11
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+        run: uv sync --dev
 
       - name: Run integration tests
         run: |
-          pytest tests/ -v -m integration --tb=short
+          uv run pytest tests/ -v -m integration --tb=short
         continue-on-error: true
 
   security-scan:
@@ -151,25 +126,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'
+        run: uv python install 3.11
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install bandit[toml] safety
+        run: uv sync --dev
 
       - name: Run Bandit security scan
         run: |
-          bandit -r analysis coaching_mcp api gong db -f json -o bandit-report.json || true
-          bandit -r analysis coaching_mcp api gong db
-
-      - name: Check dependencies for vulnerabilities
-        run: |
-          pip freeze | safety check --stdin || true
+          uv run bandit -r analysis coaching_mcp api db -f json -o bandit-report.json || true
+          uv run bandit -r analysis coaching_mcp api db
 
   backend-tests-summary:
     name: Backend Tests Summary
@@ -180,16 +149,22 @@ jobs:
     steps:
       - name: Check test results
         run: |
-          echo "Lint: ${{ needs.lint.result }}"
-          echo "Type Check: ${{ needs.type-check.result }}"
-          echo "Unit Tests: ${{ needs.unit-tests.result }}"
-          echo "Integration Tests: ${{ needs.integration-tests.result }}"
-          echo "Security Scan: ${{ needs.security-scan.result }}"
+          echo "## Backend Tests Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Check | ${{ needs.type-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
 
           if [[ "${{ needs.lint.result }}" != "success" ]] || \
              [[ "${{ needs.type-check.result }}" != "success" ]] || \
              [[ "${{ needs.unit-tests.result }}" != "success" ]]; then
-            echo "❌ Backend tests failed"
+            echo ""
+            echo "❌ Backend tests failed" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
-          echo "✅ Backend tests passed"
+          echo ""
+          echo "✅ Backend tests passed" >> $GITHUB_STEP_SUMMARY

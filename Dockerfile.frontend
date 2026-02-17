@@ -1,0 +1,84 @@
+# syntax=docker/dockerfile:1.4
+#
+# Dockerfile for Call Coach Frontend
+# Multi-stage build for Next.js with standalone output
+#
+
+# =============================================================================
+# Base stage: Common Node.js setup
+# =============================================================================
+FROM node:20-slim AS base
+
+WORKDIR /app
+
+# =============================================================================
+# Dependencies stage: Install npm packages
+# =============================================================================
+FROM base AS deps
+
+# Copy package files (monorepo structure - lock file at root)
+COPY package.json package-lock.json ./
+COPY frontend/package.json ./frontend/
+
+# Install dependencies for the frontend workspace
+RUN npm ci --workspace=frontend --ignore-scripts
+
+# =============================================================================
+# Build stage: Build the Next.js application
+# =============================================================================
+FROM base AS builder
+
+WORKDIR /app
+
+# Copy dependencies from deps stage (npm workspaces puts all deps at root node_modules)
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy frontend source code
+COPY frontend/ ./
+
+# Build arguments for environment variables
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+# Set build-time environment variables
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build the application
+RUN npm run build
+
+# =============================================================================
+# Runtime stage: Production image
+# =============================================================================
+FROM base AS runner
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create non-root user
+RUN groupadd --gid 1001 nodejs && \
+    useradd --uid 1001 --gid nodejs --shell /bin/bash nextjs
+
+# Copy public assets
+COPY --from=builder /app/public ./public
+
+# Copy standalone build output
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))" || exit 1
+
+# Start the server
+CMD ["node", "server.js"]
