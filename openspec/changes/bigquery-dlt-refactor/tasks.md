@@ -100,12 +100,12 @@
 
 ## 10. Documentation Updates
 
-- [ ] 10.1 Update README.md to remove Gong API setup instructions
-- [ ] 10.2 Add DLT pipeline section to README.md (installation, running locally, Prefect deployment)
-- [ ] 10.3 Update deployment docs (remove Gong API keys, add DLT state directory persistence)
-- [ ] 10.4 Document data freshness SLA (1-hour lag for hourly sync)
-- [ ] 10.5 Add troubleshooting guide for DLT state corruption and recovery
-- [ ] 10.6 Update CLAUDE.md with new data pipeline architecture
+- [x] 10.1 Update README.md to remove Gong API setup instructions
+- [x] 10.2 Add DLT pipeline section to README.md (installation, running locally, cron deployment)
+- [x] 10.3 Update deployment docs (remove Gong API keys, add DLT state directory persistence)
+- [x] 10.4 Document data freshness SLA (1-hour lag for hourly sync)
+- [x] 10.5 Add troubleshooting guide for DLT state corruption and recovery
+- [x] 10.6 Update CLAUDE.md with new data pipeline architecture
 
 ## 11. Testing and Validation
 

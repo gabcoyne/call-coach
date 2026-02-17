@@ -58,7 +58,7 @@ Get the backend running locally in under 5 minutes.
 - Python 3.11 or higher
 - [uv](https://github.com/astral-sh/uv) package manager
 - Access to Neon Postgres database
-- API keys for Gong and Anthropic
+- Anthropic API key
 
 ### Setup Steps
 
@@ -77,7 +77,7 @@ Get the backend running locally in under 5 minutes.
    cp .env.example .env
 
    # Edit .env with your credentials
-   # Required: GONG_API_KEY, GONG_API_SECRET, ANTHROPIC_API_KEY, DATABASE_URL
+   # Required: ANTHROPIC_API_KEY, DATABASE_URL
    ```
 
 3. **Start the REST API server** (Required for frontend):
@@ -109,14 +109,13 @@ uv run python -m coaching_mcp.server --dev
 
 # You should see:
 # ============================================================
-# Starting Gong Call Coaching MCP Server
+# Starting Call Coaching MCP Server
 # 🏗️  Dev mode: skipping expensive validations
 # ============================================================
 #
 # 🔍 Running pre-flight validation checks...
 # ✓ All required environment variables present
 # ✓ Database connection successful (dev mode - schema not validated)
-# ✓ Gong API validation skipped (dev mode)
 # ✓ Anthropic API key validated
 #
 # ✅ All validation checks passed!
@@ -212,7 +211,7 @@ call-coach/
 
 The backend uses Neon Postgres with the following key tables:
 
-- **calls**: Call metadata (Gong ID, title, date, participants)
+- **calls**: Call metadata (ID, title, date, participants)
 - **speakers**: Speaker information and roles
 - **transcripts**: Call transcripts with timestamps
 - **coaching_sessions**: Analysis results and coaching feedback
@@ -302,14 +301,12 @@ Claude Desktop → MCP Protocol (stdio) → MCP Server → Database/APIs
 
 **Development Mode** (`uv run mcp-server-dev` or `--dev` flag):
 
-- Skips Gong API connectivity check
 - Only validates basic database connection (no table schema check)
-- Faster startup (~2 seconds vs ~8 seconds)
+- Faster startup (~2 seconds vs ~5 seconds)
 - Use for rapid iteration on tool logic
 
 **Production Mode** (`uv run mcp-server`):
 
-- Full Gong API authentication check
 - Complete database schema validation
 - Stricter error handling
 - Use before committing changes or deploying
@@ -398,14 +395,14 @@ mcp call-tool http://localhost:8000 analyze_call '{
 2. Check file contains all required variables:
 
    ```bash
-   grep -E "^(GONG_API_KEY|GONG_API_SECRET|ANTHROPIC_API_KEY|DATABASE_URL)" .env
+   grep -E "^(ANTHROPIC_API_KEY|DATABASE_URL)" .env
    ```
 
 3. Ensure no trailing spaces or quotes around values
 4. Test loading manually:
 
    ```bash
-   uv run python -c "from coaching_mcp.shared import settings; print(settings.gong_api_key[:10])"
+   uv run python -c "from coaching_mcp.shared import settings; print(settings.anthropic_api_key[:10])"
    ```
 
 ### Database Connection Issues
@@ -439,31 +436,6 @@ mcp call-tool http://localhost:8000 analyze_call '{
    ```bash
    # If tables are missing but you want to test other features
    uv run mcp-server-dev
-   ```
-
-### Gong API Rate Limits
-
-**Symptom**: 429 Too Many Requests errors during validation or tool calls
-
-**Solutions**:
-
-1. **Use development mode** to skip startup validation:
-
-   ```bash
-   uv run mcp-server-dev
-   ```
-
-2. **Check Gong API rate limits**:
-
-   - Gong limits: 3 requests/second, 10,000 requests/day
-   - Validation uses 1 request at startup
-   - Each `analyze_call` uses 1-2 requests
-
-3. **Enable caching** to reduce API calls:
-
-   ```python
-   # Tools use cache by default
-   analyze_call(call_id="...", use_cache=True)  # Default
    ```
 
 ### Port Already in Use
@@ -559,9 +531,6 @@ mcp call-tool http://localhost:8000 analyze_call '{
 1. **Prepare environment variables** for Horizon UI:
 
    ```
-   GONG_API_KEY=<your_key>
-   GONG_API_SECRET=<your_secret>
-   GONG_API_BASE_URL=https://us-79647.api.gong.io/v2
    ANTHROPIC_API_KEY=sk-ant-<your_key>
    DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/db?sslmode=require
    ```
@@ -581,7 +550,7 @@ mcp call-tool http://localhost:8000 analyze_call '{
    - Working Directory: `/app`
 
 4. **Monitor deployment**:
-   - Check Horizon logs for "MCP server ready - 3 tools registered"
+   - Check Horizon logs for "MCP server ready - 5 tools registered"
    - Verify health endpoint: `curl https://<horizon-url>/health`
 
 ### Deploying Frontend to Vercel
@@ -644,9 +613,6 @@ The Next.js frontend is deployed to Vercel with cron jobs for data sync.
 
 | Variable            | Description                       | Example                                                      |
 | ------------------- | --------------------------------- | ------------------------------------------------------------ |
-| `GONG_API_KEY`      | Gong access key                   | `UQ4SK2LPUPBCFN7Q...`                                        |
-| `GONG_API_SECRET`   | Gong secret key (JWT)             | `eyJhbGciOiJIUzI1NiJ9...`                                    |
-| `GONG_API_BASE_URL` | Tenant-specific Gong URL          | `https://us-79647.api.gong.io/v2`                            |
 | `ANTHROPIC_API_KEY` | Claude API key                    | `sk-ant-api03-...`                                           |
 | `DATABASE_URL`      | Neon PostgreSQL connection string | `postgresql://user:pass@ep-xxx.neon.tech/db?sslmode=require` |
 
@@ -663,19 +629,13 @@ The Next.js frontend is deployed to Vercel with cron jobs for data sync.
 
 ### Getting API Keys
 
-1. **Gong API Keys**:
-
-   - Go to: <https://gong.app.gong.io/settings/api/authentication>
-   - Create new API key pair
-   - Save both access key and secret key (JWT token)
-
-2. **Anthropic API Key**:
+1. **Anthropic API Key**:
 
    - Go to: <https://console.anthropic.com/settings/keys>
    - Create new API key
    - Copy key (starts with `sk-ant-`)
 
-3. **Neon Database URL**:
+2. **Neon Database URL**:
    - Go to: <https://console.neon.tech>
    - Navigate to your project
    - Copy connection string from dashboard
@@ -763,7 +723,7 @@ curl http://localhost:8000/tools/get_rep_insights \
 **"Missing required environment variables" error on startup**:
 
 - Ensure `.env` file is in `/Users/gcoyne/src/prefect/call-coach/` (project root)
-- Check all required variables are set: `GONG_API_KEY`, `GONG_API_SECRET`, `ANTHROPIC_API_KEY`, `DATABASE_URL`
+- Check all required variables are set: `ANTHROPIC_API_KEY`, `DATABASE_URL`
 - Test loading: `uv run python -c "from coaching_mcp.shared import settings; print('OK')"`
 
 **API calls return 404**:
@@ -791,7 +751,7 @@ curl http://localhost:8000/tools/get_rep_insights \
 1. **Use dev mode** to skip expensive validations:
 
    ```bash
-   uv run mcp-server-dev  # 2s startup vs 8s
+   uv run mcp-server-dev  # 2s startup vs 5s
    ```
 
 2. **Enable caching** to avoid re-analyzing same calls:
@@ -839,7 +799,7 @@ time curl -X POST http://localhost:8000/tools/analyze_call \
 
 ### BigQuery to Postgres Sync
 
-Data from Salesforce (opportunities) and Gong (calls) flows through BigQuery and is synced to Neon Postgres.
+Data from Salesforce (opportunities) and Gong (calls) flows through Fivetran to BigQuery, then is synced to Neon Postgres via DLT.
 
 **Automatic sync (Vercel Cron):**
 
@@ -880,7 +840,7 @@ curl http://localhost:8000/api/v1/sync/status
 | Entity        | BigQuery Table              | Sync Frequency |
 | ------------- | --------------------------- | -------------- |
 | Opportunities | `salesforce_ft.opportunity` | Every 6 hours  |
-| Calls         | `gongio_ft.call`            | Every 6 hours  |
+| Calls         | `gongio_ft.call`            | Every 1 hour   |
 
 ## Five Wins Migration
 
@@ -901,7 +861,7 @@ uv run python scripts/migrate_to_five_wins.py validate
 
 - [FastMCP Documentation](https://github.com/jlowin/fastmcp)
 - [Model Context Protocol Specification](https://modelcontextprotocol.io)
-- [Gong API Reference](https://gong.app.gong.io/settings/api/documentation)
+- [DLT Documentation](https://dlthub.com/docs)
 - [Anthropic API Docs](https://docs.anthropic.com)
 - [Neon Postgres Docs](https://neon.tech/docs)
 

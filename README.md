@@ -1,25 +1,49 @@
-# Gong Call Coaching Agent for Prefect Sales Teams
+# Call Coaching Agent for Prefect Sales Teams
 
 [![codecov](https://codecov.io/gh/gabcoyne/call-coach/branch/main/graph/badge.svg)](https://codecov.io/gh/gabcoyne/call-coach)
 [![Backend Tests](https://github.com/gabcoyne/call-coach/actions/workflows/test-backend.yml/badge.svg)](https://github.com/gabcoyne/call-coach/actions/workflows/test-backend.yml)
 [![Frontend Tests](https://github.com/gabcoyne/call-coach/actions/workflows/test-frontend.yml/badge.svg)](https://github.com/gabcoyne/call-coach/actions/workflows/test-frontend.yml)
 
-AI-powered sales coaching system that analyzes Gong calls for SEs, AEs, and CSMs across Prefect and Horizon products.
+AI-powered sales coaching system that analyzes call transcripts for SEs, AEs, and CSMs across Prefect and Horizon products.
 
 ## Architecture
 
 - **FastMCP Server**: On-demand coaching tools via MCP protocol
-- **Prefect Flows on Horizon**: Webhook processing and scheduled batch reviews
+- **DLT Pipeline**: Syncs call data from BigQuery (Fivetran-sourced Gong data) to Neon Postgres
 - **Claude API**: AI-powered call analysis and coaching generation
 - **Neon Postgres**: Coaching data, metrics, and knowledge base
-- **Gong Integration**: Webhooks and API for call data
+
+## Data Pipeline
+
+Call data flows from Gong through the following path:
+
+```
+Gong → Fivetran → BigQuery → DLT Pipeline → Neon Postgres
+```
+
+The DLT pipeline runs hourly (via cron) and syncs:
+
+- **Calls**: Call metadata, transcripts, and speaker information
+- **Emails**: Email threads with sender/recipient data
+- **Opportunities**: Salesforce opportunity data with call linkages
+
+**Data freshness**: ~1 hour lag from Gong to available in application.
+
+### Running the DLT Sync
+
+```bash
+# Run sync manually
+uv run python -m flows.dlt_sync_flow
+
+# Schedule via cron (hourly)
+0 * * * * cd /path/to/call-coach && uv run python -m flows.dlt_sync_flow >> /var/log/dlt-sync.log 2>&1
+```
 
 ## Key Features
 
 - **Intelligent Caching**: 60-80% cost reduction through transcript hashing and rubric versioning
 - **Parallel Analysis**: 4x faster processing with concurrent dimension analysis
 - **Long Call Support**: Sliding window chunking for 60+ minute calls
-- **Real-time Ingestion**: Async webhook handling with <3s response time
 - **Trend Analysis**: Performance tracking across reps and time periods
 - **Comprehensive Testing**: 70%+ code coverage with unit, integration, and E2E tests
 
@@ -28,11 +52,11 @@ AI-powered sales coaching system that analyzes Gong calls for SEs, AEs, and CSMs
 ```
 call-coach/
 ├── db/                 # Database schema and migrations
-├── gong/               # Gong API client and webhook handling
+├── dlt_pipeline/       # DLT sources for BigQuery to Postgres sync
 ├── analysis/           # Claude-powered coaching analysis engine
 ├── knowledge/          # Coaching rubrics and product documentation
 ├── coaching_mcp/       # FastMCP server and tools
-├── flows/              # Prefect flows for automation
+├── flows/              # Data sync flows
 ├── reports/            # Report generation and templates
 └── tests/              # Test suite
 ```
@@ -57,7 +81,6 @@ call-coach/
    ```bash
    cp .env.example .env
    # Edit .env with your credentials:
-   # - GONG_API_KEY, GONG_API_SECRET (from Gong dashboard)
    # - ANTHROPIC_API_KEY (from Anthropic Console)
    # - DATABASE_URL (from Neon dashboard, must include ?sslmode=require)
    ```
@@ -74,7 +97,13 @@ call-coach/
    uv run python -m knowledge.loader
    ```
 
-5. **Start the REST API server** (for frontend integration):
+5. **Run DLT sync** (populates data from BigQuery):
+
+   ```bash
+   uv run python -m flows.dlt_sync_flow
+   ```
+
+6. **Start the REST API server** (for frontend integration):
 
    ```bash
    # Start REST API at http://localhost:8000
@@ -84,7 +113,7 @@ call-coach/
    uv run uvicorn api.rest_server:app --host 0.0.0.0 --port 8000 --reload
    ```
 
-6. **Start the Next.js frontend** (optional):
+7. **Start the Next.js frontend** (optional):
 
    ```bash
    cd frontend
@@ -93,7 +122,7 @@ call-coach/
    # Frontend available at http://localhost:3000
    ```
 
-7. **Run FastMCP server** (for Claude Desktop MCP integration):
+8. **Run FastMCP server** (for Claude Desktop MCP integration):
 
    ```bash
    # Development mode (recommended for local dev)
@@ -103,18 +132,11 @@ call-coach/
    uv run mcp-server
    ```
 
-8. **Deploy Prefect flows** (optional):
-
-   ```bash
-   prefect deploy flows/process_new_call.py
-   prefect deploy flows/weekly_review.py
-   ```
-
 ## Cloud Deployment (FastMCP + Prefect Horizon)
 
 The MCP server can be deployed to **FastMCP Cloud** via **Prefect Horizon** for team-wide access without local setup.
 
-### Prerequisites
+### Horizon Prerequisites
 
 - Prefect Horizon workspace: `https://horizon.prefect.io/prefect-george/servers`
 - FastMCP API key: `fmcp_F6rhqd9oFr1HOzNu6hOa5VBfwh2iXsKYWofXqPGTzqc`
@@ -137,7 +159,7 @@ The MCP server can be deployed to **FastMCP Cloud** via **Prefect Horizon** for 
 
 3. **Configure server settings**:
 
-   - **Name**: `gong-call-coach`
+   - **Name**: `call-coach`
    - **Runtime**: Python 3.11
    - **Command**: `uv`
    - **Args**: `["run", "python", "coaching_mcp/server.py"]`
@@ -146,9 +168,6 @@ The MCP server can be deployed to **FastMCP Cloud** via **Prefect Horizon** for 
 4. **Set environment variables** (mark as secrets):
 
    ```
-   GONG_API_KEY=your_gong_access_key_here
-   GONG_API_SECRET=your_gong_secret_key_jwt_here
-   GONG_API_BASE_URL=https://us-79647.api.gong.io/v2
    ANTHROPIC_API_KEY=sk-ant-your_key_here
    DATABASE_URL=postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/callcoach?sslmode=require
    ```
@@ -167,25 +186,21 @@ The MCP server can be deployed to **FastMCP Cloud** via **Prefect Horizon** for 
      ```
      ✓ All required environment variables present
      ✓ Database connection successful
-     ✓ Gong API authentication successful
      ✓ Anthropic API key validated
-     ✓ MCP server ready - 3 tools registered
+     ✓ MCP server ready - 5 tools registered
      ```
 
 ### Required Environment Variables
 
-| Variable            | Description           | Example                            |
-| ------------------- | --------------------- | ---------------------------------- |
-| `GONG_API_KEY`      | Gong access key       | `UQ4SK2LPUPBCFN7Q...`              |
-| `GONG_API_SECRET`   | Gong secret key (JWT) | `eyJhbGciOiJIUzI1NiJ9...`          |
-| `GONG_API_BASE_URL` | Tenant-specific URL   | `https://us-79647.api.gong.io/v2`  |
-| `ANTHROPIC_API_KEY` | Claude API key        | `sk-ant-api03-...`                 |
-| `DATABASE_URL`      | Neon PostgreSQL URL   | `postgresql://...?sslmode=require` |
+| Variable            | Description         | Example                            |
+| ------------------- | ------------------- | ---------------------------------- |
+| `ANTHROPIC_API_KEY` | Claude API key      | `sk-ant-api03-...`                 |
+| `DATABASE_URL`      | Neon PostgreSQL URL | `postgresql://...?sslmode=require` |
 
 **Optional Variables:**
 
-- `GONG_WEBHOOK_SECRET`: For webhook signature verification
 - `LOG_LEVEL`: Logging verbosity (default: `INFO`)
+- `SLACK_WEBHOOK_URL`: For sync failure notifications
 
 ### Testing Deployment
 
@@ -193,7 +208,7 @@ Once deployed, test via Claude Desktop:
 
 ```
 Test 1 - Analyze a call:
-> Can you analyze Gong call 1464927526043145564?
+> Can you analyze call 1464927526043145564?
 
 Test 2 - Get rep insights:
 > Show me performance insights for sarah.jones@prefect.io over the last quarter
@@ -204,23 +219,12 @@ Test 3 - Search calls:
 
 ### Performance Characteristics
 
-- **Cold start**: 10-15 seconds (first invocation after idle)
+- **Cold start**: 5-10 seconds (first invocation after idle)
 - **Warm start**: <2 seconds (subsequent invocations)
-- **Validation time**: 5-8 seconds (database + Gong + Anthropic checks)
+- **Validation time**: 2-3 seconds (database + Anthropic checks)
 - **Concurrent users**: Supports 5-20 simultaneous tool invocations (Neon connection pool)
 
 ### Troubleshooting
-
-#### 401 Authentication Errors
-
-**Symptom**: `✗ Gong API authentication failed`
-
-**Solutions**:
-
-1. Verify `GONG_API_KEY` and `GONG_API_SECRET` are correct
-2. Confirm `GONG_API_BASE_URL` uses your tenant-specific URL (not generic `api.gong.io`)
-3. Test credentials locally: `uv run python tests/test_gong_client_live.py`
-4. Regenerate keys at: <https://gong.app.gong.io/settings/api/authentication>
 
 #### Database Connection Timeout
 
@@ -257,23 +261,11 @@ Test 3 - Search calls:
 
 ### Credential Rotation
 
-To rotate Gong or Anthropic API keys:
+To rotate Anthropic API key:
 
-1. Generate new keys:
-
-   - **Gong**: <https://gong.app.gong.io/settings/api/authentication>
-   - **Anthropic**: <https://console.anthropic.com/settings/keys>
-
-2. Update in Horizon UI:
-
-   - Navigate to server settings
-   - Edit environment variables
-   - Update `GONG_API_KEY`, `GONG_API_SECRET`, or `ANTHROPIC_API_KEY`
-   - Save changes
-
-3. Redeploy server:
-   - Click "Redeploy" button
-   - Verify new credentials pass validation checks
+1. Generate new key at: <https://console.anthropic.com/settings/keys>
+2. Update in Horizon UI: Navigate to server settings → Edit environment variables
+3. Redeploy server
 
 **Recommended rotation schedule**: Quarterly (every 90 days)
 
@@ -283,7 +275,7 @@ To rotate Gong or Anthropic API keys:
 
 - View real-time logs in Horizon UI
 - Look for validation success messages on startup
-- Monitor for repeated 401 errors (credential issues)
+- Monitor for repeated errors
 
 **Neon Dashboard**:
 
@@ -309,14 +301,6 @@ Use with Claude Desktop (local or cloud-deployed):
 "Compare calls xyz-456 and xyz-789 for objection handling"
 ```
 
-### Weekly Reviews (Automated)
-
-Scheduled every Monday at 6am PT via Prefect Horizon:
-
-- Analyzes all calls from previous week
-- Generates rep-specific coaching reports
-- Sends team-wide insights to sales leadership
-
 ## Local Development
 
 ### Quick Start
@@ -333,7 +317,7 @@ Get the MCP backend server running locally in 3 steps:
 
    ```bash
    # Ensure .env exists in project root with required credentials
-   # Required: GONG_API_KEY, GONG_API_SECRET, ANTHROPIC_API_KEY, DATABASE_URL
+   # Required: ANTHROPIC_API_KEY, DATABASE_URL
    cp .env.example .env
    # Edit .env with your credentials
    ```
@@ -345,7 +329,7 @@ Get the MCP backend server running locally in 3 steps:
    uv run mcp-server-dev
 
    # You should see:
-   # 🚀 MCP server ready - 3 tools registered
+   # 🚀 MCP server ready - 5 tools registered
    # Server running on http://localhost:8000
    ```
 
@@ -359,17 +343,13 @@ For detailed backend development guide, see [CLAUDE.md](CLAUDE.md).
 # Ensure you're in the project root
 cd /Users/gcoyne/src/prefect/call-coach
 
-# Activate Python environment
-source .venv/bin/activate  # or use uv
-
 # Run the FastMCP server on port 8000
 uv run python coaching_mcp/server.py
 
 # You should see:
 # ✓ Database connection successful
-# ✓ Gong API authentication successful
 # ✓ Anthropic API key validated
-# 🚀 MCP server ready - 3 tools registered
+# 🚀 MCP server ready - 5 tools registered
 # Server running on http://localhost:8000
 ```
 
@@ -406,9 +386,6 @@ npm run test:watch
 # Required for MCP backend
 ANTHROPIC_API_KEY=sk-ant-...
 DATABASE_URL=postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/callcoach?sslmode=require
-GONG_API_KEY=your_key
-GONG_API_SECRET=your_secret
-GONG_API_BASE_URL=https://us-79647.api.gong.io/v2
 ```
 
 **Frontend** (`frontend/.env.local`):
@@ -428,7 +405,7 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 
 ### Development Workflow
 
-1. **Backend changes**: Edit files in `coaching_mcp/`, `analysis/`, `gong/`, or `db/`
+1. **Backend changes**: Edit files in `coaching_mcp/`, `analysis/`, or `db/`
 
    - Server auto-reloads on file changes (if using uvicorn with --reload)
    - Test with: `pytest tests/`
@@ -494,20 +471,19 @@ npm update
 
 ```bash
 # Python (if black/ruff configured)
-black coaching_mcp/ analysis/ gong/ db/
+black coaching_mcp/ analysis/ db/
 
 # Frontend
 cd frontend
 npm run lint
 ```
 
-### Troubleshooting
+### Local Troubleshooting
 
 **Backend won't start**:
 
 - Check `.env` has all required variables
 - Verify database connection: `psql $DATABASE_URL -c "SELECT 1"`
-- Check Gong credentials: `python tests/test_gong_client_live.py`
 - Review logs for specific error
 
 **Frontend won't start**:
@@ -531,11 +507,18 @@ npm run lint
 - Verify IP allowlist in Neon dashboard
 - Test connection: `psql $DATABASE_URL`
 
+**DLT sync issues**:
+
+- Check BigQuery credentials are configured
+- Verify DLT state directory (`.dlt/`) has write permissions
+- If state is corrupted, delete `.dlt/state.json` to force full refresh
+- Check logs for specific BigQuery or Postgres errors
+
 ## Testing
 
 The project uses a comprehensive test suite with unit, integration, and end-to-end tests for both backend (Python) and frontend (TypeScript/React). We follow test-driven development (TDD) practices.
 
-### Quick Start
+### Running Tests
 
 **Backend tests:**
 
@@ -592,48 +575,6 @@ frontend/
 └── app/api/*/__tests__/          # API route tests
 ```
 
-### Running Specific Tests
-
-**Backend:**
-
-```bash
-# Run specific test file
-pytest tests/analysis/test_engine.py
-
-# Run specific test function
-pytest tests/analysis/test_engine.py::test_cache_hit_prevents_api_call
-
-# Run tests matching pattern
-pytest tests/ -k "cache"  # All tests with "cache" in name
-
-# Run only unit tests (fast)
-pytest tests/ -m "not integration and not e2e"
-
-# Run in parallel (faster)
-pytest tests/ -n auto  # Uses all CPU cores
-
-# Verbose output
-pytest tests/ -v
-
-# Stop on first failure
-pytest tests/ -x
-```
-
-**Frontend:**
-
-```bash
-cd frontend
-
-# Run specific test file
-npm test -- components/ui/score-badge.test.tsx
-
-# Run tests matching pattern
-npm test -- --testNamePattern="renders correctly"
-
-# Run in CI mode
-npm run test:ci
-```
-
 ### Coverage Targets
 
 The project enforces minimum coverage thresholds:
@@ -643,33 +584,6 @@ The project enforces minimum coverage thresholds:
 
 Coverage reports are generated automatically and block CI if thresholds aren't met.
 
-### Test-Driven Development (TDD)
-
-When adding new features, follow the Red-Green-Refactor cycle:
-
-1. **Red:** Write a failing test first
-2. **Green:** Write minimum code to make it pass
-3. **Refactor:** Improve code while keeping tests passing
-
-**Example workflow:**
-
-```bash
-# 1. Write failing test
-touch tests/analysis/test_new_feature.py
-
-# 2. Run test - should fail
-pytest tests/analysis/test_new_feature.py -v
-
-# 3. Implement feature
-# Edit analysis/new_feature.py
-
-# 4. Run test - should pass
-pytest tests/analysis/test_new_feature.py -v
-
-# 5. Run full test suite
-pytest tests/
-```
-
 ### Pre-commit Hooks
 
 Tests run automatically before commits via pre-commit hooks.
@@ -677,53 +591,6 @@ Tests run automatically before commits via pre-commit hooks.
 **Manual pre-commit run:**
 
 ```bash
-pre-commit run --all-files
-```
-
-### Debugging Failing Tests
-
-**Quick debugging:**
-
-```bash
-# Backend: Run with debugger
-pytest tests/test_file.py --pdb
-
-# Show local variables on failure
-pytest tests/test_file.py -l
-
-# Verbose output
-pytest tests/test_file.py -vv
-
-# Frontend: Use debug()
-# See Testing Guide for details
-```
-
-### Documentation
-
-For comprehensive testing documentation:
-
-- **[Testing Guide](docs/testing-guide.md)** - TDD workflow, test types, examples, debugging
-- **[Code Review Checklist](docs/code-review.md)** - Test quality criteria
-
-### CI/CD Integration
-
-Tests run automatically in GitHub Actions on pull requests and commits. Coverage reports are uploaded as artifacts and merges are blocked if:
-
-- Tests fail
-- Coverage drops below thresholds
-
-**Pre-commit Hooks**:
-
-Tests run automatically on commit for changed files. Install hooks:
-
-```bash
-# Install pre-commit
-pip install pre-commit
-
-# Install git hooks
-pre-commit install
-
-# Run manually on all files
 pre-commit run --all-files
 ```
 
@@ -740,17 +607,6 @@ Tests run automatically on:
 - Backend: Lint, type check, unit tests (70% coverage)
 - Frontend: Lint, unit tests (70% coverage), build check
 - Both must pass before merge
-
-**Branch Protection**:
-
-Configure in GitHub Settings > Branches > Branch protection rules:
-
-1. Require status checks before merging
-2. Required checks:
-   - `Backend Tests Summary`
-   - `Frontend Tests Summary`
-   - `coverage/project`
-3. Require branches to be up to date before merging
 
 ### Coverage Reports
 
