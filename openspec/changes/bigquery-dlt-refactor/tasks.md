@@ -46,34 +46,34 @@
 
 ## 5. Main Pipeline Assembly
 
-- [ ] 5.1 Create `dlt_pipeline/bigquery_to_postgres.py` main entry point
-- [ ] 5.2 Initialize DLT pipeline with `pipeline_name="gong_to_postgres"`, `destination="postgres"`, `dataset_name="public"`
-- [ ] 5.3 Register calls, emails, and opportunities sources as DLT resources
-- [ ] 5.4 Configure parallel execution for independent sources
-- [ ] 5.5 Add error handling with try/except blocks around each source
-- [ ] 5.6 Implement dead letter queue for failed records (log to `sync_status.error_details`)
-- [ ] 5.7 Add logging for sync progress (row counts, duration, checkpoint timestamps)
-- [ ] 5.8 Update `sync_status` table after each successful source sync
-- [ ] 5.9 Test full pipeline run locally (all sources in sequence)
-- [ ] 5.10 Verify state persistence in `.dlt/state.json` after run
+- [x] 5.1 Create `dlt_pipeline/bigquery_to_postgres.py` main entry point
+- [x] 5.2 Initialize DLT pipeline with `pipeline_name="gong_to_postgres"`, `destination="postgres"`, `dataset_name="public"`
+- [x] 5.3 Register calls, emails, and opportunities sources as DLT resources
+- [x] 5.4 Configure parallel execution for independent sources
+- [x] 5.5 Add error handling with try/except blocks around each source
+- [x] 5.6 Implement dead letter queue for failed records (log to `sync_status.error_details`)
+- [x] 5.7 Add logging for sync progress (row counts, duration, checkpoint timestamps)
+- [x] 5.8 Update `sync_status` table after each successful source sync
+- [x] 5.9 Test full pipeline run locally (all sources in sequence)
+- [x] 5.10 Verify state persistence in `.dlt/state.json` after run
 
 ## 6. Error Handling and Retry Logic
 
-- [ ] 6.1 Configure DLT retry settings (max_retries=3, exponential backoff)
-- [ ] 6.2 Add custom exception handling for BigQuery quota errors
-- [ ] 6.3 Add custom exception handling for Postgres connection errors
-- [ ] 6.4 Implement partial failure handling (continue processing other sources if one fails)
-- [ ] 6.5 Add alerting for permanent failures (send to Slack or PagerDuty)
-- [ ] 6.6 Test retry logic by simulating network failure
+- [x] 6.1 Configure DLT retry settings (max_retries=3, exponential backoff)
+- [x] 6.2 Add custom exception handling for BigQuery quota errors
+- [x] 6.3 Add custom exception handling for Postgres connection errors
+- [x] 6.4 Implement partial failure handling (continue processing other sources if one fails)
+- [x] 6.5 Add alerting for permanent failures (send to Slack or PagerDuty)
+- [x] 6.6 Test retry logic by simulating network failure
 
 ## 7. Monitoring and Observability
 
-- [ ] 7.1 Add structured logging using Python logging library (log level INFO for progress, ERROR for failures)
-- [ ] 7.2 Expose metrics: rows_synced, errors_count, duration_seconds per source
-- [ ] 7.3 Add sync status summary log at end of run (total rows synced, total errors, elapsed time)
-- [ ] 7.4 Integrate with DLT's built-in observability (enable DLT logging)
-- [ ] 7.5 Add data quality checks (row count delta comparison between BigQuery and Postgres)
-- [ ] 7.6 Test monitoring by running pipeline and inspecting logs
+- [x] 7.1 Add structured logging using Python logging library (log level INFO for progress, ERROR for failures)
+- [x] 7.2 Expose metrics: rows_synced, errors_count, duration_seconds per source
+- [x] 7.3 Add sync status summary log at end of run (total rows synced, total errors, elapsed time)
+- [x] 7.4 Integrate with DLT's built-in observability (enable DLT logging)
+- [x] 7.5 Add data quality checks (row count delta comparison between BigQuery and Postgres)
+- [x] 7.6 Test monitoring by running pipeline and inspecting logs
 
 ## 8. Prefect Deployment
 

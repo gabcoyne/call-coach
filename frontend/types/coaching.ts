@@ -1,17 +1,37 @@
 /**
  * TypeScript Types and Zod Schemas for Coaching API
  *
- * Provides type-safe interfaces and runtime validation for all coaching API endpoints.
+ * This file contains:
+ * - Zod schemas for runtime validation (Request types)
+ * - Response types (not auto-generated from backend)
+ *
+ * Request types are re-exported from @/types/generated for convenience.
+ * Response types remain here because FastAPI endpoints return dict[str, Any].
+ *
+ * To regenerate request types: npm run generate:types
  */
 
 import { z } from "zod";
 import type { FiveWinsEvaluation, SupplementaryFrameworks } from "./rubric";
 
+// Re-export generated request types for backward compatibility
+export type {
+  AnalyzeCallRequest,
+  RepInsightsRequest,
+  SearchCallsRequest,
+  AnalyzeOpportunityRequest,
+  LearningInsightsRequest,
+  CoachingFeedRequest,
+} from "./generated";
+
 /**
  * Zod Schemas for Request Validation
+ *
+ * These schemas provide runtime validation for API requests.
+ * The inferred types match the generated types from OpenAPI.
  */
 
-// Analyze Call Request
+// Analyze Call Request Schema (runtime validation)
 export const analyzeCallRequestSchema = z.object({
   call_id: z.string().min(1, "Call ID is required"),
   dimensions: z
@@ -22,9 +42,7 @@ export const analyzeCallRequestSchema = z.object({
   force_reanalysis: z.boolean().optional().default(false),
 });
 
-export type AnalyzeCallRequest = z.infer<typeof analyzeCallRequestSchema>;
-
-// Rep Insights Request
+// Rep Insights Request Schema (runtime validation)
 export const repInsightsRequestSchema = z.object({
   rep_email: z.string().email("Valid email address required"),
   time_period: z
@@ -34,9 +52,7 @@ export const repInsightsRequestSchema = z.object({
   product_filter: z.enum(["prefect", "horizon", "both"]).optional(),
 });
 
-export type RepInsightsRequest = z.infer<typeof repInsightsRequestSchema>;
-
-// Search Calls Request
+// Search Calls Request Schema (runtime validation)
 export const searchCallsRequestSchema = z.object({
   rep_email: z.string().email().optional(),
   product: z.enum(["prefect", "horizon", "both"]).optional(),
@@ -53,8 +69,6 @@ export const searchCallsRequestSchema = z.object({
   topics: z.array(z.string()).optional(),
   limit: z.number().int().min(1).max(100).optional().default(20),
 });
-
-export type SearchCallsRequest = z.infer<typeof searchCallsRequestSchema>;
 
 /**
  * TypeScript Types for API Responses

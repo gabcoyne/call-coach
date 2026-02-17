@@ -1,11 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import type {
-  RepInsightsRequest,
-  RepInsightsResponse,
-  APIErrorResponse,
-} from "@/types/coaching";
+import type { RepInsightsRequest, RepInsightsResponse, APIErrorResponse } from "@/types/coaching";
 import { buildApiUrl, SWRError } from "../swr-config";
 
 /**
@@ -61,27 +57,20 @@ export function useRepInsights(
   repEmail: string | null | undefined,
   options: UseRepInsightsOptions = {}
 ): UseRepInsightsReturn {
-  const {
-    time_period = "last_30_days",
-    product_filter,
-    enabled = true,
-    refreshInterval,
-  } = options;
+  const { time_period = "last_30_days", product_filter, enabled = true, refreshInterval } = options;
 
   // Build API URL with query parameters
+  // Note: convert null to undefined since buildApiUrl doesn't accept null
   const url =
     repEmail && enabled
       ? buildApiUrl("/api/coaching/rep-insights", {
           rep_email: repEmail,
           time_period,
-          product_filter,
+          product_filter: product_filter ?? undefined,
         })
       : null;
 
-  const { data, error, isValidating, mutate } = useSWR<
-    RepInsightsResponse,
-    SWRError
-  >(url, {
+  const { data, error, isValidating, mutate } = useSWR<RepInsightsResponse, SWRError>(url, {
     revalidateOnFocus: true,
     keepPreviousData: true,
     refreshInterval,
@@ -131,11 +120,12 @@ export function useMultipleRepInsights(
   const { time_period = "last_30_days", product_filter, refreshInterval } = options;
 
   // Create keys for all reps
+  // Note: convert null to undefined since buildApiUrl doesn't accept null
   const keys = repEmails.map((email) =>
     buildApiUrl("/api/coaching/rep-insights", {
       rep_email: email,
       time_period,
-      product_filter,
+      product_filter: product_filter ?? undefined,
     })
   );
 

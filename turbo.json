@@ -2,8 +2,17 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
   "pipeline": {
+    "generate:types": {
+      "cache": true,
+      "inputs": ["../openapi.json", "../db/models.py", "../api/**/*.py"],
+      "outputs": ["types/generated/**"]
+    },
+    "type-check": {
+      "dependsOn": ["generate:types"],
+      "cache": true
+    },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "generate:types"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "dev": {
@@ -16,6 +25,15 @@
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
+    },
+    "test:py": {
+      "cache": true,
+      "inputs": ["../**/*.py", "../tests/**"],
+      "outputs": ["../coverage/**", "../htmlcov/**"]
+    },
+    "lint:py": {
+      "cache": true,
+      "inputs": ["../**/*.py"]
     }
   }
 }

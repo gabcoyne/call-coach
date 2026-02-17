@@ -64,3 +64,9 @@ htmlcov/
 # Scratchpad
 scratchpad/
 node_modules/
+
+# Generated types (committed for CI, but can be regenerated)
+# frontend/types/generated/api.ts  # Keep this committed for CI builds
+
+# OpenAPI schema cache
+openapi.json

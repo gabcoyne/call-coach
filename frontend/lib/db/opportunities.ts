@@ -76,9 +76,7 @@ export async function searchOpportunities({
   }
 
   if (filters.search) {
-    whereClauses.push(
-      `(o.name ILIKE $${paramIndex} OR o.account_name ILIKE $${paramIndex})`
-    );
+    whereClauses.push(`(o.name ILIKE $${paramIndex} OR o.account_name ILIKE $${paramIndex})`);
     params.push(`%${filters.search}%`);
     paramIndex++;
   }
@@ -175,7 +173,7 @@ export async function getOpportunityTimeline({
       c.gong_call_id,
       c.title,
       c.scheduled_at as timestamp,
-      c.duration,
+      c.duration_seconds as duration,
       NULL as subject,
       NULL as sender_email,
       NULL as gong_email_id

@@ -138,7 +138,7 @@ def group_insights_by_theme(
         # Find matching theme for this dimension
         matching_theme = None
         for theme_name, config in THEME_TAXONOMY.items():
-            if dim_name in config["dimensions"]:
+            if dim_name in config.get("dimensions", []):  # type: ignore[operator]
                 matching_theme = theme_name
                 break
 

@@ -584,6 +584,60 @@ mcp call-tool http://localhost:8000 analyze_call '{
    - Check Horizon logs for "MCP server ready - 3 tools registered"
    - Verify health endpoint: `curl https://<horizon-url>/health`
 
+### Deploying Frontend to Vercel
+
+The Next.js frontend is deployed to Vercel with cron jobs for data sync.
+
+1. **Required environment variables** in Vercel dashboard (Settings > Environment Variables):
+
+   ```
+   # Database
+   DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/db?sslmode=require
+
+   # Clerk Auth
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_...
+   CLERK_SECRET_KEY=sk_live_...
+
+   # Backend API
+   NEXT_PUBLIC_MCP_BACKEND_URL=https://your-backend-url
+
+   # Claude API (for insights)
+   ANTHROPIC_API_KEY=sk-ant-api03-...
+
+   # Cron authentication
+   CRON_SECRET=<random-secure-token>
+
+   # BigQuery (for data sync)
+   BIGQUERY_PROJECT_ID=your-project
+   BIGQUERY_CREDENTIALS={"type":"service_account",...}
+   ```
+
+2. **Cron job configuration** (in `vercel.json`):
+
+   ```json
+   {
+     "crons": [
+       {
+         "path": "/api/cron/daily-sync",
+         "schedule": "0 6 * * *"
+       }
+     ]
+   }
+   ```
+
+3. **Deploy**:
+
+   - Connect repo to Vercel project
+   - Set environment variables in Vercel dashboard
+   - Cron jobs run automatically on Vercel Pro/Enterprise plans
+
+4. **Test cron locally** (requires `vercel login`):
+
+   ```bash
+   cd frontend && vercel dev
+   curl http://localhost:3000/api/cron/daily-sync
+   ```
+
 ### Environment Variables Reference
 
 **Required:**

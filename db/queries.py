@@ -1326,6 +1326,11 @@ def update_sync_status(
         errors_count: Number of errors encountered
         error_details: JSONB dict with error details
     """
+    # Convert error_details dict to JSON string for JSONB column
+    import json as json_module
+
+    error_details_json = json_module.dumps(error_details) if error_details else None
+
     execute_query(
         """
         INSERT INTO sync_status (
@@ -1342,7 +1347,7 @@ def update_sync_status(
             error_details = EXCLUDED.error_details,
             updated_at = NOW()
         """,
-        (entity_type, status, items_synced, errors_count, error_details),
+        (entity_type, status, items_synced, errors_count, error_details_json),
     )
 
 

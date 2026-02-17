@@ -98,14 +98,13 @@ def aggregate_coaching_patterns(
     """
     # Map focus area to CoachingDimension
     dimension_map = {
-        "discovery": CoachingDimension.DISCOVERY_QUESTIONS,
+        "discovery": CoachingDimension.DISCOVERY,
         "objections": CoachingDimension.OBJECTION_HANDLING,
         "product_knowledge": CoachingDimension.PRODUCT_KNOWLEDGE,
-        "rapport": CoachingDimension.RAPPORT_BUILDING,
-        "next_steps": CoachingDimension.NEXT_STEPS,
+        "engagement": CoachingDimension.ENGAGEMENT,
     }
 
-    dimension = dimension_map.get(focus_area, CoachingDimension.DISCOVERY_QUESTIONS)
+    dimension = dimension_map.get(focus_area, CoachingDimension.DISCOVERY)
 
     patterns = {
         "opportunity_count": len(opportunities),
