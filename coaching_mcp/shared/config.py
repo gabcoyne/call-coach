@@ -36,15 +36,6 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # Gong API
-    gong_api_key: str = Field(..., description="Gong API access key")
-    gong_api_secret: str = Field(..., description="Gong API secret key (JWT token)")
-    gong_webhook_secret: str = Field(..., description="Secret for validating webhook signatures")
-    gong_api_base_url: str = Field(
-        default="https://us-79647.api.gong.io/v2",
-        description="Base URL for Gong API (tenant-specific)",
-    )
-
     # Claude API
     anthropic_api_key: str = Field(..., description="Anthropic API key for Claude")
 
@@ -88,6 +79,7 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO", description="Logging level")
 
     @field_validator("database_url")
+    @classmethod
     def validate_database_url(cls, v: PostgresDsn) -> str:
         """Convert PostgresDsn to string and validate SSL requirement."""
         url_str = str(v)
@@ -97,6 +89,7 @@ class Settings(BaseSettings):
         return url_str
 
     @field_validator("chunk_overlap_percentage")
+    @classmethod
     def validate_overlap_percentage(cls, v: int) -> int:
         """Ensure overlap percentage is reasonable."""
         if not 0 <= v <= 50:

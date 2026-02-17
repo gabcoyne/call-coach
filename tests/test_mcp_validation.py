@@ -3,7 +3,7 @@ Tests for MCP server startup validation.
 """
 
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -14,10 +14,7 @@ class TestEnvironmentValidation:
     @patch.dict(
         os.environ,
         {
-            "GONG_API_KEY": "test_key",
-            "GONG_API_SECRET": "test_secret",
-            "GONG_API_BASE_URL": "https://test.api.gong.io/v2",
-            "ANTHROPIC_API_KEY": "sk-ant-test",
+            "ANTHROPIC_API_KEY": "sk-ant-test-key-1234567890",
             "DATABASE_URL": "postgresql://test?sslmode=require",
         },
     )
@@ -31,10 +28,7 @@ class TestEnvironmentValidation:
     @patch.dict(
         os.environ,
         {
-            "GONG_API_KEY": "test_key",
-            # Missing GONG_API_SECRET
-            "GONG_API_BASE_URL": "https://test.api.gong.io/v2",
-            "ANTHROPIC_API_KEY": "sk-ant-test",
+            # Missing ANTHROPIC_API_KEY
             "DATABASE_URL": "postgresql://test?sslmode=require",
         },
         clear=True,
@@ -117,62 +111,6 @@ class TestDatabaseValidation:
         assert exc_info.value.code == 1
 
 
-class TestGongAPIValidation:
-    """Tests for _validate_gong_api function."""
-
-    @patch("gong.client.GongClient")
-    def test_validate_gong_api_success(self, mock_gong_client):
-        """Test Gong API validation passes with valid credentials."""
-        from coaching_mcp.server import _validate_gong_api
-
-        mock_client_instance = MagicMock()
-        mock_client_instance.__enter__.return_value = mock_client_instance
-        mock_client_instance.__exit__.return_value = None
-        mock_client_instance.list_calls.return_value = ([], None)
-
-        mock_gong_client.return_value = mock_client_instance
-
-        # Should not raise
-        _validate_gong_api()
-
-        assert mock_client_instance.list_calls.called
-
-    @patch("gong.client.GongClient")
-    def test_validate_gong_api_auth_failure(self, mock_gong_client):
-        """Test Gong API validation fails with 401 error."""
-        from coaching_mcp.server import _validate_gong_api
-        from gong.client import GongAPIError
-
-        mock_client_instance = MagicMock()
-        mock_client_instance.__enter__.return_value = mock_client_instance
-        mock_client_instance.__exit__.return_value = None
-        mock_client_instance.list_calls.side_effect = GongAPIError("HTTP 401: Unauthorized")
-
-        mock_gong_client.return_value = mock_client_instance
-
-        with pytest.raises(SystemExit) as exc_info:
-            _validate_gong_api()
-
-        assert exc_info.value.code == 1
-
-    @patch("gong.client.GongClient")
-    def test_validate_gong_api_network_failure(self, mock_gong_client):
-        """Test Gong API validation fails with network error."""
-        from coaching_mcp.server import _validate_gong_api
-
-        mock_client_instance = MagicMock()
-        mock_client_instance.__enter__.return_value = mock_client_instance
-        mock_client_instance.__exit__.return_value = None
-        mock_client_instance.list_calls.side_effect = Exception("Connection timeout")
-
-        mock_gong_client.return_value = mock_client_instance
-
-        with pytest.raises(SystemExit) as exc_info:
-            _validate_gong_api()
-
-        assert exc_info.value.code == 1
-
-
 class TestAnthropicAPIValidation:
     """Tests for _validate_anthropic_api function."""
 
@@ -187,11 +125,11 @@ class TestAnthropicAPIValidation:
         _validate_anthropic_api()
 
     @patch("coaching_mcp.server.settings")
-    def test_validate_anthropic_api_invalid_prefix(self, mock_settings):
-        """Test Anthropic API validation fails with wrong prefix."""
+    def test_validate_anthropic_api_too_short(self, mock_settings):
+        """Test Anthropic API validation fails with short key."""
         from coaching_mcp.server import _validate_anthropic_api
 
-        mock_settings.anthropic_api_key = "sk-wrong-prefix-123"
+        mock_settings.anthropic_api_key = "sk-short"
 
         with pytest.raises(SystemExit) as exc_info:
             _validate_anthropic_api()
@@ -199,11 +137,11 @@ class TestAnthropicAPIValidation:
         assert exc_info.value.code == 1
 
     @patch("coaching_mcp.server.settings")
-    def test_validate_anthropic_api_empty_key(self, mock_settings):
-        """Test Anthropic API validation fails with empty key."""
+    def test_validate_anthropic_api_placeholder(self, mock_settings):
+        """Test Anthropic API validation fails with placeholder."""
         from coaching_mcp.server import _validate_anthropic_api
 
-        mock_settings.anthropic_api_key = ""
+        mock_settings.anthropic_api_key = "your_key_here_replace_me"
 
         with pytest.raises(SystemExit) as exc_info:
             _validate_anthropic_api()
@@ -215,10 +153,9 @@ class TestStartupValidationIntegration:
     """Integration tests for complete startup validation flow."""
 
     @patch("coaching_mcp.server._validate_anthropic_api")
-    @patch("coaching_mcp.server._validate_gong_api")
     @patch("coaching_mcp.server._validate_database_connection")
     @patch("coaching_mcp.server._validate_environment")
-    def test_all_validations_pass(self, mock_env, mock_db, mock_gong, mock_anthropic):
+    def test_all_validations_pass(self, mock_env, mock_db, mock_anthropic):
         """Test startup succeeds when all validations pass."""
         # All validations pass (no exceptions)
 
@@ -232,10 +169,9 @@ class TestStartupValidationIntegration:
         # If we get here without SystemExit, validations passed
 
     @patch("coaching_mcp.server._validate_anthropic_api")
-    @patch("coaching_mcp.server._validate_gong_api")
     @patch("coaching_mcp.server._validate_database_connection")
     @patch("coaching_mcp.server._validate_environment")
-    def test_validation_fails_early(self, mock_env, mock_db, mock_gong, mock_anthropic):
+    def test_validation_fails_early(self, mock_env, mock_db, mock_anthropic):
         """Test startup fails fast on first validation error."""
         mock_env.side_effect = SystemExit(1)
 
@@ -244,5 +180,4 @@ class TestStartupValidationIntegration:
 
         # Later validations should not be called
         assert not mock_db.called
-        assert not mock_gong.called
         assert not mock_anthropic.called

@@ -87,16 +87,16 @@
 
 ## 9. Gong API Removal
 
-- [ ] 9.1 Delete `gong/client.py`
-- [ ] 9.2 Delete `gong/webhook.py`
-- [ ] 9.3 Delete `webhook_server.py`
-- [ ] 9.4 Delete `flows/daily_gong_sync.py`
-- [ ] 9.5 Remove Gong imports from `coaching_mcp/server.py`
-- [ ] 9.6 Remove Gong API validation from `coaching_mcp/server.py` startup checks
-- [ ] 9.7 Remove Gong config fields from `coaching_mcp/shared/config.py` (gong_api_key, gong_api_secret, gong_webhook_secret, gong_api_base_url)
-- [ ] 9.8 Remove Gong environment variables from `.env.example`
-- [ ] 9.9 Test MCP server startup (should be faster, no Gong validation)
-- [ ] 9.10 Run `ruff check` and fix any unused import errors
+- [x] 9.1 Delete `gong/client.py`
+- [x] 9.2 Delete `gong/webhook.py`
+- [x] 9.3 Delete `webhook_server.py`
+- [x] 9.4 Delete `flows/daily_gong_sync.py`
+- [x] 9.5 Remove Gong imports from `coaching_mcp/server.py`
+- [x] 9.6 Remove Gong API validation from `coaching_mcp/server.py` startup checks
+- [x] 9.7 Remove Gong config fields from `coaching_mcp/shared/config.py` (gong_api_key, gong_api_secret, gong_webhook_secret, gong_api_base_url)
+- [x] 9.8 Remove Gong environment variables from `.env.example`
+- [x] 9.9 Test MCP server startup (should be faster, no Gong validation)
+- [x] 9.10 Run `ruff check` and fix any unused import errors
 
 ## 10. Documentation Updates
 

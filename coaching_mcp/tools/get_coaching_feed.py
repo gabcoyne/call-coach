@@ -93,7 +93,7 @@ def get_coaching_feed_tool(
                 continue
 
             # Get call details
-            call = queries.get_call(session["call_id"])
+            call = queries.get_call_by_id(session["call_id"])
             if not call:
                 continue
 
@@ -254,7 +254,7 @@ def _is_new(session: dict[str, Any]) -> bool:
         created_at = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
 
     age = datetime.now() - created_at.replace(tzinfo=None)
-    return age.total_seconds() < 86400  # 24 hours
+    return bool(age.total_seconds() < 86400)  # 24 hours
 
 
 def _get_recent_sessions(

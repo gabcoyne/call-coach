@@ -1,6 +1,8 @@
 """
-FastMCP Server for Gong Call Coaching Agent.
+FastMCP Server for Call Coaching Agent.
 Provides on-demand coaching tools accessible via Claude Desktop.
+
+Data is sourced from Neon PostgreSQL (synced via DLT from BigQuery).
 """
 
 import argparse
@@ -32,9 +34,6 @@ def _validate_environment() -> None:
     try:
         # Access settings attributes to trigger validation
         # If any required field is missing, pydantic will raise ValidationError
-        _ = settings.gong_api_key
-        _ = settings.gong_api_secret
-        _ = settings.gong_api_base_url
         _ = settings.anthropic_api_key
         _ = settings.database_url
         logger.info("✓ All required environment variables present")
@@ -130,110 +129,6 @@ def _validate_database_connection_only() -> None:
         sys.exit(1)
 
 
-def _validate_gong_api(dev_mode: bool = False) -> None:
-    """
-    Test Gong API authentication with minimal request.
-
-    Non-fatal for timeouts (logs warning), fatal for auth failures.
-    Skipped entirely in development mode.
-
-    Args:
-        dev_mode: If True, skips Gong API validation entirely
-
-    Raises:
-        SystemExit: If Gong API authentication definitively fails (401/403)
-    """
-    if dev_mode:
-        logger.info("✓ Gong API validation skipped (dev mode)")
-        return
-
-    from datetime import datetime, timedelta
-
-    import httpx
-
-    from gong.client import GongAPIError, GongClient
-
-    try:
-        # Create client with short timeout for validation
-        client_kwargs = {
-            "api_key": settings.gong_api_key,
-            "api_secret": settings.gong_api_secret,
-            "base_url": settings.gong_api_base_url,
-        }
-
-        # Temporarily patch the client to use 1-second timeout for validation
-        original_init = GongClient.__init__
-
-        def patched_init(self, **kwargs):
-            original_init(self, **kwargs)
-            # Replace the client with a shorter timeout
-            self.client.close()
-            self.client = httpx.Client(
-                base_url=self.base_url,
-                auth=(self.api_key, self.api_secret),
-                timeout=1.0,  # 1 second timeout for validation
-                headers={
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                },
-            )
-
-        GongClient.__init__ = patched_init
-
-        try:
-            with GongClient(**client_kwargs) as client:
-                # Test with minimal date range (last 1 day instead of 7)
-                to_date = datetime.now()
-                from_date = to_date - timedelta(days=1)
-
-                # Attempt to list calls (will fail auth if credentials invalid)
-                calls, _ = client.list_calls(
-                    from_date=from_date.isoformat() + "Z",
-                    to_date=to_date.isoformat() + "Z",
-                )
-
-                logger.info("✓ Gong API authentication successful")
-        finally:
-            # Restore original __init__
-            GongClient.__init__ = original_init
-
-    except httpx.TimeoutException:
-        # Non-fatal: log warning but allow server to start
-        logger.warning("⚠️  Gong API validation timed out (server will still start)")
-        logger.warning("This may indicate slow network or Gong API issues")
-        return
-
-    except GongAPIError as e:
-        # Check for definitive auth failures (401, 403)
-        error_str = str(e)
-        if (
-            "401" in error_str
-            or "403" in error_str
-            or "authentication" in error_str.lower()
-            or "unauthorized" in error_str.lower()
-        ):
-            logger.error("✗ Gong API authentication failed")
-            logger.error("Verify GONG_API_KEY and GONG_API_SECRET are correct")
-            sys.exit(1)
-        else:
-            # Other errors - log warning but don't fail startup
-            logger.warning(f"⚠️  Gong API validation error (non-fatal): {e}")
-            logger.warning("Server will start, but Gong API may not be accessible")
-            return
-
-    except Exception as e:
-        # Check if it's a timeout-related error
-        if "timeout" in str(e).lower() or "timed out" in str(e).lower():
-            logger.warning("⚠️  Gong API validation timed out (server will still start)")
-            logger.warning("This may indicate slow network or Gong API issues")
-            return
-
-        # Other unexpected errors - log warning but don't fail startup
-        logger.warning(f"⚠️  Gong API validation failed (non-fatal): {e}")
-        logger.warning("Server will start, but Gong API may not be accessible")
-        return
-
-
 def _validate_anthropic_api() -> None:
     """
     Validate Anthropic API key format.
@@ -260,7 +155,7 @@ def _validate_anthropic_api() -> None:
 
 
 # Initialize FastMCP server
-mcp = FastMCP("Gong Call Coaching Agent")
+mcp = FastMCP("Call Coaching Agent")
 
 # Server status tracking
 _server_ready = False
@@ -598,7 +493,7 @@ def main(dev: bool = False) -> None:
     global _server_ready
 
     logger.info("=" * 60)
-    logger.info("Starting Gong Call Coaching MCP Server")
+    logger.info("Starting Call Coaching MCP Server")
     if dev:
         logger.info("🏗️  Dev mode: skipping expensive validations")
     logger.info("=" * 60)
@@ -615,10 +510,8 @@ def main(dev: bool = False) -> None:
             # Use relaxed validation in dev mode
             if dev:
                 _validate_database_connection_only()
-                _validate_gong_api(dev_mode=True)
             else:
                 _validate_database_connection()
-                _validate_gong_api(dev_mode=False)
 
             _validate_anthropic_api()
 
@@ -661,7 +554,7 @@ def main_dev() -> None:
 
 if __name__ == "__main__":
     # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="Gong Call Coaching MCP Server")
+    parser = argparse.ArgumentParser(description="Call Coaching MCP Server")
     parser.add_argument(
         "--dev",
         action="store_true",
