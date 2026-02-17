@@ -19,6 +19,8 @@ locals {
     "iam.googleapis.com",                  # IAM
     "iamcredentials.googleapis.com",       # IAM Credentials (Workload Identity)
     "cloudresourcemanager.googleapis.com", # Resource Manager
+    "compute.googleapis.com",              # Compute Engine (Load Balancer)
+    "iap.googleapis.com",                  # Identity-Aware Proxy
   ]
 }
 
