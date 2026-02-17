@@ -75,17 +75,15 @@
 - [x] 7.5 Add data quality checks (row count delta comparison between BigQuery and Postgres)
 - [x] 7.6 Test monitoring by running pipeline and inspecting logs
 
-## 8. Prefect Deployment
+## 8. Sync Script
 
-- [x] 8.1 Create Prefect flow wrapper in `flows/dlt_sync_flow.py`
-- [x] 8.2 Add `@flow` decorator with name "bigquery-dlt-sync"
+- [x] 8.1 Create sync script in `flows/dlt_sync_flow.py`
+- [x] 8.2 Implement `run_sync()` function that orchestrates all sources
 - [x] 8.3 Import and call DLT sources from `dlt_pipeline/sources/`
-- [x] 8.4 Add Prefect task for each DLT source (calls, emails, opportunities) for granular observability
-- [x] 8.5 Configure flow retries (max_retries=2, retry_delay_seconds=300)
-- [x] 8.6 Document deployment with cron schedule "0 \* \* \* \*" (hourly) - see code comments
-- [ ] 8.7 Deploy to Prefect Cloud using `prefect deployment apply` (requires PREFECT_API_KEY)
-- [ ] 8.8 Test manual trigger from Prefect UI (requires deployment)
-- [ ] 8.9 Wait for scheduled run and verify success in Prefect UI (requires deployment)
+- [x] 8.4 Add separate functions for each source (sync_calls, sync_emails, sync_opportunities)
+- [x] 8.5 Add error handling with per-source failure isolation
+- [x] 8.6 Run locally: `uv run python -m flows.dlt_sync_flow`
+- [x] 8.7 Schedule via cron for hourly execution (see module docstring)
 
 ## 9. Gong API Removal
 

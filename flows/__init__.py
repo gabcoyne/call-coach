@@ -1,6 +1,6 @@
-"""Prefect flows for orchestrating call analysis."""
+"""Data sync and call processing flows."""
 
-from .dlt_sync_flow import bigquery_dlt_sync_flow
+from .dlt_sync_flow import run_sync
 from .process_new_call import process_new_call_flow
 
-__all__ = ["bigquery_dlt_sync_flow", "process_new_call_flow"]
+__all__ = ["run_sync", "process_new_call_flow"]
