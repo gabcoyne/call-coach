@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { useAuthContext } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,7 @@ import {
   Target,
   Users,
   Shield,
+  LogOut,
 } from "lucide-react";
 import { useCurrentUser } from "@/lib/hooks/use-current-user";
 import { isManager, isAdmin } from "@/lib/rbac";
@@ -70,12 +71,52 @@ const adminNavigation = [
   },
 ];
 
+/**
+ * Generate initials from name or email
+ */
+function getInitials(name: string | null, email: string): string {
+  if (name) {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  }
+  return email.slice(0, 2).toUpperCase();
+}
+
+/**
+ * Generate a consistent color from email
+ */
+function getAvatarColor(email: string): string {
+  const colors = [
+    "bg-blue-500",
+    "bg-green-500",
+    "bg-purple-500",
+    "bg-orange-500",
+    "bg-pink-500",
+    "bg-teal-500",
+    "bg-indigo-500",
+    "bg-red-500",
+  ];
+  let hash = 0;
+  for (let i = 0; i < email.length; i++) {
+    hash = email.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { user, signOut } = useAuthContext();
   const { data: currentUser } = useCurrentUser();
   const userIsManager = isManager(currentUser);
   const userIsAdmin = isAdmin(currentUser);
+
+  const initials = user ? getInitials(user.name, user.email) : "??";
+  const avatarColor = user ? getAvatarColor(user.email) : "bg-gray-500";
 
   return (
     <div className="lg:hidden">
@@ -90,14 +131,13 @@ export function MobileNav() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: "h-8 w-8",
-              },
-            }}
-            afterSignOutUrl="/sign-in"
-          />
+          {user && (
+            <div
+              className={`h-8 w-8 rounded-full ${avatarColor} flex items-center justify-center text-white text-xs font-medium`}
+            >
+              {initials}
+            </div>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -226,6 +266,19 @@ export function MobileNav() {
                   })}
                 </>
               )}
+
+              {/* Sign Out */}
+              <div className="py-2 border-t border-border" />
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  signOut();
+                }}
+                className="group flex items-center px-3 py-3 text-base font-medium rounded-md transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground w-full"
+              >
+                <LogOut className="mr-3 h-6 w-6 flex-shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
+                Sign out
+              </button>
             </nav>
           </div>
         </div>

@@ -112,37 +112,30 @@ jest.mock("next/navigation", () => ({
   },
 }));
 
-// Mock Clerk authentication
-jest.mock("@clerk/nextjs/server", () => ({
-  auth: jest.fn(() => ({
-    userId: "test-user-id",
-    sessionId: "test-session-id",
-  })),
-  currentUser: jest.fn(() => ({
-    id: "test-user-id",
-    emailAddresses: [{ emailAddress: "test@example.com" }],
-    publicMetadata: { role: "rep" },
-  })),
-  ClerkProvider: ({ children }) => children,
-}));
-
-jest.mock("@clerk/nextjs", () => ({
-  useUser: jest.fn(() => ({
-    isSignedIn: true,
+// Mock IAP auth context
+jest.mock("@/lib/auth-context", () => ({
+  useAuthContext: jest.fn(() => ({
     user: {
       id: "test-user-id",
-      emailAddresses: [{ emailAddress: "test@example.com" }],
-      publicMetadata: { role: "rep" },
+      email: "test@example.com",
+      name: "Test User",
+      role: "rep",
     },
+    isLoading: false,
+    isAuthenticated: true,
+    signOut: jest.fn(),
   })),
-  useAuth: jest.fn(() => ({
-    isSignedIn: true,
+  AuthProvider: ({ children }) => children,
+}));
+
+// Mock IAP auth middleware
+jest.mock("@/lib/auth-middleware", () => ({
+  getAuthContext: jest.fn(() => ({
     userId: "test-user-id",
-    sessionId: "test-session-id",
+    email: "test@example.com",
+    name: "Test User",
+    role: "rep",
   })),
-  SignIn: () => <div>Sign In</div>,
-  SignUp: () => <div>Sign Up</div>,
-  UserButton: () => <div>User Button</div>,
 }));
 
 // Mock fetch globally

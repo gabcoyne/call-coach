@@ -11,7 +11,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db/connection";
-import { currentUser } from "@clerk/nextjs/server";
+import { getAuthContext } from "@/lib/auth-middleware";
 import { z } from "zod";
 
 // Validation schema for feedback submission
@@ -27,10 +27,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   try {
     // Check authentication
-    const user = await currentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authContext = await getAuthContext();
 
     // Parse and validate request body
     const body = await request.json();
@@ -95,6 +92,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         },
         { status: 400 }
       );
+    }
+
+    // If auth fails, return 401
+    if (
+      error instanceof Error &&
+      (error.message?.includes("authenticated") || error.message?.includes("Unauthorized"))
+    ) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     console.error(`Error submitting feedback for session ${coachingSessionId}:`, error);

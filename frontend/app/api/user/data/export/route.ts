@@ -14,7 +14,7 @@
  * Returns: File stream (CSV or JSON)
  */
 import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { getAuthContext } from "@/lib/auth-middleware";
 
 // Mock data for demo
 const mockCoachingData = {
@@ -93,20 +93,10 @@ function convertToJSON(data: any): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await currentUser();
+    const authContext = await getAuthContext();
     const body = await request.json();
 
-    const {
-      format = "csv",
-      includeCallRecordings = false,
-      includeTranscripts = true,
-      includeCoachingFeedback = true,
-    } = body;
+    const { format = "csv", includeTranscripts = true } = body;
 
     // Validate format
     if (!["csv", "json"].includes(format)) {
@@ -120,15 +110,12 @@ export async function POST(request: NextRequest) {
     const exportData = {
       exportDate: new Date().toISOString(),
       user: {
-        id: user?.id,
-        email: user?.emailAddresses?.[0]?.emailAddress,
-        firstName: user?.firstName,
-        lastName: user?.lastName,
-        createdAt: user?.createdAt ? new Date(user.createdAt).toISOString() : undefined,
+        id: authContext.userId,
+        email: authContext.email,
+        name: authContext.name,
       },
       sessions: mockCoachingData.sessions,
       ...(includeTranscripts && { transcripts: mockCoachingData.transcripts }),
-      // In production, includeCallRecordings would include actual audio files
     };
 
     // Convert to requested format
@@ -148,7 +135,7 @@ export async function POST(request: NextRequest) {
 
     // Log export for audit trail
     console.log(
-      `Data export for user ${userId}: ${format} format, includes transcripts: ${includeTranscripts}`
+      `Data export for user ${authContext.userId}: ${format} format, includes transcripts: ${includeTranscripts}`
     );
 
     return new NextResponse(content, {
@@ -159,6 +146,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: any) {
+    // If auth fails, return 401
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Failed to export data:", error);
     return NextResponse.json(
       { error: "Failed to export data", details: error.message },

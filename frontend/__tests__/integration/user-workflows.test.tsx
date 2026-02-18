@@ -21,8 +21,7 @@ jest.mock("@/lib/hooks/use-search-calls", () => ({
 }));
 
 // Get mock functions that are already defined in jest.setup.js
-const mockUseUser = require("@clerk/nextjs").useUser;
-const mockUseAuth = require("@clerk/nextjs").useAuth;
+const mockUseAuthContext = require("@/lib/auth-context").useAuthContext;
 const mockUseRouter = require("next/navigation").useRouter;
 const mockUsePathname = require("next/navigation").usePathname;
 
@@ -34,21 +33,17 @@ describe("User Workflow Integration Tests", () => {
   describe("test_login_dashboard (11.4)", () => {
     it("should render dashboard after successful authentication as manager", async () => {
       // Mock authenticated manager user
-      mockUseUser.mockReturnValue({
-        isLoaded: true,
-        isSignedIn: true,
+      mockUseAuthContext.mockReturnValue({
         user: {
           id: "manager-123",
-          emailAddresses: [{ emailAddress: "manager@prefect.io" }],
-          publicMetadata: { role: "manager" },
-        } as any,
+          email: "manager@prefect.io",
+          name: "Test Manager",
+          role: "manager",
+        },
+        isLoading: false,
+        isAuthenticated: true,
+        signOut: jest.fn(),
       });
-
-      mockUseAuth.mockReturnValue({
-        isSignedIn: true,
-        userId: "manager-123",
-        sessionId: "session-123",
-      } as any);
 
       // Mock API response for calls
       const { useSearchCalls } = require("@/lib/hooks/use-search-calls");
@@ -85,21 +80,17 @@ describe("User Workflow Integration Tests", () => {
 
     it("should redirect rep to their own dashboard", async () => {
       // Mock authenticated rep user
-      mockUseUser.mockReturnValue({
-        isLoaded: true,
-        isSignedIn: true,
+      mockUseAuthContext.mockReturnValue({
         user: {
           id: "rep-123",
-          emailAddresses: [{ emailAddress: "rep@prefect.io" }],
-          publicMetadata: { role: "rep" },
-        } as any,
+          email: "rep@prefect.io",
+          name: "Test Rep",
+          role: "rep",
+        },
+        isLoading: false,
+        isAuthenticated: true,
+        signOut: jest.fn(),
       });
-
-      mockUseAuth.mockReturnValue({
-        isSignedIn: true,
-        userId: "rep-123",
-        sessionId: "session-123",
-      } as any);
 
       const { container } = render(<DashboardPage />);
 
@@ -114,17 +105,12 @@ describe("User Workflow Integration Tests", () => {
 
     it("should show loading state while user data loads", () => {
       // Mock loading state
-      mockUseUser.mockReturnValue({
-        isLoaded: false,
-        isSignedIn: false,
+      mockUseAuthContext.mockReturnValue({
         user: null,
-      } as any);
-
-      mockUseAuth.mockReturnValue({
-        isSignedIn: false,
-        userId: null,
-        sessionId: null,
-      } as any);
+        isLoading: true,
+        isAuthenticated: false,
+        signOut: jest.fn(),
+      });
 
       render(<DashboardPage />);
 
@@ -135,14 +121,16 @@ describe("User Workflow Integration Tests", () => {
 
     it("should handle authentication errors gracefully", async () => {
       // Mock authenticated user but API error
-      mockUseUser.mockReturnValue({
-        isLoaded: true,
-        isSignedIn: true,
+      mockUseAuthContext.mockReturnValue({
         user: {
           id: "manager-123",
-          emailAddresses: [{ emailAddress: "manager@prefect.io" }],
-          publicMetadata: { role: "manager" },
-        } as any,
+          email: "manager@prefect.io",
+          name: "Test Manager",
+          role: "manager",
+        },
+        isLoading: false,
+        isAuthenticated: true,
+        signOut: jest.fn(),
       });
 
       const { useSearchCalls } = require("@/lib/hooks/use-search-calls");
@@ -165,21 +153,17 @@ describe("User Workflow Integration Tests", () => {
 
     it("should complete full login-to-dashboard flow for manager", async () => {
       // Simulate complete authentication and data loading flow
-      mockUseUser.mockReturnValue({
-        isLoaded: true,
-        isSignedIn: true,
+      mockUseAuthContext.mockReturnValue({
         user: {
           id: "manager-123",
-          emailAddresses: [{ emailAddress: "manager@prefect.io" }],
-          publicMetadata: { role: "manager" },
-        } as any,
+          email: "manager@prefect.io",
+          name: "Test Manager",
+          role: "manager",
+        },
+        isLoading: false,
+        isAuthenticated: true,
+        signOut: jest.fn(),
       });
-
-      mockUseAuth.mockReturnValue({
-        isSignedIn: true,
-        userId: "manager-123",
-        sessionId: "session-123",
-      } as any);
 
       const { useSearchCalls } = require("@/lib/hooks/use-search-calls");
       useSearchCalls.mockReturnValue({
@@ -220,14 +204,16 @@ describe("User Workflow Integration Tests", () => {
     });
 
     it("should display empty state when no rep data available", async () => {
-      mockUseUser.mockReturnValue({
-        isLoaded: true,
-        isSignedIn: true,
+      mockUseAuthContext.mockReturnValue({
         user: {
           id: "manager-123",
-          emailAddresses: [{ emailAddress: "manager@prefect.io" }],
-          publicMetadata: { role: "manager" },
-        } as any,
+          email: "manager@prefect.io",
+          name: "Test Manager",
+          role: "manager",
+        },
+        isLoading: false,
+        isAuthenticated: true,
+        signOut: jest.fn(),
       });
 
       const { useSearchCalls } = require("@/lib/hooks/use-search-calls");
@@ -502,14 +488,16 @@ describe("User Workflow Integration Tests", () => {
 
   describe("Navigation and Routing Tests", () => {
     it("should navigate between pages in the workflow", async () => {
-      mockUseUser.mockReturnValue({
-        isLoaded: true,
-        isSignedIn: true,
+      mockUseAuthContext.mockReturnValue({
         user: {
           id: "manager-123",
-          emailAddresses: [{ emailAddress: "manager@prefect.io" }],
-          publicMetadata: { role: "manager" },
-        } as any,
+          email: "manager@prefect.io",
+          name: "Test Manager",
+          role: "manager",
+        },
+        isLoading: false,
+        isAuthenticated: true,
+        signOut: jest.fn(),
       });
 
       const { useSearchCalls } = require("@/lib/hooks/use-search-calls");
@@ -547,14 +535,16 @@ describe("User Workflow Integration Tests", () => {
 
   describe("Error Recovery Tests", () => {
     it("should retry failed requests", async () => {
-      mockUseUser.mockReturnValue({
-        isLoaded: true,
-        isSignedIn: true,
+      mockUseAuthContext.mockReturnValue({
         user: {
           id: "manager-123",
-          emailAddresses: [{ emailAddress: "manager@prefect.io" }],
-          publicMetadata: { role: "manager" },
-        } as any,
+          email: "manager@prefect.io",
+          name: "Test Manager",
+          role: "manager",
+        },
+        isLoading: false,
+        isAuthenticated: true,
+        signOut: jest.fn(),
       });
 
       const { useSearchCalls } = require("@/lib/hooks/use-search-calls");

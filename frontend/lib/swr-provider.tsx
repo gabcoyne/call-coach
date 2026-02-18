@@ -27,11 +27,11 @@ interface SWRProviderProps {
  *   return (
  *     <html lang="en">
  *       <body>
- *         <ClerkProvider>
+ *         <AuthProvider>
  *           <SWRProvider>
  *             {children}
  *           </SWRProvider>
- *         </ClerkProvider>
+ *         </AuthProvider>
  *       </body>
  *     </html>
  *   );

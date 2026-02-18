@@ -7,14 +7,11 @@
  * Returns: { success: true, url: string }
  */
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { getAuthContext } from "@/lib/auth-middleware";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authContext = await getAuthContext();
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
@@ -48,9 +45,9 @@ export async function POST(request: NextRequest) {
     // 4. Return the URL
 
     // For now, return a mock URL
-    const mockUrl = `https://example.com/avatars/${userId}/${Date.now()}-${file.name}`;
+    const mockUrl = `https://example.com/avatars/${authContext.userId}/${Date.now()}-${file.name}`;
 
-    console.log(`Avatar upload for user ${userId}: ${file.name} (${file.size} bytes)`);
+    console.log(`Avatar upload for user ${authContext.userId}: ${file.name} (${file.size} bytes)`);
 
     return NextResponse.json({
       success: true,
@@ -59,6 +56,10 @@ export async function POST(request: NextRequest) {
       fileSize: file.size,
     });
   } catch (error: any) {
+    // If auth fails, return 401
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Failed to upload avatar:", error);
     return NextResponse.json(
       { error: "Failed to upload avatar", details: error.message },

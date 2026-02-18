@@ -11,7 +11,7 @@
  * - Data retention settings
  */
 import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { getAuthContext } from "@/lib/auth-middleware";
 
 // In-memory store for demo purposes
 // In production, this would be stored in the database
@@ -19,12 +19,9 @@ const userPreferencesStore = new Map<string, any>();
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authContext = await getAuthContext();
 
-    const preferences = userPreferencesStore.get(userId) || {
+    const preferences = userPreferencesStore.get(authContext.userId) || {
       // Default preferences
       theme: "system",
       compactMode: false,
@@ -42,6 +39,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(preferences);
   } catch (error: any) {
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Failed to get preferences:", error);
     return NextResponse.json(
       { error: "Failed to retrieve preferences", details: error.message },
@@ -52,10 +52,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authContext = await getAuthContext();
 
     const body = await request.json();
 
@@ -103,7 +100,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Store preferences
-    userPreferencesStore.set(userId, validatedPreferences);
+    userPreferencesStore.set(authContext.userId, validatedPreferences);
 
     return NextResponse.json({
       success: true,
@@ -111,6 +108,9 @@ export async function PUT(request: NextRequest) {
       preferences: validatedPreferences,
     });
   } catch (error: any) {
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Failed to update preferences:", error);
     return NextResponse.json(
       { error: "Failed to update preferences", details: error.message },

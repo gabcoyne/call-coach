@@ -3,7 +3,7 @@
  *
  * PUT /api/admin/users/[email]/role - Update user role
  *
- * Authorization: Requires manager role (Clerk publicMetadata.role === 'manager')
+ * Authorization: Requires manager role
  *
  * Request body:
  * {
@@ -11,7 +11,7 @@
  * }
  */
 import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { getAuthContext } from "@/lib/auth-middleware";
 import * as db from "@/lib/db";
 
 export async function PUT(
@@ -19,24 +19,14 @@ export async function PUT(
   { params }: { params: Promise<{ email: string }> }
 ) {
   try {
-    // Check authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
-    }
+    // Check authentication and authorization
+    const authContext = await getAuthContext();
 
-    // Check manager authorization
-    const user = await currentUser();
-    const userRole = user?.publicMetadata?.role;
-    const managerEmail = user?.primaryEmailAddress?.emailAddress;
-
-    if (userRole !== "manager") {
+    if (authContext.role !== "manager") {
       return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
     }
 
-    if (!managerEmail) {
-      return NextResponse.json({ error: "Manager email not found" }, { status: 400 });
-    }
+    const managerEmail = authContext.email;
 
     const { email } = await params;
     const body = await request.json();
@@ -71,6 +61,10 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     });
   } catch (error: any) {
+    // If auth fails, return 401
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
+    }
     console.error("Failed to update user role:", error);
     return NextResponse.json(
       { error: "Failed to update user role", details: error.message },

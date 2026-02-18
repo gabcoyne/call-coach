@@ -1,26 +1,61 @@
-'use server';
+"use server";
 
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { headers } from "next/headers";
 import { UserRole } from "./auth-utils";
 
 /**
- * Get the current user's role from Clerk metadata
- * Role is stored in publicMetadata.role
+ * Manager emails - users with manager role
+ * In production, this could come from a database or config
+ */
+const MANAGER_EMAILS = new Set([
+  "george@prefect.io",
+  "gcoyne@prefect.io",
+  // Add other managers here
+]);
+
+/**
+ * Dev mode bypass check
+ */
+const bypassAuth = process.env.NODE_ENV === "development" && process.env.BYPASS_AUTH === "true";
+
+/**
+ * Get IAP email from headers
+ */
+async function getIAPEmail(): Promise<string | null> {
+  if (bypassAuth) {
+    return "george@prefect.io";
+  }
+
+  const headersList = await headers();
+
+  // Try normalized header first
+  let email = headersList.get("x-iap-user-email");
+
+  // Fallback to raw IAP header
+  if (!email) {
+    const rawEmail = headersList.get("x-goog-authenticated-user-email");
+    if (rawEmail) {
+      email = rawEmail.replace("accounts.google.com:", "");
+    }
+  }
+
+  return email;
+}
+
+/**
+ * Get the current user's role based on email
  */
 export async function getCurrentUserRole(): Promise<UserRole | null> {
-  const user = await currentUser();
+  const email = await getIAPEmail();
 
-  if (!user) {
+  if (!email) {
     return null;
   }
 
-  const role = user.publicMetadata?.role as string | undefined;
-
-  if (role === UserRole.MANAGER || role === UserRole.REP) {
-    return role as UserRole;
+  if (MANAGER_EMAILS.has(email.toLowerCase())) {
+    return UserRole.MANAGER;
   }
 
-  // Default to rep if no role is set
   return UserRole.REP;
 }
 
@@ -44,8 +79,7 @@ export async function isRep(): Promise<boolean> {
  * Get the current user's email
  */
 export async function getCurrentUserEmail(): Promise<string | null> {
-  const user = await currentUser();
-  return user?.emailAddresses[0]?.emailAddress ?? null;
+  return getIAPEmail();
 }
 
 /**
@@ -85,14 +119,23 @@ export async function requireManager(): Promise<void> {
  * Get user session information
  */
 export async function getUserSession() {
-  const { userId, sessionId } = await auth();
-  const user = await currentUser();
+  const email = await getIAPEmail();
+  const role = await getCurrentUserRole();
+
+  const headersList = await headers();
+  let userId = headersList.get("x-iap-user-id");
+  if (!userId) {
+    const rawUserId = headersList.get("x-goog-authenticated-user-id");
+    if (rawUserId) {
+      userId = rawUserId.replace("accounts.google.com:", "");
+    }
+  }
 
   return {
-    userId,
-    sessionId,
-    user,
-    role: await getCurrentUserRole(),
-    email: await getCurrentUserEmail(),
+    userId: userId || email,
+    sessionId: null, // IAP doesn't provide session IDs like Clerk
+    user: email ? { email } : null,
+    role,
+    email,
   };
 }

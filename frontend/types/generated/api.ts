@@ -5,7 +5,7 @@
  * To regenerate, run: npm run generate:types
  *
  * Source: http://localhost:8000/openapi.json
- * Generated: 2026-02-17T15:54:46.237Z
+ * Generated: 2026-02-18T18:15:51.827Z
  */
 
 /**

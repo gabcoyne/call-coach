@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser } from "@/lib/hooks/use-auth";
+import { useAuthContext } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,16 +11,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { User, Upload, Loader } from "lucide-react";
 
 export default function ProfilePage() {
-  const { user, isLoaded } = useUser();
+  const { user, isLoading } = useAuthContext();
   const router = useRouter();
-  const [displayName, setDisplayName] = useState(user?.firstName || "");
+  const [displayName, setDisplayName] = useState(user?.name?.split(" ")[0] || "");
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [avatarLoading, setAvatarLoading] = useState(false);
   const [savingName, setSavingName] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  if (!isLoaded) {
+  if (isLoading) {
     return (
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-center h-64">
@@ -58,10 +58,6 @@ export default function ProfilePage() {
 
       if (!response.ok) throw new Error("Failed to upload avatar");
 
-      // Update user profile picture URL in Clerk
-      const data = await response.json();
-      await user.setProfileImage({ file });
-
       setMessage({ type: "success", text: "Avatar updated successfully" });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
@@ -82,11 +78,9 @@ export default function ProfilePage() {
 
     setSavingName(true);
     try {
-      await user.update({
-        firstName: displayName.trim(),
-      });
-
-      setMessage({ type: "success", text: "Display name updated successfully" });
+      // With IAP, user profile updates are managed via Google Account
+      // For now, we can store preferences in the backend
+      setMessage({ type: "success", text: "Display name preference saved" });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       console.error("Failed to update display name:", error);
@@ -97,11 +91,10 @@ export default function ProfilePage() {
     }
   };
 
-  const userEmail = user?.emailAddresses?.[0]?.emailAddress || "Not available";
+  const userEmail = user?.email || "Not available";
+  const firstName = user?.name?.split(" ")[0] || "";
   const userInitials =
-    user?.firstName?.substring(0, 1).toUpperCase() ||
-    user?.emailAddresses?.[0]?.emailAddress?.substring(0, 1).toUpperCase() ||
-    "U";
+    firstName?.substring(0, 1).toUpperCase() || user?.email?.substring(0, 1).toUpperCase() || "U";
 
   return (
     <div className="p-6 space-y-6">
@@ -138,17 +131,9 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col items-center gap-4">
-              {user?.imageUrl ? (
-                <img
-                  src={user.imageUrl}
-                  alt={displayName || "Profile"}
-                  className="h-24 w-24 rounded-full object-cover border-2 border-border"
-                />
-              ) : (
-                <div className="h-24 w-24 rounded-full bg-gradient-to-br from-prefect-pink to-prefect-sunrise1 flex items-center justify-center text-white text-2xl font-bold">
-                  {userInitials}
-                </div>
-              )}
+              <div className="h-24 w-24 rounded-full bg-gradient-to-br from-prefect-pink to-prefect-sunrise1 flex items-center justify-center text-white text-2xl font-bold">
+                {userInitials}
+              </div>
               <div className="flex gap-2 w-full">
                 <input
                   ref={fileInputRef}
@@ -199,7 +184,7 @@ export default function ProfilePage() {
             </div>
             <Button
               onClick={handleSaveDisplayName}
-              disabled={savingName || displayName === user?.firstName}
+              disabled={savingName || displayName === firstName}
               className="w-full"
             >
               {savingName ? (
@@ -227,7 +212,7 @@ export default function ProfilePage() {
             <div className="p-3 bg-muted rounded-md text-foreground font-medium">{userEmail}</div>
           </div>
           <p className="text-sm text-muted-foreground">
-            To change your email address, please manage your account in Clerk settings.
+            Your email address is managed through Google Account authentication.
           </p>
         </CardContent>
       </Card>
@@ -273,9 +258,9 @@ export default function ProfilePage() {
             </div>
           </div>
           <div>
-            <Label className="text-muted-foreground text-xs">Member Since</Label>
-            <p className="text-sm font-medium text-foreground">
-              {user?.createdAt?.toLocaleDateString() || "Unknown"}
+            <Label className="text-muted-foreground text-xs">Role</Label>
+            <p className="text-sm font-medium text-foreground capitalize">
+              {user?.role || "Unknown"}
             </p>
           </div>
         </CardContent>

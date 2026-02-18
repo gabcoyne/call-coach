@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/lib/hooks/use-auth";
+import { useAuthContext } from "@/lib/auth-context";
 import { Users, UserPlus, Shield, Edit, Trash2, Save, X, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -38,7 +38,7 @@ interface StaffRole {
 
 export default function TeamManagementPage() {
   const router = useRouter();
-  const { user: clerkUser } = useUser();
+  const { user: authUser } = useAuthContext();
   const { data: currentUser, isLoading: userLoading } = useCurrentUser();
   const [staff, setStaff] = useState<StaffRole[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -91,7 +91,7 @@ export default function TeamManagementPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "X-User-Email": clerkUser?.primaryEmailAddress?.emailAddress || "",
+          "X-User-Email": authUser?.email || "",
         },
         body: JSON.stringify({
           email,
@@ -120,7 +120,7 @@ export default function TeamManagementPage() {
       const response = await fetch(`/api/users/staff-roles?email=${encodeURIComponent(email)}`, {
         method: "DELETE",
         headers: {
-          "X-User-Email": clerkUser?.primaryEmailAddress?.emailAddress || "",
+          "X-User-Email": authUser?.email || "",
         },
       });
 
@@ -146,7 +146,7 @@ export default function TeamManagementPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "X-User-Email": clerkUser?.primaryEmailAddress?.emailAddress || "",
+          "X-User-Email": authUser?.email || "",
         },
         body: JSON.stringify({
           email: newUserEmail,

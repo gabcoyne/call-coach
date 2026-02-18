@@ -7,7 +7,7 @@
  * Authorization: Requires manager role
  */
 import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { getAuthContext } from "@/lib/auth-middleware";
 import * as db from "@/lib/db";
 import { z } from "zod";
 
@@ -33,24 +33,14 @@ export async function PUT(
   const { email } = await params;
 
   try {
-    // Check authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
-    }
+    // Check authentication and authorization
+    const authContext = await getAuthContext();
 
-    // Check manager authorization
-    const user = await currentUser();
-    const userRole = user?.publicMetadata?.role;
-    const managerEmail = user?.emailAddresses?.[0]?.emailAddress;
-
-    if (userRole !== "manager") {
+    if (authContext.role !== "manager") {
       return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
     }
 
-    if (!managerEmail) {
-      return NextResponse.json({ error: "Manager email not found" }, { status: 400 });
-    }
+    const managerEmail = authContext.email;
 
     // Decode and validate email from URL
     const staffEmail = decodeURIComponent(email);
@@ -90,6 +80,10 @@ export async function PUT(
       message: `Role updated to ${role.toUpperCase()} for ${staffEmail}`,
     });
   } catch (error: any) {
+    // If auth fails, return 401
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
+    }
     console.error("Failed to update staff role:", error);
     return NextResponse.json(
       { error: "Failed to update role", details: error.message },
@@ -108,17 +102,10 @@ export async function DELETE(
   const { email } = await params;
 
   try {
-    // Check authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
-    }
+    // Check authentication and authorization
+    const authContext = await getAuthContext();
 
-    // Check manager authorization
-    const user = await currentUser();
-    const userRole = user?.publicMetadata?.role;
-
-    if (userRole !== "manager") {
+    if (authContext.role !== "manager") {
       return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
     }
 
@@ -142,6 +129,10 @@ export async function DELETE(
       message: `Role assignment removed for ${staffEmail}`,
     });
   } catch (error: any) {
+    // If auth fails, return 401
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
+    }
     console.error("Failed to delete staff role:", error);
     return NextResponse.json(
       { error: "Failed to delete role", details: error.message },

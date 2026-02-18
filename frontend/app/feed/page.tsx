@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useUser } from "@/lib/hooks/use-auth";
+import { useAuthContext } from "@/lib/auth-context";
 import { useInfiniteFeed } from "@/lib/hooks";
 import {
   FeedItemCard,
@@ -17,7 +17,7 @@ import { Loader2, Inbox } from "lucide-react";
 import { isManager } from "@/lib/auth-utils";
 
 export default function FeedPage() {
-  const { user } = useUser();
+  const { user } = useAuthContext();
   const [filters, setFilters] = useState<FeedFilterState>({
     typeFilter: "all",
     timeFilter: "this_week",

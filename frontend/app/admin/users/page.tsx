@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@/lib/hooks/use-auth";
+import { useAuthContext } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
+import { isManager } from "@/lib/auth-utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,7 +41,7 @@ interface UserActivityMetrics {
 }
 
 export default function AdminUsersPage() {
-  const { user, isLoaded } = useUser();
+  const { user, isLoading: authLoading } = useAuthContext();
   const router = useRouter();
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [filteredStaff, setFilteredStaff] = useState<StaffMember[]>([]);
@@ -55,21 +56,20 @@ export default function AdminUsersPage() {
     action?: "assign" | "revoke";
   }>({ open: false });
 
-  // Check authorization - support both manager and admin roles
-  const userRole = (user?.publicMetadata as { role?: string } | undefined)?.role;
-  const isManager = userRole === "manager" || userRole === "admin";
+  // Check authorization
+  const userIsManager = isManager(user);
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (authLoading) return;
 
-    if (!isManager) {
+    if (!userIsManager) {
       router.push("/403?message=Admin access required");
       return;
     }
 
     fetchUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, isManager]);
+  }, [authLoading, userIsManager]);
 
   useEffect(() => {
     if (!searchQuery) {
@@ -182,7 +182,7 @@ export default function AdminUsersPage() {
     }
   };
 
-  if (!isLoaded || loading) {
+  if (authLoading || loading) {
     return (
       <div className="p-6 space-y-6">
         <div>
@@ -193,7 +193,7 @@ export default function AdminUsersPage() {
     );
   }
 
-  if (!isManager) {
+  if (!userIsManager) {
     return null;
   }
 

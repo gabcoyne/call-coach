@@ -1,12 +1,12 @@
 /**
  * Authentication Middleware for API Routes
  *
- * Provides session verification and RBAC enforcement using Clerk.
+ * Provides session verification and RBAC enforcement using IAP headers.
  * Supports dev mode bypass with BYPASS_AUTH=true.
  */
 
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { headers } from "next/headers";
 
 /**
  * User role types
@@ -39,7 +39,39 @@ const DEV_AUTH_CONTEXT: AuthContext = {
 };
 
 /**
- * Verify Clerk session and extract user context
+ * Manager emails - users with manager role
+ * In production, this could come from a database or config
+ */
+const MANAGER_EMAILS = new Set([
+  "george@prefect.io",
+  "gcoyne@prefect.io",
+  // Add other managers here
+]);
+
+/**
+ * Determine user role based on email
+ */
+function getRoleFromEmail(email: string): UserRole {
+  if (MANAGER_EMAILS.has(email.toLowerCase())) {
+    return "manager";
+  }
+  return "rep";
+}
+
+/**
+ * Extract name from email (fallback when we don't have full name)
+ */
+function getNameFromEmail(email: string): string {
+  const localPart = email.split("@")[0];
+  // Convert "george.coyne" or "gcoyne" to "George Coyne" or "Gcoyne"
+  return localPart
+    .split(/[._]/)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+/**
+ * Get auth context from IAP headers
  *
  * @throws {Error} If user is not authenticated
  */
@@ -49,34 +81,39 @@ export async function getAuthContext(): Promise<AuthContext> {
     return DEV_AUTH_CONTEXT;
   }
 
-  const { userId } = await auth();
+  const headersList = await headers();
+
+  // IAP headers (normalized by middleware or direct from IAP)
+  let email = headersList.get("x-iap-user-email");
+  let userId = headersList.get("x-iap-user-id");
+
+  // Fallback to raw IAP headers
+  if (!email) {
+    const rawEmail = headersList.get("x-goog-authenticated-user-email");
+    if (rawEmail) {
+      email = rawEmail.replace("accounts.google.com:", "");
+    }
+  }
 
   if (!userId) {
-    throw new Error("Unauthorized: No valid session");
+    const rawUserId = headersList.get("x-goog-authenticated-user-id");
+    if (rawUserId) {
+      userId = rawUserId.replace("accounts.google.com:", "");
+    }
   }
-
-  const user = await currentUser();
-
-  if (!user) {
-    throw new Error("Unauthorized: User not found");
-  }
-
-  // Get primary email
-  const email = user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)?.emailAddress;
 
   if (!email) {
-    throw new Error("Unauthorized: No email address found");
+    throw new Error("Unauthorized: No IAP authentication");
   }
 
-  // Extract role from Clerk metadata
-  // In Clerk, you can store custom metadata in publicMetadata or privateMetadata
-  const role = (user.publicMetadata?.role as UserRole) || "rep";
+  const role = getRoleFromEmail(email);
+  const name = getNameFromEmail(email);
 
   return {
-    userId,
+    userId: userId || email,
     email,
     role,
-    name: user.fullName || user.firstName || null,
+    name,
   };
 }
 
@@ -94,7 +131,7 @@ export function canAccessRepData(context: AuthContext, repEmail: string): boolea
   if (context.role === "manager") {
     return true;
   }
-  return context.email === repEmail;
+  return context.email.toLowerCase() === repEmail.toLowerCase();
 }
 
 /**

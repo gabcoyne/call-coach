@@ -8,16 +8,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { getAuthContext } from "@/lib/auth-middleware";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authContext = await getAuthContext();
 
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
@@ -41,7 +38,10 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Error fetching rubrics:", error);
     return NextResponse.json({ error: "Failed to fetch rubrics" }, { status: 500 });
   }
@@ -49,10 +49,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authContext = await getAuthContext();
 
     const body = await request.json();
 
@@ -74,7 +71,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         ...body,
-        created_by: userId,
+        created_by: authContext.userId,
       }),
     });
 
@@ -85,7 +82,10 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Error creating rubric:", error);
     return NextResponse.json(
       {
@@ -98,10 +98,7 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authContext = await getAuthContext();
 
     const { searchParams } = new URL(request.url);
     const rubricId = searchParams.get("id");
@@ -119,7 +116,7 @@ export async function PATCH(request: NextRequest) {
       },
       body: JSON.stringify({
         ...body,
-        updated_by: userId,
+        updated_by: authContext.userId,
       }),
     });
 
@@ -130,7 +127,10 @@ export async function PATCH(request: NextRequest) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Error updating rubric:", error);
     return NextResponse.json(
       {

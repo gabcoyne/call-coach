@@ -1,269 +1,192 @@
-import {
-  getCurrentUserRole,
-  isManager,
-  isRep,
-  getCurrentUserEmail,
-  canViewRepData,
-  requireManager,
-  getUserSession,
-} from '../auth'
-import { UserRole } from '../auth-utils'
-import { auth, currentUser } from '@clerk/nextjs/server'
+import { getCurrentUserRole, getCurrentUserEmail, canViewRepData, getUserSession } from "../auth";
+import { UserRole } from "../auth-utils";
 
-// Mock Clerk
-jest.mock('@clerk/nextjs/server')
+// Mock next/headers
+const mockHeadersGet = jest.fn();
+jest.mock("next/headers", () => ({
+  headers: jest.fn(() =>
+    Promise.resolve({
+      get: mockHeadersGet,
+    })
+  ),
+}));
 
-describe('auth utilities', () => {
+describe("auth utilities", () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-  })
+    jest.clearAllMocks();
+    mockHeadersGet.mockReturnValue(null);
+  });
 
-  describe('getCurrentUserRole', () => {
-    it('should return manager role when user has manager metadata', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        publicMetadata: { role: 'manager' },
-      })
+  describe("getCurrentUserRole", () => {
+    it("should return manager role when user has manager email", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-iap-user-email") return "george@prefect.io";
+        return null;
+      });
 
-      const role = await getCurrentUserRole()
-      expect(role).toBe(UserRole.MANAGER)
-    })
+      const role = await getCurrentUserRole();
+      expect(role).toBe(UserRole.MANAGER);
+    });
 
-    it('should return rep role when user has rep metadata', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        publicMetadata: { role: 'rep' },
-      })
+    it("should return rep role for non-manager email", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-iap-user-email") return "rep@prefect.io";
+        return null;
+      });
 
-      const role = await getCurrentUserRole()
-      expect(role).toBe(UserRole.REP)
-    })
+      const role = await getCurrentUserRole();
+      expect(role).toBe(UserRole.REP);
+    });
 
-    it('should default to rep when no role is set', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        publicMetadata: {},
-      })
+    it("should return null when no email header", async () => {
+      mockHeadersGet.mockReturnValue(null);
 
-      const role = await getCurrentUserRole()
-      expect(role).toBe(UserRole.REP)
-    })
+      const role = await getCurrentUserRole();
+      expect(role).toBeNull();
+    });
 
-    it('should return null when user is not authenticated', async () => {
-      (currentUser as jest.Mock).mockResolvedValue(null)
+    it("should parse raw IAP header format", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-goog-authenticated-user-email")
+          return "accounts.google.com:george@prefect.io";
+        return null;
+      });
 
-      const role = await getCurrentUserRole()
-      expect(role).toBeNull()
-    })
-  })
+      const role = await getCurrentUserRole();
+      expect(role).toBe(UserRole.MANAGER);
+    });
+  });
 
-  describe('isManager', () => {
-    it('should return true for managers', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        publicMetadata: { role: 'manager' },
-      })
+  describe("getCurrentUserEmail", () => {
+    it("should return user email from normalized header", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-iap-user-email") return "test@example.com";
+        return null;
+      });
 
-      const result = await isManager()
-      expect(result).toBe(true)
-    })
+      const email = await getCurrentUserEmail();
+      expect(email).toBe("test@example.com");
+    });
 
-    it('should return false for reps', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        publicMetadata: { role: 'rep' },
-      })
+    it("should return user email from raw IAP header", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-goog-authenticated-user-email")
+          return "accounts.google.com:test@example.com";
+        return null;
+      });
 
-      const result = await isManager()
-      expect(result).toBe(false)
-    })
-  })
+      const email = await getCurrentUserEmail();
+      expect(email).toBe("test@example.com");
+    });
 
-  describe('isRep', () => {
-    it('should return true for reps', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        publicMetadata: { role: 'rep' },
-      })
+    it("should return null when no header present", async () => {
+      mockHeadersGet.mockReturnValue(null);
 
-      const result = await isRep()
-      expect(result).toBe(true)
-    })
+      const email = await getCurrentUserEmail();
+      expect(email).toBeNull();
+    });
+  });
 
-    it('should return false for managers', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        publicMetadata: { role: 'manager' },
-      })
+  describe("canViewRepData", () => {
+    it("should allow managers to view any rep data", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-iap-user-email") return "george@prefect.io";
+        return null;
+      });
 
-      const result = await isRep()
-      expect(result).toBe(false)
-    })
-  })
+      const canView = await canViewRepData("rep@example.com");
+      expect(canView).toBe(true);
+    });
 
-  describe('getCurrentUserEmail', () => {
-    it('should return user email', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        emailAddresses: [{ emailAddress: 'test@example.com' }],
-      })
+    it("should allow reps to view their own data", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-iap-user-email") return "rep@example.com";
+        return null;
+      });
 
-      const email = await getCurrentUserEmail()
-      expect(email).toBe('test@example.com')
-    })
+      const canView = await canViewRepData("rep@example.com");
+      expect(canView).toBe(true);
+    });
 
-    it('should return null when user is not authenticated', async () => {
-      (currentUser as jest.Mock).mockResolvedValue(null)
+    it("should allow reps to view their own data (case insensitive)", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-iap-user-email") return "Rep@Example.com";
+        return null;
+      });
 
-      const email = await getCurrentUserEmail()
-      expect(email).toBeNull()
-    })
+      const canView = await canViewRepData("rep@example.com");
+      expect(canView).toBe(true);
+    });
 
-    it('should return null when user has no email addresses', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        emailAddresses: [],
-      })
+    it("should not allow reps to view other rep data", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-iap-user-email") return "rep1@example.com";
+        return null;
+      });
 
-      const email = await getCurrentUserEmail()
-      expect(email).toBeNull()
-    })
-  })
+      const canView = await canViewRepData("rep2@example.com");
+      expect(canView).toBe(false);
+    });
 
-  describe('canViewRepData', () => {
-    it('should allow managers to view any rep data', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'manager-123',
-        emailAddresses: [{ emailAddress: 'manager@example.com' }],
-        publicMetadata: { role: 'manager' },
-      })
+    it("should return false when user is not authenticated", async () => {
+      mockHeadersGet.mockReturnValue(null);
 
-      const canView = await canViewRepData('rep@example.com')
-      expect(canView).toBe(true)
-    })
+      const canView = await canViewRepData("rep@example.com");
+      expect(canView).toBe(false);
+    });
+  });
 
-    it('should allow reps to view their own data', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'rep-123',
-        emailAddresses: [{ emailAddress: 'rep@example.com' }],
-        publicMetadata: { role: 'rep' },
-      })
+  describe("getUserSession", () => {
+    it("should return complete session information", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-iap-user-email") return "george@prefect.io";
+        if (header === "x-iap-user-id") return "user-123";
+        return null;
+      });
 
-      const canView = await canViewRepData('rep@example.com')
-      expect(canView).toBe(true)
-    })
+      const session = await getUserSession();
 
-    it('should allow reps to view their own data (case insensitive)', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'rep-123',
-        emailAddresses: [{ emailAddress: 'Rep@Example.com' }],
-        publicMetadata: { role: 'rep' },
-      })
+      expect(session.userId).toBe("user-123");
+      expect(session.email).toBe("george@prefect.io");
+      expect(session.role).toBe(UserRole.MANAGER);
+    });
 
-      const canView = await canViewRepData('rep@example.com')
-      expect(canView).toBe(true)
-    })
+    it("should parse raw IAP user ID format", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-goog-authenticated-user-email")
+          return "accounts.google.com:test@example.com";
+        if (header === "x-goog-authenticated-user-id") return "accounts.google.com:12345";
+        return null;
+      });
 
-    it('should not allow reps to view other rep data', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'rep-123',
-        emailAddresses: [{ emailAddress: 'rep1@example.com' }],
-        publicMetadata: { role: 'rep' },
-      })
+      const session = await getUserSession();
 
-      const canView = await canViewRepData('rep2@example.com')
-      expect(canView).toBe(false)
-    })
+      expect(session.userId).toBe("12345");
+      expect(session.email).toBe("test@example.com");
+    });
+  });
 
-    it('should return false when user is not authenticated', async () => {
-      (currentUser as jest.Mock).mockResolvedValue(null)
+  describe("edge cases and error handling", () => {
+    it("should handle unauthenticated requests consistently", async () => {
+      mockHeadersGet.mockReturnValue(null);
 
-      const canView = await canViewRepData('rep@example.com')
-      expect(canView).toBe(false)
-    })
-  })
+      const role = await getCurrentUserRole();
+      const email = await getCurrentUserEmail();
+      const canView = await canViewRepData("test@example.com");
 
-  describe('requireManager', () => {
-    it('should not throw for managers', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'manager-123',
-        publicMetadata: { role: 'manager' },
-      })
+      expect(role).toBeNull();
+      expect(email).toBeNull();
+      expect(canView).toBe(false);
+    });
 
-      await expect(requireManager()).resolves.not.toThrow()
-    })
+    it("should handle manager email case insensitively", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "x-iap-user-email") return "GEORGE@PREFECT.IO";
+        return null;
+      });
 
-    it('should throw for non-managers', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'rep-123',
-        publicMetadata: { role: 'rep' },
-      })
-
-      await expect(requireManager()).rejects.toThrow('Unauthorized: Manager access required')
-    })
-  })
-
-  describe('getUserSession', () => {
-    it('should return complete session information', async () => {
-      const mockAuth = {
-        userId: 'user-123',
-        sessionId: 'session-456',
-      };
-      const mockUser = {
-        id: 'user-123',
-        emailAddresses: [{ emailAddress: 'test@example.com' }],
-        publicMetadata: { role: 'manager' },
-      };
-
-      (auth as jest.Mock).mockResolvedValue(mockAuth);
-      (currentUser as jest.Mock).mockResolvedValue(mockUser)
-
-      const session = await getUserSession()
-
-      expect(session.userId).toBe('user-123')
-      expect(session.sessionId).toBe('session-456')
-      expect(session.user).toEqual(mockUser)
-      expect(session.role).toBe(UserRole.MANAGER)
-      expect(session.email).toBe('test@example.com')
-    })
-  })
-
-  describe('edge cases and error handling', () => {
-    it('should handle unauthenticated requests consistently', async () => {
-      (currentUser as jest.Mock).mockResolvedValue(null)
-
-      const role = await getCurrentUserRole()
-      const email = await getCurrentUserEmail()
-      const isManagerResult = await isManager()
-      const isRepResult = await isRep()
-      const canView = await canViewRepData('test@example.com')
-
-      expect(role).toBeNull()
-      expect(email).toBeNull()
-      expect(isManagerResult).toBe(false)
-      expect(isRepResult).toBe(false)
-      expect(canView).toBe(false)
-    })
-
-    it('should handle invalid role values gracefully', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        emailAddresses: [{ emailAddress: 'test@example.com' }],
-        publicMetadata: { role: 'invalid-role' },
-      })
-
-      const role = await getCurrentUserRole()
-      expect(role).toBe(UserRole.REP) // Should default to rep
-    })
-
-    it('should handle missing publicMetadata', async () => {
-      (currentUser as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        emailAddresses: [{ emailAddress: 'test@example.com' }],
-      })
-
-      const role = await getCurrentUserRole()
-      expect(role).toBe(UserRole.REP) // Should default to rep
-    })
-  })
-})
+      const role = await getCurrentUserRole();
+      expect(role).toBe(UserRole.MANAGER);
+    });
+  });
+});

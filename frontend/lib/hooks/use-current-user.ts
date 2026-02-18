@@ -1,35 +1,34 @@
-'use client';
+"use client";
 
-import useSWR from 'swr';
-import { useAuth, useUser } from '@clerk/nextjs';
+import useSWR from "swr";
+import { useAuthContext } from "@/lib/auth-context";
 
-const MCP_BACKEND_URL = process.env.NEXT_PUBLIC_MCP_BACKEND_URL || 'http://localhost:8000';
+const MCP_BACKEND_URL = process.env.NEXT_PUBLIC_MCP_BACKEND_URL || "http://localhost:8000";
 
 export interface CurrentUser {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'manager' | 'rep';
+  role: "admin" | "manager" | "rep";
 }
 
 export function useCurrentUser() {
-  const { getToken, userId } = useAuth();
-  const { user } = useUser();
+  const { user, isLoading: authLoading } = useAuthContext();
 
-  // Get email from Clerk user for the X-User-Email header
-  const email = user?.emailAddresses[0]?.emailAddress;
+  // Get email from IAP auth context
+  const email = user?.email;
 
   return useSWR<CurrentUser>(
-    userId && email ? ['currentUser', userId] : null,
+    !authLoading && email ? ["currentUser", email] : null,
     async () => {
       const res = await fetch(`${MCP_BACKEND_URL}/api/v1/users/me`, {
         headers: {
-          'X-User-Email': email!,  // Use Clerk email for backend auth
-        }
+          "X-User-Email": email!, // Use IAP email for backend auth
+        },
       });
 
       if (!res.ok) {
-        throw new Error('Failed to fetch current user');
+        throw new Error("Failed to fetch current user");
       }
 
       return res.json();

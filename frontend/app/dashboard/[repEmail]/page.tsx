@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useState, useEffect } from "react";
-import { useUser } from "@/lib/hooks/use-auth";
+import { useAuthContext } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useRepInsights } from "@/lib/hooks";
 import { useCurrentUser } from "@/lib/hooks/use-current-user";
@@ -63,7 +63,7 @@ const MOCK_TEAM_AVERAGES: Record<string, number> = {
 };
 
 export default function RepDashboardPage({ params }: DashboardPageProps) {
-  const { user, isLoaded } = useUser();
+  const { isLoading: authLoading } = useAuthContext();
   const router = useRouter();
   const [timeRange, setTimeRange] = useState<TimeRange>("last_30_days");
 
@@ -86,7 +86,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
 
   // Handle authorization redirects
   useEffect(() => {
-    if (!isLoaded || isLoadingUser) return;
+    if (authLoading || isLoadingUser) return;
 
     if (!currentUser) {
       router.push("/sign-in");
@@ -99,7 +99,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
         router.push(`/dashboard/${encodeURIComponent(currentUser.email)}`);
       }
     }
-  }, [isLoaded, isLoadingUser, canViewData, currentUser, repEmail, router]);
+  }, [authLoading, isLoadingUser, canViewData, currentUser, repEmail, router]);
 
   // Calculate average dimension scores
   const calculateAverageDimensionScores = () => {
@@ -277,7 +277,7 @@ export default function RepDashboardPage({ params }: DashboardPageProps) {
     ];
   };
 
-  if (!isLoaded || isLoadingUser) {
+  if (authLoading || isLoadingUser) {
     return (
       <div className="container mx-auto p-6 space-y-6">
         <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse" />

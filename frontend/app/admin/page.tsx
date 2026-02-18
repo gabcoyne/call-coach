@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@/lib/hooks/use-auth";
+import { useAuthContext } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
+import { isManager } from "@/lib/auth-utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,7 +53,7 @@ interface ActivityItem {
 const COLORS = ["#f472b6", "#fb923c", "#facc15", "#86efac", "#60a5fa"];
 
 export default function AdminDashboardPage() {
-  const { user, isLoaded } = useUser();
+  const { user, isLoading: authLoading } = useAuthContext();
   const router = useRouter();
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
   const [usage, setUsage] = useState<UsageStats | null>(null);
@@ -61,21 +62,20 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Check authorization - support both manager and admin roles
-  const userRole = (user?.publicMetadata as { role?: string } | undefined)?.role;
-  const isManager = userRole === "manager" || userRole === "admin";
+  // Check authorization
+  const userIsManager = isManager(user);
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (authLoading) return;
 
-    if (!isManager) {
+    if (!userIsManager) {
       router.push("/403?message=Admin access required");
       return;
     }
 
     fetchDashboardData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, isManager]);
+  }, [authLoading, userIsManager]);
 
   const fetchDashboardData = async () => {
     try {
@@ -105,7 +105,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  if (!isLoaded || loading) {
+  if (authLoading || loading) {
     return (
       <div className="p-6 space-y-6">
         <div>
@@ -128,7 +128,7 @@ export default function AdminDashboardPage() {
     );
   }
 
-  if (!isManager) {
+  if (!userIsManager) {
     return null;
   }
 

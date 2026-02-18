@@ -1,13 +1,13 @@
 "use client";
 
-import { useAuth } from "@/lib/hooks/use-auth";
+import { useAuthContext } from "@/lib/auth-context";
 import { SettingsNav } from "@/components/settings/settings-nav";
 import { Card } from "@/components/ui/card";
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoading, isAuthenticated } = useAuthContext();
 
-  if (!isLoaded) {
+  if (isLoading) {
     return (
       <div className="p-6">
         <div className="h-64 flex items-center justify-center">
@@ -17,7 +17,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
     );
   }
 
-  if (!isSignedIn) {
+  if (!isAuthenticated) {
     return (
       <div className="p-6">
         <Card className="p-6">

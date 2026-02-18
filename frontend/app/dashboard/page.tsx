@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@/lib/hooks/use-auth";
+import { useAuthContext } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
+import { isManager as checkIsManager } from "@/lib/auth-utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScoreCard } from "@/components/coaching/ScoreCard";
@@ -17,23 +18,27 @@ import { ArrowRight, User, Calendar } from "lucide-react";
  * For reps: Redirects to their individual dashboard
  */
 export default function DashboardPage() {
-  const { user, isLoaded } = useUser();
+  const { user, isLoading: authLoading } = useAuthContext();
   const router = useRouter();
 
-  const isManager = user?.publicMetadata?.role === "manager";
-  const currentUserEmail = user?.emailAddresses[0]?.emailAddress;
+  const isManager = checkIsManager(user);
+  const currentUserEmail = user?.email;
 
   // For non-managers, redirect to their own dashboard
   useEffect(() => {
-    if (isLoaded && !isManager && currentUserEmail) {
+    if (!authLoading && !isManager && currentUserEmail) {
       router.push(`/dashboard/${encodeURIComponent(currentUserEmail)}`);
     }
-  }, [isLoaded, isManager, currentUserEmail, router]);
+  }, [authLoading, isManager, currentUserEmail, router]);
 
   // Fetch all calls to aggregate rep data (for manager view)
-  const { data: calls, isLoading, error } = useSearchCalls(isManager ? { limit: 100 } : null);
+  const {
+    data: calls,
+    isLoading: searchLoading,
+    error,
+  } = useSearchCalls(isManager ? { limit: 100 } : null);
 
-  if (!isLoaded || isLoading) {
+  if (authLoading || searchLoading) {
     return (
       <div className="p-6 space-y-6">
         <div>

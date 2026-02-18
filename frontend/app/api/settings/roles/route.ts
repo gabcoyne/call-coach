@@ -3,10 +3,10 @@
  *
  * GET /api/settings/roles - List all Prefect staff with their assigned roles
  *
- * Authorization: Requires manager role (Clerk publicMetadata.role === 'manager')
+ * Authorization: Requires manager role
  */
 import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { getAuthContext } from "@/lib/auth-middleware";
 import * as db from "@/lib/db";
 
 /**
@@ -20,17 +20,10 @@ import * as db from "@/lib/db";
  */
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
-    }
+    // Check authentication and authorization
+    const authContext = await getAuthContext();
 
-    // Check manager authorization
-    const user = await currentUser();
-    const userRole = user?.publicMetadata?.role;
-
-    if (userRole !== "manager") {
+    if (authContext.role !== "manager") {
       return NextResponse.json({ error: "Forbidden - manager access required" }, { status: 403 });
     }
 
@@ -70,6 +63,10 @@ export async function GET(request: NextRequest) {
       with_roles: roleAssignments.length,
     });
   } catch (error: any) {
+    // If auth fails, return 401
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized - please sign in" }, { status: 401 });
+    }
     console.error("Failed to list staff roles:", error);
     return NextResponse.json(
       { error: "Failed to retrieve staff roles", details: error.message },

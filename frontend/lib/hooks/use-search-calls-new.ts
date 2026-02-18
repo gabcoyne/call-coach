@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import useSWR from 'swr';
-import { useAuth } from '@clerk/nextjs';
-import { debounce } from 'lodash';
-import { mcpClient, SearchCallsResponse } from '@/lib/mcp-client';
+import { useState, useEffect, useCallback } from "react";
+import useSWR from "swr";
+import { useAuthContext } from "@/lib/auth-context";
+import { debounce } from "lodash";
+import { mcpClient, SearchCallsResponse } from "@/lib/mcp-client";
 
 export interface SearchFilters {
   rep_email?: string;
@@ -25,7 +25,7 @@ export interface SearchFilters {
  *
  * Searches for calls with filters using SWR.
  * Automatically debounces keyword search input with 300ms delay.
- * Requires authentication via Clerk.
+ * Requires authentication via IAP.
  *
  * @param filters - Search filters
  * @returns SWR response with search results, loading, and error states
@@ -38,7 +38,7 @@ export interface SearchFilters {
  * const { data, error, isLoading } = useSearchCalls(filters);
  */
 export function useSearchCalls(filters: SearchFilters | null) {
-  const { getToken, userId } = useAuth();
+  const { user, isLoading: authLoading } = useAuthContext();
   const [debouncedKeyword, setDebouncedKeyword] = useState(filters?.keyword);
 
   // Debounce keyword changes with 300ms delay
@@ -55,32 +55,26 @@ export function useSearchCalls(filters: SearchFilters | null) {
   }, [filters?.keyword, updateKeyword]);
 
   // Create SWR key with debounced keyword
-  const filtersWithDebouncedKeyword = filters
-    ? { ...filters, keyword: debouncedKeyword }
-    : null;
+  const filtersWithDebouncedKeyword = filters ? { ...filters, keyword: debouncedKeyword } : null;
 
-  const swrKey = filtersWithDebouncedKeyword
-    ? ['search-calls', JSON.stringify(filtersWithDebouncedKeyword)]
-    : null;
+  const swrKey =
+    filtersWithDebouncedKeyword && !authLoading && user
+      ? ["search-calls", JSON.stringify(filtersWithDebouncedKeyword)]
+      : null;
 
   return useSWR<SearchCallsResponse>(
     swrKey,
     async () => {
       if (!filtersWithDebouncedKeyword) {
-        throw new Error('Search filters are required');
+        throw new Error("Search filters are required");
       }
 
-      if (!userId) {
-        throw new Error('Authentication required');
+      if (!user) {
+        throw new Error("Authentication required");
       }
 
-      // Get Clerk auth token
-      const token = await getToken();
-
-      return mcpClient.searchCalls(
-        filtersWithDebouncedKeyword,
-        token || undefined
-      );
+      // IAP doesn't use tokens - auth is handled by headers
+      return mcpClient.searchCalls(filtersWithDebouncedKeyword);
     },
     {
       // Revalidate every 5 minutes

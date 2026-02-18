@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@/lib/hooks/use-auth";
+import { useAuthContext } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
+import { isManager } from "@/lib/auth-utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -86,27 +87,26 @@ function getStatusColor(status: "healthy" | "warning" | "critical") {
 }
 
 export default function AdminSystemPage() {
-  const { user, isLoaded } = useUser();
+  const { user, isLoading: authLoading } = useAuthContext();
   const router = useRouter();
   const [data, setData] = useState<SystemData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Check authorization - support both manager and admin roles
-  const userRole = (user?.publicMetadata as { role?: string } | undefined)?.role;
-  const isManager = userRole === "manager" || userRole === "admin";
+  // Check authorization
+  const userIsManager = isManager(user);
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (authLoading) return;
 
-    if (!isManager) {
+    if (!userIsManager) {
       router.push("/403?message=Admin access required");
       return;
     }
 
     fetchSystemData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, isManager]);
+  }, [authLoading, userIsManager]);
 
   const fetchSystemData = async () => {
     try {
@@ -132,7 +132,7 @@ export default function AdminSystemPage() {
     }
   };
 
-  if (!isLoaded || loading) {
+  if (authLoading || loading) {
     return (
       <div className="p-6 space-y-6">
         <div>
@@ -143,7 +143,7 @@ export default function AdminSystemPage() {
     );
   }
 
-  if (!isManager) {
+  if (!userIsManager) {
     return null;
   }
 

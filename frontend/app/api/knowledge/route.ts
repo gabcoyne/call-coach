@@ -8,16 +8,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { getAuthContext } from "@/lib/auth-middleware";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authContext = await getAuthContext();
 
     // Get query parameters
     const { searchParams } = new URL(request.url);
@@ -41,7 +38,10 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Error fetching knowledge entries:", error);
     return NextResponse.json({ error: "Failed to fetch knowledge entries" }, { status: 500 });
   }
@@ -49,10 +49,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authContext = await getAuthContext();
 
     const body = await request.json();
 
@@ -67,7 +64,7 @@ export async function POST(request: NextRequest) {
     // Add user metadata
     body.metadata = {
       ...body.metadata,
-      updated_by: userId,
+      updated_by: authContext.userId,
       updated_at: new Date().toISOString(),
     };
 
@@ -86,7 +83,10 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Error creating/updating knowledge entry:", error);
     return NextResponse.json(
       {
@@ -99,10 +99,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    await getAuthContext();
 
     const { searchParams } = new URL(request.url);
     const product = searchParams.get("product");
@@ -127,7 +124,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message?.includes("authenticated") || error.message?.includes("Unauthorized")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Error deleting knowledge entry:", error);
     return NextResponse.json({ error: "Failed to delete knowledge entry" }, { status: 500 });
   }

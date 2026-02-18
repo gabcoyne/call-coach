@@ -4,24 +4,23 @@
  * Manager-only page for assigning coaching roles (AE, SE, CSM) to Prefect staff.
  * Displays all staff members with their current role assignments and allows bulk updates.
  *
- * Authorization: Requires manager role (Clerk publicMetadata.role === 'manager')
+ * Authorization: Requires manager role
  */
 import { Suspense } from "react";
-import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { getAuthContext } from "@/lib/auth-middleware";
 import { RoleAssignmentTable } from "@/components/RoleAssignmentTable";
 
 export default async function RoleAssignmentPage() {
-  const user = await currentUser();
-
-  // Check authentication
-  if (!user) {
-    redirect("/sign-in");
+  let authContext;
+  try {
+    authContext = await getAuthContext();
+  } catch {
+    redirect("/403");
   }
 
   // Check manager authorization
-  const userRole = user.publicMetadata?.role;
-  if (userRole !== "manager") {
+  if (authContext.role !== "manager") {
     redirect("/403");
   }
 

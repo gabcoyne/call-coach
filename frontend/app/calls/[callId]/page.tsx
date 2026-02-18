@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
+import { getAuthContext } from "@/lib/auth-middleware";
 import { CallAnalysisViewer } from "./CallAnalysisViewer";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
@@ -11,13 +11,15 @@ interface PageProps {
 
 export default async function CallDetailPage({ params }: PageProps) {
   const { callId } = await params;
-  const user = await currentUser();
 
-  if (!user) {
+  let authContext;
+  try {
+    authContext = await getAuthContext();
+  } catch {
     notFound();
   }
 
-  const userRole = (user.publicMetadata?.role as string) || "rep";
+  const userRole = authContext.role || "rep";
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
