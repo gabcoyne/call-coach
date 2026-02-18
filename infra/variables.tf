@@ -114,5 +114,5 @@ variable "alert_email" {
 variable "load_balancer_domain" {
   description = "Domain name for the load balancer SSL certificate"
   type        = string
-  default     = "call-coach.prefect.io"
+  default     = "coach.coyne.sh"
 }

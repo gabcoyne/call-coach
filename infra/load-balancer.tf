@@ -111,7 +111,7 @@ resource "google_compute_url_map" "call_coach" {
 # =============================================================================
 
 resource "google_compute_managed_ssl_certificate" "call_coach" {
-  name    = "call-coach-ssl-cert"
+  name    = "call-coach-ssl-cert-v2"
   project = var.project_id
 
   managed {
