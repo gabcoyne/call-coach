@@ -5,8 +5,13 @@ Syncs calls, transcripts, and speakers from BigQuery gongio_ft tables to Postgre
 Uses incremental loading based on _fivetran_synced timestamp.
 """
 
+from datetime import UTC, datetime
+
 import dlt
 from google.cloud import bigquery
+
+# Default timestamp for initial full sync (epoch)
+DEFAULT_INITIAL_TIMESTAMP = datetime(1970, 1, 1, tzinfo=UTC)
 
 
 @dlt.source(name="gong_calls")
@@ -36,7 +41,14 @@ def gong_calls_source(
     primary_key="gong_call_id",
     merge_key="gong_call_id",
 )
-def calls_resource(project_id: str, dataset: str):
+def calls_resource(
+    project_id: str,
+    dataset: str,
+    last_synced: dlt.sources.incremental[datetime] = dlt.sources.incremental(
+        "_fivetran_synced",
+        initial_value=DEFAULT_INITIAL_TIMESTAMP,
+    ),
+):
     """
     Extract calls from BigQuery gongio_ft.call table.
 
@@ -45,13 +57,6 @@ def calls_resource(project_id: str, dataset: str):
     """
     # Get BigQuery client (uses ADC or GOOGLE_APPLICATION_CREDENTIALS)
     client = bigquery.Client(project=project_id)
-
-    # Incremental cursor on _fivetran_synced
-    # DLT tracks last synced value automatically
-    last_synced = dlt.sources.incremental(
-        "_fivetran_synced",
-        initial_value="1970-01-01T00:00:00Z",
-    )
 
     query = f"""
     SELECT
@@ -92,7 +97,14 @@ def calls_resource(project_id: str, dataset: str):
     write_disposition="merge",
     primary_key="id",
 )
-def transcripts_resource(project_id: str, dataset: str):
+def transcripts_resource(
+    project_id: str,
+    dataset: str,
+    last_synced: dlt.sources.incremental[datetime] = dlt.sources.incremental(
+        "_fivetran_synced",
+        initial_value=DEFAULT_INITIAL_TIMESTAMP,
+    ),
+):
     """
     Extract transcripts from BigQuery gongio_ft.transcript table.
 
@@ -100,11 +112,6 @@ def transcripts_resource(project_id: str, dataset: str):
     Maps BigQuery schema to Postgres transcripts table.
     """
     client = bigquery.Client(project=project_id)
-
-    last_synced = dlt.sources.incremental(
-        "_fivetran_synced",
-        initial_value="1970-01-01T00:00:00Z",
-    )
 
     query = f"""
     SELECT
@@ -140,7 +147,14 @@ def transcripts_resource(project_id: str, dataset: str):
     write_disposition="merge",
     primary_key="id",
 )
-def speakers_resource(project_id: str, dataset: str):
+def speakers_resource(
+    project_id: str,
+    dataset: str,
+    last_synced: dlt.sources.incremental[datetime] = dlt.sources.incremental(
+        "_fivetran_synced",
+        initial_value=DEFAULT_INITIAL_TIMESTAMP,
+    ),
+):
     """
     Extract speakers from BigQuery gongio_ft.call_speaker table.
 
@@ -148,11 +162,6 @@ def speakers_resource(project_id: str, dataset: str):
     Incremental loading based on _fivetran_synced timestamp.
     """
     client = bigquery.Client(project=project_id)
-
-    last_synced = dlt.sources.incremental(
-        "_fivetran_synced",
-        initial_value="1970-01-01T00:00:00Z",
-    )
 
     query = f"""
     SELECT

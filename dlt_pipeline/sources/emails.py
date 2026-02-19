@@ -6,8 +6,13 @@ Includes sender/recipient aggregation and opportunity linkage.
 Uses incremental loading based on _fivetran_synced timestamp.
 """
 
+from datetime import UTC, datetime
+
 import dlt
 from google.cloud import bigquery
+
+# Default timestamp for initial full sync (epoch)
+DEFAULT_INITIAL_TIMESTAMP = datetime(1970, 1, 1, tzinfo=UTC)
 
 
 @dlt.source(name="gong_emails")
@@ -30,7 +35,14 @@ def gong_emails_source(
     primary_key="gong_email_id",
     merge_key="gong_email_id",
 )
-def emails_resource(project_id: str, dataset: str):
+def emails_resource(
+    project_id: str,
+    dataset: str,
+    last_synced: dlt.sources.incremental[datetime] = dlt.sources.incremental(
+        "_fivetran_synced",
+        initial_value=DEFAULT_INITIAL_TIMESTAMP,
+    ),
+):
     """
     Extract emails from BigQuery gongio_ft.email table.
 
@@ -40,12 +52,6 @@ def emails_resource(project_id: str, dataset: str):
     Incremental loading based on _fivetran_synced timestamp.
     """
     client = bigquery.Client(project=project_id)
-
-    # Incremental cursor on _fivetran_synced
-    last_synced = dlt.sources.incremental(
-        "_fivetran_synced",
-        initial_value="1970-01-01T00:00:00Z",
-    )
 
     query = f"""
     WITH email_data AS (

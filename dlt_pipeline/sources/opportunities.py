@@ -6,8 +6,13 @@ Includes account resolution, owner mapping, and call-opportunity linkage.
 Uses incremental loading based on LastModifiedDate or _fivetran_synced.
 """
 
+from datetime import UTC, datetime
+
 import dlt
 from google.cloud import bigquery
+
+# Default timestamp for initial full sync (epoch)
+DEFAULT_INITIAL_TIMESTAMP = datetime(1970, 1, 1, tzinfo=UTC)
 
 
 @dlt.source(name="gong_opportunities")
@@ -35,7 +40,15 @@ def gong_opportunities_source(
     primary_key="gong_opportunity_id",
     merge_key="gong_opportunity_id",
 )
-def opportunities_resource(project_id: str, salesforce_dataset: str, gong_dataset: str):
+def opportunities_resource(
+    project_id: str,
+    salesforce_dataset: str,
+    gong_dataset: str,
+    last_modified: dlt.sources.incremental[datetime] = dlt.sources.incremental(
+        "last_modified_date",
+        initial_value=DEFAULT_INITIAL_TIMESTAMP,
+    ),
+):
     """
     Extract opportunities from BigQuery Salesforce tables.
 
@@ -44,12 +57,6 @@ def opportunities_resource(project_id: str, salesforce_dataset: str, gong_datase
     Incremental loading based on LastModifiedDate.
     """
     client = bigquery.Client(project=project_id)
-
-    # Incremental cursor on LastModifiedDate
-    last_modified = dlt.sources.incremental(
-        "last_modified_date",
-        initial_value="1970-01-01T00:00:00Z",
-    )
 
     # Try Salesforce first, fall back to Gong
     query = f"""
@@ -130,7 +137,14 @@ def opportunities_resource(project_id: str, salesforce_dataset: str, gong_datase
     write_disposition="merge",
     primary_key=["call_id", "opportunity_id"],
 )
-def call_opportunities_resource(project_id: str, gong_dataset: str):
+def call_opportunities_resource(
+    project_id: str,
+    gong_dataset: str,
+    last_synced: dlt.sources.incremental[datetime] = dlt.sources.incremental(
+        "_fivetran_synced",
+        initial_value=DEFAULT_INITIAL_TIMESTAMP,
+    ),
+):
     """
     Extract call-opportunity linkages from Gong metadata.
 
@@ -138,12 +152,6 @@ def call_opportunities_resource(project_id: str, gong_dataset: str):
     Incremental loading based on _fivetran_synced on calls.
     """
     client = bigquery.Client(project=project_id)
-
-    # Incremental cursor on call's _fivetran_synced
-    last_synced = dlt.sources.incremental(
-        "_fivetran_synced",
-        initial_value="1970-01-01T00:00:00Z",
-    )
 
     query = f"""
     SELECT DISTINCT

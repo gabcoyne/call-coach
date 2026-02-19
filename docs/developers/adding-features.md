@@ -555,7 +555,7 @@ pytest tests/test_analysis.py -v
 # Manual test
 curl -X POST http://localhost:8001/coaching/analyze-call \
   -H "Content-Type: application/json" \
-  -d '{"gong_call_id": "..."}'
+  -d '{"call_id": "..."}'
 
 # Should include customer_success in response
 ```

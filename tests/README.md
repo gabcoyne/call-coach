@@ -130,7 +130,7 @@ Test with FastAPI test client:
 pytest tests/api/test_rest_api.py::TestAnalyzeCallEndpoint -v
 ```
 
-### End-to-End Tests
+### End-to-End Test Coverage
 
 E2E tests require a running instance of the application.
 
@@ -232,7 +232,7 @@ Skip slow tests:
 pytest tests/ -v -m "not slow"
 ```
 
-### End-to-End Tests
+### E2E Tests (End-to-End)
 
 Test complete user flows through the application UI.
 
@@ -252,7 +252,7 @@ pytest e2e/ -v -m e2e
 
 ### Shared Fixtures (conftest.py)
 
-**sample_gong_call**: Sample call metadata
+**sample_call**: Sample call metadata
 
 ```python
 {
@@ -265,8 +265,6 @@ pytest e2e/ -v -m e2e
 ```
 
 **sample_transcript**: Sample transcript content
-
-**sample_webhook_payload**: Sample Gong webhook event
 
 ### E2E Fixtures (e2e/conftest.py)
 

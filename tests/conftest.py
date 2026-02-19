@@ -20,8 +20,8 @@ if str(tests_dir) in sys.path:
 
 
 @pytest.fixture
-def sample_gong_call():
-    """Sample Gong call metadata."""
+def sample_call():
+    """Sample call metadata."""
     return {
         "id": "1234567890",
         "title": "Prefect Discovery Call - Acme Corp",
@@ -87,19 +87,3 @@ def sample_transcript():
 def fixtures_dir():
     """Path to test fixtures directory."""
     return Path(__file__).parent / "fixtures"
-
-
-@pytest.fixture
-def sample_webhook_payload():
-    """Sample Gong webhook payload."""
-    return {
-        "event": "call.completed",
-        "resource_type": "call",
-        "resource_id": "1234567890",
-        "call_id": "1234567890",
-        "timestamp": "2025-01-15T14:30:00Z",
-        "data": {
-            "status": "completed",
-            "processing_status": "ready",
-        },
-    }

@@ -363,25 +363,6 @@ def mock_search_results():
     ]
 
 
-# Event/Webhook Fixtures
-
-
-@pytest.fixture
-def mock_gong_webhook():
-    """Mock Gong webhook payload."""
-    return {
-        "event": "call.completed",
-        "resource_type": "call",
-        "resource_id": "call-123",
-        "timestamp": datetime.now().isoformat() + "Z",
-        "data": {
-            "status": "completed",
-            "processing_status": "ready",
-            "call_duration": 3600,
-        },
-    }
-
-
 # Async Fixtures
 
 

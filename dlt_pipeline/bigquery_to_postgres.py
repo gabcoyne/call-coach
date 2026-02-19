@@ -152,10 +152,18 @@ def create_pipeline() -> dlt.Pipeline:
     Returns:
         Configured DLT pipeline instance for gong_to_postgres.
     """
-    # Get DATABASE_URL from environment
-    database_url = os.environ.get("DATABASE_URL")
+    # Get DATABASE_URL from environment (prefer direct URL over pooler)
+    database_url = os.environ.get("DATABASE_URL_DIRECT") or os.environ.get("DATABASE_URL")
     if not database_url:
         raise ValueError("DATABASE_URL environment variable is required")
+
+    # Convert Neon pooler URL to direct URL by removing '-pooler' from hostname
+    # Pooler URLs: ep-xxx-pooler.region.aws.neon.tech
+    # Direct URLs: ep-xxx.region.aws.neon.tech
+    # DLT requires direct connection because it uses search_path in connection options
+    if "-pooler" in database_url:
+        database_url = database_url.replace("-pooler", "")
+        logger.info("Converted pooler URL to direct URL for DLT compatibility")
 
     # Initialize pipeline with postgres destination
     pipeline = dlt.pipeline(

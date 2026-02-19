@@ -32,6 +32,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 COPY flows/ flows/
 COPY dlt_pipeline/ dlt_pipeline/
 COPY db/ db/
+COPY coaching_mcp/__init__.py coaching_mcp/
+COPY coaching_mcp/shared/ coaching_mcp/shared/
 
 # =============================================================================
 # Runtime stage: Minimal image for production
@@ -55,6 +57,7 @@ COPY --from=builder /app/.venv /app/.venv
 COPY --from=builder /app/flows /app/flows
 COPY --from=builder /app/dlt_pipeline /app/dlt_pipeline
 COPY --from=builder /app/db /app/db
+COPY --from=builder /app/coaching_mcp /app/coaching_mcp
 
 # Create DLT state directory
 RUN mkdir -p /app/.dlt && chown -R appuser:appuser /app

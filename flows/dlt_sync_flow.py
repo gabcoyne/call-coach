@@ -13,6 +13,7 @@ Schedule via cron (hourly):
 
 import json
 import logging
+import os
 from datetime import UTC, datetime
 from typing import Any
 
@@ -23,6 +24,27 @@ from dlt_pipeline.sources.emails import gong_emails_source
 from dlt_pipeline.sources.opportunities import gong_opportunities_source
 
 logger = logging.getLogger(__name__)
+
+
+def _get_postgres_destination():
+    """Get postgres destination with credentials from DATABASE_URL.
+
+    For Neon Postgres, DLT requires a direct (unpooled) connection because it
+    uses search_path in connection options, which is not supported by the pooler.
+    This function automatically converts pooler URLs to direct URLs.
+    """
+    database_url = os.environ.get("DATABASE_URL_DIRECT") or os.environ.get("DATABASE_URL")
+    if not database_url:
+        raise ValueError("DATABASE_URL environment variable is required")
+
+    # Convert Neon pooler URL to direct URL by removing '-pooler' from hostname
+    # Pooler URLs: ep-xxx-pooler.region.aws.neon.tech
+    # Direct URLs: ep-xxx.region.aws.neon.tech
+    if "-pooler" in database_url:
+        database_url = database_url.replace("-pooler", "")
+        logger.info("Converted pooler URL to direct URL for DLT compatibility")
+
+    return dlt.destinations.postgres(credentials=database_url)
 
 
 def sync_calls() -> dict[str, Any]:
@@ -40,7 +62,7 @@ def sync_calls() -> dict[str, Any]:
     try:
         pipeline = dlt.pipeline(
             pipeline_name="gong_calls_sync",
-            destination="postgres",
+            destination=_get_postgres_destination(),
             dataset_name="public",
         )
 
@@ -93,7 +115,7 @@ def sync_emails() -> dict[str, Any]:
     try:
         pipeline = dlt.pipeline(
             pipeline_name="gong_emails_sync",
-            destination="postgres",
+            destination=_get_postgres_destination(),
             dataset_name="public",
         )
 
@@ -145,7 +167,7 @@ def sync_opportunities() -> dict[str, Any]:
     try:
         pipeline = dlt.pipeline(
             pipeline_name="gong_opportunities_sync",
-            destination="postgres",
+            destination=_get_postgres_destination(),
             dataset_name="public",
         )
 

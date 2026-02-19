@@ -68,7 +68,7 @@ npm run test -- SearchPage.test.tsx
 
 ## Test Structure
 
-### Python Tests
+### Python Test Structure
 
 ```
 tests/
@@ -76,13 +76,14 @@ tests/
 ├── test_chunking.py         # Transcript chunking tests
 ├── test_analysis.py         # Analysis engine tests
 ├── test_cache.py            # Caching logic tests
-├── test_gong_client.py      # Gong API integration tests
 ├── test_database.py         # Database operations tests
+├── dlt_tests/               # DLT pipeline tests
+│   └── test_bigquery_to_postgres.py
 └── fixtures/
     └── sample_transcript.json  # Test data
 ```
 
-### Frontend Tests
+### Frontend Test Structure
 
 ```
 frontend/
@@ -290,21 +291,18 @@ def sample_call():
     )
 
 @pytest.fixture
-def mock_gong_client():
-    """Mock Gong API client"""
-    with patch("gong.client.GongClient") as mock:
-        client = Mock()
-        client.get_call.return_value = {
-            "id": "1464927526043145564",
-            "title": "Test Call",
-        }
-        mock.return_value.__enter__.return_value = client
+def mock_db_connection():
+    """Mock database connection"""
+    with patch("db.connection.get_db_connection") as mock:
+        conn = Mock()
+        conn.cursor.return_value.__enter__.return_value = Mock()
+        mock.return_value.__enter__.return_value = conn
         yield mock
 
-def test_with_fixtures(sample_call, mock_gong_client):
+def test_with_fixtures(sample_call, mock_db_connection):
     """Test using fixtures"""
     assert sample_call.title == "Test Call"
-    assert mock_gong_client.called
+    assert mock_db_connection.called
 ```
 
 ### Frontend Mocks
